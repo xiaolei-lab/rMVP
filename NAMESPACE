@@ -1,0 +1,2 @@
+exportPattern("^[[:alpha:]]+")
+import(parallel, bigmemory, bigpca, MASS, rfunctions, snpStats)
