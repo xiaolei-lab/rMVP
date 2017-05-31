@@ -423,7 +423,7 @@
 		}
 		tmpf <- fifo(tempfile(), open="w+b", blocking=TRUE)
 		print.f <- function(i){writeBin(1, tmpf)}
-		MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=FALSE)
+		MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=TRUE)
 		results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
 		Sys.sleep(1); close(tmpf); cat("\n");
 		if(R.ver == 'Linux') {
