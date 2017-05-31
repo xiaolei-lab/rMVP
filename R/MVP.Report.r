@@ -1120,7 +1120,7 @@ dpi=300
 
 MVP.Bar <- 
 function(
-	i, n, type=c("type1", "type2", "type3"), symbol="-", tmp.file=NULL, symbol.head="|", symbol.tail=">" ,fixed.points=TRUE, points=seq(0,100,5), symbol.len=50
+	i, n, type=c("type1", "type2", "type3"), symbol="-", tmp.file=NULL, symbol.head="|", symbol.tail=">" ,fixed.points=TRUE, points=seq(0,100,5), symbol.len=70
 )
 {
 #--------------------------------------------------------------------------------------------------------#
