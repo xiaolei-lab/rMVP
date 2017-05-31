@@ -421,11 +421,12 @@
 			math.cpu <- try(getMKLthreads(), silent=TRUE)
 			try(setMKLthreads(1), silent=TRUE)
 		}
-		tmpf <- fifo(tempfile(), open="w+b", blocking=TRUE)
-		print.f <- function(i){writeBin(1, tmpf)}
-		MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=TRUE)
+		tmpf.name <- tempfile()
+		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+		writeBin(0, tmpf)
+		print.f <- function(i){MRBLUP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
 		results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
-		Sys.sleep(1); close(tmpf); cat("\n");
+		close(tmpf); unlink(tmpf.name); cat('\n');
 		if(R.ver == 'Linux') {
 			try(setMKLthreads(math.cpu), silent=TRUE)
 		}
