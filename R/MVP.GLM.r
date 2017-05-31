@@ -106,7 +106,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
 		tmpf.name <- tempfile()
 		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
 		writeBin(0, tmpf)
-		print.f <- function(i){MRBLUP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
+		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
                 R.ver <- Sys.info()[['sysname']]
                 if(R.ver == 'Linux') {
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
