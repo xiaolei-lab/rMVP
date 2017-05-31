@@ -96,7 +96,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
         results <- lapply(1:m, eff.glm)
     }else{
             if(wind){
-				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
+				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
                 cl <- makeCluster(getOption("cl.cores", cpu))
                 clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
                 Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
@@ -105,7 +105,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
             }else{
 				tmpf <- fifo(tempfile(), open="w+b", blocking=TRUE)
 				print.f <- function(i){writeBin(1, tmpf)}
-				MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=FALSE)
+				MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=TRUE)
                 R.ver <- Sys.info()[['sysname']]
                 if(R.ver == 'Linux') {
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
