@@ -124,8 +124,8 @@ nf <- ncol(X0) + 1
     
     #Paralleled MLM
 	if(cpu == 1){
-		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
-        results <- lapply(1:m, eff.mlm)
+		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        results <- lapply(1:m, eff.mlm.parallel)
     }else{
         if(wind){
 			print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
