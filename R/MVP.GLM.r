@@ -96,23 +96,24 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
         results <- lapply(1:m, eff.glm)
     }else{
             if(wind){
-				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
                 cl <- makeCluster(getOption("cl.cores", cpu))
                 clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
                 Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
                 results <- parallel::parLapply(cl, 1:m, eff.glm)
                 stopCluster(cl)
             }else{
-				tmpf <- fifo(tempfile(), open="w+b", blocking=TRUE)
-				print.f <- function(i){writeBin(1, tmpf)}
-				MVP.Bar(n=m, type="type2", type2.f=tmpf, fixed.points=TRUE)
+		tmpf.name <- tempfile()
+		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+		writeBin(0, tmpf)
+		print.f <- function(i){MRBLUP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
                 R.ver <- Sys.info()[['sysname']]
                 if(R.ver == 'Linux') {
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
                     try(setMKLthreads(1), silent=TRUE)
                 }
                 results <- parallel::mclapply(1:m, eff.glm, mc.cores=cpu)
-				Sys.sleep(1); close(tmpf); cat("\n");
+		close(tmpf); unlink(tmpf.name); cat('\n');
                 if(R.ver == 'Linux') {
                     try(setMKLthreads(math.cpu), silent=TRUE)
                 }
