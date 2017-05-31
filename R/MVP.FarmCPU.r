@@ -424,7 +424,7 @@
 		tmpf.name <- tempfile()
 		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
 		writeBin(0, tmpf)
-		print.f <- function(i){MRBLUP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
+		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=FALSE)}
 		results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
 		close(tmpf); unlink(tmpf.name); cat('\n');
 		if(R.ver == 'Linux') {
