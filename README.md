@@ -54,8 +54,8 @@ MVP.Data(fileHMP="hapmap.txt",
     fileKin=FALSE,
     filePC=FALSE,
     out="mvp.hmp",
-    #maxLine=10000,
-    #priority="memory"
+    #priority="memory",
+    #maxLine=10000
 )
 ```
 If you have genotype data in **Numeric** format (bed/bim/fam):<br>
