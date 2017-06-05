@@ -349,7 +349,7 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
     #Transfer PC data to .desc, .bin files
     if(!is.logical(filePC)){
         myPC <- read.big.matrix(filePC, head=FALSE, type=type.pc, sep=sep.pc)
-        myKinship.backed<-filebacked.big.matrix(nrow(myPC), ncol(myPC), type=type.pc,
+        PC.backed <- filebacked.big.matrix(nrow(myPC), ncol(myPC), type=type.pc,
         backingfile=paste(out, ".pc.bin", sep=""), descriptorfile=paste(out, ".pc.desc", sep=""))
         PC.backed[ , ] <- myPC[ , ]
         flush(PC.backed)
