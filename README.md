@@ -71,8 +71,7 @@ If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
 ```r
-MVP.Data(
-    fileNum="Numeric.txt",
+MVP.Data(fileNum="Numeric.txt",
     filePhe="Phenotype.txt",
     fileMap="Map.txt",
     sep.num="\t",
@@ -86,6 +85,27 @@ MVP.Data(
     #maxLine=10000
 )
 ```
+If you have Kinship matrix data that represents the relationship among individuals<br>
+**fileKin**, the name of kinship matrix data, the dimension of Kinship matrix is n * n, no taxa names included<br>
+**type.kin**, the type of data in kinship matrix file, "char", "integer", or "double"<br>
+**sep.kin**, seperator of kinship matrix data file<br>
+```r
+MVP.Data(fileKin="mvp.kin.desc", 
+     type.kin="double",
+     sep.kin="\t")
+```
+If you have Principal Components matrix data<br>
+**fileKin**, the name of kinship matrix data, the dimension of Kinship matrix is n * n, no taxa names included<br>
+**type.kin**, the type of data in kinship matrix file, "char", "integer", or "double"<br>
+**sep.kin**, seperator of kinship matrix data file<br>
+```r
+MVP.Data(filePC="mvp.kin.desc", 
+     type.kin="double",
+     sep.kin="\t")
+```
+
+### Data Input
+
 
 
 
