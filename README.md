@@ -114,8 +114,12 @@ genotype <- attach.big.matrix("mvp.geno.desc")
 phenotype <- read.table("mvp.phe",head=TRUE)
 map <- read.table("mvp.map" , head = TRUE)
 ```
+You can also give MVP the prepared Kinship matrix and Covariates data
+```r
 K <- attach.big.matrix("mvp.kin.desc")
 CV <- attach.big.matrix("mvp.pc.desc")
+```
+
 
 
 
