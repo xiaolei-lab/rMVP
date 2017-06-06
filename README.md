@@ -32,7 +32,7 @@ MVP.Data(fileBed="plink",
          out="mvp.plink",         
          #priority="memory",
          #maxLine=10000,
-)
+         )
 ```
 If you have genotype data in **Hapmap** format (bed/bim/fam):<br>
 **fileHMP** is a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", chr3.hmp.txt)<br>
@@ -47,16 +47,16 @@ If you have genotype data in **Hapmap** format (bed/bim/fam):<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
 ```r
 MVP.Data(fileHMP="hapmap.txt",
-    filePhe="Phenotype.txt",
-    sep.hmp="\t",
-    sep.phe="\t",
-    SNP.effect="Add",
-    fileKin=FALSE,
-    filePC=FALSE,
-    out="mvp.hmp",
-    #priority="memory",
-    #maxLine=10000
-)
+         filePhe="Phenotype.txt",
+         sep.hmp="\t",
+         sep.phe="\t",
+         SNP.effect="Add",
+         fileKin=FALSE,
+         filePC=FALSE,
+         out="mvp.hmp",
+         #priority="memory",
+         #maxLine=10000
+         )
 ```
 If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **fileNum**, the name of genotype data in PLINK format<br>
@@ -72,39 +72,50 @@ If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
 ```r
 MVP.Data(fileNum="Numeric.txt",
-    filePhe="Phenotype.txt",
-    fileMap="Map.txt",
-    sep.num="\t",
-    sep.map="\t", 
-    sep.phe="\t",
-    type.geno="char",
-    fileKin=FALSE,
-    filePC=FALSE,
-    out="mvp.num",
-    #priority="memory"，
-    #maxLine=10000
-)
+         filePhe="Phenotype.txt",
+         fileMap="Map.txt",
+         sep.num="\t",
+         sep.map="\t", 
+         sep.phe="\t",
+         type.geno="char",
+         fileKin=FALSE,
+         filePC=FALSE,
+         out="mvp.num",
+         #priority="memory"，
+         #maxLine=10000
+         )
 ```
 If you have Kinship matrix data that represents the relationship among individuals<br>
-**fileKin**, the name of kinship matrix data, the dimension of Kinship matrix is n * n, no taxa names included<br>
-**type.kin**, the type of data in kinship matrix file, "char", "integer", or "double"<br>
-**sep.kin**, seperator of kinship matrix data file<br>
+**fileKin**, the name of Kinship matrix data, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included<br>
+**type.kin**, the type of data in Kinship matrix file, "char", "integer", or "double"<br>
+**sep.kin**, seperator of Kinship matrix data file<br>
 ```r
 MVP.Data(fileKin="mvp.kin.desc", 
-     type.kin="double",
-     sep.kin="\t")
+         type.kin="double",
+         sep.kin="\t"
+         )
 ```
 If you have Principal Components matrix data<br>
-**fileKin**, the name of kinship matrix data, the dimension of Kinship matrix is n * n, no taxa names included<br>
-**type.kin**, the type of data in kinship matrix file, "char", "integer", or "double"<br>
-**sep.kin**, seperator of kinship matrix data file<br>
+**filePC**, the name of Principal Components matrix data, the dimension of Principal Components matrix is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included<br>
+**type.pc**, the type of data in Principal Components matrix file, "char", "integer", or "double"<br>
+**sep.pc**, seperator of Principal Components matrix data file<br>
 ```r
-MVP.Data(filePC="mvp.kin.desc", 
-     type.kin="double",
-     sep.kin="\t")
+MVP.Data(filePC="mvp.pc.desc", 
+     type.pc="double",
+     sep.pc="\t"
+     )
 ```
 
 ### Data Input
+
+At least you should have three data: genotype, phenotype, and map
+```r
+genotype <- attach.big.matrix("mvp.geno.desc")
+phenotype <- read.table("mvp.phe",head=TRUE)
+map <- read.table("mvp.map" , head = TRUE)
+```
+K <- attach.big.matrix("mvp.kin.desc")
+CV <- attach.big.matrix("mvp.pc.desc")
 
 
 
