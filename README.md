@@ -1,8 +1,8 @@
 # MVP [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) [![](https://img.shields.io/badge/Release-v1.0.1-blue.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master)
 ## A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For Genome-Wide Association Study
 ### Installation
+**WE STRONGLY RECOMMEND YOU INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**<br>
 **MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:<br>
-**~ ~We strongly recommend you install MVP on Microsoft R Open (https://mran.microsoft.com/download/)~ ~**<br>
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 install_version('RcppEigen', version = "0.3.2.9.0")
