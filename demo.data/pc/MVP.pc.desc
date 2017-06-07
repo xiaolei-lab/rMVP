@@ -1,0 +1,8 @@
+new("big.matrix.descriptor"
+    , description = structure(list(sharedType = "FileBacked", filename = "MVP.pc.bin", 
+    totalRows = 279L, totalCols = 3L, rowOffset = c(0, 279), 
+    colOffset = c(0, 3), nrow = 279, ncol = 3, rowNames = NULL, 
+    colNames = NULL, type = "double", separated = FALSE), .Names = c("sharedType", 
+"filename", "totalRows", "totalCols", "rowOffset", "colOffset", 
+"nrow", "ncol", "rowNames", "colNames", "type", "separated"))
+)
