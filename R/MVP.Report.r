@@ -164,10 +164,13 @@ MVP.Report <- function(
 
 	if(class(MVP) == "list"){
 		MVP.res <- cbind(MVP$glm.results, MVP$mlm.results, MVP$farmcpu.results)
+		Cnames <- colnames(MVP.res)
+		Cnames <- Cnames[seq(2, ncol(MVP.res), 2)]
 		MVP.res <- MVP.res[, seq(2, ncol(MVP.res), 2)]
 		MVP.res[is.na(MVP.res)] <- 1
 		MVP.res <- cbind(MVP$map, MVP.res)
 		Pmap <- MVP.res
+		colnames(Pmap)[-c(1:3)] <- Cnames
 	}else{
 		Pmap <- MVP
 	}
