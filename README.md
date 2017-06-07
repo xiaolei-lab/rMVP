@@ -2,7 +2,7 @@
 ## A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For Genome-Wide Association Study
 ### Installation
 **MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:<br>
-**We strongly recommend you install MVP on Microsoft R Open (https://mran.microsoft.com/download/)**<br>
+**~ ~We strongly recommend you install MVP on Microsoft R Open (https://mran.microsoft.com/download/)~ ~**<br>
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 install_version('RcppEigen', version = "0.3.2.9.0")
@@ -151,7 +151,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **method.bin**, a parameter for FarmCPU only, there are three options: "FaST-LMM","EMMA", and "static"<br>
 **method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for assocation tests<br>
 ```r
-iGWAS <- MVP(
+imMVP <- MVP(
     phe=phenotype,
     geno=genotype,
     map=map,
