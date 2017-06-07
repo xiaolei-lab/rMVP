@@ -1,8 +1,3 @@
-new("big.matrix.descriptor"
-    , description = structure(list(sharedType = "FileBacked", filename = "MVP.pc.bin", 
-    totalRows = 279L, totalCols = 3L, rowOffset = c(0, 279), 
-    colOffset = c(0, 3), nrow = 279, ncol = 3, rowNames = NULL, 
-    colNames = NULL, type = "double", separated = FALSE), .Names = c("sharedType", 
-"filename", "totalRows", "totalCols", "rowOffset", "colOffset", 
-"nrow", "ncol", "rowNames", "colNames", "type", "separated"))
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:cc3689142eb32f4ef881e1f1b174d55fbd49eddd88cc9ca83f10ff6ac5f567e1
+size 456

@@ -171,5 +171,3 @@ imMVP <- MVP(
     method=c("GLM", "MLM", "FarmCPU")
 )
 ```
-
-# YinLL revised
