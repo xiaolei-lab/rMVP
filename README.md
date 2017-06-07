@@ -171,3 +171,6 @@ imMVP <- MVP(
     method=c("GLM", "MLM", "FarmCPU")
 )
 ```
+
+### 4. Output
+
