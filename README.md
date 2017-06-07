@@ -1,7 +1,8 @@
 # MVP [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) [![](https://img.shields.io/badge/Release-v1.0.1-blue.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master)
 ## A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For Genome-Wide Association Study
 ### Installation
-**MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:
+**MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:<br>
+**We strongly recommend you install MVP on Microsoft R Open (https://mran.microsoft.com/download/)**<br>
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 install_version('RcppEigen', version = "0.3.2.9.0")
@@ -145,7 +146,10 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **perc**, percentage of random selected SNPs used for calculating Principal Components<br>
 **priority**, **"speed"** or **"memory"**<br>
 **ncpus**, number of CPUs used for parallel computation<br>
-**vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" and "GEMMA"
+**vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" (Kang, 2008, Genetics) and "GEMMA" (HE Regression, Xiang Zhou, 2016, doi: https://doi.org/10.1101/042846)<br>
+**maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU<br>
+**method.bin**, a parameter for FarmCPU only, there are three options: "FaST-LMM","EMMA", and "static"<br>
+**method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for assocation tests<br>
 ```r
 iGWAS <- MVP(
     phe=phenotype,
