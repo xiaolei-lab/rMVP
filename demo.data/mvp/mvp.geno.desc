@@ -1,0 +1,8 @@
+new("big.matrix.descriptor"
+    , description = structure(list(sharedType = "FileBacked", filename = "mvp.geno.bin", 
+    totalRows = 3093L, totalCols = 279L, rowOffset = c(0, 3093
+    ), colOffset = c(0, 279), nrow = 3093, ncol = 279, rowNames = NULL, 
+    colNames = NULL, type = "char", separated = FALSE), .Names = c("sharedType", 
+"filename", "totalRows", "totalCols", "rowOffset", "colOffset", 
+"nrow", "ncol", "rowNames", "colNames", "type", "separated"))
+)
