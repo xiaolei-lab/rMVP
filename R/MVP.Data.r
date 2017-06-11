@@ -242,15 +242,15 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
     }
     
     #map
-    #if((!is.null(fileMap))|(!is.null(fileHMP))){
-    #if(is.null(fileMap))	fileMap <- paste(out, ".map", sep="")
-        #myGM <- read.big.matrix(fileMap, type=type.map, sep=sep.map, head = TRUE)
+    if((!is.null(fileMap))|(!is.null(fileHMP))){
+    if(is.null(fileMap))	fileMap <- paste(out, ".map", sep="")
+        myGM <- read.big.matrix(fileMap, type=type.map, sep=sep.map, head = TRUE)
         #backingfile=paste(out, ".map.bin", sep=""), descriptorfile=paste(out, ".map.desc", sep=""))
-        #nmarkers <- nrow(myGM)#build file backed matrix for genotype
+        nmarkers <- nrow(myGM)#build file backed matrix for genotype
         #print("Preparation for MAP is done!")
-        #rm("myGM")
-        #gc()
-        #}
+        rm("myGM")
+        gc()
+        }
     
     #Transfer genotype data to .desc, .bin files
     if((!is.null(fileNum))|(!is.null(fileHMP))){
