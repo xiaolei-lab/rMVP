@@ -173,5 +173,115 @@ imMVP <- MVP(
 ```
 
 ### 4. Output
-**MVP** will automatically output one(".jpg" by default) of three types (".jpg",".pdf",".tiff") high quality visual results. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
-Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` directly, for example ```MVP.Report(imMVP, ...)```. Nevertheless, users could load the prepared data into R and use the function to visualize it.
+**MVP** will automatically output one(".jpg" by default) of three types (".jpg",".pdf",".tiff") high quality visual plot. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
+Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` directly, for example ```MVP.Report(imMVP, ...)```. Nevertheless, users could load the prepared data into R and use the function to visualize it, if in this case, the data at least contains four columns, which are names of SNP, chromosome, postion and P-value of a trait respectively, more traits could be sequentially appended after the data by column. Typing ```?MVP.Report()``` to see the details of all parameters. Typing ```data(pig60K); data(cattle50K)``` to load the attached datasets.
+
+#### 4.1 SNP-density plot
+
+```r
+MVP.Report(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
+# users can personally set the windowsize and the max of legend by:
+# bin.size=1e6
+# bin.max=N
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/illumilla_60K.jpg">
+<img src="results/illumilla_60K.jpg" height="460px" width="680px">
+</a>
+</p>
+
+#### 4.2 Circular-Manhattan plot
+
+> ** 4.21 Genome-wide association study(GWAS)
+
+```r
+MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
+      cir.chr.h=1, amplify=TRUE, threshold.lty=c(2,1), threshold.col=c("blue","red"), signal.line=1,
+      signal.col="red", file="jpg", dpi=300)
+#Note: if signal.line=NULL, the lines that crosse circles won't be added.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.jpg">
+<img src="results/Circular-Manhattan.jpg" height="400px" width="400px">
+</a>
+</p>
+
+> ** 4.22 Genomic Selection/Prediction(GS/GP)
+
+```r
+MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29),sep=""),
+         r=1.2, cir.chr.h=1.3, cir.legend.cex=0.5, cir.band=1, threshold=NULL, file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.cattle.jpg">
+<img src="results/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
+</a>
+</p>
+
+#### 4.3 Rectangular-Manhattan plot
+
+> **4.31 Genome-wide association study(GWAS)
+
+```r
+MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Rectangular-Manhattan.trait3.jpg">
+<img src="results/Rectangular-Manhattan.trait3.jpg" height="300px" width="900px">
+</a>
+</p>
+
+> **4.32 Genomic Selection/Prediction(GS/GP)
+
+```r
+MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
+         threshold=NULL, file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Rectangular-Manhattan.Fat percentage.jpg">
+<img src="results/Rectangular-Manhattan.Fat percentage.jpg" height="300px" width="900px">
+</a>
+</p>
+
+> **4.33 Multiple tracks rectangular-Manhattan plot
+
+```r
+MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
+<img src="results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="1300px" width="900px">
+</a>
+</p>
+
+#### 4.4 Q-Q plot
+
+> **4.41 Single track Q-Q plot
+
+```r
+MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/QQplot.trait3.jpg">
+<img src="results/QQplot.trait3.jpg" height="400px" width="400px">
+</a>
+</p>
+
+> **4.42 Multiple track Q-Q plot
+
+```r
+MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multraits.QQplot.jpg">
+<img src="results/MVP.Multraits.QQplot.jpg" height="500px" width="500px">
+</a>
+</p>
