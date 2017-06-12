@@ -256,7 +256,7 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
-<img src="results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="1200px" width="750px">
+<img src="results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="900px" width="750px">
 </a>
 </p>
 
