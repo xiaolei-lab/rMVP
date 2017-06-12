@@ -173,4 +173,4 @@ imMVP <- MVP(
 ```
 
 ### 4. Output
-
+**MVP** will automatically output one(".jpg") of three types (".jpg",".pdf",".tiff") high quality visual results. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
