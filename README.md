@@ -193,7 +193,7 @@ MVP.Report(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",d
 
 #### 4.2 Circular-Manhattan plot
 
-> ** 4.21 Genome-wide association study(GWAS)
+***4.21 Genome-wide association study(GWAS)***
 
 ```r
 MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
@@ -208,7 +208,7 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
 </a>
 </p>
 
-> ** 4.22 Genomic Selection/Prediction(GS/GP)
+***4.22 Genomic Selection/Prediction(GS/GP)***
 
 ```r
 MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29),sep=""),
@@ -223,7 +223,7 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 
 #### 4.3 Rectangular-Manhattan plot
 
-> **4.31 Genome-wide association study(GWAS)
+***4.31 Genome-wide association study(GWAS)***
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
@@ -235,7 +235,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 </a>
 </p>
 
-> **4.32 Genomic Selection/Prediction(GS/GP)
+***4.32 Genomic Selection/Prediction(GS/GP)***
 
 ```r
 MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
@@ -248,7 +248,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect",
 </a>
 </p>
 
-> **4.33 Multiple tracks rectangular-Manhattan plot
+***4.33 Multiple tracks rectangular-Manhattan plot***
 
 ```r
 MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
@@ -256,13 +256,13 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
-<img src="results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="1300px" width="900px">
+<img src="results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="1200px" width="750px">
 </a>
 </p>
 
 #### 4.4 Q-Q plot
 
-> **4.41 Single track Q-Q plot
+***4.41 Single track Q-Q plot***
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
@@ -274,7 +274,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 </a>
 </p>
 
-> **4.42 Multiple track Q-Q plot
+***4.42 Multiple track Q-Q plot***
 
 ```r
 MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
