@@ -21,10 +21,10 @@
   - [Advanced](#advanced)
 * [Start GWAS](#start-gwas)
 * [OUTPUT](#output)
-  - [SNP-density plot](#SNP-density plot)
-  - [Circular-Manhattan plot](#snp-density-plot)
-  - [Rectangular-Manhattan plot](#SNP-density plot)
-  - [Q-Q plot](#SNP-density plot)
+  - [SNP-density plot](#SNP-density-plot)
+  - [Circular-Manhattan plot](#circular-manhattan-plot)
+  - [Rectangular-Manhattan plot](#rectangular-manhattan-plot)
+  - [Q-Q plot](#q-q-plot)
 * [FAQ AND HINTS](#faq-and-hints)
 
 ---
