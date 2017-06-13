@@ -285,3 +285,32 @@ MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="gr
 <img src="results/MVP.Multraits.QQplot.jpg" height="500px" width="500px">
 </a>
 </p>
+
+### FAQ and Hints
+
+:sos: **Question1:** Failing to install "devtools":
+
+***ERROR: configuration failed for package ‘git2r’***
+
+***removing ‘/Users/acer/R/3.4/library/git2r’***
+
+***ERROR: dependency ‘git2r’ is not available for package ‘devtools’***
+
+***removing ‘/Users/acer/R/3.4/library/devtools’***
+
+:yum: **Answer:** Please type the following codes in terminal.
+```ssh
+apt-get install libssl-dev/unstable
+```
+---
+:sos: **Question2:** When installing packages from Github with "devtools", there is a error:
+ 
+ ***Error in curl::curl_fetch_disk(url, x$path, handle = handle): Problem with the SSL CA cert (path? access rights?)***
+ 
+:yum: **Answer:** Please type the following codes and than try agian.
+```r
+library(httr)
+set_config(config(ssl_verifypeer = 0L))
+```
+
+**Questions, suggestions, and bug reports are welcome and appreciated.** [:arrow_right:](https://github.com/XiaoleiLiuBio/MVP/issues)
