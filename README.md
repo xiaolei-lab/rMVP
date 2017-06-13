@@ -20,7 +20,7 @@
   - [Basic](#basic)
   - [Advanced](#advanced)
 * [Start GWAS](#start-gwas)
-* [OUTPUT](#output)
+* [Output](#output)
   - [SNP-density plot](#SNP-density-plot)
   - [Circular-Manhattan plot](#circular-manhattan-plot)
   - [Rectangular-Manhattan plot](#rectangular-manhattan-plot)
