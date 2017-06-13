@@ -39,7 +39,6 @@ if(priority == "speed"){
 ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
-    print(mode(K))
     if(file.output){
         Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
         descriptorfile="MVP.kin.desc")
