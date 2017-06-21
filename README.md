@@ -85,6 +85,16 @@ If you have genotype data in **Hapmap** format (bed/bim/fam):<br>
 **out**, the name of output file<br>
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
+
+| rs# | alleles | chrom | pos | strand | assembly# | center | protLSID | assayLSID | panelLSID | QCcode | A048005080 | A048006063 | A048006555 | A048007096 | A048010273 | ... | A084292044 |
+| :---: | :---: |  :---: |  :---: |  :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| rs3683945 | G/A | 1 | 3197400 | + | NA | NA | NA | NA | NA | NA | AG | AG | GG | AG | GG | ... | AA |
+| rs3707673 | A/G | 1 | 3407393 | + | NA | NA | NA | NA | NA | NA | GA | GA | AA | GA | AA | ... | GG |
+| rs6269442 | G/A | 1 | 3492195 | + | NA | NA | NA | NA | NA | NA | AG | GG | GG | AG | GG | ... | AA |
+| rs6336442 | G/A | 1 | 3580634 | + | NA | NA | NA | NA | NA | NA | AG | AG | GG | AG | GG | ... | AA |
+| rs13475699 | G | 1 | 3860406 | + | NA | NA | NA | NA | NA | NA | GG | GG | GG | GG | GG | ... | GG |
+
+
 ```r
 MVP.Data(fileHMP="hapmap.txt",
          filePhe="Phenotype.txt",
@@ -111,6 +121,14 @@ If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **out** is a string, the name of output file<br>
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
+
+| 1 | 1 | 2 | 1 | 2 | … | 0 |
+| :---: | :---: |  :---: |  :---: |  :---: | :---: | :---: |
+| 1 | 1 | 0 | 1 | 0 | … | 2 |
+| 1 | 2 | 2 | 1 | 2 | … | 0 |
+| 1 | 1 | 2 | 1 | 2 | … | 0 |
+| 0 | 0 | 0 | 0 | 0 | … | 0 |
+
 ```r
 MVP.Data(fileNum="Numeric.txt",
          filePhe="Phenotype.txt",
@@ -126,11 +144,22 @@ MVP.Data(fileNum="Numeric.txt",
          #maxLine=10000
          )
 ```
+
 #### Kinship
 If you have Kinship matrix data that represents the relationship among individuals<br>
 **fileKin**, the name of Kinship matrix data, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included<br>
 **type.kin**, the type of data in Kinship matrix file, "char", "integer", or "double"<br>
 **sep.kin**, seperator of Kinship matrix data file<br>
+
+| 0.3032 | -0.0193 | 0.0094 | 0.0024 | 0.0381 | ... | -0.0072 |
+| :---: | :---: |  :---: |  :---: |  :---: |  :---: |  :---: |
+| -0.0193 | 0.274 | -0.0243 | 0.0032 | -0.0081 | ... | 0.0056 |
+| 0.0094 | -0.0243 | 0.3207 | -0.0071 | -0.0045 | ... | -0.0407 |
+| 0.0024 | 0.0032 | -0.0071 | 0.321 | -0.008 | ... | -0.0093 |
+| 0.0381 | -0.0081 | -0.0045 | -0.008 | 0.3498 | ... | -0.0238 |
+| ... | ... | ... | ... | ... | ... | ... | 
+| -0.0072 | 0.0056 | -0.0407 | -0.0093 | -0.0238 | ... | 0.3436 |
+
 ```r
 MVP.Data(fileKin="mvp.kin.txt", 
          type.kin="double",
