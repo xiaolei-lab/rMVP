@@ -3,8 +3,8 @@
 ## A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For Genome-Wide Association Study
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo2.png">
-<img src="results/mvp_logo2.png" height="340px" width="480px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
+<img src="results/mvp_logo.png" height="340px" width="500px">
 </a>
 </p>
 
