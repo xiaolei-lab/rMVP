@@ -234,7 +234,7 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
 ```
 
-**plot.type**, which type will be plotted, if "d", ploting ***SNP-density plot***; if "c", ploting ***Circular-Manhattan plot***; if "m", ploting ***Rectangular-Manhattan plot***, if "q", ploting ***QQ-plot***<br>
+**plot.type**, which type will be plotted, if "d", plotting ***SNP-density plot***; if "c", plotting ***Circular-Manhattan plot***; if "m", plotting ***Rectangular-Manhattan plot***, if "q", plotting ***QQ-plot***<br>
 **bin.size**, the window size for counting the number of SNP<br>
 **bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
 
@@ -275,6 +275,12 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
          r=1.2, cir.chr.h=1.3, cir.legend.cex=0.5, cir.band=1, threshold=NULL, file="jpg", dpi=300)
 ```
 
+**LOG10**, "TRUE" or "FALSE", if FALSE, the original values will be used to plot<br>
+**outward**, "TRUE" or "FALSE", the direction of plotting points<br>
+**r**, the radius of the circle<br>
+**cir.legend.cex**, the size of axis number of legend<br>
+**cir.band**, the size of interval between circles<br>
+
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.cattle.jpg">
 <img src="results/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
@@ -313,6 +319,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect",
 ```r
 MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
 ```
+**multracks**, logical, if FALSE, plotting multiple rectangular Manhattan plots on multiple tracks, if TRUE, all Manhattan plots will be plotted in only one track<br>
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multracks.Rectangular_Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
@@ -327,6 +334,8 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
 ```
+**conf.int**, logical, whether to drew the confidence interval on QQ-plot<br>
+**conf.int.col**, character, the color of the confidence interval on QQ-plot<br>
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/QQplot.trait3.jpg">
