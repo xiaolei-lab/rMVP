@@ -234,6 +234,7 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
 ```
 
+**plot.type**, which type will be plotted, if "d", ploting ***SNP-density plot***; if "c", ploting ***Circular-Manhattan plot***; if "m", ploting ***Rectangular-Manhattan plot***, if "q", ploting ***QQ-plot***<br>
 **bin.size**, the window size for counting the number of SNP<br>
 **bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
 
@@ -253,7 +254,13 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
       signal.col="red", file="jpg", dpi=300)
 ```
 
-#Note: if signal.line=NULL, the lines that crosse circles won't be added.
+**chr.labels**, renamed names of each chromosome<br>
+**threshold**, the significant level for Bonferroni adjustment<br>
+**cir.chr.h**, the width of outer circle<br>
+**amplify**, "TRUE" or "FALSE", whether to highlight the significant SNPs<br>
+**signal.line**, the width of the lines that cross all circle, if signal.line=NULL, the lines that crosse circles won't be added<br>
+**signal.col**, the color for the significant SNPs, if NULL, it will use the color index of ***col***<br>
+**signal.cex**, the cex for the significant SNPs<br>
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.jpg">
