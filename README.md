@@ -234,7 +234,7 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
 ```
 
-**bin.size**, the window size for counting the number of SNP
+**bin.size**, the window size for counting the number of SNP<br>
 **bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
 
 <p align="center">
@@ -251,8 +251,9 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
       cir.chr.h=1, amplify=TRUE, threshold.lty=c(2,1), threshold.col=c("blue","red"), signal.line=1,
       signal.col="red", file="jpg", dpi=300)
-#Note: if signal.line=NULL, the lines that crosse circles won't be added.
 ```
+
+#Note: if signal.line=NULL, the lines that crosse circles won't be added.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.jpg">
