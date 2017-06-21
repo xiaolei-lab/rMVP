@@ -231,11 +231,11 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 #### SNP-density plot
 
 ```r
-MVP.Report(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
-# users can personally set the windowsize and the max of legend by:
-# bin.size=1e6
-# bin.max=N
+MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
 ```
+
+**bin.size**, the window size for counting the number of SNP
+**bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/illumilla_60K.jpg">
