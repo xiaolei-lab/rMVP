@@ -1,6 +1,6 @@
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=2, vc.method="EMMA", method="MLM", maxLine=1000, memo="MVP", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=TRUE,
-col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8
+permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8
 )
 {
 ###################################################################################################
@@ -194,13 +194,39 @@ col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.t
 	
 	MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
 	
+    if(permutation.threshold){
+	    set.seed(12345)
+	    i=1
+    	    for(i in 1:permutation.rep){
+        	index=1:nrow(phe)
+        	index.shuffle=sample(index,length(index),replace=F)
+        	myY.shuffle=myY
+        	myY.shuffle[,2]=myY.shuffle[index.shuffle,2]
+        	#GWAS using t.test...
+        	myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, priority=priority, cpu=ncpus)
+        	pvalue=min(mymyPermutation[,4],na.rm=T)
+        	if(i==1){
+            		pvalue.final=pvalue
+       		}else{
+            		pvalue.final=c(pvalue.final,pvalue)
+        	}
+   	 }#end of permutation.rep
+    	permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]	    
+    }
+	
     if(file.output){
 		print("Visualization Start...")
 		#plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
-        plot3D <- FALSE
+        	plot3D <- FALSE
 		if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi)
+	    if(!permutation.threshold){
 		MVP.Report(MVP.return, col=col, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex, outward=outward)
 		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex)
+	    }else{
+	    	MVP.Report(MVP.return, col=col, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, permutation.cutoff=permutation.cutoff, signal.cex=signal.cex, outward=outward)
+		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, permutation.cutoff=permutation.cutoff, signal.cex=signal.cex)
+	    
+	    }
 	}
 	return(MVP.return)
 }#end of MVP function
