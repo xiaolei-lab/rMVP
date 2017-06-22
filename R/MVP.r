@@ -204,7 +204,7 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
         	myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
         	#GWAS using t.test...
         	myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, priority=priority, cpu=ncpus)
-        	pvalue = min(myPermutation[,4],na.rm=T)
+        	pvalue = min(myPermutation[,2],na.rm=T)
         	if(i==1){
             		pvalue.final=pvalue
        		}else{
