@@ -211,7 +211,8 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
             		pvalue.final=c(pvalue.final,pvalue)
         	}
    	 }#end of permutation.rep
-    	permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]	    
+    	permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
+	threshold = permutation.cutoff * m
     }
 	
     if(file.output){
@@ -219,14 +220,8 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
 		#plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
         	plot3D <- FALSE
 		if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi)
-	    if(!permutation.threshold){
 		MVP.Report(MVP.return, col=col, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex, outward=outward)
 		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex)
-	    }else{
-	    	MVP.Report(MVP.return, col=col, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, permutation.cutoff=permutation.cutoff, signal.cex=signal.cex, outward=outward)
-		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, permutation.cutoff=permutation.cutoff, signal.cex=signal.cex)
-	    
-	    }
 	}
 	return(MVP.return)
 }#end of MVP function
