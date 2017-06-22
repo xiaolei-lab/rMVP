@@ -137,6 +137,6 @@ a number, the picture element for .jpg and .tiff files. The default is 300.
 }
 }
 \author{
-LiLin-Yin \cr
-Maintainer: LiLin-Yin <\bold{ylilin@163.com}>
+Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
+Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
