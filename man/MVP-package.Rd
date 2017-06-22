@@ -77,6 +77,6 @@ License: \tab GPL(>=2)\cr
 }
 }
 \author{
-Lilin Yin, Xiaolei Liu\cr
+Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
 Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
