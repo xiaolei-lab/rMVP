@@ -23,6 +23,6 @@ MVP.MLM(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", genoName=NULL, 
 	\item{memo}{a marker on output file name}
 }
 \author{
-Lilin Yin, Xiaolei Liu \cr
-Maintainer: Xiaolei Liu <\bold{xll19870827@hotmail.com}>
+Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
+Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
