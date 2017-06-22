@@ -198,13 +198,13 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
 	    set.seed(12345)
 	    i=1
     	    for(i in 1:permutation.rep){
-        	index=1:nrow(phe)
-        	index.shuffle=sample(index,length(index),replace=F)
-        	myY.shuffle=myY
-        	myY.shuffle[,2]=myY.shuffle[index.shuffle,2]
+        	index = 1:nrow(phe)
+        	index.shuffle = sample(index,length(index),replace=F)
+        	myY.shuffle = phe
+        	myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
         	#GWAS using t.test...
         	myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, priority=priority, cpu=ncpus)
-        	pvalue=min(mymyPermutation[,4],na.rm=T)
+        	pvalue = min(mymyPermutation[,4],na.rm=T)
         	if(i==1){
             		pvalue.final=pvalue
        		}else{
