@@ -1,10 +1,10 @@
 Package: MVP
 Type: Package
 Title: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS
-Version: 1.0.1
+Version: 0.1
 Date: 2017-05-26
-Author: Xiaolei Liu, Lilin Yin
-Maintainer: Xiaolei Liu <xll19870827@hotmail.com>
+Author: Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu
+Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
 Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS
 License: GPL(>=2)
 Depends: R (>= 3.0), bigmemory, biganalytics, bigpca, rfunctions, snpStats, parallel, MASS
