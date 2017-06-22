@@ -43,6 +43,8 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
 # QTN.threshold: Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
 # bound: maximum number of SNPs selected as pseudo QTNs for each iteration
 # outward: the direction of circular Manhattan plot
+# permutation.threshold=FALSE: if use a permutation cutoff or not (bonferroni cutoff)
+# permutation.rep=100: number of permutation replicates
 # col, for color of points in each chromosome on manhattan plot
 # plot.type: "b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)
 # file.output: whether to output files or not
