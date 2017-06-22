@@ -7,7 +7,7 @@ function(){
 # Build date: Aug 30, 2017
 # Last update: May 25, 2017
 ##############################################################################################
-version <- "1.0.1"
+version <- "0.1"
 
 cat(paste("#", paste(rep("-", 35), collapse=""), "Welcome to MVP", paste(rep("-", 35), collapse=""), "#",sep=""), "\n")
 
