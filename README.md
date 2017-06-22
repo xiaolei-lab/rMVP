@@ -251,6 +251,32 @@ imMVP <- MVP(
 )
 ```
 
+If there are more than one phenotype
+
+```r
+for(i in 2:ncol(phenotype)){
+  imMVP <- MVP(
+    phe=phenotype,
+    geno=genotype,
+    map=map,
+    #K=K,
+    #CV.GLM=Covariates,
+    #CV.MLM=Covariates,
+    #CV.FarmCPU=Covariates,
+    nPC.GLM=5,
+    nPC.MLM=3,
+    nPC.FarmCPU=3,
+    perc=1,
+    priority="speed",
+    ncpus=10,
+    vc.method="EMMA",
+    maxLoop=10,
+    method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
+    method=c("GLM", "MLM", "FarmCPU")
+  )
+}
+```
+
 ---
 
 ### Output
