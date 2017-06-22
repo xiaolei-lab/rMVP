@@ -18,7 +18,6 @@ MVP.Report <- function(
 	xaxs="i",
 	yaxs="r",
 	outward=FALSE,
-	permutation.cutoff = NULL,
 	threshold = NULL, 
 	threshold.col="red",
 	threshold.lwd=1,
