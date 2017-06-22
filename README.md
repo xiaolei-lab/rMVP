@@ -228,6 +228,9 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" (Kang, 2008, Genetics) and "GEMMA" (HE Regression, Xiang Zhou, 2016, doi: https://doi.org/10.1101/042846)<br>
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU<br>
 **method.bin**, a parameter for FarmCPU only, there are three options: "FaST-LMM","EMMA", and "static"<br>
+**permutation.threshold**, if **TRUE**, a threshold of permutation will be used in manhattan plot. The phenotypes are permuted to break the relationship with the genotypes. The experiment is replicated for a number of times. A vector of minimum p value of all experiments is recorded and the 95% quantile value of this vector is recommended to be used as significant threshold<br>
+**permutation.rep**, number of permutaion replicates, only used when **permutation.threshold** is **TRUE**<br>
+**threshold**, 0.05/marker size, a cutoff line on manhattan plot<br>
 **method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for assocation tests<br>
 ```r
 imMVP <- MVP(
@@ -247,11 +250,14 @@ imMVP <- MVP(
     vc.method="EMMA",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
+    #permutation.threshold=TRUE,
+    #permutation.rep=100,
+    threshold=0.05,
     method=c("GLM", "MLM", "FarmCPU")
 )
 ```
 
-If there are more than one phenotype
+If you have more than one phenotype
 
 ```r
 for(i in 2:ncol(phenotype)){
@@ -272,6 +278,9 @@ for(i in 2:ncol(phenotype)){
     vc.method="EMMA",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
+    #permutation.threshold=TRUE,
+    #permutation.rep=100,
+    threshold=0.05,
     method=c("GLM", "MLM", "FarmCPU")
   )
 }
