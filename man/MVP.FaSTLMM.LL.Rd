@@ -14,6 +14,6 @@ MVP.FaSTLMM.LL(pheno, snp.pool,X0=NULL,ncpus=2)
 	\item{ncpus}{number of CPUs used for parallel computation}
 }
 \author{
-Lilin Yin, Xiaolei Liu \cr
-Maintainer: Xiaolei Liu <\bold{xll19870827@hotmail.com}>
+Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
+Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
