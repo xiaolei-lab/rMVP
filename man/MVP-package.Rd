@@ -57,6 +57,8 @@ MVP(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 	\item{bound}{maximum number of SNPs selected as pseudo QTNs for each iteration}
 	\item{outward}{the direction of circular Manhattan plot}
 	\item{col}{for color of points in each chromosome on manhattan plot}
+	\item{permutation.threshold}{if use a permutation cutoff or not (bonferroni cutoff)}
+	\item{permutation.rep}{number of permutation replicates}
 	\item{plot.type}{"b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)}
 	\item{file.output}{whether to output files or not}
 	\item{file}{figure format, "jpg", "tiff"}
@@ -69,12 +71,12 @@ MVP(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 \tabular{ll}{
 Package: \tab MVP\cr
 Type: \tab Package\cr
-Version: \tab 1.0.1\cr
+Version: \tab 0.1\cr
 Date: \tab 2017-05-26\cr
 License: \tab GPL(>=2)\cr
 }
 }
 \author{
-Xiaolei Liu, Lilin Yin \cr
-Maintainer: Xiaolei Liu <\bold{xll19870827@hotmail.com}>
+Lilin Yin, Xiaolei Liu\cr
+Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
