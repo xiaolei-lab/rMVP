@@ -86,6 +86,21 @@ If you have genotype data in **Hapmap** format (bed/bim/fam):<br>
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
 
+> `Phenotype.txt`
+
+| Taxa | trait1 | trait2 | trait3 |
+| :---: | :---: |:---: |:---: |
+|33-16|101.5|0.25|0|
+|38-11|	102.7|0.23|1|
+|4226	|101.2|-0.17|1|
+|4722|	105.5|-0.24|0|
+|A188	|108.1|0.57|1|
+|A214N|	95.13|0.87|0|
+|A239	|100.2|-0.16|1|
+
+
+> `hapmap.txt`
+
 | rs# | alleles | chrom | pos | strand | assembly# | center | protLSID | assayLSID | panelLSID | QCcode | A048005080 | A048006063 | A048006555 | A048007096 | A048010273 | ... | A084292044 |
 | :---: | :---: |  :---: |  :---: |  :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | rs3683945 | G/A | 1 | 3197400 | + | NA | NA | NA | NA | NA | NA | AG | AG | GG | AG | GG | ... | AA |
@@ -122,6 +137,8 @@ If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory<br>
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory<br>
 
+> `Numeric.txt`
+
 | 1 | 1 | 2 | 1 | 2 | … | 0 |
 | :---: | :---: |  :---: |  :---: |  :---: | :---: | :---: |
 | 1 | 1 | 0 | 1 | 0 | … | 2 |
@@ -151,6 +168,8 @@ If you have Kinship matrix data that represents the relationship among individua
 **type.kin**, the type of data in Kinship matrix file, "char", "integer", or "double"<br>
 **sep.kin**, seperator of Kinship matrix data file<br>
 
+> `mvp.kin.txt`
+
 | 0.3032 | -0.0193 | 0.0094 | 0.0024 | 0.0381 | ... | -0.0072 |
 | :---: | :---: |  :---: |  :---: |  :---: |  :---: |  :---: |
 | -0.0193 | 0.274 | -0.0243 | 0.0032 | -0.0081 | ... | 0.0056 |
@@ -172,6 +191,17 @@ If you have Principal Components matrix data<br>
 **filePC**, the name of Principal Components matrix data, the dimension of Principal Components matrix is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included<br>
 **type.pc**, the type of data in Principal Components matrix file, "char", "integer", or "double"<br>
 **sep.pc**, seperator of Principal Components matrix data file<br>
+
+> `mvp.pc.txt`
+
+| 0.010175524|-0.037989071|0.009588312|
+| :---: |:---:|:---:|
+| -0.009138673 |-0.036763080 |-0.006396714|
+| -0.004723734| -0.047837625 | 0.021687731|
+| 0.012887843 |-0.048418352|  0.054298850|
+| 0.003871951 |-0.038070387|  0.008020508|
+| -0.079505846 | 0.005818163| -0.206364549|
+
 ```r
 MVP.Data(filePC="mvp.pc.txt", 
      type.pc="double",
@@ -291,6 +321,28 @@ for(i in 2:ncol(phenotype)){
 ### Output
 **MVP** will automatically output one(".jpg" by default) of three types (".jpg",".pdf",".tiff") high quality visual plot. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
 Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` directly, for example ```MVP.Report(imMVP, ...)```. Nevertheless, users could load the prepared data into R and use the function to visualize it, if in this case, the data at least contains four columns, which are names of SNP, chromosome, postion and P-value of a trait respectively, more traits could be sequentially appended after the data by column. Typing ```?MVP.Report()``` to see the details of all parameters. Typing ```data(pig60K); data(cattle50K)``` to load the attached datasets.
+
+> `head(pig60K)`
+
+|SNP |Chromosome| Position  |  trait1   |  trait2   |  trait3|
+|:---: |:---:| :---:  | :---:  | :---:  | :---:|
+|ALGA0000009 |1|52297 |0.7738187| 0.51194318| 0.51194318|
+|ALGA0000014|1| 79763| 0.7738187 |0.51194318 |0.51194318|
+|ALGA0000021|1 |  209568| 0.7583016 |0.98405289 |0.98405289|
+|ALGA0000022|1  | 292758 |0.7200305 |0.48887140|0.48887140|
+|ALGA0000046|1 |  747831 |0.9736840 |0.22096836| 0.22096836|
+|ALGA0000047|1 |  761957 |0.9174565 |0.05753712| 0.05753712|
+
+> `head(cattle50K)`
+
+|SNP| chr  |  pos |Somatic cell score | Milk yield| Fat percentage|
+|:---:|:---: |:---:|:---:|:---:|:---:|
+| SNP1| 1  59082  | 0.000244361 |0.000484255  |  0.001379210|
+|SNP2| 1 118164 |  0.000532272| 0.000039800  |  0.000598951|
+| SNP3 | 1 177246  |  0.001633058 |0.000311645 |   0.000279427|
+|SNP4 | 1 236328  |  0.001412865 |0.000909370  |  0.001040161|
+|SNP5 | 1 295410  |   0.000090700 |0.002202973  |  0.000351394|
+| SNP6 | 1 354493  | 0.000110681| 0.000342628  |  0.000105792|
 
 #### SNP-density plot
 
