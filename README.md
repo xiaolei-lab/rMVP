@@ -123,6 +123,23 @@ MVP.Data(fileHMP="hapmap.txt",
          #maxLine=10000
          )
 ```
+
+If you have more than one hapmap file, such as "hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", ... , "hmp.chr10.txt"<br>
+
+```r
+MVP.Data(fileHMP=c(hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt", "hmp.chr5.txt", "hmp.chr6.txt", "hmp.chr7.txt", "hmp.chr8.txt", "hmp.chr9.txt", "hmp.chr10.txt"),
+         filePhe="Phenotype.txt",
+         sep.hmp="\t",
+         sep.phe="\t",
+         SNP.effect="Add",
+         fileKin=FALSE,
+         filePC=FALSE,
+         out="mvp.hmp",
+         #priority="memory",
+         #maxLine=10000
+         )
+```
+
 #### Numeric
 If you have genotype data in **Numeric** format (bed/bim/fam):<br>
 **fileNum**, the name of genotype data in PLINK format<br>
