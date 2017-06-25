@@ -799,7 +799,7 @@
             results = cbind(myGLM$B, P)
             colnames(results) = c("effect","p")
         } #end of while loop
-        print("**********FarmCPU ACCOMPLISHED SUCCESSFULLY**********")
+        print("****************FarmCPU ACCOMPLISHED****************")
         return(results)
 }#The MVP.FarmCPU function ends here
 
