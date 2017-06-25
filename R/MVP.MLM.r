@@ -152,6 +152,6 @@ nf <- ncol(X0) + 1
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-    print("MLM is Done!")
+    print("****************MLM ACCOMPLISHED****************")
     return(results)
 }#end of MVP.MLM function
