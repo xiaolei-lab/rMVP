@@ -120,6 +120,6 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
             }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-    print("GLM is Done!")
+    print("****************GLM ACCOMPLISHED****************")
     return(results)
 }#end of MVP.GLM function
