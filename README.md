@@ -211,13 +211,12 @@ If you have Principal Components matrix data<br>
 
 > `mvp.pc.txt`
 
-| 0.010175524|-0.037989071|0.009588312|
-| :---: |:---:|:---:|
-| -0.009138673 |-0.036763080 |-0.006396714|
-| -0.004723734| -0.047837625 | 0.021687731|
-| 0.012887843 |-0.048418352|  0.054298850|
-| 0.003871951 |-0.038070387|  0.008020508|
-| -0.079505846 | 0.005818163| -0.206364549|
+0.010175524  -0.037989071  0.009588312
+-0.009138673 -0.036763080  -0.006396714
+-0.004723734 -0.047837625  0.021687731
+0.012887843  -0.048418352  0.054298850
+0.003871951  -0.038070387  0.008020508
+-0.079505846  0.005818163  -0.206364549
 
 ```r
 MVP.Data(filePC="mvp.pc.txt", 
@@ -364,7 +363,7 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
 
 ```
-As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
+As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 #### SNP-density plot
 
