@@ -339,27 +339,32 @@ for(i in 2:ncol(phenotype)){
 **MVP** will automatically output one(".jpg" by default) of three types (".jpg",".pdf",".tiff") high quality visual plot. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
 Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` directly, for example ```MVP.Report(imMVP, ...)```. Nevertheless, users could load the prepared data into R and use the function to visualize it, if in this case, the data at least contains four columns, which are names of SNP, chromosome, postion and P-value of a trait respectively, more traits could be sequentially appended after the data by column. Typing ```?MVP.Report()``` to see the details of all parameters. Typing ```data(pig60K); data(cattle50K)``` to load the attached datasets.
 
-> `head(pig60K)`
+```r
+> data(pig60K)   #calculated p-values by MLM
+> data(cattle50K)   #calculated SNP effects by rrblup
 
-|SNP |Chromosome| Position  |  trait1   |  trait2   |  trait3|
-|:---: |:---:| :---:  | :---:  | :---:  | :---:|
-|ALGA0000009 |1|52297 |0.7738187| 0.51194318| 0.51194318|
-|ALGA0000014|1| 79763| 0.7738187 |0.51194318 |0.51194318|
-|ALGA0000021|1 |  209568| 0.7583016 |0.98405289 |0.98405289|
-|ALGA0000022|1  | 292758 |0.7200305 |0.48887140|0.48887140|
-|ALGA0000046|1 |  747831 |0.9736840 |0.22096836| 0.22096836|
-|ALGA0000047|1 |  761957 |0.9174565 |0.05753712| 0.05753712|
+> head(pig60K)
 
-> `head(cattle50K)`
+          SNP Chromosome Position    trait1     trait2     trait3
+1 ALGA0000009          1    52297 0.7738187 0.51194318 0.51194318
+2 ALGA0000014          1    79763 0.7738187 0.51194318 0.51194318
+3 ALGA0000021          1   209568 0.7583016 0.98405289 0.98405289
+4 ALGA0000022          1   292758 0.7200305 0.48887140 0.48887140
+5 ALGA0000046          1   747831 0.9736840 0.22096836 0.22096836
+6 ALGA0000047          1   761957 0.9174565 0.05753712 0.05753712
 
-|SNP| chr  |  pos |Somatic cell score | Milk yield| Fat percentage|
-|:---:|:---: |:---:|:---:|:---:|:---:|
-| SNP1| 1 | 59082  | 0.000244361 |0.000484255  |  0.001379210|
-|SNP2| 1 |118164 |  0.000532272| 0.000039800  |  0.000598951|
-| SNP3 | 1| 177246  |  0.001633058 |0.000311645 |   0.000279427|
-|SNP4 | 1 |236328  |  0.001412865 |0.000909370  |  0.001040161|
-|SNP5 | 1 |295410  |   0.000090700 |0.002202973  |  0.000351394|
-| SNP6 | 1 |354493  | 0.000110681| 0.000342628  |  0.000105792|
+> head(cattle50K)
+
+   SNP chr    pos Somatic cell score  Milk yield Fat percentage
+1 SNP1   1  59082        0.000244361 0.000484255    0.001379210
+2 SNP2   1 118164        0.000532272 0.000039800    0.000598951
+3 SNP3   1 177246        0.001633058 0.000311645    0.000279427
+4 SNP4   1 236328        0.001412865 0.000909370    0.001040161
+5 SNP5   1 295410        0.000090700 0.002202973    0.000351394
+6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
+
+```
+As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 #### SNP-density plot
 
