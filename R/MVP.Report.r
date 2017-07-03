@@ -854,7 +854,7 @@ MVP.Report <- function(
 			}
 			
 			#add the labels of X-axis
-			mtext(xlab,side=1,padj=2.6,font=2,cex=1.6)
+			#mtext(xlab,side=1,padj=2.6,font=2,cex=1.6)
 			if(file.output==TRUE) dev.off()
 			#print("Rectangular-Manhattan has been finished!",quote=F)
 		}
