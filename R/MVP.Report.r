@@ -743,10 +743,10 @@ MVP.Report <- function(
 			#print("Starting Rectangular-Manhattan plot!",quote=F)
 			#print("Plotting in multiple tracks!",quote=F)
 			if(file.output==TRUE){
-				if(file=="jpg")	jpeg(paste("MVP.Multracks.Rectangular_Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
-				if(file=="pdf")	pdf(paste("MVP.Multracks.Rectangular_Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
-				if(file=="tiff")	tiff(paste("MVP.Multracks.Rectangular_Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
-				par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,1,3,0),xaxs=xaxs,yaxs=yaxs)
+				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
+				if(file=="tiff")	tiff(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
+				par(mfcol=c(R,1),mar=c(0, 6+(R-1)*2, 0, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
 			}
 			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
@@ -789,37 +789,44 @@ MVP.Report <- function(
 							# }
 						}
 					}
+					xn <- ifelse(R == 1, R, R * 2/3)
 					if(Max<=1){
-						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
-							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
+						plot(logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}else{
-						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
-							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
+						plot(logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
+							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}
 				}else{
-					plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
-						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
+					plot(logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
+						cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 				}
 				
-				#add the names of traits on plot  
-				text(ticks[1],Max,labels=taxa[i],adj=0,font=3,cex=1.5)
-				if(is.null(chr.labels)){
-					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
+				#add the names of traits on plot 
+				if(Max<=1){
+					text(ticks[1],Max+10^(-ceiling(-log10(Max))),labels=taxa[i],adj=0,font=3,cex=xn)
 				}else{
-					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
+					text(ticks[1],Max+1,labels=taxa[i],adj=0,font=3,cex=xn)
 				}
-				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=1.5)
+				if(i == R){
+					if(is.null(chr.labels)){
+						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.ori),padj=(xn-1)/2)
+					}else{
+						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.labels),padj=(xn-1)/2)
+					}
+				}
+				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=xn)
 				if(is.null(ylim)){
 					if(Max>1){
-						axis(2,at=seq(0,(Max+1),round((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),round((Max+1)/10)))
+						axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis*xn,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
 					}else{
-						axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+						axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis*xn,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)))
+						axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis*xn,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
 					}else{
-						axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+						axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
 					}
 				}
 				if(!is.null(threshold)){
@@ -834,11 +841,11 @@ MVP.Report <- function(
 							HX1=which(logpvalue>=sgline1)
 							
 							#cover the points that exceed the threshold with the color "white"
-							points(HX1,HY1,pch=pch,cex=cex[2],col="white")
+							points(HX1,HY1,pch=pch,cex=cex[2]*xn,col="white")
 							if(is.null(signal.col)){
-								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]])[HX1])
 							}else{
-								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2]*xn,col=signal.col)
 							}
 						}
 					}
