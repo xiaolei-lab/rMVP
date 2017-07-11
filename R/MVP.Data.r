@@ -56,6 +56,9 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
         phe <- read.table(paste(fileBed, ".fam", sep=""), head=FALSE)[, -c(1,3:5)]
         write.table(phe, paste(out, ".phe", sep=""), row.names=FALSE, col.names=TRUE, sep=sep.phe, quote=FALSE)
         map <- read.table(paste(fileBed, ".bim", sep=""), head=FALSE)
+        if(length(unique(map[, 2])) != nrow(map)){
+			stop("The names of all SNPs must be unique, please check 'BIM' file!")
+		}
         map <- map[, c(2, 1, 4)]
         colnames(map) <- c("SNP", "chrom", "pos")
         write.table(map, paste(out, ".map", sep=""), row.names=FALSE, col.names=TRUE, sep=sep.map, quote=FALSE)
