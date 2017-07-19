@@ -633,7 +633,7 @@ MVP.Report <- function(
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				print(paste("Rectangular.Manhattan Plotting ",taxa[i],"...",sep=""))
+				print(paste("Rectangular_Manhattan Plotting ",taxa[i],"...",sep=""))
 					if(file.output==TRUE){
 						if(file=="jpg")	jpeg(paste("MVP.Rectangular.Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
 						if(file=="pdf")	pdf(paste("MVP.Rectangular.Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
