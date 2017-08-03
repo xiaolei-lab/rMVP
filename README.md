@@ -36,6 +36,7 @@
 
 ---
 ### Installation
+**MVP** IS **UNIX ONLY**, CAN BE INSTALLED ON **LINUX AND MAC**<br>
 **WE STRONGLY RECOMMEND YOU INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**<br>
 **MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:<br>
 ```r
