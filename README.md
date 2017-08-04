@@ -175,13 +175,6 @@ If you have genotype data in **Numeric** format:
 
 > `Numeric.txt`
 
-| 1 | 1 | 2 | 1 | 2 | … | 0 |
-| :---: | :---: |  :---: |  :---: |  :---: | :---: | :---: |
-| 1 | 1 | 0 | 1 | 0 | … | 2 |
-| 1 | 2 | 2 | 1 | 2 | … | 0 |
-| 1 | 1 | 2 | 1 | 2 | … | 0 |
-| 0 | 0 | 0 | 0 | 0 | … | 0 |
-
 <table>
 <tbody>
 <tr>
@@ -287,6 +280,39 @@ If you have Principal Components matrix data
 |0.012887843 | -0.048418352 | 0.054298850|
 |0.003871951 |-0.038070387 | 0.008020508|
 |-0.079505846 | 0.005818163 | -0.206364549|
+
+<table>
+<tbody>
+<tr>
+<td align="center">0.010175524</td>
+<td align="center">-0.037989071</td>
+<td align="center">0.009588312</td>
+</tr>
+<tr>
+<td align="center">-0.009138673</td>
+<td align="center">-0.036763080</td>
+<td align="center">-0.006396714</td>
+</tr>
+<tr>
+<td align="center">-0.004723734</td>
+<td align="center">-0.047837625</td>
+<td align="center">0.021687731</td>
+</tr>
+<tr>
+<td align="center">0.012887843</td>
+<td align="center">-0.048418352</td>
+<td align="center">0.054298850</td>
+</tr>
+<tr>
+<td align="center">0.003871951</td>
+<td align="center">-0.038070387</td>
+<td align="center">0.008020508</td>
+</tr>
+<tr>
+<td align="center">-0.079505846</td>
+<td align="center">0.005818163</td>
+<td align="center">-0.206364549</td>
+</tr></tbody></table>
 
 ```r
 MVP.Data(filePC="mvp.pc.txt", 
