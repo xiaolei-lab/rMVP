@@ -13,35 +13,44 @@
 > Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, ***Xiaolei Liu***
 
 ### Contact:
-> xiaoleiliu@mail.hzau.edu.cn
+> [xiaoleiliu@mail.hzau.edu.cn]()
 
 ### Contents
-* [Installation](#installation)
-* [Data Preparation](#data-preparation)
-  - [PLINK binary](#plink-binary)
-  - [Hapmap](#hapmap)
-  - [Numeric](#numeric)
-  - [Kinship](#kinship)
-  - [Principal Components](#principal-components)
-* [Data Input](#data-input)
-  - [Basic](#basic)
-  - [Advanced](#advanced)
-* [Start GWAS](#start-gwas)
-* [Output](#output)
-  - [SNP-density plot](#SNP-density-plot)
-  - [Circular-Manhattan plot](#circular-manhattan-plot)
-  - [Rectangular-Manhattan plot](#rectangular-manhattan-plot)
-  - [Q-Q plot](#q-q-plot)
-* [FAQ AND HINTS](#faq-and-hints)
+<!-- TOC updateOnSave:false -->
+
+- [Installation](#installation)
+- [Data Preparation](#data-preparation)
+    - [PLINK binary](#plink-binary)
+    - [Hapmap](#hapmap)
+    - [Numeric](#numeric)
+    - [Kinship](#kinship)
+    - [Principal Components](#principal-components)
+- [Data Input](#data-input)
+    - [Basic](#basic)
+    - [Advanced](#advanced)
+- [Start GWAS](#start-gwas)
+- [Output](#output)
+    - [SNP-density plot](#snp-density-plot)
+    - [Circular-Manhattan plot](#circular-manhattan-plot)
+    - [Rectangular-Manhattan plot](#rectangular-manhattan-plot)
+        - [Genome-wide association study(GWAS)](#genome-wide-association-studygwas)
+        - [Genomic Selection/Prediction(GS/GP)](#genomic-selectionpredictiongsgp)
+        - [Multiple tracks rectangular-Manhattan plot](#multiple-tracks-rectangular-manhattan-plot)
+    - [Q-Q plot](#q-q-plot)
+        - [Single track Q-Q plot](#single-track-q-q-plot)
+        - [Multiple track Q-Q plot](#multiple-track-q-q-plot)
+- [FAQ and Hints](#faq-and-hints)
+
+<!-- /TOC -->
 
 ---
-### Installation
+# Installation
 **MVP** IS **UNIX ONLY**, CAN BE INSTALLED ON **LINUX AND MAC**<br>
 **WE STRONGLY RECOMMEND YOU INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**<br>
 **MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). **MVP** can be installed with the following R code:<br>
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-install_version('RcppEigen', version = "0.3.2.9.0")
+devtools::install_version('RcppEigen', version = "0.3.2.9.0")
 devtools::install_github("Bioconductor-mirror/snpStats")
 devtools::install_github("jaredhuling/rfunctions")
 devtools::install_github("xiaoleiLiubio/MVP")
@@ -54,9 +63,9 @@ Typing ```?MVP``` could get the details of all parameters.
 
 ---
 
-### Data Preparation
+# Data Preparation
 
-#### PLINK binary
+## PLINK binary
 If you have genotype data in **PLINK** format (bed/bim/fam):<br>
 **fileBed**, the name of genotype data in PLINK format<br>
 **fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated<br>
@@ -74,8 +83,8 @@ MVP.Data(fileBed="plink",
          #maxLine=10000,
          )
 ```
-#### Hapmap
-If you have genotype data in **Hapmap** format (bed/bim/fam):<br>
+## Hapmap
+If you have genotype data in **Hapmap** format:<br>
 **fileHMP** is a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", chr3.hmp.txt)<br>
 **filePhe**, name of phenotype file<br>
 **sep.hmp**, seperator of hapmap file<br>
@@ -141,8 +150,8 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
          )
 ```
 
-#### Numeric
-If you have genotype data in **Numeric** format (bed/bim/fam):<br>
+## Numeric
+If you have genotype data in **Numeric** format:<br>
 **fileNum**, the name of genotype data in PLINK format<br>
 **filePhe**, name of phenotype file<br>
 **fileMap**, name of map file<br>
@@ -180,7 +189,7 @@ MVP.Data(fileNum="Numeric.txt",
          )
 ```
 
-#### Kinship
+## Kinship
 If you have Kinship matrix data that represents the relationship among individuals<br>
 **fileKin**, the name of Kinship matrix data, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included<br>
 **type.kin**, the type of data in Kinship matrix file, "char", "integer", or "double"<br>
@@ -204,7 +213,7 @@ MVP.Data(fileKin="mvp.kin.txt",
          )
 ```
 
-#### Principal Components
+## Principal Components
 If you have Principal Components matrix data<br>
 **filePC**, the name of Principal Components matrix data, the dimension of Principal Components matrix is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included<br>
 **type.pc**, the type of data in Principal Components matrix file, "char", "integer", or "double"<br>
@@ -229,9 +238,9 @@ MVP.Data(filePC="mvp.pc.txt",
 
 ---
 
-### Data Input
+# Data Input
 
-#### Basic
+## Basic
 At least you should have three data: genotype, phenotype, and map<br>
 **genotype**, genotype data generated by **'MVP.Data'** function<br>
 **phenotype**, phenotype data, the first column is taxa name and second column is phenotype value<br>
@@ -242,7 +251,7 @@ phenotype <- read.table("mvp.phe",head=TRUE)
 map <- read.table("mvp.map" , head = TRUE)
 ```
 
-#### Advanced
+## Advanced
 You can give MVP the prepared Kinship matrix and Covariates data generated by **'MVP.Data'** function<br>
 **Kinship**, Kinship matrix, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included<br>
 **Covariates**, Covariates matrix, the dimension of Covariates matrix is n * nCV (n is sample size, nCV is number of covariates, no taxa names and header row included<br>
@@ -254,7 +263,7 @@ If you have prepared Kinship matrix and Covariates data generated by other softw
 
 ---
 
-### Start GWAS
+# Start GWAS
 
 Three models are included in MVP package: General Linear Model (GLM), Mixed Linear Model (MLM), and FarmCPU.
 **phe**, phenotype data, details see **2.1**<br>
@@ -336,7 +345,7 @@ for(i in 2:ncol(phenotype)){
 
 ---
 
-### Output
+# Output
 **MVP** will automatically output one(".jpg" by default) of three types (".jpg",".pdf",".tiff") high quality visual plot. Still, users could adjust about 40 parameters to plot more elaborate results by the function of ```MVP.Report()```. 
 Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` directly, for example ```MVP.Report(imMVP, ...)```. Nevertheless, users could load the prepared data into R and use the function to visualize it, if in this case, the data at least contains four columns, which are names of SNP, chromosome, postion and P-value of a trait respectively, more traits could be sequentially appended after the data by column. Typing ```?MVP.Report()``` to see the details of all parameters. Typing ```data(pig60K); data(cattle50K)``` to load the attached datasets.
 
@@ -367,7 +376,7 @@ Generally, ```MVP.Report()``` could accept the final return of ```MVP()``` direc
 ```
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
-#### SNP-density plot
+## SNP-density plot
 
 ```r
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
@@ -383,9 +392,9 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 </a>
 </p>
 
-#### Circular-Manhattan plot
+## Circular-Manhattan plot
 
-***Genome-wide association study(GWAS)***
+### Genome-wide association study(GWAS)
 
 ```r
 MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
@@ -407,7 +416,7 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
 </a>
 </p>
 
-***Genomic Selection/Prediction(GS/GP)***
+### Genomic Selection/Prediction(GS/GP)
 
 ```r
 MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29),sep=""),
@@ -426,9 +435,9 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </a>
 </p>
 
-#### Rectangular-Manhattan plot
+## Rectangular-Manhattan plot
 
-***Genome-wide association study(GWAS)***
+### Genome-wide association study(GWAS)
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
@@ -440,7 +449,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 </a>
 </p>
 
-***Genomic Selection/Prediction(GS/GP)***
+### Genomic Selection/Prediction(GS/GP)
 
 ```r
 MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
@@ -453,7 +462,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect",
 </a>
 </p>
 
-***Multiple tracks rectangular-Manhattan plot***
+### Multiple tracks rectangular-Manhattan plot
 
 ```r
 MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
@@ -466,9 +475,9 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 </a>
 </p>
 
-#### Q-Q plot
+## Q-Q plot
 
-***Single track Q-Q plot***
+### Single track Q-Q plot
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
@@ -482,7 +491,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 </a>
 </p>
 
-***Multiple track Q-Q plot***
+### Multiple track Q-Q plot
 
 ```r
 MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
@@ -496,7 +505,7 @@ MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="gr
 
 ---
 
-### FAQ and Hints
+# FAQ and Hints
 
 :sos: **Question1:** Failing to install "devtools":
 
