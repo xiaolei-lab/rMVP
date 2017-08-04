@@ -182,6 +182,54 @@ If you have genotype data in **Numeric** format:
 | 1 | 1 | 2 | 1 | 2 | … | 0 |
 | 0 | 0 | 0 | 0 | 0 | … | 0 |
 
+<table>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">…</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">…</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">…</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">…</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">…</td>
+<td align="center">0</td>
+</tr></tbody></table>
+
 ```r
 MVP.Data(fileNum="Numeric.txt",
          filePhe="Phenotype.txt",
