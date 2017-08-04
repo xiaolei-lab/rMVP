@@ -248,14 +248,71 @@ If you have Kinship matrix data that represents the relationship among individua
 
 > `mvp.kin.txt`
 
-| 0.3032 | -0.0193 | 0.0094 | 0.0024 | 0.0381 | ... | -0.0072 |
-| :---: | :---: |  :---: |  :---: |  :---: |  :---: |  :---: |
-| -0.0193 | 0.274 | -0.0243 | 0.0032 | -0.0081 | ... | 0.0056 |
-| 0.0094 | -0.0243 | 0.3207 | -0.0071 | -0.0045 | ... | -0.0407 |
-| 0.0024 | 0.0032 | -0.0071 | 0.321 | -0.008 | ... | -0.0093 |
-| 0.0381 | -0.0081 | -0.0045 | -0.008 | 0.3498 | ... | -0.0238 |
-| ... | ... | ... | ... | ... | ... | ... | 
-| -0.0072 | 0.0056 | -0.0407 | -0.0093 | -0.0238 | ... | 0.3436 |
+<table>
+<tbody>
+<tr>
+<td align="center">0.3032</td>
+<td align="center">-0.0193</td>
+<td align="center">0.0094</td>
+<td align="center">0.0024</td>
+<td align="center">0.0381</td>
+<td align="center">...</td>
+<td align="center">-0.0072</td>
+</tr>
+<tr>
+<td align="center">-0.0193</td>
+<td align="center">0.274</td>
+<td align="center">-0.0243</td>
+<td align="center">0.0032</td>
+<td align="center">-0.0081</td>
+<td align="center">...</td>
+<td align="center">0.0056</td>
+</tr>
+<tr>
+<td align="center">0.0094</td>
+<td align="center">-0.0243</td>
+<td align="center">0.3207</td>
+<td align="center">-0.0071</td>
+<td align="center">-0.0045</td>
+<td align="center">...</td>
+<td align="center">-0.0407</td>
+</tr>
+<tr>
+<td align="center">0.0024</td>
+<td align="center">0.0032</td>
+<td align="center">-0.0071</td>
+<td align="center">0.321</td>
+<td align="center">-0.008</td>
+<td align="center">...</td>
+<td align="center">-0.0093</td>
+</tr>
+<tr>
+<td align="center">0.0381</td>
+<td align="center">-0.0081</td>
+<td align="center">-0.0045</td>
+<td align="center">-0.008</td>
+<td align="center">0.3498</td>
+<td align="center">...</td>
+<td align="center">-0.0238</td>
+</tr>
+<tr>
+<td align="center">...</td>
+<td align="center">...</td>
+<td align="center">...</td>
+<td align="center">...</td>
+<td align="center">...</td>
+<td align="center">...</td>
+<td align="center">...</td>
+</tr>
+<tr>
+<td align="center">-0.0072</td>
+<td align="center">0.0056</td>
+<td align="center">-0.0407</td>
+<td align="center">-0.0093</td>
+<td align="center">-0.0238</td>
+<td align="center">...</td>
+<td align="center">0.3436</td>
+</tr></tbody></table>
 
 ```r
 MVP.Data(fileKin="mvp.kin.txt", 
@@ -272,14 +329,6 @@ If you have Principal Components matrix data
 **sep.pc**, seperator of Principal Components matrix data file  
 
 > `mvp.pc.txt`
-
-|0.010175524  |-0.037989071 | 0.009588312|
-| :---: | :---: |  :---: |
-|-0.009138673 |-0.036763080  |-0.006396714|
-|-0.004723734 |-0.047837625 | 0.021687731|
-|0.012887843 | -0.048418352 | 0.054298850|
-|0.003871951 |-0.038070387 | 0.008020508|
-|-0.079505846 | 0.005818163 | -0.206364549|
 
 <table>
 <tbody>
