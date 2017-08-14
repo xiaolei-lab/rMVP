@@ -89,17 +89,17 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
     }
     
     #remove samples with missing phenotype
-    seqTaxa = which(!is.na(phe[,2]))
+    #seqTaxa = which(!is.na(phe[,2]))
     #file.exsits()
-    geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
-    phe = phe[seqTaxa,]
-    if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
-    if(!is.null(CV.MLM)){CV.MLM = CV.MLM[seqTaxa,]}
-    if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
-    rm(geno)
-    gc()
-    genoName <- "geno.temp.desc"
-    geno <- attach.big.matrix(genoName)
+    #geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
+    #phe = phe[seqTaxa,]
+    #if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
+    #if(!is.null(CV.MLM)){CV.MLM = CV.MLM[seqTaxa,]}
+    #if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
+    #rm(geno)
+    #gc()
+    #genoName <- "geno.temp.desc"
+    #geno <- attach.big.matrix(genoName)
 
     #Data information
     m=nrow(geno)
