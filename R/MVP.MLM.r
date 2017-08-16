@@ -123,8 +123,12 @@ nf <- ncol(X0) + 1
     
     #Paralleled MLM
 	if(cpu == 1){
+		math.cpu <- try(getMKLthreads(), silent=TRUE)
+	    	mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
+                try(setMKLthreads(mkl.cpu), silent=TRUE)
 		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
         results <- lapply(1:m, eff.mlm.parallel)
+	try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
         if(wind){
 			print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
