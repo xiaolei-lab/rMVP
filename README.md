@@ -159,7 +159,7 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
 ```
 
 ## Numeric
-If you have genotype data in **Numeric** format:  
+If you have genotype data in **Numeric**(m * n, m is the number of SNPs, n is the number of individuals)format:  
 
 **fileNum**, the name of genotype data in PLINK format  
 **filePhe**, name of phenotype file  
@@ -173,7 +173,14 @@ If you have genotype data in **Numeric** format:
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
 
-> `Numeric.txt`
+<table>
+<tbody>
+<tr>
+<td align="center"><em><strong><code>Numeric.txt</code></strong></em></td>
+<td align="center"><em><strong><code>Map.txt</code></strong></em></td>
+</tr>
+<tr>
+<td align="center">
 
 <table>
 <tbody>
@@ -221,6 +228,40 @@ If you have genotype data in **Numeric** format:
 <td align="center">0</td>
 <td align="center">…</td>
 <td align="center">0</td>
+</tr></tbody></table>
+
+</td>
+
+<td align="center">
+<table>
+<tbody>
+<tr>
+<td align="center">rs3683945</td>
+<td align="center">1</td>
+<td align="center">3197400</td>
+</tr>
+<tr>
+<td align="center">rs3707673</td>
+<td align="center">1</td>
+<td align="center">3407393</td>
+</tr>
+<tr>
+<td align="center">rs6269442</td>
+<td align="center">1</td>
+<td align="center">3492195</td>
+</tr>
+<tr>
+<td align="center">rs6336442</td>
+<td align="center">1</td>
+<td align="center">3580634</td>
+</tr>
+<tr>
+<td align="center">rs13475699</td>
+<td align="center">1</td>
+<td align="center">3860406</td>
+</tr></tbody></table>
+
+</td>
 </tr></tbody></table>
 
 ```r
