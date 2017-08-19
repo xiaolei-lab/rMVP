@@ -20,7 +20,7 @@
 
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
-    - [PLINK binary](#plink-binary)/[Hapmap](#hapmap)/[Numeric](#numeric)
+    - [PLINK binary](#plink-binary)/[Hapmap](#hapmap)/[Numeric](#numeric)
     - [Kinship](#kinship)/[Principal Components](#principal-components)
 - [Data Input](#data-input)
     - [Basic](#basic)
