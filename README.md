@@ -73,7 +73,9 @@ source("MVPinstall.r")
 ```
 
 ***For Windows/mac:***
-click [here](https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip) in your browser to download, after downloaded, unzip the file and change the workplace to the folder by setwd("") in R, then ```r source("MVPinstall.r") ```.
+click [here](https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip) in your browser to download, after downloaded, unzip the file and change the workplace to the folder by setwd("") in R, then ```source("MVPinstall.r")```.
+
+After installed successfully, **MVP** can be loaded by typing
 ```r
 library(MVP)
 ```
