@@ -61,7 +61,19 @@ devtools::install_github("Bioconductor-mirror/snpStats")
 devtools::install_github("jaredhuling/rfunctions")
 devtools::install_github("xiaoleiLiubio/MVP")
 ```
-After installed successfully, **MVP** can be loaded with the following R code:
+If there are some problems hard to solve using the codes above, users could try to installed locally as follow:
+
+***For Linux:***
+```bash
+wget https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip
+unzip packages.zip
+cd packages
+R
+source("MVPinstall.r")
+```
+
+***For Windows/mac:***
+click [here](https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip) in your browser to download, after downloaded, unzip the file and change the workplace to the folder by setwd("") in R, then ```r source("MVPinstall.r") ```.
 ```r
 library(MVP)
 ```
