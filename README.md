@@ -58,7 +58,7 @@ devtools::install_github("Bioconductor-mirror/snpStats")
 devtools::install_github("jaredhuling/rfunctions")
 devtools::install_github("xiaoleiLiubio/MVP")
 ```
-If there are some problems hard to solve using the codes above, users could try to installed locally as follow:
+If there are some problems hard to solve using the codes above, users could try to install locally as follow:
 
 ***For Linux:***
 ```bash
