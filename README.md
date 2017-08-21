@@ -69,7 +69,7 @@ R
 source("MVPinstall.r")
 ```
 
-***For Windows/mac:***
+***For mac:***
 
 click [here](https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip) in your browser to download, after downloaded, unzip the file and change the workplace to the folder by setwd("") in R, then ```source("MVPinstall.r")```.
 
