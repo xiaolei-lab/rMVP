@@ -94,6 +94,7 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
 	if(length(seqTaxa) != length(phe[,2])){
     	geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
     	phe = phe[seqTaxa,]
+		if(!is.null(K)){K = K[seqTaxa, seqTaxa]}
     	if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
     	if(!is.null(CV.MLM)){CV.MLM = CV.MLM[seqTaxa,]}
     	if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
