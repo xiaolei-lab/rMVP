@@ -91,7 +91,7 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
     #file.exsits()
-	if(length(seqTaxa) != phe[,2]){
+	if(length(seqTaxa) != length(phe[,2])){
     	geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
     	phe = phe[seqTaxa,]
     	if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
