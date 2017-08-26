@@ -647,9 +647,8 @@
 		
 		return(P)
 	}#The function FarmCPU.Prior ends here
-
 	
-	echo=TRUE
+    echo=TRUE
     nm=nrow(map)
     if(!is.null(CV)){
         CV=as.matrix(CV)
@@ -659,7 +658,7 @@
     }
     
     if(is.null(QTN.threshold)){QTN.threshold = 0.01}
-    if(!is.na(p.threshold)) QTN.threshold = min(p.threshold, QTN.threshold)
+    if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
     name.of.trait=colnames(phe)[2]
     if(!is.null(memo)) name.of.trait=paste(memo,".",name.of.trait,sep="")
