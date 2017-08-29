@@ -52,7 +52,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
 
     #parallel function for GLM model
     eff.glm <- function(i){
-		#print.f(i)
+		print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
@@ -95,12 +95,12 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
 	    	math.cpu <- try(getMKLthreads(), silent=TRUE)
 	    	mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
                 try(setMKLthreads(mkl.cpu), silent=TRUE)
-		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
+		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.glm)
 	try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
             if(wind){
-				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=FALSE)}
+				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
                 cl <- makeCluster(getOption("cl.cores", cpu))
                 clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
                 Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
