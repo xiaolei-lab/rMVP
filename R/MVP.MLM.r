@@ -1,5 +1,5 @@
 MVP.MLM <-
-function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", genoName=NULL, cpu=2, vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
+function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", genoName=NULL, cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
 ##########################################################################################################
 # Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
 #
@@ -87,7 +87,7 @@ nf <- ncol(X0) + 1
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
-		print.f(i)
+		if(bar)	print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
