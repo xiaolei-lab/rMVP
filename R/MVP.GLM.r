@@ -52,7 +52,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
 
     #parallel function for GLM model
     eff.glm <- function(i){
-		print.f(i)
+		#print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
