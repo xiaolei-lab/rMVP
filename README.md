@@ -508,7 +508,7 @@ If you have more than one phenotype
 ```r
 for(i in 2:ncol(phenotype)){
   imMVP <- MVP(
-    phe=phenotype,
+    phe=phenotype[, c(1, i)],
     geno=genotype,
     map=map,
     #K=Kinship,
