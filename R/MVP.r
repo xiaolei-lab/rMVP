@@ -1,6 +1,6 @@
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=2, vc.method="EMMA", method="MLM", maxLine=1000, memo="MVP", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=TRUE,
-permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8
+permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8
 )
 {
 ###################################################################################################
@@ -178,14 +178,14 @@ permutation.threshold=FALSE, permutation.rep=100, col=c("dodgerblue4","olivedrab
     
     if(glm.run){
         print("General Linear Model (GLM) Start ...")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM")
+        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar)
 		colnames(glm.results) <- c("effect", paste(colnames(phe)[2],"GLM",sep="."))
 		if(file.output)	write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
 	}
 
     if(mlm.run){
         print("Mixed Linear Model (MLM) Start ...")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, genoName=genoName, cpu=ncpus, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM")
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, genoName=genoName, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM")
 		colnames(mlm.results) <- c("effect", paste(colnames(phe)[2],"MLM",sep="."))
 		if(file.output)	write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
 	}
