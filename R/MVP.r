@@ -75,20 +75,20 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #}
     
     MVP.Version()
-    if(nrow(phe) != nrow(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
+    if(nrow(phe) != ncol(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
     if(!is.null(CV.GLM)){
         CV.GLM <- as.matrix(CV.GLM)
-	if(nrow(CV.GLM) != nrow(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
+	if(nrow(CV.GLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
     }
     if(!is.null(CV.MLM)){
         CV.MLM <- as.matrix(CV.MLM)
-	    if(nrow(CV.MLM) != nrow(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
+	    if(nrow(CV.MLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
     }
     if(!is.null(CV.FarmCPU)){
         CV.FarmCPU <- as.matrix(CV.FarmCPU)
-	    if(nrow(CV.FarmCPU) != nrow(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
+	    if(nrow(CV.FarmCPU) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
     }
     
     #remove samples with missing phenotype
