@@ -42,12 +42,25 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
     }
     print("Principal Component Analysis Start ...")
     if(perc < 1){
-        big.geno <- thin(bigMat=M, keep = perc)
+        if(wind){
+            set.seed(123456)
+            m <- nrow(M)
+            big.geno <- M[sample(1:m, round(m * perc)), ]
+        }else{
+            big.geno <- thin(bigMat=M, keep = perc)
+        }
     }else{
-        big.geno=M
+        if(wind){
+            big.geno <- t(as.matrix(m))
+        }else{
+            big.geno <- M
+        }
     }
     #Calculate PCs by using bigPCA package
-    PCs <- big.PCA(bigMat=big.geno,pcs.to.keep=pcs.keep)$PCs
-
+    if(wind){
+        PCs <- prcomp(big.geno)$x[, 1:pcs.keep]
+    }else{
+        PCs <- big.PCA(bigMat=big.geno,pcs.to.keep=pcs.keep)$PCs
+    }
     return(list(PCs=PCs))
 }#end of MVP.PCA function
