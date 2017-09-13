@@ -3,9 +3,8 @@ Type: Package
 Title: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
 Version: 0.1
 Date: 2017-05-26
-Author: Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu
+Author: Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
 Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS
 License: GPL(>=2)
-Depends: R (>= 3.0), bigmemory, biganalytics, bigpca, rfunctions, snpStats, parallel, MASS
-OS_type: unix
+Depends: R (>= 3.0), bigmemory, biganalytics, rfunctions, snpStats, parallel, MASS
