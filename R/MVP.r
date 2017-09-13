@@ -66,7 +66,8 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-
+	
+	if(wind)	ncpus <- 1
     if(r.open && ncpus>1 && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
