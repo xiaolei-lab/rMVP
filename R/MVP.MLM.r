@@ -29,7 +29,7 @@ R.ver <- Sys.info()[['sysname']]
 wind <- R.ver == 'Windows'
 #taxa <- colnames(phe)[2]
 #r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-#math.cpu <- try(getMKLthreads(), silent=TRUE)
+math.cpu <- try(getMKLthreads(), silent=TRUE)
 
 n <- ncol(geno)
 m <- nrow(geno)
