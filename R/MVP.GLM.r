@@ -22,7 +22,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
     wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    #math.cpu <- try(getMKLthreads(), silent=TRUE)
+    math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
