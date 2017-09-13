@@ -415,21 +415,27 @@
 			P = pvalue[-1]
 			return(list(B=B,P=P))
 		}
-		
+
 		R.ver <- Sys.info()[['sysname']]
 		if(R.ver == 'Linux') {
 			math.cpu <- try(getMKLthreads(), silent=TRUE)
 			try(setMKLthreads(1), silent=TRUE)
 		}
-		tmpf.name <- tempfile()
-		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
-		writeBin(0, tmpf)
-		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-		results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
-		close(tmpf); unlink(tmpf.name); cat('\n');
-		if(R.ver == 'Linux') {
-			try(setMKLthreads(math.cpu), silent=TRUE)
+		if(R.ver == 'Windows'){
+			print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        		results <- lapply(1:m, eff.farmcpu.parallel)
+		}else{
+			tmpf.name <- tempfile()
+			tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+			writeBin(0, tmpf)
+			print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+			results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
+			close(tmpf); unlink(tmpf.name); cat('\n');
+			if(R.ver == 'Linux') {
+				try(setMKLthreads(math.cpu), silent=TRUE)
+			}
 		}
+
 
 		if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
 		return(list(P=results[,-1],betapred=betapred,B=results[,1]))
