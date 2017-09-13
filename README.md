@@ -169,7 +169,7 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
 ## Numeric
 If you have genotype data in **Numeric**(m * n, m is the number of SNPs, n is the number of individuals)format:  
 
-**fileNum**, the name of genotype data in PLINK format  
+**fileNum**, the name of genotype data in Numeric format  
 **filePhe**, name of phenotype file  
 **fileMap**, name of map file  
 **sep.num**, seperator of Numeric file  
