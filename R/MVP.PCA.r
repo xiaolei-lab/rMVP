@@ -51,7 +51,7 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
         }
     }else{
         if(wind){
-            big.geno <- t(as.matrix(m))
+            big.geno <- t(as.matrix(M))
         }else{
             big.geno <- M
         }
