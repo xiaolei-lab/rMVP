@@ -44,11 +44,12 @@
 
 ---
 # Installation
-**MVP** IS **UNIX ONLY**, CAN BE INSTALLED ON **LINUX AND MAC**  
 
 **WE STRONGLY RECOMMEND YOU INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**  
 
 **MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). 
+
+***For Windows:***
 
 it can be installed with the following R code:  
 ```r
@@ -58,9 +59,8 @@ devtools::install_github("Bioconductor-mirror/snpStats")
 devtools::install_github("jaredhuling/rfunctions")
 devtools::install_github("xiaoleiLiubio/MVP")
 ```
-If there are some problems hard to solve using the codes above, users could try to install locally as follow:
 
-***For Linux:***
+***For Linux/Mac:***
 ```bash
 wget https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip
 unzip packages.zip
@@ -68,10 +68,6 @@ cd packages
 R
 source("MVPinstall.r")
 ```
-
-***For mac:***
-
-click [here](https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip) in your browser to download, after downloaded, unzip the file and change the workplace to the folder by setwd("") in R, then ```source("MVPinstall.r")```.
 
 After installed successfully, **MVP** can be loaded by typing
 ```r
