@@ -29,7 +29,7 @@
     # Last update: May 25, 2017
     ##############################################################################################
     #print("--------------------- Welcome to FarmCPU ----------------------------")
-    
+    print("welcome")
 	FarmCPU.BIN <-
 	function(Y=NULL,GDP=NULL,GM=NULL,CV=NULL,P=NULL,method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
 		#Input: Y - n by 2 matrix with fist column as taxa name and second as trait
@@ -415,27 +415,21 @@
 			P = pvalue[-1]
 			return(list(B=B,P=P))
 		}
-
+		
 		R.ver <- Sys.info()[['sysname']]
 		if(R.ver == 'Linux') {
 			math.cpu <- try(getMKLthreads(), silent=TRUE)
 			try(setMKLthreads(1), silent=TRUE)
 		}
-		if(R.ver == 'Windows'){
-			print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        		results <- lapply(1:m, eff.farmcpu.parallel)
-		}else{
-			tmpf.name <- tempfile()
-			tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
-			writeBin(0, tmpf)
-			print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-			results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
-			close(tmpf); unlink(tmpf.name); cat('\n');
-			if(R.ver == 'Linux') {
-				try(setMKLthreads(math.cpu), silent=TRUE)
-			}
+		tmpf.name <- tempfile()
+		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+		writeBin(0, tmpf)
+		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+		results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
+		close(tmpf); unlink(tmpf.name); cat('\n');
+		if(R.ver == 'Linux') {
+			try(setMKLthreads(math.cpu), silent=TRUE)
 		}
-
 
 		if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
 		return(list(P=results[,-1],betapred=betapred,B=results[,1]))
@@ -507,8 +501,13 @@
 		if(is.null(GLM$P)) return(NULL)  #P is required
 		if(is.null(QTN)) return(NULL)  #QTN is required
 		#print("FarmCPU.SUB Started")
-		if(length(QTN==1)){QTN=as.matrix(QTN)}
-		position=match(QTN[,1], GM[,1], nomatch = 0)
+		#print(length(QTN))
+		if(length(QTN)==3){
+			QTN=QTN[1]
+		}else{
+			QTN=QTN[,1]
+		}
+		position=match(QTN, GM[,1], nomatch = 0)
 		nqtn=length(position)
 		if(is.numeric(GLM$P)){
 			GLM$P = as.matrix(GLM$P)
