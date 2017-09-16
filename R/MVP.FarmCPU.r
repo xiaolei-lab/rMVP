@@ -507,6 +507,7 @@
 		if(is.null(GLM$P)) return(NULL)  #P is required
 		if(is.null(QTN)) return(NULL)  #QTN is required
 		#print("FarmCPU.SUB Started")
+		if(length(QTN==1)){QTN=as.matrix(QTN)}
 		position=match(QTN[,1], GM[,1], nomatch = 0)
 		nqtn=length(position)
 		if(is.numeric(GLM$P)){
