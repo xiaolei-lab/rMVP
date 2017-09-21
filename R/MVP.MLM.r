@@ -40,6 +40,12 @@ ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
     if(file.output){
+	xx <- grep("kin.desc", list.files(), value=1)
+	if(length(xx) != 0){
+		for(i in xx){
+			if(nrow(attach.big.matrix(i))==nrow(K))	unlink(i);gc()
+		}
+	}
         Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
         descriptorfile="MVP.kin.desc")
         Kin.backed[, ] <- K[, ]
