@@ -41,6 +41,12 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
         perc <- 1
     }
     print("Principal Component Analysis Start ...")
+    xx <- grep("pc.desc", list.files(), value=1)
+	if(length(xx) != 0){
+		for(i in xx){
+			if(nrow(attach.big.matrix(i))==ncol(M) && ncol(attach.big.matrix(i))==pcs.keep)	unlink(i);gc()
+		}
+	}
     if(perc < 1){
         if(wind){
             set.seed(123456)
