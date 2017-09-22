@@ -79,21 +79,27 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(nrow(phe) != ncol(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
+	na.index <- NULL
     if(!is.null(CV.GLM)){
         CV.GLM <- as.matrix(CV.GLM)
 	if(nrow(CV.GLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
+		na.index <- c(na.index, which(is.na(CV.GLM), arr.ind=T)[, 1])
     }
     if(!is.null(CV.MLM)){
         CV.MLM <- as.matrix(CV.MLM)
 	    if(nrow(CV.MLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
-    }
+   	na.index <- c(na.index, which(is.na(CV.MLM), arr.ind=T)[, 1])
+	}
     if(!is.null(CV.FarmCPU)){
         CV.FarmCPU <- as.matrix(CV.FarmCPU)
 	    if(nrow(CV.FarmCPU) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
-    }
-    
+    	na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind=T)[, 1])
+	}
+    na.index <- unique(na.index)
+	
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
+	if(length(na.index) != 0)	seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
     #file.exsits()
 	if(length(seqTaxa) != length(phe[,2])){
 		try(unlink(c("geno.temp.bin","geno.temp.desc")), silent=TRUE)
