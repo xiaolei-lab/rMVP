@@ -29,7 +29,7 @@ R.ver <- Sys.info()[['sysname']]
 wind <- R.ver == 'Windows'
 #taxa <- colnames(phe)[2]
 #r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-math.cpu <- try(getMKLthreads(), silent=TRUE)
+math.cpu <- try(getMKLthreads(), silent=TRUE
 
 n <- ncol(geno)
 m <- nrow(geno)
@@ -43,11 +43,14 @@ if(is.null(K)){
 	xx <- grep("kin.desc", list.files(), value=1)
 	if(length(xx) != 0){
 		for(i in xx){
-			if(nrow(attach.big.matrix(i))==nrow(K))	unlink(i);gc()
+			if(nrow(attach.big.matrix(i))==nrow(K))	Kin.backed <- attach.big.matrix(i)
 		}
-	}
+		if(!exists("Kin.backed"))	Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
+        descriptorfile="MVP.kin.desc")
+	}else{
         Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
         descriptorfile="MVP.kin.desc")
+	}
         Kin.backed[, ] <- K[, ]
         flush(Kin.backed)
         rm(list=c("Kin.backed"))
