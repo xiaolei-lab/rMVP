@@ -96,6 +96,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     seqTaxa = which(!is.na(phe[,2]))
     #file.exsits()
 	if(length(seqTaxa) != length(phe[,2])){
+		try(unlink(c("geno.temp.bin","geno.temp.desc")), silent=TRUE)
     	geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
     	phe = phe[seqTaxa,]
 		if(!is.null(K)){K = K[seqTaxa, seqTaxa]}
