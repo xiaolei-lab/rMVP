@@ -40,8 +40,8 @@ ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
     if(file.output){
-	filebck <- paste("MVP.", colnames(phe)[2], ".kin.bin", sep="")
-	filedes <- paste("MVP.", colnames(phe)[2], ".kin.desc", sep="")
+	filebck <- paste("MVP.", colnames(phe)[2], memo, ".kin.bin", sep="")
+	filedes <- paste("MVP.", colnames(phe)[2], memo, ".kin.desc", sep="")
 	if(file.exists(filebck) & file.exists(filedes)){
 	Kin.backed <- attach.big.matrix(filedes)
 	}else{
