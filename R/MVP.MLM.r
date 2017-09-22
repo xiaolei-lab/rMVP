@@ -40,16 +40,13 @@ ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
     if(file.output){
-	xx <- grep("kin.desc", list.files(), value=1)
-	if(length(xx) != 0){
-		for(i in xx){
-			if(nrow(attach.big.matrix(i))==nrow(K))	Kin.backed <- attach.big.matrix(i)
-		}
-		if(!exists("Kin.backed"))	Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
-        descriptorfile="MVP.kin.desc")
+	filebck <- paste("MVP.", colnames(phe)[2], ".kin.bin", sep="")
+	filedes <- paste("MVP.", colnames(phe)[2], ".kin.desc", sep="")
+	if(file.exists(filebck) & file.exists(filedes)){
+	Kin.backed <- attach.big.matrix(filedes)
 	}else{
-        Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile="MVP.kin.bin",
-        descriptorfile="MVP.kin.desc")
+        Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile=filebck,
+        descriptorfile=filedes)
 	}
         Kin.backed[, ] <- K[, ]
         flush(Kin.backed)
