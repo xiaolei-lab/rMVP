@@ -136,8 +136,14 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(!is.null(nPC)){
         ipca <- MVP.PCA(M=geno, perc=perc, pcs.keep=nPC)$PCs
         if(file.output){
-            PC.backed<-big.matrix(nrow(ipca), ncol(ipca), type="double", backingfile=paste(memo, ".pc.bin", sep=""),
-            descriptorfile=paste(memo, ".pc.desc", sep=""))
+		filebck <- paste("MVP.", colnames(phe)[2], memo, ".pc.bin", sep="")
+		filedes <- paste("MVP.", colnames(phe)[2], memo, ".pc.desc", sep="")
+		if(file.exists(filebck) & file.exists(filedes)){
+			PC.backed <- attach.big.matrix(filedes)
+		}else{
+       			 PC.backed<-big.matrix(nrow(ipca), ncol(ipca), type="double", backingfile=filebck,
+       		 descriptorfile=filedes)
+		}
             PC.backed[, ] <- ipca[, ]
             flush(PC.backed)
             #print("Preparation for PC matrix is done!")
