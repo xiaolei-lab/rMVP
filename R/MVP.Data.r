@@ -75,28 +75,33 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
         backingfile=bck, descriptorfile=dsc)
         options(bigmemory.typecast.warning=FALSE)
         #print("Output BIG genotype...")
-        inGENOFile=TRUE
-        i <- 0
-        printN <- unlist(strsplit(x=as.character(nmarkers), split="", fixed=TRUE))
-        printIndex <- seq(0, (as.numeric(printN[1]) + 1) * 10^(length(printN)), 1000)[-1]
-        while(inGENOFile){
-            i <- i + maxLine
-            if(i >= nmarkers){
-                xx <- nmarkers
-                inGENOFile <- FALSE
-            }else{
-                xx <- i
-            }
-            if(sum(i >= printIndex )!=0){
-                printIndex <- printIndex[printIndex > i]
-                print(paste("Number of Markers Written into File: ", xx, sep=""))
-            }
-            if(i >= nmarkers){
-                myGeno.backed [(i-maxLine + 1):nmarkers, ] = -1 * data.matrix(geno[(i-maxLine + 1):nmarkers, ]) + 3
-            }else{
-                myGeno.backed [(i-maxLine + 1):i, ] = -1 * data.matrix(geno[(i-maxLine + 1):i, ]) + 3
-            }
-        }
+	inGENOFile=TRUE
+		i <- 0
+		printN <- unlist(strsplit(x=as.character(nmarkers), split="", fixed=TRUE))
+		printIndex <- seq(0, (as.numeric(printN[1]) + 1) * 10^(length(printN)), 1000)[-1]
+		Num.fun <- function(x){
+			x <- data.matrix(as.data.frame(x))
+			x[x==0]=2
+			return(x)
+		}
+		while(inGENOFile){
+			i <- i + maxLine
+			if(i >= nmarkers){
+				xx <- nmarkers
+				inGENOFile <- FALSE
+			}else{
+				xx <- i
+			}
+			if(sum(i >= printIndex )!=0){
+				printIndex <- printIndex[printIndex > i]
+				print(paste("Number of Markers Written into BIG File: ", xx, sep=""))
+			}
+			if(i >= nmarkers){
+				myGeno.backed [(i-maxLine + 1):nmarkers, ] <- -1 * apply(geno[, (i-maxLine + 1):nmarkers], 1, Num.fun) + 3
+			}else{
+				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[, (i-maxLine + 1):i], 1, Num.fun) + 3
+			}
+		}
         geno.flush <- flush(myGeno.backed)
         if(!geno.flush){
             stop("flush failed")
