@@ -244,6 +244,11 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 <table>
 <tbody>
 <tr>
+<td align="center">SNP</td>
+<td align="center">Chr</td>
+<td align="center">Pos</td>
+</tr>
+<tr>
 <td align="center">rs3683945</td>
 <td align="center">1</td>
 <td align="center">3197400</td>
