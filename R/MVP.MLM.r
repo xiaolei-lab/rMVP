@@ -1,5 +1,5 @@
 MVP.MLM <-
-function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", genoName=NULL, cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
+function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
 ##########################################################################################################
 # Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
 #
@@ -33,9 +33,7 @@ math.cpu <- try(getMKLthreads(), silent=TRUE)
 
 n <- ncol(geno)
 m <- nrow(geno)
-if(priority == "speed"){
-    geno <- as.matrix(geno)
-}
+
 ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
@@ -66,8 +64,10 @@ if(is.null(CV)){
 #number of fixed effects
 nf <- ncol(X0) + 1
     if(is.null(REML)){
+	print("Variance components...")   
         if(vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if(vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
+	print("Variance components DONE!")
     }
 
     q0 <- ncol(X0)
@@ -98,9 +98,7 @@ nf <- ncol(X0) + 1
             # print(paste("****************", i, "****************",sep=""))
         # }
         #if(cpu>1 & r.open)	setMKLthreads(math.cpu)
-        if(cpu>1 & priority == "memory" & wind){
-            geno <- attach.big.matrix(genoName)
-        }
+
         SNP <- geno[i, ]
         xst <- crossprod(U, SNP)
         Xt[1:n,q0+1] <- xst
