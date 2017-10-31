@@ -37,7 +37,7 @@ m <- nrow(geno)
 ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
     print("Calculating Kinship...")
-    K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine)
+    K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
     if(file.output){
 	filebck <- paste("MVP.", colnames(phe)[2], memo, ".kin.bin", sep="")
 	filedes <- paste("MVP.", colnames(phe)[2], memo, ".kin.desc", sep="")
