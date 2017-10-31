@@ -195,14 +195,14 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     
     if(glm.run){
         print("General Linear Model (GLM) Start ...")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar)
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar);gc()
 		colnames(glm.results) <- c("effect", paste(colnames(phe)[2],"GLM",sep="."))
 		if(file.output)	write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
 	}
 
     if(mlm.run){
         print("Mixed Linear Model (MLM) Start ...")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, genoName=genoName, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM")
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, genoName=genoName, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM");gc()
 		colnames(mlm.results) <- c("effect", paste(colnames(phe)[2],"MLM",sep="."))
 		if(file.output)	write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
 	}
@@ -225,7 +225,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         	myY.shuffle = phe
         	myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
         	#GWAS using t.test...
-        	myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, priority=priority, cpu=ncpus)
+        	myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, cpu=ncpus)
         	pvalue = min(myPermutation[,2],na.rm=T)
         	if(i==1){
             		pvalue.final=pvalue
