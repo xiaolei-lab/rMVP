@@ -1,5 +1,5 @@
 MVP.GLM <-
-function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.GLM", bar=TRUE){
+function(phe, geno, CV=NULL, cpu=2, memo="MVP.GLM", bar=TRUE){
 ##########################################################################################################
 # Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
 #
@@ -26,9 +26,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
     
     n <- ncol(geno)
     m <- nrow(geno)
-    if(priority == "speed"){
-        geno <- as.matrix(geno)
-    }
+
     ys <- as.numeric(as.matrix(phe[,2]))
     
     if(is.null(CV)){
@@ -59,9 +57,7 @@ function(phe, geno, CV=NULL, priority="speed", genoName=NULL, cpu=2, memo="MVP.G
         #if(cpu>1 & r.open){
         #setMKLthreads(math.cpu)
         #}
-        if(cpu>1 & priority == "memory" & wind){
-           geno <- attach.big.matrix(genoName)
-        }
+
         SNP <- geno[i, ]
         #Process the edge (marker effects)
             sy <- crossprod(SNP,y)
