@@ -54,24 +54,24 @@
 it can be installed with the following R code:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-devtools::install_version('RcppEigen', version = "0.3.2.9.0")
-devtools::install_github("Bioconductor-mirror/snpStats")
-devtools::install_github("jaredhuling/rfunctions")
-devtools::install_github("xiaoleiLiubio/MVP")
+> devtools::install_version('RcppEigen', version = "0.3.2.9.0")
+> devtools::install_github("Bioconductor-mirror/snpStats")
+> devtools::install_github("jaredhuling/rfunctions")
+> devtools::install_github("xiaoleiLiubio/MVP")
 ```
 
 ***For Linux/Mac:***
 ```bash
-wget https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip
-unzip packages.zip
-cd packages
-R
-source("MVPinstall.r")
+$ wget https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/packages.zip
+$ unzip packages.zip
+$ cd packages
+$ R
+> source("MVPinstall.r")
 ```
 
 After installed successfully, **MVP** can be loaded by typing
 ```r
-library(MVP)
+> library(MVP)
 ```
 Typing ```?MVP``` could get the details of all parameters.
 
