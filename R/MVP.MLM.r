@@ -68,7 +68,6 @@ nf <- ncol(X0) + 1
 	print("Variance components...")   
         if(vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if(vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
-	print("Variance components DONE!")
     }
 
     q0 <- ncol(X0)
@@ -78,8 +77,9 @@ nf <- ncol(X0) + 1
     ves <- REML$ve
     vgs <- REML$vg
     lambda <- ves/vgs
-    
+    print("Eigen-Decomposition...")
     eig <- eigen(K, symmetric=TRUE)
+    print("Eigen-Decomposition is Done!")
     
     U <- eig$vectors * matrix(sqrt(1/(eig$values + lambda)), n, length(eig$values), byrow=TRUE)
     
