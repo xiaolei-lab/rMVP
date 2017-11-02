@@ -591,7 +591,7 @@ MVP.PCAplot(PCA=pca, Ncluster=4,col=c("red","green","yellow","blue"),file="jpg",
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP_pca.jpg">
-<img src="results/MVP_pca.jpg" height="460px" width="920x">
+<img src="results/MVP_pca.jpg" height="300px" width="600x">
 </a>
 </p>
 
