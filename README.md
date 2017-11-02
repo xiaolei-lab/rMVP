@@ -28,6 +28,7 @@
 - [Start GWAS](#start-gwas)
 - [Output](#output)
     - [SNP-density plot](#snp-density-plot)
+    - [PCA plot](#pca-plot)
     - [Circular-Manhattan plot](#circular-manhattan-plot)
         - [Genome-wide association study(GWAS)](#genome-wide-association-studygwas)
         - [Genomic Selection/Prediction(GS/GP)](#genomic-selectionpredictiongsgp)
@@ -591,7 +592,7 @@ MVP.PCAplot(PCA=pca, Ncluster=4,col=c("red","green","yellow","blue"),file="jpg",
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP_pca.jpg">
-<img src="results/MVP_pca.jpg" height="300px" width="600x">
+<img src="results/MVP_pca.jpg" height="380px" width="760x">
 </a>
 </p>
 
