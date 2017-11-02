@@ -582,6 +582,19 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 </a>
 </p>
 
+## PCA plot
+
+```r
+pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
+MVP.PCAplot(PCA=pca, Ncluster=4,col=c("red","green","yellow","blue"),file="jpg",plot3D=TRUE,pch=19)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP_pca.jpg">
+<img src="results/MVP_pca.jpg" height="460px" width="920x">
+</a>
+</p>
+
 ## Circular-Manhattan plot
 
 ### Genome-wide association study(GWAS)
