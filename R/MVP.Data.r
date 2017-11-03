@@ -99,7 +99,7 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
 			if(i >= nmarkers){
 				myGeno.backed [(i-maxLine + 1):nmarkers, ] <- -1 * apply(geno[, (i-maxLine + 1):nmarkers], 1, Num.fun) + 3
 			}else{
-				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[, (i-maxLine + 1):i], 1, Num.fun) + 3
+				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[(i-maxLine + 1):i, ], 1, Num.fun) + 3
 			}
 		}
         geno.flush <- flush(myGeno.backed)
