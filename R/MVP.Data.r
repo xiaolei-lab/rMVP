@@ -65,12 +65,12 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
         print("Reading binary file...")
         geno <- read.plink(paste(fileBed, ".bed", sep=""))[[1]]
         print("Reading binary files is done!")
-        geno <- t(geno); gc()
-        geno=as.data.frame(geno)
+        #geno <- t(geno); gc()
+        #geno=as.data.frame(geno)
         bck <- paste(out, ".geno.bin", sep="")
         dsc <- paste(out, ".geno.desc", sep="")
-        nmarkers <- nrow(geno)
-        ns <- ncol(geno)
+        nmarkers <- ncol(geno)
+        ns <- nrow(geno)
         myGeno.backed<-big.matrix(nmarkers, ns, type="char",
         backingfile=bck, descriptorfile=dsc)
         options(bigmemory.typecast.warning=FALSE)
@@ -99,7 +99,7 @@ SNP.impute="Middle", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed",
 			if(i >= nmarkers){
 				myGeno.backed [(i-maxLine + 1):nmarkers, ] <- -1 * apply(geno[, (i-maxLine + 1):nmarkers], 1, Num.fun) + 3
 			}else{
-				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[(i-maxLine + 1):i, ], 1, Num.fun) + 3
+				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[, (i-maxLine + 1):i], 1, Num.fun) + 3
 			}
 		}
         geno.flush <- flush(myGeno.backed)
