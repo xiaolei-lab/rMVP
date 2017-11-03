@@ -40,7 +40,7 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
         print("perc value should less than 1 and bigger than 0, MVP reset it to 1")
         perc <- 1
     }
-    print("Principal Component Analysis Start ...")
+    print("Principal Component Analysis Start...")
     if(perc < 1){
         if(wind){
             set.seed(123456)
