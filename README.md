@@ -740,7 +740,7 @@ set_config(config(ssl_verifypeer = 0L))
  
 ***Error in lazyLoadDBinsertVariable(vars[i], from, datafile, ascii, compress,  : write failed
 ERROR: lazy loading failed for package ‘MVP’
-* removing ‘/home/liuxl/R/x86_64-pc-linux-gnu-library/3.3/MVP’
+removing ‘/home/liuxl/R/x86_64-pc-linux-gnu-library/3.3/MVP’
 Warning message:
 In install.packages("MVP_1.0.1.tar.gz", repos = NULL) :
   installation of package ‘MVP_1.0.1.tar.gz’ had non-zero exit status***
