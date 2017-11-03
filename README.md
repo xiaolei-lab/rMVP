@@ -735,5 +735,16 @@ apt-get install libssl-dev/unstable
 library(httr)
 set_config(config(ssl_verifypeer = 0L))
 ```
+---
+:sos: **Question3:** When installing **MVP**:
+ 
+***Error in lazyLoadDBinsertVariable(vars[i], from, datafile, ascii, compress,  : write failed
+ERROR: lazy loading failed for package ‘MVP’
+* removing ‘/home/liuxl/R/x86_64-pc-linux-gnu-library/3.3/MVP’
+Warning message:
+In install.packages("MVP_1.0.1.tar.gz", repos = NULL) :
+  installation of package ‘MVP_1.0.1.tar.gz’ had non-zero exit status***
+ 
+:yum: **Answer:** Nevermind it's probably a local disk full issue, please check disk space.
 
 **Questions, suggestions, and bug reports are welcome and appreciated.** [:arrow_right:](https://github.com/XiaoleiLiuBio/MVP/issues)
