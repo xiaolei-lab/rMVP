@@ -202,7 +202,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
 
     if(mlm.run){
         print("Mixed Linear Model (MLM) Start ...")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, genoName=genoName, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM");gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM");gc()
 		colnames(mlm.results) <- c("effect", paste(colnames(phe)[2],"MLM",sep="."))
 		if(file.output)	write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
 	}
