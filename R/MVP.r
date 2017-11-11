@@ -239,8 +239,15 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
 	
     if(file.output){
 		print("Visualization Start...")
+	    print("Phenotype distribution Plotting...")
+		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
+		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".pdf",sep=""), width = 6,height=6)
+		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
+		Breaks <- seq(min(phe[, 2]), max(phe[, 2]), length=10)
+		hist(phe[, 2], breaks=Breaks, col=colorRampPalette(col)(10), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep="")
+		dev.off()
 		#plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
-        	plot3D <- TRUE
+        plot3D <- TRUE
 		if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi)
 		MVP.Report(MVP.return, col=col, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex, outward=outward)
 		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, threshold=threshold, signal.cex=signal.cex)
