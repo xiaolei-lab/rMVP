@@ -20,7 +20,7 @@
 
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
-    - [PLINK binary](#plink-binary)/[Hapmap](#hapmap)/[Numeric](#numeric)
+    - [PLINK binary](#plink-binary)/[VCF](#vcf)/[Hapmap](#hapmap)/[Numeric](#numeric)
     - [Kinship](#kinship)/[Principal Components](#principal-components)
 - [Data Input](#data-input)
     - [Basic](#basic)
@@ -99,6 +99,22 @@ MVP.Data(fileBed="plink",
          #maxLine=10000,
          )
 ```
+
+## VCF
+
+```r
+MVP.Data(fileVCF="myVCF.vcf",
+         #filePhe="Phenotype.txt",
+         vcf.jump=6,
+         sep.vcf="\t",
+         #sep.phe="\t",
+         fileKin=FALSE,
+         filePC=FALSE,
+         out="mvp.vcf",
+         #maxLine=10000
+         )
+```
+
 ## Hapmap
 If you have genotype data in **Hapmap** format:  
 
