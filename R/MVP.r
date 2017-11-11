@@ -243,8 +243,8 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
 		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
 		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".pdf",sep=""), width = 6,height=6)
 		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
-		Breaks <- seq(min(phe[, 2]), max(phe[, 2]), length=10)
-		hist(phe[, 2], breaks=Breaks, ylim=c(0, max(density(phe[, 2])$y)),xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(10), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
+		Breaks <- seq(min(phe[, 2]), max(phe[, 2]), length=16)
+		hist(phe[, 2], breaks=Breaks, ylim=c(0, max(density(phe[, 2])$y)),xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(16), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
 		lines(density(phe[, 2]), lwd=2)
 	    dev.off()
 		#plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
