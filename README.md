@@ -27,6 +27,7 @@
     - [Advanced](#advanced)
 - [Start GWAS](#start-gwas)
 - [Output](#output)
+    - [Phenotype distribution](#Phenotype distribution)
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
     - [Circular-Manhattan plot](#circular-manhattan-plot)
@@ -582,6 +583,14 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 
 ```
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
+
+## Phenotype distribution
+<p align="center">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Sos.jpg">
+<img src="results/MVP.Phe_Distribution.Sos.jpg" height="460px" width="460px">
+</a>
+</p>
+
 
 ## SNP-density plot
 
