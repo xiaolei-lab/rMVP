@@ -263,7 +263,10 @@ SNP.impute="Major", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed", 
                     tt2 <- unlist(strsplit(x=tt, split=sep.vcf, fixed=TRUE))
                     
                     #Identify end of file
-                    if(is.null(tt2[1])) inFile=FALSE
+                    if(is.null(tt2[1])){
+			print(paste("Number of Markers Written into File: ", theFile, ": ", i-1, sep=""))
+		    	inFile=FALSE
+		    }
                     if(i>maxRecord) inFile=FALSE
                     
                     if(inFile){
@@ -364,7 +367,10 @@ SNP.impute="Major", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed", 
                     tt2<-unlist(strsplit(x=tt, split=sep.hmp, fixed=TRUE))
                     
                     #Identify end of file
-                    if(is.null(tt2[1])) inFile=FALSE
+                    if(is.null(tt2[1])){
+		    print(paste("Number of Markers Written into File: ", theFile, ": ", i-1, sep=""))
+		    inFile=FALSE
+		    }
                     if(i>maxRecord) inFile=FALSE
                     
                     if(inFile){
