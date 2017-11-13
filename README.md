@@ -595,9 +595,9 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 ## Phenotype distribution
-**phe**, phenotype data, details see **2.1**
-**file**, format of output figure
-**breakNum**, nunmber of breaking points for phenotype when plotting distribution
+**phe**, phenotype data, details see **2.1**  
+**file**, format of output figure  
+**breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure
 ```r
 MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
