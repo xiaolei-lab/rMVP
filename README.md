@@ -595,7 +595,7 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 ## Phenotype distribution
-**phe**, phenotype data, details see **2.1** 
+**phe**, phenotype data, details see **2.1**
 **file**, format of output figure
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution
 **dpi**, resolution of output figure
@@ -612,13 +612,13 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-```r
-MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
-```
-
 **plot.type**, which type will be plotted, if "d", plotting ***SNP-density plot***; if "c", plotting ***Circular-Manhattan plot***; if "m", plotting ***Rectangular-Manhattan plot***, if "q", plotting ***QQ-plot***  
 **bin.size**, the window size for counting the number of SNP  
 **bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
+
+```r
+MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
+```
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/illumilla_60K.jpg">
