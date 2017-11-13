@@ -95,7 +95,7 @@ Typing ```?MVP``` could get the details of all parameters.
 
 
 ## PLINK binary
-If you have genotype data in **PLINK** format (bed/bim/fam):  
+If you have genotype data in **PLINK** format (bed/bim/fam, http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
 
 **fileBed**, the name of genotype data in PLINK format  
 **fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
@@ -523,6 +523,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **permutation.rep**, number of permutaion replicates, only used when **permutation.threshold** is **TRUE**  
 **threshold**, 0.05/marker size, a cutoff line on manhattan plot  
 **method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for assocation tests  
+
 ```r
 imMVP <- MVP(
     phe=phenotype,
@@ -611,13 +612,14 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 ## Phenotype distribution
+
+```r
+MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
+```
 **phe**, phenotype data, details see **2.1**  
 **file**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure
-```r
-MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
-```
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Flower time.jpg">
