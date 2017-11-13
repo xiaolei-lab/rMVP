@@ -584,10 +584,14 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 ```
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
-## Phenotype distribution
+## Phenotype distribution]
+```r
+MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
+```
+
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Sos.jpg">
-<img src="results/MVP.Phe_Distribution.Sos.jpg" height="460px" width="460px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Flower time.jpg">
+<img src="results/MVP.Phe_Distribution.Flower time.jpg" height="460px" width="460px">
 </a>
 </p>
 
