@@ -240,15 +240,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(file.output){
 		print("Visualization Start...")
 	    print("Phenotype distribution Plotting...")
-		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
-		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".pdf",sep=""), width = 6,height=6)
-		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
-		Breaks <- seq(min(phe[, 2]), max(phe[, 2]), length=16)
-		xx <- hist(phe[, 2], breaks=Breaks,xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(16), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
-		maxY <- max(max(xx$density),  max(density(phe[, 2])$y))
-		hist(phe[, 2], breaks=Breaks,xlab="",ylab="Density", ylim=c(0, maxY), freq=FALSE, col=colorRampPalette(col)(16), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
-	    lines(density(phe[, 2]), lwd=2)
-	    dev.off()
+		MVP.Hist(phe=phe, file=file, col=col, dpi=dpi)
 		#plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
         plot3D <- TRUE
 		if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi)
