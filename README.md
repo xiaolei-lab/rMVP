@@ -119,14 +119,23 @@ MVP.Data(fileBed="plink",
 If you have genotype data in **VCF** format:  
 
 **fileVCF**, the name of genotype data in VCF format
+
 **filePhe**, the name of phenotype data
+
 **vcf.jump**, number of annotation (Header) rows in VCF file
+
 **sep.vcf**, seperator of vcf file
+
 **sep.phe**, seperator of phenotype file
+
 **fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
+
 **filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
+
 **out**, the name of output file  
+
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
+
 
 ```
 ##fileformat=VCFv4.2
