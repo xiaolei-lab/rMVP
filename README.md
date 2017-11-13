@@ -102,7 +102,17 @@ MVP.Data(fileBed="plink",
 ```
 
 ## VCF
+If you have genotype data in **VCF** format:  
 
+**fileVCF**, the name of genotype data in VCF format
+**filePhe**, the name of phenotype data
+**vcf.jump**, number of annotation (Header) rows in VCF file
+**sep.vcf**, seperator of vcf file
+**sep.phe**, seperator of phenotype file
+**fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
+**filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
+**out**, the name of output file  
+**maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
 ```r
 MVP.Data(fileVCF="myVCF.vcf",
          #filePhe="Phenotype.txt",
@@ -585,6 +595,10 @@ Generally, `MVP.Report()` could accept the final return of `MVP()` directly, for
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 ## Phenotype distribution
+**phe**, phenotype data, details see **2.1** 
+**file**, format of output figure
+**breakNum**, nunmber of breaking points for phenotype when plotting distribution
+**dpi**, resolution of output figure
 ```r
 MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 ```
