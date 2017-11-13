@@ -1087,6 +1087,36 @@ MVP.Report <- function(
 	}
 }
 
+MVP.Hist <- function(
+phe,
+col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
+breakNum=15,
+file="pdf",
+dpi=300
+)
+{
+		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
+		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".pdf",sep=""), width = 6,height=6)
+		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(colnames(phe)[2],collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
+		Breaks <- seq(min(phe[, 2]), max(phe[, 2]), length=breakNum)
+		xx <- hist(phe[, 2], breaks=Breaks,xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
+		maxY <- max(max(xx$density),  max(density(phe[, 2])$y))
+		hist(phe[, 2], breaks=Breaks,xlab="",ylab="Density", ylim=c(0, maxY), freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", colnames(phe)[2], sep=""))
+	    lines(density(phe[, 2]), lwd=2)
+	
+		if(length(phe[, 2]) <= 5000){
+			norm.p <- round(shapiro.test(phe[, 2])$p, 4)
+			test.method <- "Shapiro-Wilk"
+		}else{
+			norm.p <- round(ks.test(phe[, 2],"pnorm")$p, 4)
+			test.method <- "Kolmogorov-Smirnov"
+		}
+		text(xx$breaks[1], y=maxY*0.95, labels=paste("Mean: ", round(mean(phe[, 2]), 2), sep=""), font=2, adj=0)
+		text(xx$breaks[1], y=maxY*0.9, labels=paste("Sd: ", round(sd(phe[, 2]), 2), sep=""), font=2, adj=0)
+		text(xx$breaks[1], y=maxY*0.85, labels=paste(test.method, ": ", norm.p, sep=""), font=2, adj=0)
+	    dev.off()
+}
+
 MVP.PCAplot <- function(
 PCA,
 col=c("darkgreen","darkmagenta","orange"),
