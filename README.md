@@ -81,6 +81,19 @@ Typing ```?MVP``` could get the details of all parameters.
 
 # Data Preparation
 
+## Phenotype
+
+| Taxa | trait1 | trait2 | trait3 |
+| :---: | :---: |:---: |:---: |
+|33-16|101.5|0.25|0|
+|38-11|	102.7|0.23|1|
+|4226	|101.2|-0.17|1|
+|4722|	105.5|-0.24|0|
+|A188	|108.1|0.57|1|
+|A214N|	95.13|0.87|0|
+|A239	|100.2|-0.16|1|
+
+
 ## PLINK binary
 If you have genotype data in **PLINK** format (bed/bim/fam):  
 
@@ -113,6 +126,22 @@ If you have genotype data in **VCF** format:
 **filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
 **out**, the name of output file  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
+
+```
+##fileformat=VCFv4.2
+##fileDate=20171105
+##source=PLINKv1.90
+##contig=<ID=1,length=2>
+##INFO=<ID=PR,Number=0,Type=Flag,Description="Provisional reference allele, may not be based on real reference genome">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	-9_CZTB0004	-9_CZTB0006	-9_CZTB0008	-9_CZTB0010	-9_CZTB0011	-9_CZTB0012
+1	1	10000235	A	C	.	.	PR	GT	0/1	0/0	0/0	0/0	0/0	0/1
+1	1	10000345	A	G	.	.	PR	GT	0/0	0/0	0/0	0/0	1/1	1/1
+1	1	10004575	G	.	.	.	PR	GT	0/0	0/0	0/0	0/0	0/0	0/0
+1	1	10006974	C	T	.	.	PR	GT	0/0	0/0	0/1	1/1	0/1	1/1
+1	1	10006986	A	G	.	.	PR	GT	0/0	0/0	0/1	./.	1/1	1/1
+```
+
 ```r
 MVP.Data(fileVCF="myVCF.vcf",
          #filePhe="Phenotype.txt",
@@ -139,19 +168,6 @@ If you have genotype data in **Hapmap** format:
 **out**, the name of output file  
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
-
-> `Phenotype.txt`
-
-| Taxa | trait1 | trait2 | trait3 |
-| :---: | :---: |:---: |:---: |
-|33-16|101.5|0.25|0|
-|38-11|	102.7|0.23|1|
-|4226	|101.2|-0.17|1|
-|4722|	105.5|-0.24|0|
-|A188	|108.1|0.57|1|
-|A214N|	95.13|0.87|0|
-|A239	|100.2|-0.16|1|
-
 
 > `hapmap.txt`
 
