@@ -20,6 +20,7 @@
 
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
+    - [Phenotype](#Phenotype)
     - [PLINK binary](#plink-binary)/[VCF](#vcf)/[Hapmap](#hapmap)/[Numeric](#numeric)
     - [Kinship](#kinship)/[Principal Components](#principal-components)
 - [Data Input](#data-input)
@@ -27,7 +28,7 @@
     - [Advanced](#advanced)
 - [Start GWAS](#start-gwas)
 - [Output](#output)
-    - [Phenotype distribution](#Phenotype distribution)
+    - [Phenotype distribution](#phenotype-distribution)
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
     - [Circular-Manhattan plot](#circular-manhattan-plot)
