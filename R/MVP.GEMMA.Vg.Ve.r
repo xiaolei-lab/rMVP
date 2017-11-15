@@ -176,5 +176,6 @@ MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE
 		ve = exp(log_sigma2[2])
 		delta = ve / vg
 	}
+	print("Variance Components Estimation is Done!")
 	return(list(vg=vg, ve=ve, delta=delta))
 }
