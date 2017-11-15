@@ -1156,7 +1156,7 @@ dpi=300
 		dir.create('PCA plot3D')
 		setwd('./PCA plot3D')
 		M <- par3d("userMatrix")
-		movie3d(par3dinterp(time=(0:2)*0.75,userMatrix=list(M,rotate3d(M, pi, 1, 0, 0), rotate3d(M, pi, 0, 1, 0))),fps=30,duration=3,movie="MVP.3D",dir=getwd(),top=FALSE)
+		try(movie3d(par3dinterp(time=(0:2)*0.75,userMatrix=list(M,rotate3d(M, pi, 1, 0, 0), rotate3d(M, pi, 0, 1, 0))),fps=30,duration=3,movie="MVP.3D",dir=getwd(),top=FALSE), silent=TRUE)
 		movie3d(spin3d(rpm=20),duration=3,fps=15,frames="MVP.3D",convert=FALSE,dir=getwd(),top=FALSE)
 		setwd("../")
 	}
