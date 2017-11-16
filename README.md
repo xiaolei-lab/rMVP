@@ -613,13 +613,14 @@ As the example datasets, the first three columns are names, chromosome, position
 
 ## Phenotype distribution
 
-```r
-MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
-```
 **phe**, phenotype data, details see **2.1**  
 **file**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure
+
+```r
+MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
+```
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Flower time.jpg">
