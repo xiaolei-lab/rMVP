@@ -78,10 +78,10 @@ nf <- ncol(X0) + 1
     vgs <- REML$vg
     lambda <- ves/vgs
     print("Eigen-Decomposition...")
-    eig <- eigen(K, symmetric=TRUE)
+    eig <- eigen(K, symmetric=TRUE); rm(K); gc()
     print("Eigen-Decomposition is Done!")
     
-    U <- eig$vectors * matrix(sqrt(1/(eig$values + lambda)), n, length(eig$values), byrow=TRUE)
+    U <- eig$vectors * matrix(sqrt(1/(eig$values + lambda)), n, length(eig$values), byrow=TRUE); rm(eig); gc()
     
     y <- matrix(ys)
     yt <- crossprod(U, y)
