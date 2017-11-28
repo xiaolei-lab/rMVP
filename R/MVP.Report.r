@@ -1136,7 +1136,7 @@ dpi=300
 	if(!is.null(col)){
 		col <- rep(col, Ncluster)
 	}else{
-		col <- RColorBrewer::brewer.pal(Ncluster,"Set1")
+		col <- c("dodgerblue1", "olivedrab3", "darkgoldenrod1", "red")
 	}
 	if(!is.null(pch)){
 		pch <- rep(pch, Ncluster)
