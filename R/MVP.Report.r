@@ -1137,6 +1137,7 @@ dpi=300
 		col <- rep(col, Ncluster)
 	}else{
 		col <- c("dodgerblue1", "olivedrab3", "darkgoldenrod1", "red")
+		col <- colorRampPalette(col)(Ncluster)
 	}
 	if(!is.null(pch)){
 		pch <- rep(pch, Ncluster)
