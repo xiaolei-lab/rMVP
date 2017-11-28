@@ -1124,12 +1124,14 @@ MVP.PCAplot <- function(
 PCA,
 col=c("darkgreen","darkmagenta","orange"),
 pch=c(16,17,8),
+class=NULL
 Ncluster=3,
 plot3D=TRUE,
 file="pdf",
 dpi=300
 )
 {
+	if(!is.null(class))	Ncluster <- length(unique(class))
 	if(!is.null(col)){
 		col <- rep(col, Ncluster)
 	}
@@ -1140,7 +1142,11 @@ dpi=300
 	if(file=="jpg")	jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
 	if(file=="pdf")	pdf("MVP.PCA_2D.pdf", width = 6,height=6)
 	if(file=="tiff")	tiff("MVP.PCA_2D.tiff", width = 6*dpi,height=6*dpi,res=dpi)			
-	kc <- kmeans(PCA[,c(1,2)], Ncluster)
+	if(is.null(class)){
+		kc <- kmeans(PCA[,c(1,2)], Ncluster)
+	}else{
+		kc <- list(cluster=as.numeric(as.factor(class)))
+	}
 	plot(PCA[,1],PCA[,2],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC2")
     #kc <- kmeans(PCA[,c(2,3)], Ncluster)
     #plot(PCA[,2],PCA[,3],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC2",ylab="PC3")
@@ -1150,7 +1156,7 @@ dpi=300
 	if(plot3D){
 		print("PCA plot3d...")
 		par3d(cex=0.8,windowRect=c(100,100,600,600),font=4,userMatrix=matrix(c(0.88,0.47,-0.07,0,-0.14,0.40,0.90,0,0.45,-0.78,0.42,0,0,0,0,1),4,byrow=TRUE))
-		kc <- kmeans(PCA, Ncluster)
+		if(is.null(class))	kc <- kmeans(PCA, Ncluster)
 		plot3d(PCA,col=col[kc$cluster],type="s",size=1.5,top=FALSE)
 		#rgl.postscript("MVP.PCA_3D.pdf","pdf")
 		dir.create('PCA plot3D')
