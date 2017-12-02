@@ -631,11 +631,7 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-**plot.type**, four options ("d", "c", "m", "q")  
-        if "d", plot ***SNP-density plot***;  
-        if "c", plot ***Circular-Manhattan plot***;  
-        if "m", plot ***Rectangular-Manhattan plot***,  
-        if "q", plot ***QQ-plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "d", plot ***SNP-density plot***; if "c", plot ***Circular-Manhattan plot***; if "m", plot ***Rectangular-Manhattan plot***; if "q", plot ***QQ-plot***  
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 **col**, colors for seperating windows with different SNP density  
@@ -672,9 +668,9 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="
 </a>
 </p>
 
-## Circular-Manhattan plot
+## Manhattan plot in Circular fashion
 
-### Genome-wide association study(GWAS)
+For GWAS results
 
 **chr.labels**, rename the each chromosome name  
 **threshold**, the significant level for Bonferroni correction  
@@ -696,18 +692,18 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
 </a>
 </p>
 
-### Genomic Selection/Prediction(GS/GP)
+For GS/GP results
+
+**LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
+**outward**, TRUE or FALSE, the direction of plotting points  
+**r**, the radius of the circle  
+**cir.legend.cex**, the size of axis number of legend  
+**cir.band**, the size of interval between circles  
 
 ```r
 MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29),sep=""),
          r=1.2, cir.chr.h=1.3, cir.legend.cex=0.5, cir.band=1, threshold=NULL, file="jpg", dpi=300)
 ```
-
-**LOG10**, "TRUE" or "FALSE", if FALSE, the original values will be used to plot  
-**outward**, "TRUE" or "FALSE", the direction of plotting points  
-**r**, the radius of the circle  
-**cir.legend.cex**, the size of axis number of legend  
-**cir.band**, the size of interval between circles  
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.cattle.jpg">
@@ -715,9 +711,9 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </a>
 </p>
 
-## Rectangular-Manhattan plot
+## Manhattan plot in Rectangular fashion
 
-### Genome-wide association study(GWAS)
+For GWAS results
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
@@ -729,7 +725,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 </a>
 </p>
 
-### Genomic Selection/Prediction(GS/GP)
+For GS/GP results
 
 ```r
 MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
