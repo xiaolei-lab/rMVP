@@ -740,7 +740,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 
 For GS/GP results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "d", plot ***SNP-density plot***; if "c", plot ***Circular-Manhattan plot***; if "m", plot ***Rectangular-Manhattan plot***; if "q", plot ***QQ-plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
 **LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
 **ylab**, Y axis  
 **threshold**, the significant level for Bonferroni correction  
@@ -759,10 +759,15 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
 
 ### Rectangular Manhattan plot for multiple traits/methods
 
+**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
+**threshold**, the significant level for Bonferroni correction  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
+**multracks**, TRUE or FALSE, if TRUE, Manhattan plots of multiple traits will be plotted together in one figure  
+
 ```r
 MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
 ```
-**multracks**, logical, if FALSE, plotting multiple rectangular Manhattan plots on multiple tracks, if TRUE, all Manhattan plots will be plotted in only one track  
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Multi_Rectangular-Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
@@ -774,11 +779,15 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 
 ### Q-Q plot for single trait/method
 
+**plot.type**, four options ("d", "c", "m", "q"); if "q", plot ***Q-Q plot***  
+**conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
+**conf.int.col**, color of the confidence interval shadow on Q-Q plot  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
+
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
 ```
-**conf.int**, logical, whether to drew the confidence interval on QQ-plot  
-**conf.int.col**, character, the color of the confidence interval on QQ-plot  
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/QQplot.trait3.jpg">
@@ -787,6 +796,13 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 </p>
 
 ### Q-Q plot for multiple traits/methods
+
+**plot.type**, four options ("d", "c", "m", "q"); if "q", plot ***Q-Q plot***  
+**multracks**, TRUE or FALSE, if TRUE, Q-Q plots of multiple traits will be plotted together in one figure  
+**conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
+**conf.int.col**, color of the confidence interval shadow on Q-Q plot  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
 MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
@@ -812,16 +828,16 @@ MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="gr
 
 ***removing ‘/Users/acer/R/3.4/library/devtools’***
 
-:yum: **Answer:** Please type the following codes in terminal.
+:yum: **Answer:** Please try following codes in terminal:
 ```ssh
 apt-get install libssl-dev/unstable
 ```
 ---
-:sos: **Question2:** When installing packages from Github with "devtools", there is a error:
+:sos: **Question2:** When installing packages from Github with "devtools", an error occurred:
  
  ***Error in curl::curl_fetch_disk(url, x$path, handle = handle): Problem with the SSL CA cert (path? access rights?)***
  
-:yum: **Answer:** Please type the following codes and than try agian.
+:yum: **Answer:** Please try following codes and then try agian.
 ```r
 library(httr)
 set_config(config(ssl_verifypeer = 0L))
@@ -836,6 +852,6 @@ Warning message:
 In install.packages("MVP_1.0.1.tar.gz", repos = NULL) :
   installation of package ‘MVP_1.0.1.tar.gz’ had non-zero exit status***
  
-:yum: **Answer:** Nevermind it's probably a local disk full issue, please check disk space.
+:yum: **Answer:** It is probably an issue caused by disk full, please check disk space.
 
 **Questions, suggestions, and bug reports are welcome and appreciated.** [:arrow_right:](https://github.com/XiaoleiLiuBio/MVP/issues)
