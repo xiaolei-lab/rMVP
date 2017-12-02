@@ -31,14 +31,11 @@
     - [Phenotype distribution](#phenotype-distribution)
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
-    - [Circular-Manhattan plot](#circular-manhattan-plot)
-        - [Genome-wide association study(GWAS)](#genome-wide-association-studygwas)
-        - [Genomic Selection/Prediction(GS/GP)](#genomic-selectionpredictiongsgp)
-    - [Rectangular-Manhattan plot](#rectangular-manhattan-plot)
-        - [Genome-wide association study(GWAS)](#genome-wide-association-studygwas-1)
-        - [Genomic Selection/Prediction(GS/GP)](#genomic-selectionpredictiongsgp-1)
-        - [Multiple tracks rectangular-Manhattan plot](#multiple-tracks-rectangular-manhattan-plot)
-    - [Q-Q plot](#q-q-plot)
+    - [Manhattan plot in Circular fashion](#Manhattan plot in Circular fashion)
+    - [Manhattan plot in Rectangular fashion for single trait/method](#Manhattan plot in Rectangular fashion for single trait/method)
+    - [Manhattan plot in Rectangular fashion for multiple traits/methods](#Manhattan plot in Rectangular fashion for multiple traits/methods)
+    - [Q-Q plot for single trait/method](#Q-Q plot for single trait/method)
+    - [Q-Q plot for multiple traits/methods](#Q-Q plot for multiple traits/methods)    
         - [Single track Q-Q plot](#single-track-q-q-plot)
         - [Multiple track Q-Q plot](#multiple-track-q-q-plot)
 - [FAQ and Hints](#faq-and-hints)
@@ -757,7 +754,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
 </a>
 </p>
 
-### Rectangular Manhattan plot for multiple traits/methods
+### Manhattan plot in Rectangular fashion for multiple traits/methods
 
 **plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
 **threshold**, the significant level for Bonferroni correction  
@@ -774,8 +771,6 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 <img src="results/Multi_Rectangular-Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="900px" width="840px">
 </a>
 </p>
-
-## Q-Q plot
 
 ### Q-Q plot for single trait/method
 
