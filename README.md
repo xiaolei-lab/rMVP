@@ -48,13 +48,13 @@
 ---
 # Installation
 
-**WE STRONGLY RECOMMEND YOU INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**  
+**WE STRONGLY RECOMMEND INSTALL MVP ON Microsoft R Open (https://mran.microsoft.com/download/)**  
 
-**MVP** is only available on GitHub, and can be installed using **devtools**. Two packages should be installed beforehand, **snpStats** and **rfunctions** (only accepts **RcppEigen** <= "0.3.2.9.0"). 
+**MVP** can be installed on Windows and Linux/Mac with following steps, respectively:
 
 ***For Windows:***
 
-it can be installed with the following R code:  
+MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 > devtools::install_version('RcppEigen', version = "0.3.2.9.0")
@@ -96,14 +96,14 @@ Typing ```?MVP``` could get the details of all parameters.
 
 
 ## PLINK binary
-If you have genotype data in **PLINK** format (bed/bim/fam, http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
+If you have genotype data in **PLINK Binary** format (bed/bim/fam, details see http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
 
-**fileBed**, the name of genotype data in PLINK format  
-**fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
-**filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
-**out**, the name of output file  
-**priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
-**maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
+**fileBed**, the name of genotype data in PLINK Binary format  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
+**out**, the prefix of output file  
+**priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
+**maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
 ```r
 MVP.Data(fileBed="plink",
          filePhe=NULL,
@@ -122,9 +122,9 @@ If you have genotype data in **VCF** format:
 **vcf.jump**, number of annotation (Header) rows in VCF file  
 **sep.vcf**, seperator of vcf file  
 **sep.phe**, seperator of phenotype file  
-**fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
-**filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
-**out**, the name of output file  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
+**out**, the prefix of output file  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
 
 ```
@@ -158,14 +158,14 @@ MVP.Data(fileVCF="myVCF.vcf",
 ## Hapmap
 If you have genotype data in **Hapmap** format:  
 
-**fileHMP** is a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", chr3.hmp.txt)  
+**fileHMP**, a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", "chr3.hmp.txt")  
 **filePhe**, name of phenotype file  
 **sep.hmp**, seperator of hapmap file  
 **sep.phe**, seperator of phenotype file  
-**SNP.effect** is "Add" or "Dom"  
-**fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
-**filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
-**out**, the name of output file  
+**SNP.effect**, "Add" or "Dom"  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
+**out**, the prefix of output file  
 **priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
 
@@ -213,16 +213,16 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
 ## Numeric
 If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the number of SNPs, n is the number of individuals) format:  
 
-**fileNum**, the name of genotype data in Numeric format  
+**fileNum**, name of genotype data in Numeric format  
 **filePhe**, name of phenotype file  
 **fileMap**, name of map file, a header should be added, e.g. SNP Chr Pos  
 **sep.num**, seperator of Numeric file  
 **sep.phe**, seperator of phenotype file  
 **type.geno**, the type of data in Numeric file, "char", "integer", or "double"  
-**fileKin** is "TRUE" or "FALSE", if true, a kinship matrix represents relationship among individuals will be calculated  
-**filePC** is "TRUE" or "FALSE", if true, principal component analysis will be performed  
-**out** is a string, the name of output file  
-**priority** is "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
+**out**, the prefix of output file  
+**priority** is "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
 **maxLine** is a number, if **priority = "memory"**, it is the number of markers read into memory  
 
 <table>
@@ -340,9 +340,9 @@ MVP.Data(fileNum="Numeric.txt",
 ## Kinship
 If you have Kinship matrix data that represents the relationship among individuals  
 
-**fileKin**, the name of Kinship matrix data, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included  
-**type.kin**, the type of data in Kinship matrix file, "char", "integer", or "double"  
-**sep.kin**, seperator of Kinship matrix data file  
+**fileKin**, name of Kinship matrix data, the dimension is n * n (n is sample size), no taxa names included  
+**type.kin**, type of data in Kinship matrix file, "char", "integer", or "double" and "double" is default  
+**sep.kin**, seperator of Kinship file  
 
 > `mvp.kin.txt`
 
@@ -422,9 +422,9 @@ MVP.Data(fileKin="mvp.kin.txt",
 ## Principal Components
 If you have Principal Components matrix data  
 
-**filePC**, the name of Principal Components matrix data, the dimension of Principal Components matrix is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
-**type.pc**, the type of data in Principal Components matrix file, "char", "integer", or "double"  
-**sep.pc**, seperator of Principal Components matrix data file  
+**filePC**, name of Principal Components matrix data, the dimension is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
+**type.pc**, type of data in Principal Components matrix file, "char", "integer", or "double", default is "double"  
+**sep.pc**, seperator of Principal Components file  
 
 > `mvp.pc.txt`
 
