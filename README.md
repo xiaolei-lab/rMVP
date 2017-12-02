@@ -76,7 +76,6 @@ Typing ```?MVP``` could get the details of all parameters.
 ---
 
 # Data Preparation
-
 ## Phenotype
 **[back to top](#contents)**
 
