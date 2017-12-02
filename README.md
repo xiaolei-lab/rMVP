@@ -616,7 +616,7 @@ In the demo datasets, the first three columns are marker name, chromosome, and p
 **phe**, phenotype data  
 **file**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
-**dpi**, resolution of output figure
+**dpi**, resolution of output figure  
 
 ```r
 MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
@@ -632,12 +632,15 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 ## SNP-density plot
 
 **plot.type**, four options ("d", "c", "m", "q")  
-    if "d", plot ***SNP-density plot***;  
-    if "c", plot ***Circular-Manhattan plot***;  
-    if "m", plot ***Rectangular-Manhattan plot***,  
-    if "q", plot ***QQ-plot***  
+        if "d", plot ***SNP-density plot***;  
+        if "c", plot ***Circular-Manhattan plot***;  
+        if "m", plot ***Rectangular-Manhattan plot***,  
+        if "q", plot ***QQ-plot***  
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
+**col**, colors for seperating windows with different SNP density  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
@@ -650,10 +653,16 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 </p>
 
 ## PCA plot
+**pca**, the first three columns of principle components  
+**Ncluster**, cluster number  
+**col**, colors for each cluster  
+**pch**, point shape for each cluster  
+**file**, format of output figure  
+**plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead  
 
 ```r
 pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=4,col=c("red","green","yellow","blue"),file="jpg",plot3D=TRUE,pch=19)
+MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red","green","yellow","blue"), file="jpg", plot3D=TRUE, pch=19)
 ```
 
 <p align="center">
