@@ -78,7 +78,6 @@ Typing ```?MVP``` could get the details of all parameters.
 # Data Preparation
 
 ## Phenotype
-# [back to top](#contents)
 
 | Taxa | trait1 | trait2 | trait3 |
 | :---: | :---: |:---: |:---: |
@@ -89,7 +88,7 @@ Typing ```?MVP``` could get the details of all parameters.
 |A188	|108.1|0.57|1|
 |A214N|	95.13|0.87|0|
 |A239	|100.2|-0.16|1|
-
+[back to top](#contents)
 
 ## PLINK binary [back to top](#contents)
 If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
