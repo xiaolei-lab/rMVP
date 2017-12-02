@@ -668,7 +668,6 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="
 </p>
 
 ## Manhattan plot in Circular fashion
-
 For GWAS results:
 
 **plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
