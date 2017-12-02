@@ -99,7 +99,7 @@ Typing ```?MVP``` could get the details of all parameters.
 If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
 
 **fileBed**, name of genotype data in PLINK Binary format  
-**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, prefix of output file  
 **priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
