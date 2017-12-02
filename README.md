@@ -32,10 +32,10 @@
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
     - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
-    - [Manhattan plot in Rectangular fashion for single trait/method](#manhattan-plot-in-rectangular-fashion-for-single-trait-/-method)
-    - [Manhattan plot in Rectangular fashion for multiple traits/methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits/methods)
-    - [Q-Q plot for single trait/method](#q-q-plot-for-single-trait/method)
-    - [Q-Q plot for multiple traits/methods](#q-q-plot-for-multiple-traits/methods)    
+    - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
+    - [Manhattan plot in Rectangular fashion for multiple traits or methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits-or-methods)
+    - [Q-Q plot for single trait or method](#q-q-plot-for-single-trait-or-method)
+    - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)    
 - [FAQ and Hints](#faq-and-hints)
 
 <!-- /TOC -->
@@ -713,7 +713,7 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </a>
 </p>
 
-## Manhattan plot in Rectangular fashion for single trait/method
+## Manhattan plot in Rectangular fashion for single trait or method
 For GWAS results:
 
 **plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
@@ -750,7 +750,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
 </a>
 </p>
 
-### Manhattan plot in Rectangular fashion for multiple traits/methods
+### Manhattan plot in Rectangular fashion for multiple traits or methods
 
 **plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
 **threshold**, the significant level for Bonferroni correction  
@@ -768,7 +768,7 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 </a>
 </p>
 
-### Q-Q plot for single trait/method
+### Q-Q plot for single trait or method
 
 **plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
 **conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
@@ -786,7 +786,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 </a>
 </p>
 
-### Q-Q plot for multiple traits/methods
+### Q-Q plot for multiple traits or methods
 
 **plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
 **multracks**, TRUE or FALSE, if TRUE, Q-Q plots of multiple traits will be plotted together in one figure  
