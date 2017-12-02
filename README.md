@@ -21,6 +21,7 @@
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
     - [Phenotype](#phenotype)
+    - [Phenotype](#phenotype)
     - [PLINK binary](#plink-binary)/[VCF](#vcf)/[Hapmap](#hapmap)/[Numeric](#numeric)
     - [Kinship](#kinship)/[Principal Components](#principal-components)
 - [Data Input](#data-input)
