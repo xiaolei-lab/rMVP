@@ -631,7 +631,7 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-**plot.type**, four options ("d", "c", "m", "q"); if "d", plot ***SNP-density plot***; if "c", plot ***Circular-Manhattan plot***; if "m", plot ***Rectangular-Manhattan plot***; if "q", plot ***QQ-plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "d", draw ***SNP-density plot***  
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 **col**, colors for seperating windows with different SNP density  
@@ -674,8 +674,8 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="
 
 For GWAS results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "c", plot ***Circular-Manhattan plot***  
-**chr.labels**, rename the each chromosome name  
+**plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
+**chr.labels**, rename name of each chromosome  
 **threshold**, the significant level for Bonferroni correction  
 **cir.chr.h**, the width of outer circle  
 **amplify**, if TRUE, significant SNPs will be highlighted   
@@ -699,7 +699,7 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
 
 For GS/GP results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "c", plot ***Circular-Manhattan plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
 **LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
 **outward**, TRUE or FALSE, the plotting direction  
 **r**, the radius of circle  
@@ -723,7 +723,7 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 
 For GWAS results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
 **threshold**, the significant level for Bonferroni correction  
 **file**, format of output figure  
 **dpi**, resolution of output figure  
@@ -740,7 +740,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 
 For GS/GP results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
 **LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
 **ylab**, Y axis  
 **threshold**, the significant level for Bonferroni correction  
@@ -759,7 +759,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
 
 ### Rectangular Manhattan plot for multiple traits/methods
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
 **threshold**, the significant level for Bonferroni correction  
 **file**, format of output figure  
 **dpi**, resolution of output figure  
@@ -779,7 +779,7 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 
 ### Q-Q plot for single trait/method
 
-**plot.type**, four options ("d", "c", "m", "q"); if "q", plot ***Q-Q plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
 **conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
 **conf.int.col**, color of the confidence interval shadow on Q-Q plot  
 **file**, format of output figure  
@@ -797,7 +797,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 
 ### Q-Q plot for multiple traits/methods
 
-**plot.type**, four options ("d", "c", "m", "q"); if "q", plot ***Q-Q plot***  
+**plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
 **multracks**, TRUE or FALSE, if TRUE, Q-Q plots of multiple traits will be plotted together in one figure  
 **conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
 **conf.int.col**, color of the confidence interval shadow on Q-Q plot  
