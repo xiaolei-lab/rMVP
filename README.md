@@ -32,7 +32,7 @@
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
     - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
-    - [Manhattan plot in Rectangular fashion for single trait/method](#manhattan-plot-in-rectangular-fashion-for-single-trait/method)
+    - [Manhattan plot in Rectangular fashion for single trait/method](#manhattan-plot-in-rectangular-fashion-for-single-trait-/-method)
     - [Manhattan plot in Rectangular fashion for multiple traits/methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits/methods)
     - [Q-Q plot for single trait/method](#q-q-plot-for-single-trait/method)
     - [Q-Q plot for multiple traits/methods](#q-q-plot-for-multiple-traits/methods)    
@@ -714,7 +714,6 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </p>
 
 ## Manhattan plot in Rectangular fashion for single trait/method
-
 For GWAS results:
 
 **plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
