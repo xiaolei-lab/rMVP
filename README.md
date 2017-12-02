@@ -613,7 +613,7 @@ In the demo datasets, the first three columns are marker name, chromosome, and p
 
 ## Phenotype distribution
 
-**phe**, phenotype data, details see **2.1**  
+**phe**, phenotype data  
 **file**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure
@@ -631,7 +631,11 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-**plot.type**, which type will be plotted, if "d", plotting ***SNP-density plot***; if "c", plotting ***Circular-Manhattan plot***; if "m", plotting ***Rectangular-Manhattan plot***, if "q", plotting ***QQ-plot***  
+**plot.type**, four options ("d", "c", "m", "q")
+    if "d", plot ***SNP-density plot***; 
+    if "c", plot ***Circular-Manhattan plot***; 
+    if "m", plot ***Rectangular-Manhattan plot***, 
+    if "q", plot ***QQ-plot***  
 **bin.size**, the window size for counting the number of SNP  
 **bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
 
