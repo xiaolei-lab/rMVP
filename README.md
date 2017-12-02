@@ -122,7 +122,7 @@ If you have genotype data in **VCF** format:
 **vcf.jump**, number of annotation (Header) rows in VCF file  
 **sep.vcf**, seperator of vcf file  
 **sep.phe**, seperator of phenotype file  
-**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
 **maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
@@ -163,7 +163,7 @@ If you have genotype data in **Hapmap** format:
 **sep.hmp**, seperator of hapmap file  
 **sep.phe**, seperator of phenotype file  
 **SNP.effect**, "Add" or "Dom"  
-**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
 **priority**, "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
@@ -219,7 +219,7 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 **sep.num**, seperator of Numeric file  
 **sep.phe**, seperator of phenotype file  
 **type.geno**, the type of data in Numeric file, "char", "integer", or "double"  
-**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
+**fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
 **priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
