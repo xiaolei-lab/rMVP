@@ -655,7 +655,7 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 </p>
 
 ## PCA plot
-**[back to top](#contents)**
+**[back to top](#contents)**  
 **pca**, the first three columns of principle components  
 **Ncluster**, cluster number  
 **col**, colors for each cluster  
@@ -678,7 +678,7 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="
 </p>
 
 ## Manhattan plot in Circular fashion
-**[back to top](#contents)**
+**[back to top](#contents)**  
 For GWAS results:
 
 **plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
@@ -727,7 +727,7 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </p>
 
 ## Manhattan plot in Rectangular fashion for single trait or method
-**[back to top](#contents)**
+**[back to top](#contents)**  
 For GWAS results:
 
 **plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
