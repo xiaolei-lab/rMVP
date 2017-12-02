@@ -32,12 +32,10 @@
     - [SNP-density plot](#snp-density-plot)
     - [PCA plot](#pca-plot)
     - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
-    - [Manhattan plot in Rectangular fashion for single trait/method](#Manhattan plot in Rectangular fashion for single trait/method)
-    - [Manhattan plot in Rectangular fashion for multiple traits/methods](#Manhattan plot in Rectangular fashion for multiple traits/methods)
-    - [Q-Q plot for single trait/method](#Q-Q plot for single trait/method)
-    - [Q-Q plot for multiple traits/methods](#Q-Q plot for multiple traits/methods)    
-        - [Single track Q-Q plot](#single-track-q-q-plot)
-        - [Multiple track Q-Q plot](#multiple-track-q-q-plot)
+    - [Manhattan plot in Rectangular fashion for single trait/method](#manhattan-plot-in-rectangular-fashion-for-single-trait/method)
+    - [Manhattan plot in Rectangular fashion for multiple traits/methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits/methods)
+    - [Q-Q plot for single trait/method](#q-q-plot-for-single-trait/method)
+    - [Q-Q plot for multiple traits/methods](#q-q-plot-for-multiple-traits/methods)    
 - [FAQ and Hints](#faq-and-hints)
 
 <!-- /TOC -->
