@@ -631,9 +631,9 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-**plot.type**, four options ("d", "c", "m", "q"); if "d", draw ***SNP-density plot***  
-**bin.size**, the window size for counting SNP number  
-**bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
+**plot.type**, four options ("d", "c", "m", "q"); if "d", draw ***SNP-density plot***  
+**bin.size**, the window size for counting SNP number  
+**bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 **col**, colors for seperating windows with different SNP density  
 **file**, format of output figure  
 **dpi**, resolution of output figure  
@@ -654,7 +654,7 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **col**, colors for each cluster  
 **pch**, point shape for each cluster  
 **file**, format of output figure  
-**plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead  
+**plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, **"rgl"** package should be installed beforehead  
 **file**, format of output figure  
 **dpi**, resolution of output figure  
 
