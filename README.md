@@ -661,8 +661,9 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead  
 
 ```r
-pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red","green","yellow","blue"), file="jpg", plot3D=TRUE, pch=19)
+pca <- attach.big.matrix("mvp.pc.desc")[, 1:3]
+#pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
+MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="jpg", plot3D=TRUE, pch=19)
 ```
 
 <p align="center">
@@ -675,19 +676,19 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red","green","yellow","blue"), file="jpg
 
 ### Genome-wide association study(GWAS)
 
+**chr.labels**, rename the each chromosome name  
+**threshold**, the significant level for Bonferroni correction  
+**cir.chr.h**, the width of outer circle  
+**amplify**, if TRUE, significant SNPs will be highlighted   
+**signal.line**, the width of the line that cross all circle, if signal.line=NULL, the lines that crosse circles won't be added  
+**signal.col**, the color for the significant SNPs, if NULL, it will use the color index of ***col***  
+**signal.cex**, the cex for the significant SNPs  
+
 ```r
 MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
       cir.chr.h=1, amplify=TRUE, threshold.lty=c(2,1), threshold.col=c("blue","red"), signal.line=1,
       signal.col="red", file="jpg", dpi=300)
 ```
-
-**chr.labels**, renamed names of each chromosome  
-**threshold**, the significant level for Bonferroni adjustment  
-**cir.chr.h**, the width of outer circle  
-**amplify**, "TRUE" or "FALSE", whether to highlight the significant SNPs  
-**signal.line**, the width of the lines that cross all circle, if signal.line=NULL, the lines that crosse circles won't be added  
-**signal.col**, the color for the significant SNPs, if NULL, it will use the color index of ***col***  
-**signal.cex**, the cex for the significant SNPs  
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.jpg">
