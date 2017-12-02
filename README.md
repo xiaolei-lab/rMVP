@@ -655,6 +655,8 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **pch**, point shape for each cluster  
 **file**, format of output figure  
 **plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
 pca <- attach.big.matrix("mvp.pc.desc")[, 1:3]
@@ -670,8 +672,9 @@ MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="
 
 ## Manhattan plot in Circular fashion
 
-For GWAS results
+For GWAS results:
 
+**plot.type**, four options ("d", "c", "m", "q"); if "c", plot ***Circular-Manhattan plot***  
 **chr.labels**, rename the each chromosome name  
 **threshold**, the significant level for Bonferroni correction  
 **cir.chr.h**, the width of outer circle  
@@ -679,6 +682,8 @@ For GWAS results
 **signal.line**, the width of the line that cross all circle, if signal.line=NULL, the lines that crosse circles won't be added  
 **signal.col**, the color for the significant SNPs, if NULL, it will use the color index of ***col***  
 **signal.cex**, the cex for the significant SNPs  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
 MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
@@ -692,16 +697,19 @@ MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), th
 </a>
 </p>
 
-For GS/GP results
+For GS/GP results:
 
+**plot.type**, four options ("d", "c", "m", "q"); if "c", plot ***Circular-Manhattan plot***  
 **LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
-**outward**, TRUE or FALSE, the direction of plotting points  
-**r**, the radius of the circle  
+**outward**, TRUE or FALSE, the plotting direction  
+**r**, the radius of circle  
 **cir.legend.cex**, the size of axis number of legend  
-**cir.band**, the size of interval between circles  
+**cir.band**, the interval size among circles  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
-MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29),sep=""),
+MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29), sep=""),
          r=1.2, cir.chr.h=1.3, cir.legend.cex=0.5, cir.band=1, threshold=NULL, file="jpg", dpi=300)
 ```
 
@@ -711,9 +719,14 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 </a>
 </p>
 
-## Manhattan plot in Rectangular fashion
+## Manhattan plot in Rectangular fashion for single trait/method
 
-For GWAS results
+For GWAS results:
+
+**plot.type**, four options ("d", "c", "m", "q"); if "m", plot ***Rectangular-Manhattan plot***  
+**threshold**, the significant level for Bonferroni correction  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
@@ -725,11 +738,17 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300
 </a>
 </p>
 
-For GS/GP results
+For GS/GP results:
+
+**plot.type**, four options ("d", "c", "m", "q"); if "d", plot ***SNP-density plot***; if "c", plot ***Circular-Manhattan plot***; if "m", plot ***Rectangular-Manhattan plot***; if "q", plot ***QQ-plot***  
+**LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
+**ylab**, Y axis  
+**threshold**, the significant level for Bonferroni correction  
+**file**, format of output figure  
+**dpi**, resolution of output figure  
 
 ```r
-MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", 
-         threshold=NULL, file="jpg", dpi=300)
+MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", threshold=NULL, file="jpg", dpi=300)
 ```
 
 <p align="center">
@@ -738,7 +757,7 @@ MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect",
 </a>
 </p>
 
-### Multiple tracks rectangular-Manhattan plot
+### Rectangular Manhattan plot for multiple traits/methods
 
 ```r
 MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
@@ -753,7 +772,7 @@ MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi
 
 ## Q-Q plot
 
-### Single track Q-Q plot
+### Q-Q plot for single trait/method
 
 ```r
 MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
@@ -767,7 +786,7 @@ MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey",
 </a>
 </p>
 
-### Multiple track Q-Q plot
+### Q-Q plot for multiple traits/methods
 
 ```r
 MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
