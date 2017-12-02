@@ -631,13 +631,13 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 
 ## SNP-density plot
 
-**plot.type**, four options ("d", "c", "m", "q")
-    if "d", plot ***SNP-density plot***; 
-    if "c", plot ***Circular-Manhattan plot***; 
-    if "m", plot ***Rectangular-Manhattan plot***, 
-    if "q", plot ***QQ-plot***  
-**bin.size**, the window size for counting the number of SNP  
-**bin.max**, the max value of legend, the windows whose number of SNP are bigger than **bin.max** will be painted in same color
+**plot.type**, four options ("d", "c", "m", "q")  
+    if "d", plot ***SNP-density plot***;  
+    if "c", plot ***Circular-Manhattan plot***;  
+    if "m", plot ***Rectangular-Manhattan plot***,  
+    if "q", plot ***QQ-plot***  
+**bin.size**, the window size for counting SNP number  
+**bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 
 ```r
 MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
