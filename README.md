@@ -77,7 +77,8 @@ Typing ```?MVP``` could get the details of all parameters.
 
 # Data Preparation
 
-## Phenotype [back to top](#contents)
+## Phenotype
+[back to top](#contents)
 
 | Taxa | trait1 | trait2 | trait3 |
 | :---: | :---: |:---: |:---: |
