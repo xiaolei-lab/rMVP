@@ -659,6 +659,7 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **[back to top](#contents)**  
 **pca**, the first three columns of principle components  
 **Ncluster**, cluster number  
+**class**, the class of all individuals, for example: "breed", "location"...
 **col**, colors for each cluster  
 **pch**, point shape for each cluster  
 **file**, format of output figure  
@@ -669,12 +670,12 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 ```r
 pca <- attach.big.matrix("mvp.pc.desc")[, 1:3]
 #pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=4, col=c("red", "green", "yellow", "blue"), file="jpg", plot3D=TRUE, pch=19)
+MVP.PCAplot(PCA=pca, Ncluster=4, class=NULL, col=c("red", "green", "yellow", "blue"), file="jpg", plot3D=TRUE, pch=19)
 ```
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP_pca.jpg">
-<img src="results/MVP_pca.jpg" height="380px" width="760x">
+<img src="results/MVP.PCA.jpg" height="380px" width="760x">
 </a>
 </p>
 
