@@ -1,5 +1,5 @@
 MVP.GLM <-
-function(phe, geno, CV=NULL, cpu=2, memo="MVP.GLM", bar=TRUE){
+function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
 ##########################################################################################################
 # Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
 #
@@ -26,7 +26,9 @@ function(phe, geno, CV=NULL, cpu=2, memo="MVP.GLM", bar=TRUE){
     
     n <- ncol(geno)
     m <- nrow(geno)
-
+	
+	if(priority=="speed")	geno <- as.matrix(geno)
+	
     ys <- as.numeric(as.matrix(phe[,2]))
     
     if(is.null(CV)){
