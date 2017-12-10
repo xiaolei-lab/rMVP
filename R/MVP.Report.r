@@ -40,7 +40,8 @@ MVP.Report <- function(
 	conf.int.col="grey",
 	file.output=TRUE,
 	file="jpg",
-	dpi=300
+	dpi=300,
+	memo=""
 )
 {	
 	#plot a circle with a radius of r
