@@ -1100,7 +1100,7 @@ dpi=300
 		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
 		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".pdf",sep=""), width = 6,height=6)
 		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
-		Breaks <- seq(min(phe[, i]), max(phe[, i]), length=breakNum)
+		Breaks <- seq(min(phe[, i], na.rm=TRUE), max(phe[, i], na.rm=TRUE), length=breakNum)
 		xx <- hist(phe[, i], plot=FALSE, breaks=Breaks,xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
 		maxY <- max(max(xx$density),  max(density(phe[, i])$y))
 		hist(phe[, i], breaks=Breaks,xlab="",ylab="Density", ylim=c(0, maxY), freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
