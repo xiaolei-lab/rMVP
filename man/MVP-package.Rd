@@ -71,12 +71,12 @@ MVP(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 \tabular{ll}{
 Package: \tab MVP\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
-Date: \tab 2017-05-26\cr
+Version: \tab 2.0\cr
+Date: \tab 2017-12-12\cr
 License: \tab GPL(>=2)\cr
 }
 }
 \author{
-Lilin Yin, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
+Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu \cr
 Maintainer: Xiaolei Liu <\bold{xiaoleiliu@mail.hzau.edu.cn}>
 }
