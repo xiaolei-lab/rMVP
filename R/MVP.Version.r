@@ -7,7 +7,7 @@ function(){
 # Build date: Aug 30, 2017
 # Last update: May 25, 2017
 ##############################################################################################
-version <- "1.0.1"
+version <- "2.0"
 authors <- "Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu"
 cat(paste("#", paste(rep("-", 38), collapse=""), "Welcome to MVP", paste(rep("-", 38), collapse=""), "#",sep=""), "\n")
 
