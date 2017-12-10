@@ -450,7 +450,7 @@ MVP.Report <- function(
 							(RR)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
-							col=density.list$den.col, lwd=0.6
+							col=density.list$den.col, lwd=0.1
 						)
 						legend(
 							x=RR+4*cir.chr.h,
@@ -629,7 +629,7 @@ MVP.Report <- function(
 							(2*cir.band+RR)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(2*cir.band+RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(2*cir.band+RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
-							col=density.list$den.col, lwd=0.6
+							col=density.list$den.col, lwd=0.1
 						)
 						legend(
 							x=RR+4*cir.chr.h,
