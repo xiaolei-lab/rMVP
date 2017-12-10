@@ -245,7 +245,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         plot3D <- TRUE
 		if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi, box=box)
 		MVP.Report(MVP.return, col=col, box=box, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold/m, signal.cex=signal.cex, outward=outward)
-		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, threshold=threshold/m, signal.cex=signal.cex)
+		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, box=box, threshold=threshold/m, signal.cex=signal.cex)
 	}
 	cat(paste("#",  paste(rep("-", 34), collapse=""), "MVP ACCOMPLISHED", paste(rep("-", 34), collapse=""), "#", sep=""), "\n")
 	return(MVP.return)
