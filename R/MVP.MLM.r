@@ -33,6 +33,7 @@ math.cpu <- try(getMKLthreads(), silent=TRUE)
 
 n <- ncol(geno)
 m <- nrow(geno)
+if(priority=="speed")	geno <- as.matrix(geno)
 
 ys <- as.numeric(as.matrix(phe[,2]))
 if(is.null(K)){
