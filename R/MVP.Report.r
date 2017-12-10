@@ -1318,7 +1318,8 @@ legend.pos="topright",
 Ncluster=3,
 plot3D=TRUE,
 file="pdf",
-dpi=300
+dpi=300，
+box=FALSE
 )
 {
 	if(!is.null(class)){if(length(class) != nrow(PCA)) stop("the length of 'class' differs from the row of 'PCA'");	Ncluster <- length(unique(class))}
@@ -1342,8 +1343,13 @@ dpi=300
 	}else{
 		kc <- list(cluster=as.numeric(as.factor(class)))
 	}
-	plot(PCA[,1],PCA[,2],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC2")
-	if(!is.null(class))	legend(legend.pos,levels(as.factor(class)),col=col[1:Ncluster],pch=pch[1:Ncluster],lwd=2,text.font=6)
+	plot(PCA[,1],PCA[,2],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC2",axes=FALSE)
+	axis(1, font.axis=2)
+	if(!is.null(class)){
+		legend(legend.pos,levels(as.factor(class)),col=col[1:Ncluster],pch=pch[1:Ncluster],lwd=2,text.font=6,box.col=NA)
+	}
+	axis(2, font.axis=2)
+	if(box) box()
     #kc <- kmeans(PCA[,c(2,3)], Ncluster)
     #plot(PCA[,2],PCA[,3],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC2",ylab="PC3")
     #kc <- kmeans(PCA[,c(1,3)], Ncluster)
