@@ -1318,7 +1318,7 @@ legend.pos="topright",
 Ncluster=3,
 plot3D=TRUE,
 file="pdf",
-dpi=300，
+dpi=300,
 box=FALSE
 )
 {
