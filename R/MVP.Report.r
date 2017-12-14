@@ -36,7 +36,6 @@ MVP.Report <- function(
 	cir.legend.col="grey45",
 	LOG10=TRUE,
 	box=FALSE,
-	conf.int=TRUE,
 	conf.int.col="grey",
 	file.output=TRUE,
 	file="jpg",
@@ -44,6 +43,7 @@ MVP.Report <- function(
 	memo=""
 )
 {	
+
 	#plot a circle with a radius of r
 	circle.plot <- function(myr,type="l",x=NULL,lty=1,lwd=1,col="black",add=TRUE,n.point=1000)
 	{
@@ -180,14 +180,14 @@ MVP.Report <- function(
 	}else{
 		Pmap <- MVP
 	}
-
+	
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
 
 	taxa=colnames(Pmap)[-c(1:3)]
 	if(!is.null(memo) && memo != "")	memo <- paste("_", memo, sep="")
 	if(length(taxa) == 0)	taxa <- "Index"
 	taxa <- paste(taxa, memo, sep="")
-	
+
 	#SNP-Density plot
 	if("d" %in% plot.type){
 		print("SNP_Density Plotting...")
@@ -204,7 +204,9 @@ MVP.Report <- function(
 		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, legend.max=bin.max, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
 		if(file.output)	dev.off()
 	}
+
 	if(length(plot.type) !=1 | (!"d" %in% plot.type)){
+	
 		#order Pmap by the name of SNP
 		#Pmap=Pmap[order(Pmap[,1]),]
 		Pmap <- as.matrix(Pmap)
@@ -212,7 +214,7 @@ MVP.Report <- function(
 		#delete the column of SNPs names
 		Pmap <- Pmap[,-1]
 		Pmap <- na.omit(Pmap)
-
+		
 		#scale and adjust the parameters
 		cir.chr.h <- cir.chr.h/5
 		cir.band <- cir.band/5
@@ -234,6 +236,13 @@ MVP.Report <- function(
 			cir.density=FALSE
 		}
 		
+		if(is.null(conf.int.col))	conf.int.col <- NA
+		if(is.na(conf.int.col)){
+			conf.int=FALSE
+		}else{
+			conf.int=TRUE
+		}
+
 		#get the number of traits
 		R=ncol(Pmap)-2
 
@@ -252,7 +261,6 @@ MVP.Report <- function(
 		}
 
 		Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
-		if(!is.null(threshold))	threshold <- threshold * nrow(Pmap)
 
 		#order the GWAS results by chromosome and position
 		Pmap <- Pmap[order(Pmap[, 1], Pmap[,2]), ]
@@ -292,11 +300,11 @@ MVP.Report <- function(
 		#T=floor(1024/max(pvalue))
 		#plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
 		if(is.vector(col)){
-			col <- matrix(col,R,length(col),byrow=T)
+			col <- matrix(col,R,length(col),byrow=TRUE)
 		}
 		if(is.matrix(col)){
 			#try to transform the colors into matrix for all traits
-			col <- matrix(as.vector(t(col)),R,dim(col)[2],byrow=T)
+			col <- matrix(as.vector(t(col)),R,dim(col)[2],byrow=TRUE)
 		}
 
 		Num <- as.numeric(table(Pmap[,1]))
@@ -309,7 +317,7 @@ MVP.Report <- function(
 			colx <- colx[!is.na(colx)]
 			N[i] <- ceiling(Nchr/length(colx))
 		}
-
+		
 		#insert the space into chromosomes and return the midpoint of each chromosome
 		ticks <- NULL
 		pvalue.posN <- NULL
@@ -349,7 +357,11 @@ MVP.Report <- function(
 		if(!is.null(threshold)){
 			if(!is.null(signal.line)){
 				for(l in 1:R){
-					signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)/nrow(pvalueT)))
+					if(LOG10){
+						signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)))
+					}else{
+						signal.line.index <- c(signal.line.index,which(pvalueT[,l] > max(threshold)))
+					}
 				}
 				signal.line.index <- unique(signal.line.index)
 			}
@@ -502,7 +514,7 @@ MVP.Report <- function(
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						for(thr in 1:length(threshold)){
-							significantline1=H*(-log10(threshold[thr]/max(dim(Pmap))))/Max
+							significantline1=ifelse(LOG10, H*(-log10(threshold[thr]))/Max, H*(threshold[thr])/Max)
 							#s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
 							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
 							if(significantline1<H){
@@ -518,8 +530,14 @@ MVP.Report <- function(
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						if(amplify==TRUE){
-							threshold <- sort(threshold)
-							significantline1=H*(-log10(max(threshold)/max(dim(Pmap))))/Max
+							if(LOG10){
+								threshold <- sort(threshold)
+								significantline1=H*(-log10(max(threshold)))/Max
+							}else{
+								threshold <- sort(threshold, decreasing=TRUE)
+								significantline1=H*(min(threshold))/Max
+							}
+							
 							p_amp.index <- which(Cpvalue>=significantline1)
 							HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 							HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
@@ -529,20 +547,29 @@ MVP.Report <- function(
 							
 								for(ll in 1:length(threshold)){
 									if(ll == 1){
-										significantline1=H*(-log10(threshold[ll]/max(dim(Pmap))))/Max
+										if(LOG10){
+											significantline1=H*(-log10(threshold[ll]))/Max
+										}else{
+											significantline1=H*(threshold[ll])/Max
+										}
 										p_amp.index <- which(Cpvalue>=significantline1)
 										HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 										HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 									}else{
-										significantline0=H*(-log10(threshold[ll-1]/max(dim(Pmap))))/Max
-										significantline1=H*(-log10(threshold[ll]/max(dim(Pmap))))/Max
+										if(LOG10){
+											significantline0=H*(-log10(threshold[ll-1]))/Max
+											significantline1=H*(-log10(threshold[ll]))/Max
+										}else{
+											significantline0=H*(threshold[ll-1])/Max
+											significantline1=H*(threshold[ll])/Max
+										}
 										p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
 										HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 										HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 									}
 								
 									if(is.null(signal.col)){
-										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=rep(rep(colx,N[i]),add[[i]])[p_amp.index])
 									}else{
 										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=signal.col[ll])
 									}
@@ -680,7 +707,7 @@ MVP.Report <- function(
 					if(sum(threshold!=0)==length(threshold)){
 					
 						for(thr in 1:length(threshold)){
-							significantline1=H*(-log10(threshold[thr]/max(dim(Pmap))))/Max
+							significantline1=ifelse(LOG10, H*(-log10(threshold[thr]))/Max, H*(threshold[thr])/Max)
 							#s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
 							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
 							if(significantline1<H){
@@ -691,8 +718,13 @@ MVP.Report <- function(
 							}
 						}
 						if(amplify==TRUE){
-							threshold <- sort(threshold)
-							significantline1=H*(-log10(max(threshold)/max(dim(Pmap))))/Max
+							if(LOG10){
+								threshold <- sort(threshold)
+								significantline1=H*(-log10(max(threshold)))/Max
+							}else{
+								threshold <- sort(threshold, decreasing=TRUE)
+								significantline1=H*(min(threshold))/Max
+							}
 							p_amp.index <- which(Cpvalue>=significantline1)
 							HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 							HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
@@ -702,13 +734,22 @@ MVP.Report <- function(
 							
 								for(ll in 1:length(threshold)){
 									if(ll == 1){
-										significantline1=H*(-log10(threshold[ll]/max(dim(Pmap))))/Max
+										if(LOG10){
+											significantline1=H*(-log10(threshold[ll]))/Max
+										}else{
+											significantline1=H*(threshold[ll])/Max
+										}
 										p_amp.index <- which(Cpvalue>=significantline1)
 										HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 										HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 									}else{
-										significantline0=H*(-log10(threshold[ll-1]/max(dim(Pmap))))/Max
-										significantline1=H*(-log10(threshold[ll]/max(dim(Pmap))))/Max
+										if(LOG10){
+											significantline0=H*(-log10(threshold[ll-1]))/Max
+											significantline1=H*(-log10(threshold[ll]))/Max
+										}else{
+											significantline0=H*(threshold[ll-1])/Max
+											significantline1=H*(threshold[ll])/Max
+										}
 										p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
 										HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
 										HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2))/TotalN)
@@ -716,7 +757,7 @@ MVP.Report <- function(
 									}
 								
 									if(is.null(signal.col)){
-										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=rep(rep(colx,N[i]),add[[i]])[p_amp.index])
 									}else{
 										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[1],col=signal.col[ll])
 									}
@@ -786,18 +827,17 @@ MVP.Report <- function(
 						if(!is.null(threshold)){
 							if(sum(threshold!=0)==length(threshold)){
 								if(LOG10 == TRUE){
-									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(-log10(min(threshold))))
 								}else{
-									Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
+									if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
 								}
 							}else{
 								if(LOG10){
 									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 								}else{
-									Max=max(ceiling(max(pvalue[pvalue!=Inf])))
-									if(Max<=1)
-									#{
-										Max=max(max(pvalue[pvalue!=Inf]))
+									Max=max(pvalue[pvalue!=Inf])
+									if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 									# }else{
 										# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 									# }
@@ -807,10 +847,10 @@ MVP.Report <- function(
 							if(LOG10){
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 							}else{
-								Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+								Max=max(pvalue[pvalue!=Inf])
 								if(Max<=1)
 								#{
-									Max=max(max(pvalue[pvalue!=Inf]))
+									Max=max(pvalue[pvalue!=Inf])
 								# }else{
 									# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 								# }
@@ -849,7 +889,7 @@ MVP.Report <- function(
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
 							for(thr in 1:length(threshold)){
-								h=-log10(threshold[thr]/max(dim(Pmap)))
+								h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
 								# print(h)
 								# print(threshold.col[thr])
 								# print(threshold.lty[thr])
@@ -857,8 +897,14 @@ MVP.Report <- function(
 								par(xpd=FALSE); abline(h=h,col=threshold.col[thr],lty=threshold.lty[thr],lwd=threshold.lwd[thr]); par(xpd=TRUE)
 							}
 							if(amplify == TRUE){
-								threshold <- sort(threshold)
-								sgline1=-log10(max(threshold)/max(dim(Pmap)))
+								if(LOG10){
+									threshold <- sort(threshold)
+									sgline1=-log10(max(threshold))
+								}else{
+									threshold <- sort(threshold, decreasing=TRUE)
+									sgline1=min(threshold)
+								}
+
 								sgindex=which(logpvalue>=sgline1)
 								HY1=logpvalue[sgindex]
 								HX1=pvalue.posN[sgindex]
@@ -868,20 +914,29 @@ MVP.Report <- function(
 								
 								for(ll in 1:length(threshold)){
 									if(ll == 1){
-										sgline1=-log10(threshold[ll]/max(dim(Pmap)))
+										if(LOG10){
+											sgline1=-log10(threshold[ll])
+										}else{
+											sgline1=threshold[ll]
+										}
 										sgindex=which(logpvalue>=sgline1)
 										HY1=logpvalue[sgindex]
 										HX1=pvalue.posN[sgindex]
 									}else{
-										sgline0=-log10(threshold[ll-1]/max(dim(Pmap)))
-										sgline1=-log10(threshold[ll]/max(dim(Pmap)))
+										if(LOG10){
+											sgline0=-log10(threshold[ll-1])
+											sgline1=-log10(threshold[ll])
+										}else{
+											sgline0=threshold[ll-1]
+											sgline1=threshold[ll]
+										}
 										sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
 										HY1=logpvalue[sgindex]
 										HX1=pvalue.posN[sgindex]
 									}
 
 									if(is.null(signal.col)){
-										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2],col=rep(rep(colx,N[i]),add[[i]])[sgindex])
 									}else{
 										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2],col=signal.col[ll])
 									}
@@ -910,24 +965,25 @@ MVP.Report <- function(
 			}
 			for(i in 1:R){
 				print(paste("Multracks_Rectangular Plotting ",taxa[i],"...",sep=""))
+				colx=col[i,]
+				colx=colx[!is.na(colx)]
 				pvalue=pvalueT[,i]
 				logpvalue=logpvalueT[,i]
 				if(is.null(ylim)){
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
 							if(LOG10){
-								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(min(threshold)/max(dim(Pmap))))
+								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(min(threshold)))
 							}else{
-								Max=max(ceiling(max(pvalue[pvalue!=Inf])),-log10(min(threshold)/max(dim(Pmap))))
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
+								if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
 							}
 						}else{
 							if(LOG10){
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 							}else{
 								Max=max(ceiling(max(pvalue[pvalue!=Inf])))
-								if(Max<=1)
-								#{
-									Max=max(max(pvalue[pvalue!=Inf]))
+								if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 								# }else{
 									# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 								# }
@@ -937,7 +993,7 @@ MVP.Report <- function(
 						if(LOG10){
 							Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 						}else{
-						Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 							if(Max<=1)
 							#{
 								Max=max(max(pvalue[pvalue!=Inf]))
@@ -989,12 +1045,17 @@ MVP.Report <- function(
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						for(thr in 1:length(threshold)){
-							h=-log10(threshold[thr]/max(dim(Pmap)))
+							h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
 							par(xpd=FALSE); abline(h=h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr]); par(xpd=TRUE)
 						}
 						if(amplify==TRUE){
-								threshold <- sort(threshold)
-								sgline1=-log10(max(threshold)/max(dim(Pmap)))
+								if(LOG10){
+									threshold <- sort(threshold)
+									sgline1=-log10(max(threshold))
+								}else{
+									threshold <- sort(threshold, decreasing=TRUE)
+									sgline1=min(threshold)
+								}
 								sgindex=which(logpvalue>=sgline1)
 								HY1=logpvalue[sgindex]
 								HX1=pvalue.posN[sgindex]
@@ -1004,20 +1065,29 @@ MVP.Report <- function(
 								
 								for(ll in 1:length(threshold)){
 									if(ll == 1){
-										sgline1=-log10(threshold[ll]/max(dim(Pmap)))
+										if(LOG10){
+											sgline1=-log10(threshold[ll])
+										}else{
+											sgline1=threshold[ll]
+										}
 										sgindex=which(logpvalue>=sgline1)
 										HY1=logpvalue[sgindex]
 										HX1=pvalue.posN[sgindex]
 									}else{
-										sgline0=-log10(threshold[ll-1]/max(dim(Pmap)))
-										sgline1=-log10(threshold[ll]/max(dim(Pmap)))
+										if(LOG10){
+											sgline0=-log10(threshold[ll-1])
+											sgline1=-log10(threshold[ll])
+										}else{
+											sgline0=threshold[ll-1]
+											sgline1=threshold[ll]
+										}
 										sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
 										HY1=logpvalue[sgindex]
 										HX1=pvalue.posN[sgindex]
 									}
 
 									if(is.null(signal.col)){
-										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]])[HX1])
+										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]])[sgindex])
 									}else{
 										points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*xn,col=signal.col[ll])
 									}
@@ -1032,7 +1102,123 @@ MVP.Report <- function(
 			#add the labels of X-axis
 			#mtext(xlab,side=1,padj=2.5,font=2,cex=R*2/3)
 			if(file.output) dev.off()
-			#print("Rectangular-Manhattan has been finished!",quote=F)
+			
+			if(file.output){
+				if(file=="jpg")	jpeg(paste("Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste("Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6)
+				if(file=="tiff")	tiff(paste("Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+				par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
+			}
+			if(!file.output){
+				if(is.null(dev.list()))	dev.new(width = 15, height = 6)
+				par(xpd=TRUE)
+			}
+			
+			pvalue <- as.vector(Pmap[,3:(R+2)])
+			if(is.null(ylim)){
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						if(LOG10){
+							Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(min(threshold)))
+						}else{
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
+							if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
+						}
+					}else{
+						if(LOG10){
+							Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+						}else{
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+							if(Max<=1)
+							#{
+								Max=max(max(pvalue[pvalue!=Inf]))
+							# }else{
+								# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+							# }
+						}	
+					}
+				}else{
+					if(LOG10){
+						Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+					}else{
+						Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+						
+						#{
+						if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+						# }else{
+							# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+						# }
+					}
+				}
+				if(Max<=1){
+					plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
+				}else{
+					plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+1),ylab=ylab,
+						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+				}
+			}else{
+				plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=ylim,ylab=ylab,
+					cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+			}
+			
+			legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
+
+			if(is.null(chr.labels)){
+				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
+			}else{
+				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
+			}
+			if(is.null(ylim)){
+				if(Max>1){
+					#print(seq(0,(Max+1),ceiling((Max+1)/10)))
+					axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
+				}else{
+					axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+				}
+			}else{
+				if(ylim[2]>1){
+					axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
+				}else{
+					axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+				}
+			}
+			do <- TRUE
+			sam.index <- list()
+			for(l in 1:R){
+				sam.index[[l]] <- 1:nrow(Pmap)
+			}
+			sam.num <- 1000
+			print("Multraits_Rectangular Plotting...")
+			while(do){
+				for(i in 1:R){
+					if(length(sam.index[[i]]) < sam.num){
+						plot.index <- sam.index[[i]]
+					}else{
+						plot.index <- sample(sam.index[[i]], sam.num, rep=FALSE)
+					}
+					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
+					logpvalue=logpvalueT[plot.index,i]
+					points(pvalue.posN[plot.index],logpvalue,pch=pch,cex=cex[2],col=t(col)[i])
+					#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min(threshold)/max(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
+				}
+				if(length(sam.index[[i]]) == 0) do <- FALSE
+			}
+			# for(i in 1:R){
+				# logpvalue=logpvalueT[,i]
+				# points(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=t(col)[i])
+			# }
+			if(!is.null(threshold)){
+				if(sum(threshold!=0)==length(threshold)){
+					for(thr in 1:length(threshold)){
+						h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
+						par(xpd=FALSE); abline(h=h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr]); par(xpd=TRUE)
+					}
+				}
+			}
+
+			if(file.output) dev.off()
+			
 		}
 	}
 		
@@ -1098,7 +1284,7 @@ MVP.Report <- function(
 				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
-						thre.line=-log10(min(threshold)/N)
+						thre.line=-log10(min(threshold))
 						if(amplify==TRUE){
 							thre.index=which(log.P.values>=thre.line)
 							if(length(thre.index)!=0){
@@ -1133,7 +1319,7 @@ MVP.Report <- function(
 				Pmap.min <- Pmap[,3:(R+2)]
 				YlimMax <- -log10(min(Pmap.min[Pmap.min > 0]))
 				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
-				legend("topleft",taxa,col=t(col)[1:R],lwd=2,text.font=6,box.col=NA)
+				legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
 				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
 				axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
 				
@@ -1178,7 +1364,7 @@ MVP.Report <- function(
 						
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
-							thre.line=-log10(min(threshold)/N)
+							thre.line=-log10(min(threshold))
 							if(amplify==TRUE){
 								thre.index=which(log.P.values>=thre.line)
 								if(length(thre.index)!=0){
@@ -1254,7 +1440,7 @@ MVP.Report <- function(
 				
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
-						thre.line=-log10(min(threshold)/N)
+						thre.line=-log10(min(threshold))
 						if(amplify==TRUE){
 							thre.index=which(log.P.values>=thre.line)
 							if(length(thre.index)!=0){
@@ -1276,6 +1462,7 @@ MVP.Report <- function(
 		}
 	}
 }
+
 
 MVP.Hist <- function(
 phe,
