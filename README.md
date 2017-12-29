@@ -684,19 +684,19 @@ MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), fi
 For GWAS results:
 
 ```r
-> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+> MVP.Report(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
         outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
         memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
-<img src="Figure/9.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/9.jpg">
+<img src="results/9.jpg" height="400px" width="400px">
 </a>
 </p>
 
 ```r
-> CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+> MVP.Report(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
       bin.size=1e6,outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
@@ -708,15 +708,15 @@ For GWAS results:
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
-<img src="Figure/10.jpg" height="400px" width="453px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/10.jpg">
+<img src="results/10.jpg" height="400px" width="453px">
 </a>
 </p>
 
 For GS/GP results:
 
 ```r
-> CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
+> MVP.Report(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
         NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
         c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,cir.band=1,file="jpg",
         memo="",dpi=300,chr.den.col="black")
@@ -726,8 +726,8 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/11.jpg">
-<img src="Figure/11.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/11.jpg">
+<img src="results/11.jpg" height="400px" width="400px">
 </a>
 </p>
 
@@ -736,30 +736,30 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 For GWAS results:
 
 ```r
-> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/1.jpg">
-<img src="Figure/1.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/1.jpg">
+<img src="results/1.jpg" height="300px" width="900px">
 </a>
 </p>
 
 ```r
-> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
+> MVP.Report(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
         file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
-<img src="Figure/2.jpg" height="330px" width="900px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/2.jpg">
+<img src="results/2.jpg" height="330px" width="900px">
 </a>
 </p>
 
 ```r
-> CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
+> MVP.Report(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
         signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
@@ -770,15 +770,15 @@ if the length of parameter 'chr.den.col' is bigger than 1, SNP density that coun
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
-<img src="Figure/2_2.jpg" height="330px" width="900px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/2_2.jpg">
+<img src="results/2_2.jpg" height="330px" width="900px">
 </a>
 </p>
 
 For GS/GP results:
 
 ```r
-> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
+> MVP.Report(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
         chr.den.col=NULL, file="jpg",memo="",dpi=300)
 
@@ -787,8 +787,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/3.jpg">
-<img src="Figure/3.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/3.jpg">
+<img src="results/3.jpg" height="300px" width="900px">
 </a>
 </p>
 
@@ -796,7 +796,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> CMplot(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+> MVP.Report(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
         file="jpg",memo="",dpi=300)
@@ -805,16 +805,16 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 #### a. all traits in a axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
-<img src="Figure/5.jpg" height="330px" width="900px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/4.jpg">
+<img src="results/5.jpg" height="330px" width="900px">
 </a>
 </p>
 
 #### b. all traits in separated axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
-<img src="Figure/4.jpg" height="900px" width="840px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/5.jpg">
+<img src="results/4.jpg" height="900px" width="840px">
 </a>
 </p>
 
@@ -822,12 +822,12 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> CMplot(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/6.jpg">
-<img src="Figure/6.jpg" height="450px" width="450px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/6.jpg">
+<img src="results/6.jpg" height="450px" width="450px">
 </a>
 </p>
 
@@ -836,7 +836,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
+> MVP.Report(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
         signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
         TRUE,file="jpg",memo="",dpi=300)
 ```
@@ -844,16 +844,16 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 #### a. all traits in a axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
-<img src="Figure/8.jpg" height="450px" width="450px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/8.jpg">
+<img src="results/8.jpg" height="450px" width="450px">
 </a>
 </p>
 
 #### b. all traits in separated axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="450px" width="680px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/7.jpg">
+<img src="results/7.jpg" height="450px" width="680px">
 </a>
 </p>
 
