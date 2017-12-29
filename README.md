@@ -683,48 +683,51 @@ MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), fi
 **[back to top](#contents)**  
 For GWAS results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
-**chr.labels**, rename name of each chromosome  
-**threshold**, the significant level for Bonferroni correction  
-**cir.chr.h**, the width of outer circle  
-**amplify**, if TRUE, significant SNPs will be highlighted   
-**signal.line**, the width of the line that cross all circle, if signal.line=NULL, the lines that crosse circles won't be added  
-**signal.col**, the color for the significant SNPs, if NULL, it will use the color index of ***col***  
-**signal.cex**, the cex for the significant SNPs  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(pig60K, plot.type="c", chr.labels=paste("Chr",c(1:18,"X"),sep=""), threshold=c(0.05,0.01),
-      cir.chr.h=1, amplify=TRUE, threshold.lty=c(2,1), threshold.col=c("blue","red"), signal.line=1,
-      signal.col="red", file="jpg", dpi=300)
+> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
+        memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.jpg">
-<img src="results/Circular-Manhattan.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
+<img src="Figure/9.jpg" height="400px" width="400px">
+</a>
+</p>
+
+```r
+> CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+      threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
+      "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
+      bin.size=1e6,outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
+
+#Note:
+1. if signal.line=NULL, the lines that crosse circles won't be added.
+2. if the length of parameter 'chr.den.col' is not equal to 1, SNP density that counts 
+   the number of SNP within given size('bin.size') will be plotted around the circle.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
+<img src="Figure/10.jpg" height="400px" width="453px">
 </a>
 </p>
 
 For GS/GP results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "c", draw ***Circular-Manhattan plot***  
-**LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
-**outward**, TRUE or FALSE, the plotting direction  
-**r**, the radius of circle  
-**cir.legend.cex**, the size of axis number of legend  
-**cir.band**, the interval size among circles  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste("Chr",c(1:29), sep=""),
-         r=1.2, cir.chr.h=1.3, cir.legend.cex=0.5, cir.band=1, threshold=NULL, file="jpg", dpi=300)
+> CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
+        NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
+        c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,cir.band=1,file="jpg",
+        memo="",dpi=300,chr.den.col="black")
+        
+#Note: 
+Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Circular-Manhattan.cattle.jpg">
-<img src="results/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/11.jpg">
+<img src="Figure/11.jpg" height="400px" width="400px">
 </a>
 </p>
 
@@ -732,95 +735,125 @@ MVP.Report(cattle50K, plot.type="c", LOG10=FALSE, outward=TRUE, chr.labels=paste
 **[back to top](#contents)**  
 For GWAS results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
-**threshold**, the significant level for Bonferroni correction  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(pig60K[,c(1:3,6)], plot.type="m", threshold=NULL, file="jpg", dpi=300)
+> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Rectangular-Manhattan.trait3.jpg">
-<img src="results/Rectangular-Manhattan.trait3.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/1.jpg">
+<img src="Figure/1.jpg" height="300px" width="900px">
+</a>
+</p>
+
+```r
+> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
+        threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
+        file="jpg",memo="",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
+<img src="Figure/2.jpg" height="330px" width="900px">
+</a>
+</p>
+
+```r
+> CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
+        signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        
+#Note:
+if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
+   the number of SNP within given size('bin.size') will be plotted.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
+<img src="Figure/2_2.jpg" height="330px" width="900px">
 </a>
 </p>
 
 For GS/GP results:
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
-**LOG10**, TRUE or FALSE, if FALSE, the original value of result will be used to plot  
-**ylab**, Y axis  
-**threshold**, the significant level for Bonferroni correction  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(cattle50K[,c(1:3,5)], plot.type="m", LOG10=FALSE, ylab="SNP effect", threshold=NULL, file="jpg", dpi=300)
+> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
+        threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
+        chr.den.col=NULL, file="jpg",memo="",dpi=300)
+
+#Note: 
+if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Rectangular-Manhattan.Fat percentage.jpg">
-<img src="results/Rectangular-Manhattan.Fat percentage.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/3.jpg">
+<img src="Figure/3.jpg" height="300px" width="900px">
 </a>
 </p>
 
 ### Manhattan plot in Rectangular fashion for multiple traits or methods
 **[back to top](#contents)**  
 
-**plot.type**, four options ("d", "c", "m", "q"); if "m", draw ***Rectangular-Manhattan plot***  
-**threshold**, the significant level for Bonferroni correction  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-**multracks**, TRUE or FALSE, if TRUE, Manhattan plots of multiple traits will be plotted together in one figure  
-
 ```r
-MVP.Report(imMVP, plot.type="m", threshold=0.05, multracks=TRUE, file="jpg", dpi=300)
+> CMplot(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
+        file="jpg",memo="",dpi=300)
 ```
 
+#### a. all traits in a axes:
+
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/Multi_Rectangular-Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg">
-<img src="results/Multi_Rectangular-Manhattan.trait.GLM.trait.MLM.trait.FarmCPU.jpg" height="900px" width="840px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
+<img src="Figure/5.jpg" height="330px" width="900px">
+</a>
+</p>
+
+#### b. all traits in separated axes:
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
+<img src="Figure/4.jpg" height="900px" width="840px">
 </a>
 </p>
 
 ### Q-Q plot for single trait or method
 **[back to top](#contents)**  
 
-**plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
-**conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
-**conf.int.col**, color of the confidence interval shadow on Q-Q plot  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(pig60K[,c(1:3,6)], plot.type="q", conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
+> CMplot(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/QQplot.trait3.jpg">
-<img src="results/QQplot.trait3.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/6.jpg">
+<img src="Figure/6.jpg" height="450px" width="450px">
 </a>
 </p>
+
 
 ### Q-Q plot for multiple traits or methods
 **[back to top](#contents)**  
 
-**plot.type**, four options ("d", "c", "m", "q"); if "q", draw ***Q-Q plot***  
-**multracks**, TRUE or FALSE, if TRUE, Q-Q plots of multiple traits will be plotted together in one figure  
-**conf.int**, TRUE or FALSE, If TRUE, draw the 95% confidence interval on Q-Q plot  
-**conf.int.col**, color of the confidence interval shadow on Q-Q plot  
-**file**, format of output figure  
-**dpi**, resolution of output figure  
-
 ```r
-MVP.Report(imMVP, plot.type="q", multracks=TRUE, conf.int=TRUE, conf.int.col="grey", file="jpg", dpi=300)
+> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
+        signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
+        TRUE,file="jpg",memo="",dpi=300)
 ```
 
+#### a. all traits in a axes:
+
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Multraits.QQplot.jpg">
-<img src="results/MVP.Multraits.QQplot.jpg" height="500px" width="500px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
+<img src="Figure/8.jpg" height="450px" width="450px">
+</a>
+</p>
+
+#### b. all traits in separated axes:
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
+<img src="Figure/7.jpg" height="450px" width="680px">
 </a>
 </p>
 
