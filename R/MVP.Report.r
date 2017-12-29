@@ -1,6 +1,6 @@
 MVP.Report <- function(
 	MVP,
-	col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1", "red"),
+	col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
 	bin.size=1e6,
 	bin.max=NULL,
 	pch=19,
@@ -30,7 +30,7 @@ MVP.Report <- function(
 	signal.line=NULL,
 	cir.chr=TRUE,
 	cir.chr.h=1.3,
-	cir.chr.col=c("darkgreen", "yellow", "red"),
+	chr.den.col=c("darkgreen", "yellow", "red"),
 	cir.legend=TRUE,
 	cir.legend.cex=0.8,
 	cir.legend.col="grey45",
@@ -230,11 +230,6 @@ MVP.Report <- function(
 		if(!is.null(ylim)){
 			if(length(ylim)==1) ylim <- c(0,ylim)
 		}
-		if(length(cir.chr.col) != 1){
-			cir.density=TRUE
-		}else{
-			cir.density=FALSE
-		}
 		
 		if(is.null(conf.int.col))	conf.int.col <- NA
 		if(is.na(conf.int.col)){
@@ -353,6 +348,15 @@ MVP.Report <- function(
 
 		TotalN <- max(pvalue.posN)
 
+		if(length(chr.den.col) > 1){
+			cir.density=TRUE
+			den.fold <- 20
+			density.list <- Densitplot(map=Pmap[,c(1,1,2)], col=chr.den.col, plot=FALSE, bin=bin.size, legend.max=bin.max)
+			#list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
+		}else{
+			cir.density=FALSE
+		}
+		
 		signal.line.index <- NULL
 		if(!is.null(threshold)){
 			if(!is.null(signal.line)){
@@ -434,10 +438,14 @@ MVP.Report <- function(
 							Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
 							X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
 							Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
-							if(is.null(cir.chr.col)){
+							if(is.null(chr.den.col)){
 								polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
 							}else{
-								polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								if(cir.density){
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="grey",border="grey")
+								}else{
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.den.col,border=chr.den.col)
+								}
 							}
 						}else{
 							polygon.index <- seq(1+round(band/2)+max(pvalue.posN.list[[k-1]]),-round(band/2)+max(pvalue.posN.list[[k]]), length=polygon.num)
@@ -445,17 +453,19 @@ MVP.Report <- function(
 							Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
 							X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
 							Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
-							if(is.null(cir.chr.col)){
+							if(is.null(chr.den.col)){
 								polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])
 							}else{
-								polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								if(cir.density){
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="grey",border="grey")
+								}else{
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.den.col,border=chr.den.col)
+								}
 							}		
 						}
 					}
 					
 					if(cir.density){
-						density.list <- Densitplot(map=Pmap[,c(1,1,2)], col=cir.chr.col, plot=FALSE, bin=bin.size, legend.max=bin.max)
-						#list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
 
 						segments(
 							(RR)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
@@ -473,6 +483,7 @@ MVP.Report <- function(
 							x.intersp=1,
 							yjust=0.5, xjust=0, xpd=TRUE
 						)
+						
 					}
 					
 					# XLine=(RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
@@ -498,10 +509,15 @@ MVP.Report <- function(
 					}
 					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
@@ -621,13 +637,13 @@ MVP.Report <- function(
 							Y1chr=(2*cir.band+RR)*cos(2*pi*(polygon.index)/TotalN)
 							X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
 							Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
-								if(is.null(cir.chr.col)){
+								if(is.null(chr.den.col)){
 									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
 								}else{
 									if(cir.density){
 										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="grey",border="grey")
 									}else{
-										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.den.col,border=chr.den.col)
 									}
 								}
 						}else{
@@ -636,20 +652,18 @@ MVP.Report <- function(
 							Y1chr=(2*cir.band+RR)*cos(2*pi*(polygon.index)/TotalN)
 							X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
 							Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
-							if(is.null(cir.chr.col)){
+							if(is.null(chr.den.col)){
 								polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
 							}else{
 									if(cir.density){
 										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="grey",border="grey")
 									}else{
-										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.den.col,border=chr.den.col)
 									}
 							}	
 						}
 					}
 					if(cir.density){
-						density.list <- Densitplot(map=Pmap[,c(1,1,2)], col=cir.chr.col, plot=FALSE, bin=bin.size, legend.max=bin.max)
-						#list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
 
 						segments(
 							(2*cir.band+RR)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
@@ -667,6 +681,7 @@ MVP.Report <- function(
 							x.intersp=1,
 							yjust=0.5, xjust=0, xpd=TRUE
 						)
+						
 					}
 					
 					if(cir.density){
@@ -689,10 +704,15 @@ MVP.Report <- function(
 					}
 					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
@@ -857,16 +877,33 @@ MVP.Report <- function(
 							}
 						}
 						if(Max<=1){
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							if(cir.density){
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}else{
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}
 						}else{
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+1),ylab=ylab,
+							if(cir.density){
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}else{
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}
 						}
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=ylim,ylab=ylab,
+						Max <- max(ylim)
+						if(cir.density){
+							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, max(ylim)),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}else{
+							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}
 					}
+					
 					if(is.null(chr.labels)){
 						axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
 					}else{
@@ -876,14 +913,18 @@ MVP.Report <- function(
 						if(Max>1){
 							#print(seq(0,(Max+1),ceiling((Max+1)/10)))
 							axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
+							legend.y <- tail(seq(0,(Max+1),ceiling((Max+1)/10)), 1)
 						}else{
 							axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+							legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
 						}
 					}else{
 						if(ylim[2]>1){
-							axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
+							axis(2,at=seq(0,ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+							legend.y <- tail(ylim[2], 1)
 						}else{
-							axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+							axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+							legend.y <- tail(ylim[2], 1)
 						}
 					}
 					if(!is.null(threshold)){
@@ -945,6 +986,32 @@ MVP.Report <- function(
 							}
 						}
 					}
+					if(cir.density){
+						for(yll in 1:length(pvalue.posN.list)){
+							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
+								c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
+								-1.5*Max/den.fold, -0.5*Max/den.fold), 
+								col="grey", border="grey")
+						}
+						
+						segments(
+							pvalue.posN,
+							-0.5*Max/den.fold,
+							pvalue.posN,
+							-1.5*Max/den.fold,
+							col=density.list$den.col, lwd=0.1
+						)
+						legend(
+							x=max(pvalue.posN),
+							y=legend.y,
+							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
+							cex=0.8, bty="n",
+							y.intersp=1,
+							x.intersp=1,
+							yjust=1, xjust=0, xpd=TRUE
+						)
+						
+					}
 				if(box) box()
 				#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min(threshold)/max(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 				if(file.output)  dev.off()
@@ -1004,14 +1071,16 @@ MVP.Report <- function(
 					}
 					xn <- ifelse(R == 1, R, R * 2/3)
 					if(Max<=1){
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+1),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+1),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}
 				}else{
-					plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+2*band),ylim=ylim,ylab=ylab,
+					xn <- ifelse(R == 1, R, R * 2/3)
+					Max <- max(ylim)
+					plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 				}
 				
@@ -1037,9 +1106,9 @@ MVP.Report <- function(
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis*xn,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
+						axis(2,at=seq(0,(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis*xn,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
 					}else{
-						axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+						axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
 					}
 				}
 				if(!is.null(threshold)){
@@ -1110,7 +1179,7 @@ MVP.Report <- function(
 				par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 			}
 			if(!file.output){
-				if(is.null(dev.list()))	dev.new(width = 15, height = 6)
+				dev.new(width = 15, height = 6)
 				par(xpd=TRUE)
 			}
 			
@@ -1151,19 +1220,33 @@ MVP.Report <- function(
 					}
 				}
 				if(Max<=1){
-					plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
-						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
+					if(cir.density){
+						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
+					}else{
+						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
+					}
 				}else{
-					plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=c(0,Max+1),ylab=ylab,
-						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+					if(cir.density){
+						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+					}else{
+						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+					}
 				}
 			}else{
-				plot(NULL,xlim=c(0,max(pvalue.posN)+2*band),ylim=ylim,ylab=ylab,
-					cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+				Max <- max(ylim)
+				if(cir.density){
+					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+				}else{
+					plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
+						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
+				}
 			}
-			
 			legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
-
 			if(is.null(chr.labels)){
 				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
 			}else{
@@ -1173,14 +1256,18 @@ MVP.Report <- function(
 				if(Max>1){
 					#print(seq(0,(Max+1),ceiling((Max+1)/10)))
 					axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
+					legend.y <- tail(seq(0,(Max+1),ceiling((Max+1)/10)), 1)
 				}else{
 					axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+					legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
 				}
 			}else{
 				if(ylim[2]>1){
-					axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
+					axis(2,at=seq(0,(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+					legend.y <- tail(ylim[2], 1)
 				}else{
-					axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+					axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+					legend.y <- tail(ylim[2], 1)
 				}
 			}
 			do <- TRUE
@@ -1195,7 +1282,7 @@ MVP.Report <- function(
 					if(length(sam.index[[i]]) < sam.num){
 						plot.index <- sam.index[[i]]
 					}else{
-						plot.index <- sample(sam.index[[i]], sam.num, rep=FALSE)
+						plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
 					}
 					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
 					logpvalue=logpvalueT[plot.index,i]
@@ -1204,10 +1291,12 @@ MVP.Report <- function(
 				}
 				if(length(sam.index[[i]]) == 0) do <- FALSE
 			}
+			
 			# for(i in 1:R){
 				# logpvalue=logpvalueT[,i]
 				# points(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=t(col)[i])
 			# }
+			
 			if(!is.null(threshold)){
 				if(sum(threshold!=0)==length(threshold)){
 					for(thr in 1:length(threshold)){
@@ -1216,7 +1305,32 @@ MVP.Report <- function(
 					}
 				}
 			}
-
+			if(cir.density){
+						for(yll in 1:length(pvalue.posN.list)){
+							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
+								c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
+								-1.5*Max/den.fold, -0.5*Max/den.fold), 
+								col="grey", border="grey")
+						}
+						
+						segments(
+							pvalue.posN,
+							-0.5*Max/den.fold,
+							pvalue.posN,
+							-1.5*Max/den.fold,
+							col=density.list$den.col, lwd=0.1
+						)
+						legend(
+							x=max(pvalue.posN),
+							y=legend.y,
+							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
+							cex=0.8, bty="n",
+							y.intersp=1,
+							x.intersp=1,
+							yjust=1, xjust=0, xpd=TRUE
+						)
+						
+			}
 			if(file.output) dev.off()
 			
 		}
@@ -1311,7 +1425,7 @@ MVP.Report <- function(
 					if(file=="tiff")	tiff(paste("Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
 					par(mar = c(5,5,4,2),xpd=TRUE)
 				}else{
-					if(is.null(dev.list()))	dev.new(width = 5.5, height = 5.5)
+					dev.new(width = 5.5, height = 5.5)
 					par(xpd=TRUE)
 				}
 				p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
