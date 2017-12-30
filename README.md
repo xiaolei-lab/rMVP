@@ -761,7 +761,7 @@ For GWAS results:
 
 ```r
 > MVP.Report(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
-        col=c("grey60","grey30")threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        col=c("grey60","grey30"), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
         signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
         
