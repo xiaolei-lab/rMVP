@@ -837,12 +837,10 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> MVP.Report(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
+> MVP.Report(imMVP,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
         signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
         TRUE,file="jpg",memo="",dpi=300)
 ```
-
-#### a. all traits in a axes:
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/8.jpg">
@@ -850,13 +848,6 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 </a>
 </p>
 
-#### b. all traits in separated axes:
-
-<p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/7.jpg">
-<img src="results/7.jpg" height="450px" width="680px">
-</a>
-</p>
 
 ### Parameters of MVP.Report
 
