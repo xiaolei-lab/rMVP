@@ -736,7 +736,8 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 For GWAS results:
 
 ```r
-> MVP.Report(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,col=c("dodgerblue4","deepskyblue"), cex=0.7
+            chr.den.col=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -746,10 +747,10 @@ For GWAS results:
 </p>
 
 ```r
-> MVP.Report(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
-        threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
-        file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K, plot.type="m", col=c("dodgerblue4","deepskyblue"), LOG10=TRUE, ylim=NULL,
+        threshold=c(1e-6,1e-4), threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black",
+        "grey"), amplify=TRUE,chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),
+        signal.pch=c(19,19),file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -760,7 +761,7 @@ For GWAS results:
 
 ```r
 > MVP.Report(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
-        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        col=c("grey60","grey30")threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
         signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
         
@@ -780,7 +781,7 @@ For GS/GP results:
 ```r
 > MVP.Report(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
-        chr.den.col=NULL, file="jpg",memo="",dpi=300)
+        col=c("dodgerblue4","deepskyblue"), chr.den.col=NULL, file="jpg",memo="",dpi=300)
 
 #Note: 
 if signal.col=NULL, the significant SNPs will be plotted with original colors.
