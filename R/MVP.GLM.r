@@ -122,6 +122,6 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
             }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-    print("****************GLM ACCOMPLISHED****************")
+    #print("****************GLM ACCOMPLISHED****************")
     return(results)
 }#end of MVP.GLM function
