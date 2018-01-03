@@ -236,7 +236,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     	permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
 		threshold = permutation.cutoff * m
     }
-	
+	print(paste("Significance Level: ", threshold/m, sep=""))
     if(file.output){
 		print("Visualization Start...")
 	    print("Phenotype distribution Plotting...")
