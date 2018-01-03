@@ -75,7 +75,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #setMKLthreads(1)
     #}
     
-    MVP.Version()
+    MVP.Version(TRUE)
     if(nrow(phe) != ncol(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
@@ -247,6 +247,6 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
 		MVP.Report(MVP.return, col=col, box=box, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold/m, signal.cex=signal.cex, outward=outward)
 		if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, box=box, threshold=threshold/m, signal.cex=signal.cex)
 	}
-	cat(paste("#",  paste(rep("-", 34), collapse=""), "MVP ACCOMPLISHED", paste(rep("-", 34), collapse=""), "#", sep=""), "\n")
+	MVP.Version(FALSE)
 	return(MVP.return)
 }#end of MVP function
