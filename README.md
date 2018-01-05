@@ -843,8 +843,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/8.tif">
-<img src="results/8.tif" height="450px" width="450px">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/8.jpg">
+<img src="results/8.jpg" height="450px" width="450px">
 </a>
 </p>
 
