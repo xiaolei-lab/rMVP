@@ -1656,7 +1656,7 @@ box=FALSE
 	plot(PCA[,1],PCA[,2],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC2",axes=FALSE)
 	axis(1, font.axis=2)
 	if(!is.null(class)){
-		legend(legend.pos,levels(as.factor(class)),col=col[1:Ncluster],pch=pch[1:Ncluster],lwd=2,text.font=6,box.col=NA)
+		legend(legend.pos,levels(as.factor(class)),col=col[1:Ncluster],pch=pch[1:Ncluster],text.font=6,box.col=NA)
 	}
 	axis(2, font.axis=2)
 	if(box) box()
