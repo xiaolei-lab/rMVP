@@ -1002,7 +1002,7 @@ MVP.Report <- function(
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
-							x=max(pvalue.posN),
+							x=max(pvalue.posN)+band,
 							y=legend.y,
 							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
 							cex=0.8, bty="n",
@@ -1321,7 +1321,7 @@ MVP.Report <- function(
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
-							x=max(pvalue.posN),
+							x=max(pvalue.posN)+band,
 							y=legend.y,
 							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
 							cex=0.8, bty="n",
