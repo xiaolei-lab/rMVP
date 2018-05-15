@@ -48,7 +48,7 @@
 
 **MVP** can be installed on Windows and Linux/Mac with following steps, respectively:
 
-***Online installation(Recommend)***
+***Online installation(Windows only)***
 
 MVP can be installed with following R codes:  
 ```r
@@ -59,7 +59,7 @@ MVP can be installed with following R codes:
 > devtools::install_github("xiaoleiLiubio/MVP")
 ```
 
-***Offline installation***
+***Offline installation(Linux only)***
 
 1. Download the MVP offline installation package on the [releases page](https://github.com/XiaoleiLiuBio/MVP/releases)
 2. Unzip the installation package
