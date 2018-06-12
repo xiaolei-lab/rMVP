@@ -90,7 +90,7 @@ Typing ```?MVP``` could get the details of all parameters.
 |33-16|101.5|0.25|0|
 |38-11|	102.7|0.23|1|
 |4226	|101.2|-0.17|1|
-|4722|	105.5|-0.24|0|
+|4722|	105.5|NA|0|
 |A188	|108.1|0.57|1|
 |A214N|	95.13|0.87|0|
 |A239	|100.2|-0.16|1|
@@ -524,7 +524,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **nPC.FarmCPU**, number of first columns of Principal Components added in FarmCPU  
 **perc**, percentage of random selected SNPs used for calculating Principal Components  
 **priority**, **"speed"** or **"memory"**  
-**ncpus**, number of CPUs used for parallel computation  
+**ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default.
 **vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" (Kang, 2008, Genetics) and "GEMMA" (HE Regression, Xiang Zhou, 2016, doi: https://doi.org/10.1101/042846)  
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
 **method.bin**, a parameter for FarmCPU only, three options are available: "FaST-LMM","EMMA", and "static"  
@@ -547,7 +547,7 @@ imMVP <- MVP(
     nPC.FarmCPU=3,
     perc=1,
     priority="speed",
-    ncpus=10,
+    #ncpus=10,
     vc.method="EMMA",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
@@ -575,7 +575,7 @@ for(i in 2:ncol(phenotype)){
     nPC.FarmCPU=3,
     perc=1,
     priority="speed",
-    ncpus=10,
+    #ncpus=10,
     vc.method="EMMA",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"

@@ -1594,8 +1594,11 @@ file="pdf",
 dpi=300
 )
 {
+	options(warn = -1)
+	phex <- phe
 	for(i in 2: ncol(phe)){
 		trait <- colnames(phe)[i]
+		phe <- phe[!is.na(phe[, i]), ]
 		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
 		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".pdf",sep=""), width = 6,height=6)
 		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
@@ -1616,7 +1619,9 @@ dpi=300
 		text(xx$breaks[1], y=maxY*0.9, labels=paste("Sd: ", round(sd(phe[, i]), 2), sep=""), font=2, adj=0)
 		text(xx$breaks[1], y=maxY*0.85, labels=paste(test.method, ": ", norm.p, sep=""), font=2, adj=0)
 	    dev.off()
+		phe <- phex
 	}
+	options(warn = 0)
 }
 
 MVP.PCAplot <- function(
