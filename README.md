@@ -35,7 +35,8 @@
     - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
     - [Manhattan plot in Rectangular fashion for multiple traits or methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits-or-methods)
     - [Q-Q plot for single trait or method](#q-q-plot-for-single-trait-or-method)
-    - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)    
+    - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)
+- [Citation](#citation)
 - [FAQ and Hints](#faq-and-hints)
 
 <!-- /TOC -->
@@ -945,7 +946,23 @@ dpi: a number, the picture element for .jpg and .tiff files. The default is 300.
 memo: add a character to the output file name.
 
 ```
+---
 
+# Citation
+```
+For MVP:
+Hoping it will be coming soon!
+
+For MLM(K) model:
+Yu, Jianming, et al. "A unified mixed-model method for association mapping that accounts for multiple levels of relatedness." Nature genetics 38.2 (2006): 203.
+
+For MLM(PCA+K) model:
+Price, Alkes L., et al. "Principal components analysis corrects for stratification in genome-wide association studies." Nature genetics 38.8 (2006): 904.
+
+For FarmCPU model:
+Liu, Xiaolei, et al. "Iterative usage of fixed and random effect models for powerful and efficient genome-wide association studies." PLoS genetics 12.2 (2016): e1005767.
+
+```
 ---
 
 # FAQ and Hints
