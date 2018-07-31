@@ -962,6 +962,12 @@ Price, Alkes L., et al. "Principal components analysis corrects for stratificati
 For FarmCPU model:
 Liu, Xiaolei, et al. "Iterative usage of fixed and random effect models for powerful and efficient genome-wide association studies." PLoS genetics 12.2 (2016): e1005767.
 
+For variance components:
+> HE: Zhou, Xiang. "A unified framework for variance component estimation with summary statistics in genome-wide association studies." The annals of applied statistics 11.4 (2017): 2027.
+> EMMA/P3D:
+1. Kang, Hyun Min, et al. "Efficient control of population structure in model organism association mapping." Genetics 178.3 (2008): 1709-1723.
+2. Zhang, Zhiwu, et al. "Mixed linear model approach adapted for genome-wide association studies." Nature genetics 42.4 (2010): 355.
+> Fast-lmm: Lippert, Christoph, et al. "FaST linear mixed models for genome-wide association studies." Nature methods 8.10 (2011): 833.
 ```
 ---
 
