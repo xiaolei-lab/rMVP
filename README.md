@@ -951,7 +951,13 @@ memo: add a character to the output file name.
 # Citation
 ```
 For MVP:
-Hoping it will be coming soon!
+Hope it will be coming soon!
+
+For calculation of K matrix:
+Vanraden, P. M. "Efficient Methods to Compute Genomic Predictions." Journal of Dairy Science 91.11(2008):4414-4423.
+
+For GLM(PC) model:
+Price, Alkes L., et al. "Principal components analysis corrects for stratification in genome-wide association studies." Nature genetics 38.8 (2006): 904.
 
 For MLM(K) model:
 Yu, Jianming, et al. "A unified mixed-model method for association mapping that accounts for multiple levels of relatedness." Nature genetics 38.2 (2006): 203.
