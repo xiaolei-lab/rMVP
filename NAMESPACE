@@ -1,4 +1,6 @@
+useDynLib(MVP, .registration=TRUE)
 exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
 export(MVP)
 import(parallel)
 import(bigmemory)

@@ -1,668 +1,452 @@
-MVP.Data <-
-function(fileVCF=NULL, fileHMP=NULL, fileBed=NULL, fileNum=NULL, filePhe=NULL, fileMap=NULL, fileKin=TRUE, filePC=TRUE, out=NULL, sep.vcf="\t", sep.hmp="\t", sep.num="\t", sep.map="\t", sep.phe="\t", sep.kin="\t", sep.pc="\t", vcf.jump=6, type.geno="char", type.kin="double", type.pc="double", type.map="integer", SNP.effect="Add",
-SNP.impute="Major", maxLine=10000, maxRecord=1e9, maxInd=1e9, priority="speed", perc=1, pcs.keep=5){
-##########################################################################################################
-# Object: To prepare data for MVP package
-#
-# Input:
-# fileHMP: Genotype in hapmap format
-# fileBed: Genotype in PLINK binary format
-# fileNum: Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
-# filePhe: Phenotype, two columns, the first column is taxa name, the second column is trait
-# fileMap: SNP map information, three columns: SNP name, Chr, Pos
-# fileKin: Kinship, n * n matrix, n is sample size
-# out: A marker on output file name
-# sep.hmp, sep.num, sep.map, sep.phe, sep.kin, sep.pc: seperator for hapmap, numeric, map, phenotype, kinship and PC files, respectively
-# type.geno: type parameter in bigmemory, genotype data
-# type.kin: type parameter in bigmemory, Kinship
-# type.pc: type parameter in bigmemory, PC
-# type.map: type parameter in bigmemory, map
-# SNP.effect: "Add" or "Dom"
-# SNP.impute: "Left", "Middle", "Right"
-# maxLine: number of SNPs, only used for saving memory when calculate kinship matrix
-# maxRecord: maximum number for markers
-# maxInd: maximum number for individuals
-#
-# Output files:
-# genotype.desc, genotype.bin: genotype file in bigmemory format
-# phenotype.phe: ordered phenotype file, same taxa order with genotype file
-# map.map: SNP information
-# k.desc, k.bin: Kinship matrix in bigmemory format
-# pc.desc, pc.bin: PC matrix in bigmemory format
-# Requirement: fileHMP, fileBed, and fileNum can not input at the same time
-#
-# Authors: Xiaolei Liu and Lilin Yin
-# Build date: Aug 30, 2016
-# Last update: May 25, 2017
-##############################################################################################
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+#' MVP.Data: To prepare data for MVP package
+#' Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
+#' Build date: Aug 30, 2016
+#' Last update: Sep 12, 2018
+#' 
+#' @param fileVCF Genotype in VCF format
+#' @param fileHMP Genotype in hapmap format
+#' @param fileBed Genotype in PLINK binary format
+#' @param fileNum Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
+#' @param filePhe Phenotype, two columns, the first column is taxa name, the second column is trait
+#' @param fileMap SNP map information, three columns: SNP name, Chr, Pos
+#' @param fileKin Kinship, n * n matrix, n is sample size
+#' @param filePC 
+#' @param out A marker on output file name
+#' @param sep.vcf seperator for hapmap, numeric, map, phenotype, kinship and PC files, respectively
+#' @param sep.hmp 
+#' @param sep.num 
+#' @param sep.map 
+#' @param sep.phe 
+#' @param sep.kin 
+#' @param sep.pc 
+#' @param vcf.jump 
+#' @param type.geno type parameter in bigmemory, genotype data
+#' @param type.kin type parameter in bigmemory, Kinship
+#' @param type.pc type parameter in bigmemory, PC
+#' @param type.map type parameter in bigmemory, PC
+#' @param SNP.effect "Add" or "Dom"
+#' @param SNP.impute "Left", "Middle", "Right"
+#' @param maxLine number of SNPs, only used for saving memory when calculate kinship matrix
+#' @param maxRecord maximum number for markers
+#' @param maxInd maximum number for individuals
+#' @param priority 
+#' @param perc 
+#' @param pcs.keep 
+#'
+#' Output files:
+#' genotype.desc, genotype.bin: genotype file in bigmemory format
+#' phenotype.phe: ordered phenotype file, same taxa order with genotype file
+#' map.map: SNP information
+#' k.desc, k.bin: Kinship matrix in bigmemory format
+#' pc.desc, pc.bin: PC matrix in bigmemory format
+#' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
+
+MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
+                     filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t", auto_transpose = T,
+                     sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t", type.geno = "char", pheno_cols = NULL,
+                     SNP.impute = "Major", maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5, ...) {
     
     print("Preparing data for MVP...")
     
-    #if(is.null(fileHMP)&is.null(fileNum))
-    #stop("Hapmap or Numeric genotype is needed.")
-    if(!is.null(fileHMP)&!is.null(fileNum)&!is.null(fileBed))
-    stop("Please don't input more than one data format!")
-    if((!is.null(fileNum) & is.null(fileMap)) | (is.null(fileNum) & !is.null(fileMap)))
-    stop("Both Map and Numeric genotype files are needed!")
-    if(is.null(out)) out="MVP"
+    # Parameter compatible upgrade
+    params <- list(...)
+    if ("sep.vcf" %in% names(params)) { message("WARNING: 'sep.vcf' has been DEPRECATED.") }
+    if ("vcf.jump" %in% names(params)) { message("WARNING: 'vcf.jump' has been DEPRECATED.") }
+    if ("SNP.effect" %in% names(params)) { message("WARNING: 'SNP.effect' has been DEPRECATED.") }
+    if ("sep.hmp" %in% names(params)) { message("WARNING: 'sep.hmp' has been DEPRECATED.") }
+    if ("type.kin" %in% names(params)) { message("WARNING: 'type.kin' has been DEPRECATED.") }
+    if ("type.pc" %in% names(params)) { message("WARNING: 'type.pc' has been DEPRECATED.") }
+    if ("type.map" %in% names(params)) { message("WARNING: 'type.map' has been DEPRECATED.") }
+    if ("maxRecord" %in% names(params)) { message("WARNING: 'maxRecord' has been DEPRECATED.") }
+    if ("maxInd" %in% names(params)) { message("WARNING: 'maxInd' has been DEPRECATED.") }
     
-    #get id list from phenotype
-    if(!is.null(filePhe)){
-        myY <- read.delim(filePhe, sep=sep.phe, head = TRUE)
-        taxa.y <- as.vector(myY[, 1])
-        taxa <- taxa.y
-    }
+    # Check Data Input
+    geno_files <- !sapply(list(
+        fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
+        ), is.null)
     
-    #convert bed/bim.fam to MVP
-    if(!is.null(fileBed)){
-        phe <- read.table(paste(fileBed, ".fam", sep=""), head=FALSE)[, -c(1,3:5)]
-        write.table(phe, paste(out, ".phe", sep=""), row.names=FALSE, col.names=TRUE, sep=sep.phe, quote=FALSE)
-        map <- read.table(paste(fileBed, ".bim", sep=""), head=FALSE)
-        if(length(unique(map[, 2])) != nrow(map)){
-			stop("The names of all SNPs must be unique, please check 'BIM' file!")
-		}
-        map <- map[, c(2, 1, 4)]
-        colnames(map) <- c("SNP", "chrom", "pos")
-        write.table(map, paste(out, ".map", sep=""), row.names=FALSE, col.names=TRUE, sep=sep.map, quote=FALSE)
-        print("Reading binary file...")
-        geno <- read.plink(paste(fileBed, ".bed", sep=""))[[1]]
-        print("Reading binary files is done!")
-        #geno <- t(geno); gc()
-        #geno=as.data.frame(geno)
-        bck <- paste(out, ".geno.bin", sep="")
-        dsc <- paste(out, ".geno.desc", sep="")
-        nmarkers <- ncol(geno)
-        ns <- nrow(geno)
-        myGeno.backed <- big.matrix(nmarkers, ns, type="char", backingfile=bck, descriptorfile=dsc)
-        options(bigmemory.typecast.warning=FALSE)
-        #print("Output BIG genotype...")
-	    inGENOFile=TRUE
-		i <- 0
-		printN <- unlist(strsplit(x=as.character(nmarkers), split="", fixed=TRUE))
-		printIndex <- seq(0, (as.numeric(printN[1]) + 1) * 10^(length(printN)), 1000)[-1]
-		Num.fun <- function(x, impute="Middle"){
-		
-			x <- data.matrix(as.data.frame(x))
-			
-			if(impute=="Middle"){
-				x[x==0] = 2
-			}
-			
-			if(impute=="Minor"){
-				lev=levels(as.factor(x))
-				lev=setdiff(lev,"0")
-				len=length(lev)
-				if(len==0){
-					minA = 2
-				}else if(len==1){
-					minA = lev[1]
-				}else if(len==2){
-					len.1 <- length(x[x==lev[1]])
-					len.2 <- length(x[x==lev[2]])
-					if(len.1<len.2){
-						minA = lev[1]
-					}else{
-						minA = lev[2]
-					}
-				}else if(len==3){
-					len.1 <- length(x[x==lev[1]])
-					len.2 <- length(x[x==lev[2]])
-					len.3 <- length(x[x==lev[3]])
-
-					min.all = min(len.1, len.2, len.3)
-					if(len.1 == min.all){
-						minA = lev[1]
-					}
-					if(len.2 == min.all){
-						minA = lev[2]
-					}
-					if(len.3 == min.all){
-						minA = lev[3]
-					}
-				}else if(len>3){
-					stop("More than three genotypes at a locus!")
-				}
-				x[x==0] = as.numeric(minA)
-			}
-			
-			if(impute=="Major"){
-				lev=levels(as.factor(x))
-				lev=setdiff(lev,"0")
-				len=length(lev)
-				if(len==0){
-					maxA = 2
-				}else if(len==1){
-					maxA = lev[1]
-				}else if(len==2){
-					len.1 <- length(x[x==lev[1]])
-					len.2 <- length(x[x==lev[2]])
-					if(len.1<len.2){
-						maxA = lev[2]
-					}else{
-						maxA = lev[1]
-					}
-				}else if(len==3){
-					len.1 <- length(x[x==lev[1]])
-					len.2 <- length(x[x==lev[2]])
-					len.3 <- length(x[x==lev[3]])
-
-					max.all = max(len.1, len.2, len.3)
-
-					if(len.1 == max.all){
-						maxA = lev[1]
-					}
-					if(len.2 == max.all){
-						maxA = lev[2]
-					}
-					if(len.3 == max.all){
-						maxA = lev[3]
-					}
-				}else if(len>3){
-					stop("More than three genotypes at a locus!")
-				}
-				x[x==0] = as.numeric(maxA)
-			}
-			return(x)
-		}
-		
-		while(inGENOFile){
-			i <- i + maxLine
-			if(i >= nmarkers){
-				xx <- nmarkers
-				inGENOFile <- FALSE
-			}else{
-				xx <- i
-			}
-			if(sum(i >= printIndex )!=0){
-				printIndex <- printIndex[printIndex > i]
-				print(paste("Number of Markers Written into BIG File: ", xx, sep=""))
-			}
-			if(i >= nmarkers){
-				myGeno.backed [(i-maxLine + 1):nmarkers, ] <- -1 * apply(geno[, (i-maxLine + 1):nmarkers], 1,  function(x) Num.fun(x, impute=SNP.impute)) + 3
-			}else{
-				myGeno.backed [(i-maxLine + 1):i, ] <- -1 * apply(geno[, (i-maxLine + 1):i], 1, function(x) Num.fun(x, impute=SNP.impute)) + 3
-			}
-		}
-        geno.flush <- flush(myGeno.backed)
-        if(!geno.flush){
-            stop("flush failed")
-        }else{
-            print("Preparation for Genotype data is done!")
+    flag <- paste(sapply(strsplit(as.character(geno_files), ''), `[[`, 1), collapse = '')
+    
+    error_input <- function(geno_files) {
+        if (length(which(geno_files[1:5])) != 1) {
+            stop("Please input only one genotype data format!")
         }
-    }
-    
-    #Convert vcf to numeric
-    if(!is.null(fileVCF)){    
-        #get the first vcf
-        fileVCFCon <- file(description=fileVCF[1], open="r")
-        jj <- readLines(fileVCFCon, n=vcf.jump)
-        tt <- readLines(fileVCFCon, n=1, skipNul=1)
-        close.connection(fileVCFCon)
-        #tt2 <- unlist(strsplit(tt, sep.vcf))
-        tt3 <- unlist(strsplit(tt, sep.vcf))
-        tt2 <- unlist(strsplit(tt3, "-9_"))
-        taxa.g <- as.vector(tt2[-c(1:9)])
-        taxa.g <- taxa.g[taxa.g!=""]
-
-        if(is.null(filePhe)){
-            taxa=taxa.g
-        }else{
-            #Output Y in new order
-            taxa=intersect(taxa.g, taxa)
-            if(length(taxa) == 0){
-                print(paste("Phenotype individuals: ", paste(taxa.y[1:5], collapse=", "), "...", sep=""))
-                print(paste("Genotype individuals: ", paste(taxa.g[1:5], collapse=", "), "...", sep=""))
-                stop("No common individuals between phenotype and genotype!")
-            }
-            index = match(taxa, myY[, 1], nomatch = 0)
-            write.table(myY[index, ], file=paste(out, ".phe", sep=""), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-            print("Preparation for PHENOTYPE data is done!")
-        }
-
-        #taxa <- intersect(taxa.g, taxa)
-        index=match(taxa, taxa.g, nomatch = 0)
-        ns = length(index)  #Number of individuals
-        #if(length(taxa) == 0){
-            #stop("No common individuals between phenotype and vcf file!")
-        #}
         
-        nFile=length(fileVCF)
-        
-        #Iteration among file
-        print("Numericilization...")
-        #if(priority == "memory"){
-            for (theFile in 1:nFile){
-                #Open VCF files
-                fileVCFCon <- file(description=fileVCF[theFile], open="r")
-                #Get VCF hearder
-                #index = taxa
-                #index = match(taxa, taxa.g, nomatch = 0)
-                #ns = length(index)  #Number of individuals
-                
-                #handler of first file
-                if(theFile == 1){
-                    #Open GD and GM file
-                    fileNumCon <- file(description=paste(out, ".numeric", sep=""), open="w")
-                    fileMapCon <- file(description=paste(out, ".map", sep=""), open="w")
-                    #GM header
-                    writeLines("SNP", fileMapCon, sep=sep.num)
-                    writeLines("Chrom", fileMapCon, sep=sep.num)
-                    writeLines("BP", fileMapCon, sep="\n")
-                }
-                
-                #Initialization for iteration within file
-                inFile=TRUE
-                i=0
-                jj <- readLines(fileVCFCon, n=vcf.jump+1)
-                #Iteration within file
-                while(inFile){
-                    i =i + 1
-                    if(i %% 1000 == 0) print(paste("Number of Markers Written into File: ", theFile, ": ", i, sep=""))
-
-                    tt <- readLines(fileVCFCon, n=1)
-                    tt2 <- unlist(strsplit(x=tt, split=sep.vcf, fixed=TRUE))
-                    
-                    #Identify end of file
-                    if(is.null(tt2[1])){
-			print(paste("Number of Markers Written into File: ", theFile, ": ", i-1, sep=""))
-		    	inFile=FALSE
-		    }
-                    if(i>maxRecord) inFile=FALSE
-                    
-                    if(inFile){
-                        #GM
-                        rs=tt2[3]
-                        chrom=tt2[1]
-                        pos=tt2[2]
-                        writeLines(as.character(rs), fileMapCon, sep=sep.num)
-                        writeLines(as.character(chrom), fileMapCon, sep=sep.num)
-                        writeLines(as.character(pos), fileMapCon, sep="\n")
- 
-                        #GD
-                        GD <- VCF.Numeralization(x=tt2[-c(1:9)][index], impute=SNP.impute)
-                        writeLines(as.character(GD[1:(ns-1)]), fileNumCon, sep=sep.num)
-                        writeLines(as.character(GD[ns]), fileNumCon, sep="\n")
-                    }#enf of inFIle
-                } #end iteration within file
-                
-                #Close VCF file
-                close.connection(fileVCFCon)
-            } #end iteration among files
-            
-            #Close GD and GM file
-            close.connection(fileNumCon)
-            close.connection(fileMapCon)
-        #}
-        print("Preparation for numeric data is done!")
-    }#end of convert vcf to numeric
-
-    #Convert hapmap to numeric
-    if(!is.null(fileHMP)){
-        #get the first hmp
-        fileHMPCon<-file(description=fileHMP[1], open="r")
-        #fileHMPCon<-file(description="hapmap3.hmp.txt", open="r")
-        tt<-readLines(fileHMPCon, n=1)
-        gg<-readLines(fileHMPCon, n=1, skipNul=1)
-        close.connection(fileHMPCon)
-        tt2<-unlist(strsplit(tt, sep.hmp))
-        gg2<-unlist(strsplit(gg, sep.hmp))
-        taxa.g<-as.vector(tt2[-c(1:11)] )
-        gg.name<-names(which.max(table(nchar(gg2))))
-        bit <- as.numeric(gg.name)
-        #length(taxa.g)
-        if(is.null(filePhe)){
-            taxa=taxa.g
-        }else{
-            #Output Y in new order
-            taxa=intersect(taxa.g, taxa)
-            if(length(taxa) == 0){
-                print(paste("Phenotype individuals: ", paste(taxa.y[1:5], collapse=", "), "...", sep=""))
-                print(paste("Genotype individuals: ", paste(taxa.g[1:5], collapse=", "), "...", sep=""))
-                stop("No common individuals between phenotype and genotype!")
-            }
-            index=match(taxa, myY[, 1], nomatch = 0)
-            write.table(myY[index, ], file=paste(out, ".phe", sep=""), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-            print("Preparation for PHENOTYPE data is done!")
+        if (length(which(geno_files[5:6])) == 1) {
+            stop("Both Map and Numeric genotype files are needed!")
         }
-
-        nFile=length(fileHMP)
-        
-        #Iteration among file
-        print("Output numeric genotype...")
-        if(priority == "memory"){
-            for (theFile in 1:nFile){
-                
-                #Open HMP files
-                fileHMPCon<-file(description=fileHMP[theFile], open="r")
-                
-                #Get HMP hearder
-                tt<-readLines(fileHMPCon, n=1)
-                tt2<-unlist(strsplit(x=tt, split=sep.hmp, fixed=TRUE))
-                taxa.g=as.vector(tt2[-c(1:11)] )
-                index=match(taxa, taxa.g, nomatch = 0)
-                ns=length(index)  #Number of individuals
-                
-                #Handler maximum number of individuals to output
-                if(ns>maxInd)ns=maxInd
-                
-                #handler of first file
-                if(theFile == 1){
-                    #Open GD and GM file
-                    fileNumCon<-file(description=paste(out, ".numeric", sep=""), open="w")
-                    fileMapCon<-file(description=paste(out, ".map", sep=""), open="w")
-                    #GM header
-                    writeLines("SNP", fileMapCon, sep=sep.num)
-                    writeLines("Chrom", fileMapCon, sep=sep.num)
-                    writeLines("BP", fileMapCon, sep="\n")
-                }
-                
-                #Initialization for iteration within file
-                inFile=TRUE
-                i=0
-                #Iteration within file
-                while(inFile){
-                    i=i + 1
-                    if(i %% 1000 == 0)print(paste("Number of Markers Written into File: ", theFile, ": ", i, sep=""))
-                    tt<-readLines(fileHMPCon, n=1)
-                    tt2<-unlist(strsplit(x=tt, split=sep.hmp, fixed=TRUE))
-                    
-                    #Identify end of file
-                    if(is.null(tt2[1])){
-		    print(paste("Number of Markers Written into File: ", theFile, ": ", i-1, sep=""))
-		    inFile=FALSE
-		    }
-                    if(i>maxRecord) inFile=FALSE
-                    
-                    if(inFile){
-                        #GM
-                        rs=tt2[1]
-                        chrom=tt2[3]
-                        pos=tt2[4]
-                        writeLines(as.character(rs), fileMapCon, sep=sep.num)
-                        writeLines(as.character(chrom), fileMapCon, sep=sep.num)
-                        writeLines(as.character(pos), fileMapCon, sep="\n")
-                        
-                        #GD
-                        GD= HMP.Numeralization(x=tt2[-c(1:11)], bit=bit, effect=SNP.effect, impute=SNP.impute)
-                        writeLines(as.character(GD[index[1:(ns-1)]]), fileNumCon, sep=sep.num)
-                        writeLines(as.character(GD[index[ns]]), fileNumCon, sep="\n")
-                    }#enf of inFIle
-                } #end iteration within file
-                
-                #Close HMP file
-                close.connection(fileHMPCon)
-            } #end iteration among files
-            
-            #Close GD and GM file
-            close.connection(fileNumCon)
-            close.connection(fileMapCon)
-        }
-        if(priority == "speed"){
-            fileNumCon<-file(description=paste(out, ".numeric", sep=""), open="w")
-            fileMapCon<-file(description=paste(out, ".map", sep=""), open="w")
-            #GM header
-            writeLines("SNP", fileMapCon, sep=sep.num)
-            writeLines("Chrom", fileMapCon, sep=sep.num)
-            writeLines("BP", fileMapCon, sep="\n")
-            close.connection(fileNumCon)
-            close.connection(fileMapCon)
-            for(theFile in 1: nFile){
-                fileHMPCon<-file(description=fileHMP[theFile], open="r")
-                #Get HMP hearder
-                tt<-readLines(fileHMPCon, n=1)
-                close.connection(fileHMPCon)
-                tt2<-unlist(strsplit(x=tt, split=sep.hmp, fixed=TRUE))
-                taxa.g <- as.vector(tt2[-c(1:11)])
-                index <- match(taxa, taxa.g, nomatch = 0)
-                myFile <- read.delim(fileHMP[theFile], colClasses="character", sep=sep.hmp, head=FALSE, skip=1)
-                nM <- nrow(myFile)
-                write.table(myFile[, c(1, 3, 4)], paste(out, ".map", sep=""), append=TRUE, col.names=FALSE, row.names=FALSE, quote=FALSE, sep=sep.num)
-                myFile <- myFile[, -c(1:11)];gc()
-                myGDx <- apply(myFile[, index], 1, function(x) HMP.Numeralization(x, bit=bit, effect=SNP.effect, impute=SNP.impute))
-                myGDx <- t(myGDx)
-                write.table(myGDx, paste(out, ".numeric", sep=""), append=TRUE, col.names=FALSE, row.names=FALSE, quote=FALSE, sep=sep.num)
-                rm(myFile);rm(myGDx);gc()
-                
-                print(paste("File:", fileHMP[theFile], "; Total markers: ", nM, " finished!"))
-            }
-        }
-        print("Preparation for numeric data is done!")
-    }else if(!is.null(filePhe)){
-        write.table(myY, file=paste(out, ".phe", sep=""), quote = FALSE, sep = "\t",
-        row.names = FALSE, col.names = TRUE)
-        print("Preparation for PHENOTYPE data is done!")
     }
     
-    #map
-    if((!is.null(fileMap))|(!is.null(fileHMP))|(!is.null(fileVCF))){
-    if(is.null(fileMap))	fileMap <- paste(out, ".map", sep="")
-        myGM <- read.big.matrix(fileMap, type=type.map, sep=sep.map, head = TRUE)
-        #backingfile=paste(out, ".map.bin", sep=""), descriptorfile=paste(out, ".map.desc", sep=""))
-        nmarkers <- nrow(myGM)#build file backed matrix for genotype
-        #print("Preparation for MAP is done!")
-        rm("myGM")
-        gc()
-        }
+    # convert genotype file
+    switch(flag,
+           # fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
+           TFFFFF = MVP.Data.MVP2MVP(),
+           FTFFFF = MVP.Data.VCF2MVP(fileVCF, out),
+           FFTFFF = MVP.Data.Hapmap2MVP(fileHMP, out),
+           FFFTFF = MVP.Data.Bfile2MVP(fileBed, out, maxLine, priority, type.geno),
+           FFFFTT = MVP.Data.Numeric2MVP(fileNum, out, maxLine, priority, type.geno, auto_transpose),
+           error_input(geno_files)
+    )
+    print("Preparation for Genotype File is done!")
     
-    #Transfer genotype data to .desc, .bin files
-    if((!is.null(fileNum))|(!is.null(fileHMP))|(!is.null(fileVCF))){
-        print("Output mvp genotype...")
-        if(is.null(fileNum)) fileNum <- paste(out, ".numeric", sep="")
-        # myGD <- read.big.matrix(fileNum, type=type.geno, sep=sep.num, head = FALSE,
-        # backingfile=paste(out, ".geno.bin", sep=""), descriptorfile=paste(out, ".geno.desc", sep=""))
-        fileGenoCon <- file(description=fileNum, open="r")
-        tt2 <-readLines(fileGenoCon, n=1)
-        tt2 <- unlist(strsplit(x=tt2, split=sep.num, fixed=TRUE))
-        ns <- length(tt2)
-        close.connection(fileGenoCon)
-        bck <- paste(out, ".geno.bin", sep="")
-        dsc <- paste(out, ".geno.desc", sep="")
-        myGeno.backed<-big.matrix(nmarkers, ns, type=type.geno,
-        backingfile=bck, descriptorfile=dsc)
-        if(priority == "memory"){
-            #Initialization for iteration within file
-            inGENOFile=TRUE
-            i=0
-            printN <- unlist(strsplit(x=as.character(nmarkers), split="", fixed=TRUE))
-            printIndex <- seq(0, (as.numeric(printN[1]) + 1) * 10^(length(printN)), 1000)[-1]
-            #Iteration within file		
-            fileGenoCon <- file(description=fileNum, open="r")
-            while(inGENOFile){
-                i=i + maxLine
-                tt<-readLines(fileGenoCon, n=maxLine)
-                if(i >= nmarkers){
-                    i <- nmarkers
-                }
-                if(sum(i >= printIndex )!=0){
-                    printIndex <- printIndex[printIndex > i]
-                    print(paste("Number of Markers Written into MVP File: ", i, sep=""))
-                }
-                tt<-do.call(rbind, strsplit(x=tt, split=sep.num, fixed=TRUE))
-                nn <- nrow(tt)
-                #Identify end of file
-                if(is.null(tt[1])) inGENOFile=FALSE
-                if(inGENOFile){
-                    if(i == nmarkers){
-                        myGeno.backed [(i-nn + 1):i, ] = tt; rm(tt); gc()
-                    }else{
-                        myGeno.backed [(i-maxLine + 1):i, ] = tt; rm(tt); gc()
-                    }
-                }else{
-                    geno.flush <- flush(myGeno.backed)
-                }
-            }
-            if(!geno.flush){
-                stop("flush failed")
-            }else{
-                print("Preparation for Genotype File is done!")
-            }
-            #Close GENO file
-            close.connection(fileGenoCon)
-        }
-        if(priority == "speed"){
-            myGeno <- read.big.matrix(fileNum, type=type.geno, head=FALSE, sep=sep.num)
-            options(bigmemory.typecast.warning=FALSE)
-            myGeno.backed[, ] <- myGeno[, ]
-            flush(myGeno.backed)
-            rm("myGeno")
-        }
-        rm(list=c("myGeno.backed"))
-        gc()
+    # phenotype
+    if (!is.null(filePhe)) {
+        MVP.Data.Pheno(filePhe, out, pheno_cols, sep = sep.phe)
     }
+    # impute
+    MVP.Data.impute(joint(out, '.geno.desc'), SNP.impute)
     
-    #Transfer KINSHIP data to .desc, .bin files
-    if(!is.logical(fileKin)){
-        # myKinship <- read.big.matrix(fileKin, type=type.kin, sep=sep.kin, head = FALSE,
-        # backingfile=paste(out, ".kin.bin", sep=""), descriptorfile=paste(out, ".kin.desc", sep=""))
-        myKinship <- read.big.matrix(fileKin, head=FALSE, type=type.kin, sep=sep.kin)
-        myKinship.backed<-filebacked.big.matrix(nrow(myKinship), ncol(myKinship), type=type.kin,
-        backingfile=paste(out, ".kin.bin", sep=""), descriptorfile=paste(out, ".kin.desc", sep=""))
-        myKinship.backed[, ] <- myKinship[, ]
-        flush(myKinship.backed)
-        print("Preparation for KINSHIP is done!")
-        rm(list=c("myKinship", "myKinship.backed"))
-        #rm(list=c("myKinship"))
-        gc()
-    }
-    #Calculate Kinship matrix
-    if((fileKin == TRUE) & (!is.null(fileHMP)|!is.null(fileNum)|!is.null(fileBed))){
-        geno.big <- attach.big.matrix(paste(out, ".geno.desc", sep=""))
-        print("Calculate KINSHIP using Vanraden method...")
-        myKinship <- MVP.K.VanRaden(geno.big, priority=priority, maxLine=maxLine)
-        Kin.backed<-big.matrix(nrow(myKinship), ncol(myKinship), type=type.kin, backingfile=paste(out, ".kin.bin", sep=""),
-        descriptorfile=paste(out, ".kin.desc", sep=""))
-        Kin.backed[, ] <- myKinship[, ]
-        flush(Kin.backed)
-        print("Preparation for Kinship matrix is done!")
-        rm(list=c("Kin.backed", "myKinship"))
-        gc()
-    }
+    # get pc
+    MVP.Data.PC(filePC, out, perc, pcs.keep, sep.pc)
     
-    #Transfer PC data to .desc, .bin files
-    if(!is.logical(filePC)){
-        myPC <- read.big.matrix(filePC, head=FALSE, type=type.pc, sep=sep.pc)
-        PC.backed <- filebacked.big.matrix(nrow(myPC), ncol(myPC), type=type.pc,
-        backingfile=paste(out, ".pc.bin", sep=""), descriptorfile=paste(out, ".pc.desc", sep=""))
-        PC.backed[ , ] <- myPC[ , ]
-        flush(PC.backed)
-        print("Preparation for PC matrix is done!")
-        rm(list=c("myPC", "PC.backed"))
-        gc()
-    }
-    #Calculate PC matrix
-    if((filePC == TRUE) & (!is.null(fileHMP)|!is.null(fileNum)|!is.null(fileBed))){
-        geno.big <- attach.big.matrix(paste(out, ".geno.desc", sep=""))
-        myPC <- MVP.PCA(geno.big, perc=perc, pcs.keep=pcs.keep)$PCs
-        PC.backed<-big.matrix(nrow(myPC), ncol(myPC), type=type.pc, backingfile=paste(out, ".pc.bin", sep=""),
-        descriptorfile=paste(out, ".pc.desc", sep=""))
-        PC.backed[, ] <- myPC[, ]
-        flush(PC.backed)
-        print("Preparation for PC matrix is done!")
-        rm(list=c("myPC", "PC.backed"))
-        gc()
-    }
+    # get kin
+    MVP.Data.Kin(fileKin, out, maxLine, priority, sep.kin)
 
     print("MVP data prepration accomplished successfully!")
-}#end of MVP.Data function
+}# end of MVP.Data function
 
-VCF.Numeralization <- function(x, impute="Major"){
-    #Object: To convert vcf genotype to numeric data
-    #Input: x, a SNP vector
-    #Input: impute, "Major", "Minor", "Middle"
-    #Output: Coresponding numerical value
-    #Authors: Xiaolei Liu
-    #Last update: Nov 5, 2017
-    ##############################################################################################
-    x[x=="0/0"] = 0
-    x[x=="0/1"] = 1
-    x[x=="1/0"] = 1
-    x[x=="1/1"] = 2
-    x[x=="./1"] = "N"
-    x[x=="1/."] = "N"
-    x[x=="./0"] = "N"
-    x[x=="0/."] = "N"
-    x[x=="./."] = "N"
+joint <- function(...) { paste(..., sep = "") }
 
-    #Imputation for missing value
-    if(impute=="Middle"){
-        x[x=="N"] = 1
+MVP.Data.VCF2MVP <- function(vcf_file, out, type.geno='char') {
+    # check old file
+    backingfile <- joint(out, ".geno.bin")
+    descriptorfile <- joint(out, ".geno.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # parser map
+    m_res <- vcf_parser_map(vcf_file, out)
+    cat(joint("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
+    
+    # parse genotype
+    bigmat <- filebacked.big.matrix(
+        nrow = m_res$m,
+        ncol = m_res$n,
+        type = type.geno,
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    vcf_parser_genotype(vcf_file, bigmat@address, m_res$pos)
+}
+
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char') {
+    # check old file
+    backingfile <- joint(out, ".geno.bin")
+    descriptorfile <- joint(out, ".geno.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # parser map
+    map <- MVP.Data.Map(joint(bfile, '.bim'), out, c(2, 1, 4))
+    
+    # parser phenotype
+    fam <- read.delim(joint(bfile, '.fam'), header = F)
+    
+    cat(joint("inds: ", nrow(fam), "\tmarkers:", nrow(map), '\n'))
+    
+    # parse genotype
+    bigmat <- filebacked.big.matrix(
+        nrow = nrow(map),
+        ncol = nrow(fam),
+        type = type.geno,
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    if (priority == "speed") {maxLine <- -1}
+    read_bfile(bfile, bigmat@address, maxLine)
+}
+
+MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
+    # check old file
+    backingfile <- joint(out, ".geno.bin")
+    descriptorfile <- joint(out, ".geno.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # parser map
+    m_res <- hapmap_parser_map(hapmap_file, out)
+    cat(joint("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
+    
+    # parse genotype
+    bigmat <- filebacked.big.matrix(
+        nrow = m_res$m,
+        ncol = m_res$n,
+        type = type.geno,
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    hapmap_parser_genotype(hapmap_file, bigmat@address)
+}
+
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', type.geno='char', auto_transpose=T) {
+    # check old file
+    backingfile <- joint(out, ".geno.bin")
+    descriptorfile <- joint(out, ".geno.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # detecte n(ind) and m(marker)
+    scan <- numeric_scan(num_file)
+    n <- scan$n
+    m <- scan$m
+
+    transposed <- FALSE
+    if (auto_transpose & (m < n)) {
+        message("WARNING: nrow < ncol detected, has been automatically transposed.")
+        transposed <- TRUE
+        t <- n; n <- m; m <- t;
+    }
+    cat(joint("inds: ", n, "\tmarkers:", m, '\n'))
+    
+    # define bigmat
+    bigmat <- filebacked.big.matrix(
+        nrow = m,
+        ncol = n,
+        type = type.geno,
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    
+    # convert to bigmat - speed
+    if (priority == "speed") {
+        options(bigmemory.typecast.warning = FALSE)
+        
+        # detecte sep
+        con <- file(num_file, open = 'r')
+        line <- readLines(con, 1)
+        close(con)
+        sep <- substr(line, 2, 2)
+        
+        # load geno
+        suppressWarnings(
+            geno <- read.big.matrix(num_file, head = FALSE, sep = sep) 
+        )
+        if (transposed) {
+            bigmat[, ] <- t(geno[, ])
+        } else {
+            bigmat[, ] <- geno[, ]
+        }
+        rm("geno")
     }
     
-    if(impute=="Minor"){
-        n=length(x)
-        lev=levels(as.factor(x))
-        lev=setdiff(lev,"N")
-        len=length(lev)
-        if(len==0){
-            minA = 1
-        }else if(len==1){
-            minA = lev[1]
-        }else if(len==2){
-            len.1 <- length(x[x==lev[1]])
-            len.2 <- length(x[x==lev[2]])
-            if(len.1<len.2){
-                minA = lev[1]
-            }else{
-                minA = lev[2]
-            }
-        }else if(len==3){
-            len.1 <- length(x[x==lev[1]])
-            len.2 <- length(x[x==lev[2]])
-            len.3 <- length(x[x==lev[3]])
+    # convert to bigmat - memory
+    if (priority == "memory") {
+        i <- 0
+        con <- file(num_file, open = 'r')
+        if (col_name) { readLines(con, n = 1) }
+        while (TRUE) {
+            line = readLines(con, n = maxLine)
 
-            min.all = min(len.1, len.2, len.3)
-            if(len.1 == min.all){
-                minA = lev[1]
+            len <- length(line)
+            if (len == 0) { break }
+
+            line <- do.call(rbind, strsplit(line, '\\s+'))
+            if (row_name) { line <- line[, 2:ncol(line)]}
+            if (transposed) {
+                bigmat[, (i + 1):(i + length(line))] <- line
+                i <- i + length(line)
+                percent <- 100 * i / n
+            } else {
+                bigmat[(i + 1):(i + length(line)), ] <- line
+                i <- i + length(line)
+                percent <- 100 * i / m
             }
-            if(len.2 == min.all){
-                minA = lev[2]
-            }
-            if(len.3 == min.all){
-                minA = lev[3]
-            }
+
+            cat(joint("Written into MVP File: ", percent, "%"))
         }
-        x[x=="N"] = minA
+        close(con)
     }
     
-    if(impute=="Major"){
-        n=length(x)
-        lev=levels(as.factor(x))
-        lev=setdiff(lev,"N")
-        len=length(lev)
-        if(len==0){
-            maxA = 1
-        }else if(len==1){
-            maxA = lev[1]
-        }else if(len==2){
-            len.1 <- length(x[x==lev[1]])
-            len.2 <- length(x[x==lev[2]])
-            if(len.1<len.2){
-                maxA = lev[2]
-            }else{
-                maxA = lev[1]
-            }
-        }else if(len==3){
-            len.1 <- length(x[x==lev[1]])
-            len.2 <- length(x[x==lev[2]])
-            len.3 <- length(x[x==lev[3]])
+    flush(bigmat)
+    gc()
+}
 
-            max.all = max(len.1, len.2, len.3)
+MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9')) {
+    # read data
+    if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
 
-            if(len.1 == max.all){
-                maxA = lev[1]
-            }
-            if(len.2 == max.all){
-                maxA = lev[2]
-            }
-            if(len.3 == max.all){
-                maxA = lev[3]
-            }
-        }
-        x[x=="N"] = maxA
+    # phenotype files
+    f <- read.delim(pheno_file, sep = sep, header = header)
+    
+    # auto select columns
+    if (is.null(cols)) {
+        c <- c(1:ncol(f))
+    } else {
+        c <- cols
     }
+    
+    if (length(c) < 2) {
+        stop("ERROR: At least 2 columns in the phenotype file should be specified.")
+    }
+    
+    # read geno ind list
+    geno.ind.file <- joint(out, '.geno.ind')
+    if (file.exists(geno.ind.file)) {
+        geno.ind <- read.table(geno.ind.file)
+    } else {
+        geno.ind <- f[, c[1]]
+    }
+    
+    # merge
+    pheno <- merge(geno.ind, f[, c],  by = 1, all.x = T)
 
-    return(x)
-}#end of `VCF.Numeralization`
+    
+    # rename header
+    colnames(pheno)[1] <- 'Taxa'
+    if (!header)  {
+        traits <- 2:ncol(pheno)
+        colnames(pheno)[traits] <- joint('t', traits - 1)
+    }
+    
+    # drop empty traits
+    pheno[pheno %in% missing] <- NA
+    drop = c()
+    for (i in 2:ncol(pheno)) {
+        if (all(is.na(pheno[, i]))) {
+            drop = c(drop, i)
+        }
+    }
+    if (length(drop) > 0) {
+        pheno <- pheno[, -drop]
+    }
+    
+    # Output
+    write.table(pheno, joint(out, '.phe'), quote = F, sep = "\t", row.names = F, col.names = T)
+    
+    print("Preparation for PHENOTYPE data is done!")
+    return(pheno)
+}
+
+MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t') {
+    map <- read.table(map_file, header = header)
+    map <- map[, cols]
+    colnames(map) <- c("SNP", "CHROM", "POS")
+    if (length(unique(map[, 1])) != nrow(map)) {
+        warning("WARNING: SNP is not unique and has been automatically renamed.")
+        map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
+    }
+    write.table(map, joint(out, ".map"), row.names = F, col.names = T, sep = '\t', quote = F)
+    return(map)
+}
+
+MVP.Data.PC <- function(filePC=T, out='mvp', perc=1, pcs.keep=5, sep='\t') {
+    # check old file
+    backingfile <- joint(out, ".pc.bin")
+    descriptorfile <- joint(out, ".pc.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # get pc
+    if (!is.logical(filePC)) {
+        myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
+    } else if (filePC == TRUE) {
+        geno <- attach.big.matrix(joint(out, ".geno.desc"))
+        myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs
+    } else {
+        stop("ERROR: The value of filePC is invalid.")
+    }
+    
+    # define bigmat
+    PC <- filebacked.big.matrix(
+        nrow = nrow(myPC),
+        ncol = ncol(myPC),
+        type = 'double',
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    
+    PC[, ] <- myPC[, ]
+    flush(PC)
+    print("Preparation for PC matrix is done!")
+}
+
+MVP.Data.Kin <- function(fileKin=T, out='mvp', maxLine=1e4, priority='speed', sep='\t') {
+    # check old file
+    backingfile <- joint(out, ".kin.bin")
+    descriptorfile <- joint(out, ".kin.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    # get kin
+    if (!is.logical(fileKin)) {
+        myKin <- read.big.matrix(fileKin, head = F, type = 'double', sep = sep)
+    } else if (fileKin == TRUE) {
+        geno <- attach.big.matrix(joint(out, ".geno.desc"))
+        print("Calculate KINSHIP using Vanraden method...")
+        myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
+    } else {
+        stop("ERROR: The value of fileKin is invalid.")
+    }
+    
+    # define bigmat
+    Kinship <- filebacked.big.matrix(
+        nrow = nrow(myKin),
+        ncol = ncol(myKin),
+        type = 'double',
+        backingfile = backingfile,
+        backingpath = ".",
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    
+    Kinship[, ] <- myKin[, ]
+    flush(Kinship)
+    print("Preparation for Kinship matrix is done!")
+}
+
+# TODO: Very slow (inds: 6, markers:50703 ~ 30s @haohao's mbp)
+MVP.Data.impute <- function(mvp_file, method = 'Major') {
+    bigmat  <- attach.big.matrix(mvp_file)
+    options(bigmemory.typecast.warning = FALSE)
+    
+    for (i in 1:nrow(bigmat)) {
+        # get frequency 
+        c <- table(bigmat[i, ])
+        
+        # get Minor / Major / Middle Gene
+        if (method == 'Middle' | length(c) == 0) { A <- 1 }
+        else if (method == 'Major') { A <- as.numeric(names(c[c == max(c)])) }
+        else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
+        
+        # impute
+        if (length(A) > 1) { A <- sample(A, 1) }
+        bigmat[i, is.na(bigmat[i, ])] <- A
+    }
+    print("Impute Genotype File is done!")
+    
+    # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
+}
+
+MVP.Data.QC <- function() {
+    
+}
 
 HMP.Numeralization <-
 function(x,bit=2,effect="Add",impute="None", Create.indicator = FALSE, Major.allele.zero = FALSE){
