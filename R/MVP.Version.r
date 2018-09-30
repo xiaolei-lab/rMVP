@@ -7,7 +7,7 @@ function(start=TRUE){
 # Build date: Aug 30, 2017
 # Last update: May 25, 2017
 ##############################################################################################
-version <- "1.0.1"
+version <- packageVersion("MVP")
 authors <- "Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Xiaohui Yuan, Shuhong Zhao, and Xiaolei Liu"
 title <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
 mail <- "xiaoleiliu@mail.hzau.edu.cn"
