@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+MVP.Rproj
+.Rbuildignore
+*.o
+*.so
+demo.data/
