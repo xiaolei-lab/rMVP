@@ -62,7 +62,7 @@
         beta2=0
         for(i in 1:nrow(U1)){
             one=matrix(IUX[i,], nrow=1)
-            beta=crossprodcpp(one)
+            beta = crossprod(one)
             beta2= beta2+beta
         }
         beta2<-beta2/delta

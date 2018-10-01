@@ -350,10 +350,12 @@
 		
 		iXX=matrix(0,q0+k,q0+k) #Reserve the maximum size of inverse of LHS
 		
-		ww=crossprodcpp(w)
+		# ww=crossprodcpp(w)
+		ww = crossprod(w)
 
 		wy = crossprod(w,y)
-		yy=crossprodcpp(y)
+		# yy=crossprodcpp(y)
+		yy = crossprod(y)
 		wwi = solve(ww)
 		
 		#Statistics on the reduced model without marker

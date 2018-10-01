@@ -42,11 +42,11 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         gc()
         #check.r <- "checkpoint" %in% rownames(installed.packages())
         if(!is.null(weight)) M <- M * sqrt(as.vector(weight))
-        if(r.open){
+        # if(r.open){
             K <- 0.5 * crossprod(M)/SUM
-        }else{
-            K <- 0.5 * crossprodcpp(M)/SUM
-        }
+        # }else{
+        #     K <- 0.5 * crossprodcpp(M)/SUM
+        # }
     },
     "memory" = {
         if(!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
