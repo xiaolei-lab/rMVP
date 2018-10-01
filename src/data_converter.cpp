@@ -1,8 +1,6 @@
 #include <Rcpp.h>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
-#include <iostream>
-#include <iomanip>
 #include <fstream>
 
 using namespace std;
