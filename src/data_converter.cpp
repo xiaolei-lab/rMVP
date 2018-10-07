@@ -293,7 +293,7 @@ List numeric_scan(std::string num_file) {
 // ***** BFILE *****
 
 template <typename T>
-void write_bfile(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, std::string bed_file) {
+void write_bfile(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, std::string bed_file, double NA_C) {
     // Rcout << pMat->nrow() << std::endl;
     // Rcout << pMat->ncol() << std::endl;
     string ending = ".bed";
@@ -317,6 +317,7 @@ void write_bfile(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, std::string bed_fi
     code[0] = 3;
     code[1] = 2;
     code[2] = 0;
+    code[static_cast<T>(NA_C)] = 1;
     
     for (size_t i = 0; i < m; i++) {
         for (size_t j = 0; j < n; j++) {
@@ -343,13 +344,13 @@ void write_bfile(SEXP pBigMat, std::string bed_file) {
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return write_bfile<char>(xpMat, MatrixAccessor<char>(*xpMat), bed_file);
+        return write_bfile<char>(xpMat, MatrixAccessor<char>(*xpMat), bed_file, NA_CHAR);
     case 2:
-        return write_bfile<short>(xpMat, MatrixAccessor<short>(*xpMat), bed_file);
+        return write_bfile<short>(xpMat, MatrixAccessor<short>(*xpMat), bed_file, NA_SHORT);
     case 4:
-        return write_bfile<int>(xpMat, MatrixAccessor<int>(*xpMat), bed_file);
+        return write_bfile<int>(xpMat, MatrixAccessor<int>(*xpMat), bed_file, NA_INTEGER);
     case 8:
-        return write_bfile<double>(xpMat, MatrixAccessor<double>(*xpMat), bed_file);
+        return write_bfile<double>(xpMat, MatrixAccessor<double>(*xpMat), bed_file, NA_REAL);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
