@@ -286,6 +286,46 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     gc()
 }
 
+MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink') {
+    # write bed file
+    write_bfile(bigmatrix@address, out)
+    
+    # write fam
+    #  1. Family ID ('FID')
+    #  2. Within-family ID ('IID'; cannot be '0')
+    #  3. Within-family ID of father ('0' if father isn't in dataset)
+    #  4. Within-family ID of mother ('0' if mother isn't in dataset)
+    #  5. Sex code ('1' = male, '2' = female, '0' = unknown)
+    #  6. Phenotype value ('1' = control, '2' = case, '-9'/'0'/non-numeric = missing data if case/control)
+    if (is.null(pheno)) {
+        ind <- joint("ind", 1:ncol(bigmatrix))
+        pheno <- rep(-9, nrow(ind))
+        message("pheno is NULL, automatically named individuals.")
+    } else if (ncol(pheno) == 1) {
+        ind <- pheno[, 1]
+        pheno <- rep(-9, nrow(ind))
+    } else if (ncol(pheno) >= 2) {
+        ind <- pheno[, 1]
+        pheno <- pheno[, 2]
+        if (ncol(pheno) > 2) { 
+            message("Only the first phenotype is written to the fam file, and the remaining ", ncol(pheno) - 1, " phenotypes are ignored.")
+        }
+    }
+    
+    fam <- cbind(ind, ind, 0, 0, 0, pheno)
+    write.table(fam, joint(out, '.fam'), quote = F, row.names = F, col.names = F, sep = '\t')
+    
+    # write bim
+    #  1. Chromosome code (either an integer, or 'X'/'Y'/'XY'/'MT'; '0' indicates unknown) or name
+    #  2. Variant identifier
+    #  3. Position in morgans or centimorgans (safe to use dummy value of '0')
+    #  4. Base-pair coordinate (normally 1-based, but 0 ok; limited to 231-2)
+    #  5. Allele 1 (corresponding to clear bits in .bed; usually minor)
+    #  6. Allele 2 (corresponding to set bits in .bed; usually major)
+    bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
+    write.table(fam, joint(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
+}
+
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9')) {
     # read data
     if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
