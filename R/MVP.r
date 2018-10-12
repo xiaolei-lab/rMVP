@@ -209,7 +209,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     
     if(farmcpu.run){
         print("FarmCPU Start ...")
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, priority=priority, CV=CV.FarmCPU, ncpus=ncpus, memo="MVP.FarmCPU", P=P, method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, Prior=Prior, maxLoop=maxLoop, threshold.output=threshold.output, iteration.output=iteration.output, p.threshold=p.threshold, QTN.threshold=QTN.threshold, bound=NULL)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, priority=priority, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", P=P, method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, Prior=Prior, maxLoop=maxLoop, threshold.output=threshold.output, iteration.output=iteration.output, p.threshold=p.threshold, QTN.threshold=QTN.threshold, bound=NULL)
         colnames(farmcpu.results) <- c("effect", paste(colnames(phe)[2],"FarmCPU",sep="."))
         if(file.output)	write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
     }

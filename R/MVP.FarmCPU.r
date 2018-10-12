@@ -1,4 +1,4 @@
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL){
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL){
     ##############################################################################################
     # Object: Perform GWAS using FarmCPU method
     # Input
@@ -373,7 +373,7 @@
 		m = nrow(GDP)
 		
 		eff.farmcpu.parallel <- function(i){
-			print.f(i)
+			if(bar) print.f(i)
 			# if(i%%1000==0){
 				# print(paste("****************", i, "****************",sep=""))
 			# }
