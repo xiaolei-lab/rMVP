@@ -354,7 +354,9 @@ MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t
     return(map)
 }
 
-MVP.Data.PC <- function(filePC=T, out='mvp', perc=1, pcs.keep=5, sep='\t') {
+MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
+    if (is.null(out)) out <- mvp_prefix
+    
     # check old file
     backingfile <- joint(out, ".pc.bin")
     descriptorfile <- joint(out, ".pc.desc")
@@ -362,11 +364,13 @@ MVP.Data.PC <- function(filePC=T, out='mvp', perc=1, pcs.keep=5, sep='\t') {
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # get pc
-    if (!is.logical(filePC)) {
+    if (is.character(filePC)) {
         myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
-        geno <- attach.big.matrix(joint(out, ".geno.desc"))
+        geno <- attach.big.matrix(joint(mvp_prefix, ".geno.desc"))
         myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs
+    } else if (filePC == FALSE || is.null(filePC)) {
+        return()
     } else {
         stop("ERROR: The value of filePC is invalid.")
     }
@@ -387,7 +391,9 @@ MVP.Data.PC <- function(filePC=T, out='mvp', perc=1, pcs.keep=5, sep='\t') {
     print("Preparation for PC matrix is done!")
 }
 
-MVP.Data.Kin <- function(fileKin=T, out='mvp', maxLine=1e4, priority='speed', sep='\t') {
+MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
+    if (is.null(out)) out <- mvp_prefix
+    
     # check old file
     backingfile <- joint(out, ".kin.bin")
     descriptorfile <- joint(out, ".kin.desc")
@@ -395,12 +401,14 @@ MVP.Data.Kin <- function(fileKin=T, out='mvp', maxLine=1e4, priority='speed', se
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # get kin
-    if (!is.logical(fileKin)) {
+    if (is.character(fileKin)) {
         myKin <- read.big.matrix(fileKin, head = F, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
-        geno <- attach.big.matrix(joint(out, ".geno.desc"))
+        geno <- attach.big.matrix(joint(mvp_prefix, ".geno.desc"))
         print("Calculate KINSHIP using Vanraden method...")
         myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
+    } else if (fileKin == FALSE || is.null(fileKin)) {
+        return()
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
