@@ -429,14 +429,38 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
     print("Preparation for Kinship matrix is done!")
 }
 
-# TODO: Very slow (inds: 6, markers:50703 ~ 30s @haohao's mbp)
-MVP.Data.impute <- function(mvp_file, method = 'Major') {
-    bigmat  <- attach.big.matrix(mvp_file)
+# A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
+MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
+    print("Imputing...")
+    # input
+    bigmat  <- attach.big.matrix(mvp_file) -> outmat
     options(bigmemory.typecast.warning = FALSE)
+    if (is.null(ncpus)) ncpus <- detectCores()
     
-    for (i in 1:nrow(bigmat)) {
+    if (is.null(out)) {
+        message("out is NULL, impute inplace.")
+    } else {
+        # output to new genotype file.
+        backingfile <- joint(out, ".geno.bin")
+        descriptorfile <- joint(out, ".geno.desc")
+        if (file.exists(backingfile)) file.remove(backingfile)
+        if (file.exists(descriptorfile)) file.remove(descriptorfile)
+        outmat <- filebacked.big.matrix(
+            nrow = nrow(bigmat),
+            ncol = ncol(bigmat),
+            type = typeof(bigmat),
+            backingfile = backingfile,
+            backingpath = ".",
+            descriptorfile = descriptorfile,
+            dimnames = c(NULL, NULL)
+        )
+        outmat[] <- bigmat[]
+    }
+    
+    # impute single marker
+    impute_marker <- function(i) {
         # get frequency 
-        c <- table(bigmat[i, ])
+        c <- table(outmat[i, ])
         
         # get Minor / Major / Middle Gene
         if (method == 'Middle' | length(c) == 0) { A <- 1 }
