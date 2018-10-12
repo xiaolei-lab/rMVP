@@ -57,9 +57,8 @@
 #' k.desc, k.bin: Kinship matrix in bigmemory format
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
-
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
-                     filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t", auto_transpose = T,
+                     filePhe = NULL, fileInd = NULL, fileKin = T, filePC = T, out = "mvp", sep.num = "\t", auto_transpose = T,
                      sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t", type.geno = "char", pheno_cols = NULL,
                      SNP.impute = "Major", maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5, ...) {
     
@@ -74,15 +73,15 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     if ("type.kin" %in% names(params)) { message("WARNING: 'type.kin' has been DEPRECATED.") }
     if ("type.pc" %in% names(params)) { message("WARNING: 'type.pc' has been DEPRECATED.") }
     if ("type.map" %in% names(params)) { message("WARNING: 'type.map' has been DEPRECATED.") }
-    if ("maxRecord" %in% names(params)) { message("WARNING: 'maxRecord' has been DEPRECATED.") }
-    if ("maxInd" %in% names(params)) { message("WARNING: 'maxInd' has been DEPRECATED.") }
+    if ("maxRecord" %in% names(params)) { message("WARNING: 'maxRecord' has been DEPRECATED. Use maxLine instead.") }
+    if ("maxInd" %in% names(params)) { message("WARNING: 'maxInd' has been DEPRECATED. Use maxLine instead.") }
     
     # Check Data Input
     geno_files <- !sapply(list(
         fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
         ), is.null)
     
-    flag <- paste(sapply(strsplit(as.character(geno_files), ''), `[[`, 1), collapse = '')
+    flag <- paste(sapply(strsplit(as.character(geno_files), ''), `[[`, 1), collapse = '')   # flag = 'TFFFFF'
     
     error_input <- function(geno_files) {
         if (length(which(geno_files[1:5])) != 1) {
@@ -120,7 +119,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     MVP.Data.Kin(fileKin, out, maxLine, priority, sep.kin)
 
     print("MVP data prepration accomplished successfully!")
-}# end of MVP.Data function
+} # end of MVP.Data function
 
 joint <- function(...) { paste(..., sep = "") }
 
