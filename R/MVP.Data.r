@@ -445,14 +445,48 @@ MVP.Data.impute <- function(mvp_file, method = 'Major') {
         
         # impute
         if (length(A) > 1) { A <- sample(A, 1) }
-        bigmat[i, is.na(bigmat[i, ])] <- A
+        outmat[i, is.na(outmat[i, ])] <- A
     }
-    print("Impute Genotype File is done!")
     
+    
+    mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
+    
+    print("Impute Genotype File is done!")
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
 }
 
-MVP.Data.QC <- function() {
-    
-}
+MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
+        print("Quality control...")
+        # input
+        bigmat  <- attach.big.matrix(mvp_file)
+        options(bigmemory.typecast.warning = FALSE)
+        if (is.null(ncpus)) ncpus <- detectCores()
+        
+        # qc marker
+        marker_index <- rep(T, nrow(bigmat))
+        if (!is.null(geno)) {
+            qc_marker <- function(i, cutoff) {
+                c <- table(bigmat[i, ])
+                if (c[NA] > cutoff) {return(F)} else {return(T)}
+ }
+            marker_index <- cbind(mclapply(1:nrow(bigmat), qc_marker, mc.cores = ncpus, cutoff = (geno * nrow(bigmat))))
+            print(joint(length(marker_index[marker_index == F, ])), " markers are filtered because the missing ratio is higher than ", geno)
+ }
+        
+        # qc individual
+        ind_index <- rep(T, ncol(bigmat))
+        if (!is.null(mind)) {
+            qc_ind <- function(i, cutoff) {
+                c <- table(bigmat[, i])
+                if (c[NA] > cutoff) {return(F)} else {return(T)}
+ }
+            ind_index <- cbind(mclapply(1:ncol(bigmat), qc_ind, mc.cores = ncpus, cutoff = (mind * ncol(bigmat))))
+            print(joint(length(marker_index[marker_index == F, ])), " individuals are filtered because the missing ratio is higher than ", mind)
+ }
+        
+        # TODO: support hwe
+        # TODO: qc report
+        
+        bigmat <- bigmat[marker_index, ind_index]
+ }
 
