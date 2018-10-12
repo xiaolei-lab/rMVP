@@ -83,6 +83,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     
     flag <- paste(sapply(strsplit(as.character(geno_files), ''), `[[`, 1), collapse = '')   # flag = 'TFFFFF'
     
+    # convert genotype file
     error_input <- function(geno_files) {
         if (length(which(geno_files[1:5])) != 1) {
             stop("Please input only one genotype data format!")
@@ -92,8 +93,6 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             stop("Both Map and Numeric genotype files are needed!")
         }
     }
-    
-    # convert genotype file
     switch(flag,
            # fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
            TFFFFF = MVP.Data.MVP2MVP(),
@@ -123,7 +122,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 
 joint <- function(...) { paste(..., sep = "") }
 
-MVP.Data.VCF2MVP <- function(vcf_file, out, type.geno='char') {
+MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
     # check old file
     backingfile <- joint(out, ".geno.bin")
     descriptorfile <- joint(out, ".geno.desc")
