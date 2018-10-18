@@ -157,7 +157,7 @@ MVP.Data(fileVCF="myVCF.vcf",
          )
 
 # Only convert genotypes
-MVP.Data.VCF2MVP <- function("myVCF.vcf", out='mvp')
+MVP.Data.VCF2MVP("myVCF.vcf", out='mvp')
 ```
 
 ## Hapmap
@@ -201,7 +201,7 @@ MVP.Data(fileHMP="hapmap.txt",
          )
 
 # Only convert genotypes
-MVP.Data.Hapmap2MVP <- function("hapmap.txt", out='mvp')
+MVP.Data.Hapmap2MVP("hapmap.txt", out='mvp')
 ```
 
 If you have **more than one** hapmap file, such as **"hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", ... , "hmp.chr10.txt"**  
