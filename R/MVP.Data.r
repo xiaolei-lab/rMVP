@@ -109,7 +109,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         MVP.Data.Pheno(filePhe, out, pheno_cols, sep = sep.phe)
     }
     # impute
-    MVP.Data.impute(joint(out, '.geno.desc'), SNP.impute)
+    MVP.Data.impute(joint(out, '.geno.desc'), method = SNP.impute)
     
     # get pc
     MVP.Data.PC(filePC, out, perc, pcs.keep, sep.pc)
