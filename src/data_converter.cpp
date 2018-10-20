@@ -197,7 +197,11 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
 template <typename T>
 T hapmap_marker_parser(string m, char major, double NA_C) {
     int number = 0;
-    if (m.length() != 2 || m[0] == 'N' || m[1] == 'N') {
+    if (m.length() != 2 || 
+        // m[0] == 'N' || m[1] == 'N' ||
+        (m[0] != 'A' && m[0] != 'T' && m[0] != 'G' && m[0] != 'C') ||
+        (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')
+    ) {
         return static_cast<T>(NA_C);
     } else {
         number += (m[0] == major)?0:1;

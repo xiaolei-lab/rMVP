@@ -62,7 +62,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                      sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t", type.geno = "char", pheno_cols = NULL,
                      SNP.impute = "Major", maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5, ...) {
     
-    print("Preparing data for MVP...")
+    cat("Preparing data for MVP...\n")
     
     # Parameter compatible upgrade
     params <- list(...)
@@ -102,14 +102,14 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
            FFFFTT = MVP.Data.Numeric2MVP(fileNum, out, maxLine, priority, type.geno, auto_transpose),
            error_input(geno_files)
     )
-    print("Preparation for Genotype File is done!")
+    cat("Preparation for Genotype File is done!\n")
     
     # phenotype
     if (!is.null(filePhe)) {
         MVP.Data.Pheno(filePhe, out, pheno_cols, sep = sep.phe)
     }
     # impute
-    MVP.Data.impute(joint(out, '.geno.desc'), method = SNP.impute)
+    MVP.Data.impute(joint(out, '.geno.desc'), out = joint(out, '.imp'), method = SNP.impute)
     
     # get pc
     MVP.Data.PC(filePC, out, perc, pcs.keep, sep.pc)
@@ -117,7 +117,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     # get kin
     MVP.Data.Kin(fileKin, out, maxLine, priority, sep.kin)
 
-    print("MVP data prepration accomplished successfully!")
+    cat("MVP data prepration accomplished successfully!\n")
 } # end of MVP.Data function
 
 joint <- function(...) { paste(..., sep = "") }
@@ -324,7 +324,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink') {
     write.table(fam, joint(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
 }
 
-MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9')) {
+MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
     # read data
     if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
 
@@ -376,7 +376,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     # Output
     write.table(pheno, joint(out, '.phe'), quote = F, sep = "\t", row.names = F, col.names = T)
     
-    print("Preparation for PHENOTYPE data is done!")
+    cat("Preparation for PHENOTYPE data is done!\n")
     return(pheno)
 }
 
@@ -426,7 +426,7 @@ MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, 
     
     PC[, ] <- myPC[, ]
     flush(PC)
-    print("Preparation for PC matrix is done!")
+    cat("Preparation for PC matrix is done!\n")
 }
 
 MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
@@ -443,7 +443,7 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
         myKin <- read.big.matrix(fileKin, head = F, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(joint(mvp_prefix, ".geno.desc"))
-        print("Calculate KINSHIP using Vanraden method...")
+        cat("Calculate KINSHIP using Vanraden method...\n")
         myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
     } else if (fileKin == FALSE || is.null(fileKin)) {
         return()
@@ -464,12 +464,12 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
     
     Kinship[, ] <- myKin[, ]
     flush(Kinship)
-    print("Preparation for Kinship matrix is done!")
+    cat("Preparation for Kinship matrix is done!\n")
 }
 
 # A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
-    print("Imputing...")
+    cat("Imputing...\n")
     # input
     bigmat  <- attach.big.matrix(mvp_file) -> outmat
     options(bigmemory.typecast.warning = FALSE)
@@ -513,12 +513,12 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
     
     mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
     
-    print("Impute Genotype File is done!")
+    cat("Impute Genotype File is done!\n")
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
 }
 
 MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
-        print("Quality control...")
+        cat("Quality control...\n")
         # input
         bigmat  <- attach.big.matrix(mvp_file)
         options(bigmemory.typecast.warning = FALSE)
@@ -530,10 +530,10 @@ MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hw
             qc_marker <- function(i, cutoff) {
                 c <- table(bigmat[i, ])
                 if (c[NA] > cutoff) {return(F)} else {return(T)}
- }
+        }
             marker_index <- cbind(mclapply(1:nrow(bigmat), qc_marker, mc.cores = ncpus, cutoff = (geno * nrow(bigmat))))
-            print(joint(length(marker_index[marker_index == F, ])), " markers are filtered because the missing ratio is higher than ", geno)
- }
+            cat(joint(length(marker_index[marker_index == F, ])), "markers are filtered because the missing ratio is higher than", geno, "\n")
+        }
         
         # qc individual
         ind_index <- rep(T, ncol(bigmat))
@@ -541,10 +541,10 @@ MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hw
             qc_ind <- function(i, cutoff) {
                 c <- table(bigmat[, i])
                 if (c[NA] > cutoff) {return(F)} else {return(T)}
- }
+        }
             ind_index <- cbind(mclapply(1:ncol(bigmat), qc_ind, mc.cores = ncpus, cutoff = (mind * ncol(bigmat))))
-            print(joint(length(marker_index[marker_index == F, ])), " individuals are filtered because the missing ratio is higher than ", mind)
- }
+            cat(joint(length(marker_index[marker_index == F, ])), "individuals are filtered because the missing ratio is higher than", mind, "\n")
+        }
         
         # TODO: support hwe
         # TODO: qc report
