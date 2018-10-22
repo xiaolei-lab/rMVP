@@ -90,8 +90,8 @@ print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # align logo
     logo_width <- max(sapply(logo, nchar))
     for (i in 1:length(logo)) {
-        l <- stringr::str_pad(logo[i], "right", width = logo_width)
-        # l <- paste0(logo[i], paste(rep(" ", logo_width - nchar(logo[i])), collapse = ""))
+        # l <- stringr::str_pad(logo[i], "right", width = logo_width)
+        l <- paste0(logo[i], paste(rep(" ", logo_width - nchar(logo[i])), collapse = ""))
         # blank <- stringr::str_match(logo[i], "^\\s+")
         l <- rule(center = l, line = " ", width = width)
         # if (!is.na(blank)) { l <- paste0(blank, substr(l, 1, nchar(l) - nchar(blank))) }
