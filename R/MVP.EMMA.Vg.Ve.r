@@ -28,7 +28,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10){
         iXX <- try(solve(XX), silent = TRUE)
         if(inherits(iXX, "try-error")){
             #library(MASS)
-            iXX <- geninv(XX)
+            iXX <- ginv(XX)
         }
 
         SS1 <- X %*% iXX
