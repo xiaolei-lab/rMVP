@@ -75,7 +75,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #setMKLthreads(1)
     #}
     
-    MVP.Version(TRUE)
+    MVP.Version(TRUE, 60)
     if(nrow(phe) != ncol(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
