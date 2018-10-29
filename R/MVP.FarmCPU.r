@@ -464,7 +464,7 @@
 		if(method=="EMMA"){
 			theGK <- t(theGK)
 			K <- MVP.K.VanRaden(M=theGK, priority="speed")
-			myEMMAREML <- MVP.EMMA.Vg.Ve(y=matrix(Y[,-1],nrow(Y),1), X=theCV, K=K, cpu=ncpus)
+			myEMMAREML <- MVP.EMMA.Vg.Ve(y=matrix(Y[,-1],nrow(Y),1), X=theCV, K=K)
 			REMLs=-2*myEMMAREML$REML
 			delta=myEMMAREML$delta
 			vg=myEMMAREML$vg
