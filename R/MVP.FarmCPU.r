@@ -404,7 +404,7 @@
 			ve=(yy-crossprod(beta,rhs))/df #this is a scaler
 			
 			#using iXX in the same as above to derive se
-			se=sqrt(diag(iXX)*ve)
+			se=sqrt(as.vector(diag(iXX)*ve))
 			tvalue=beta/se
 			pvalue <- 2 * pt(abs(tvalue), df,lower.tail = FALSE)
 			
