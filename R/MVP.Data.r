@@ -123,8 +123,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
     # check old file
-    backingfile <- paste0(out, ".geno.bin")
-    descriptorfile <- paste0(out, ".geno.desc")
+    backingfile <- paste0(basename(out), ".geno.bin")
+    descriptorfile <- paste0(basename(out), ".geno.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -138,7 +138,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
         ncol = m_res$n,
         type = type.geno,
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -147,8 +147,8 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
 
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char') {
     # check old file
-    backingfile <- paste0(out, ".geno.bin")
-    descriptorfile <- paste0(out, ".geno.desc")
+    backingfile <- paste0(basename(out), ".geno.bin")
+    descriptorfile <- paste0(basename(out), ".geno.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -166,7 +166,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         ncol = nrow(fam),
         type = type.geno,
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -176,8 +176,8 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 
 MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
     # check old file
-    backingfile <- paste0(out, ".geno.bin")
-    descriptorfile <- paste0(out, ".geno.desc")
+    backingfile <- paste0(basename(out), ".geno.bin")
+    descriptorfile <- paste0(basename(out), ".geno.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -191,7 +191,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
         ncol = m_res$n,
         type = type.geno,
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -200,8 +200,8 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
 
 MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', type.geno='char', auto_transpose=T) {
     # check old file
-    backingfile <- paste0(out, ".geno.bin")
-    descriptorfile <- paste0(out, ".geno.desc")
+    backingfile <- paste0(basename(out), ".geno.bin")
+    descriptorfile <- paste0(basename(out), ".geno.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -224,7 +224,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
         ncol = n,
         type = type.geno,
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -395,8 +395,8 @@ MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, 
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
-    backingfile <- paste0(out, ".pc.bin")
-    descriptorfile <- paste0(out, ".pc.desc")
+    backingfile <- paste0(basename(out), ".pc.bin")
+    descriptorfile <- paste0(basename(out), ".pc.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -418,7 +418,7 @@ MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, 
         ncol = ncol(myPC),
         type = 'double',
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -432,8 +432,8 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
-    backingfile <- paste0(out, ".kin.bin")
-    descriptorfile <- paste0(out, ".kin.desc")
+    backingfile <- paste0(basename(out), ".kin.bin")
+    descriptorfile <- paste0(basename(out), ".kin.desc")
     if (file.exists(backingfile)) file.remove(backingfile)
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
@@ -456,7 +456,7 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
         ncol = ncol(myKin),
         type = 'double',
         backingfile = backingfile,
-        backingpath = ".",
+        backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
@@ -478,8 +478,8 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
         message("out is NULL, impute inplace.")
     } else {
         # output to new genotype file.
-        backingfile <- paste0(out, ".geno.bin")
-        descriptorfile <- paste0(out, ".geno.desc")
+        backingfile <- paste0(basename(out), ".geno.bin")
+        descriptorfile <- paste0(basename(out), ".geno.desc")
         if (file.exists(backingfile)) file.remove(backingfile)
         if (file.exists(descriptorfile)) file.remove(descriptorfile)
         outmat <- filebacked.big.matrix(
@@ -487,7 +487,7 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
             ncol = ncol(bigmat),
             type = typeof(bigmat),
             backingfile = backingfile,
-            backingpath = ".",
+            backingpath = dirname(out),
             descriptorfile = descriptorfile,
             dimnames = c(NULL, NULL)
         )
