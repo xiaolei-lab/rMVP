@@ -328,30 +328,37 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
 
     # phenotype files
-    f <- read.delim(pheno_file, sep = sep, header = header)
+    phe <- read.delim(pheno_file, sep = sep, header = header)
     
     # auto select columns
     if (is.null(cols)) {
-        c <- c(1:ncol(f))
-    } else {
-        c <- cols
+        cols <- c(1:ncol(phe))
     }
     
-    if (length(c) < 2) {
+    # check phenotype file
+    if (length(cols) < 2) {
         stop("ERROR: At least 2 columns in the phenotype file should be specified.")
     }
+    phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
+    
     
     # read geno ind list
     geno.ind.file <- paste0(out, '.geno.ind')
     if (file.exists(geno.ind.file)) {
+        # read from file
         geno.ind <- read.table(geno.ind.file)
+        if (length(intersect(geno.ind, phe[, cols[1]])) == 0) {
+            print(paste0("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "..."))
+            print(paste0("Genotype individuals: ", paste(geno.ind[1:5], collapse = ", "), "..."))
+            stop("No common individuals between phenotype and genotype!")
+        }
     } else {
-        geno.ind <- f[, c[1]]
+        # use ind. name from phenotypefile
+        geno.ind <- phe[, cols[1]]
     }
     
     # merge
-    pheno <- merge(geno.ind, f[, c],  by = 1, all.x = T)
-
+    pheno <- merge(geno.ind, phe[, cols],  by = 1, all.x = T)
     
     # rename header
     colnames(pheno)[1] <- 'Taxa'
