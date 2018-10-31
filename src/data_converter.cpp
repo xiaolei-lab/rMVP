@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/progress.hpp>
 #include <fstream>
 
 using namespace std;
@@ -29,8 +30,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     
     // Skip Header
     string prefix("#CHROM");
-    while (true) {
-        getline(file, line);
+    while (getline(file, line)) {
         if (!line.compare(0, prefix.size(), prefix)) { break; }
     }
     
@@ -46,7 +46,6 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     // Get num of ind / marker
     n = ind.size();
     
-    int pos = file.tellg();
     // unsigned m = count(                 // 3-4s per 100Mb
     //     istream_iterator<char>(file),
     //     istream_iterator<char>(),
@@ -71,8 +70,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     file.close();
     
     return List::create(_["n"] = n,
-                        _["m"] = m, 
-                        _["pos"] = pos);
+                        _["m"] = m);
 }
 
 template <typename T>
@@ -85,15 +83,27 @@ T vcf_marker_parser(string m, double NA_C) {
 }
 
 template <typename T>
-void vcf_parser_genotype(std::string vcf_file, MatrixAccessor<T> mat, int pos, double NA_C) {
+void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, bool show_progress=true) {
     // define
     ifstream file(vcf_file);
-    file.seekg(pos);
     
     string line;
     vector<string> l;
     vector<char> markers;
     size_t m;
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    
+    // progress bar
+    boost::progress_display * progress = NULL;
+    if(show_progress) {
+        progress = new boost::progress_display(pMat->nrow());
+    }
+    
+    // Skip Header
+    string prefix("#CHROM");
+    while (getline(file, line)) {
+        if (!line.compare(0, prefix.size(), prefix)) { break; }
+    }
     
     // parser genotype
     m = 0;
@@ -112,22 +122,25 @@ void vcf_parser_genotype(std::string vcf_file, MatrixAccessor<T> mat, int pos, d
             mat[i][m] = markers[i];
         }
         m++;
+        if(show_progress) {
+            ++(*progress);
+        }
     }
 }
 
 // [[Rcpp::export]]
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int pos) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return vcf_parser_genotype<char>(vcf_file, MatrixAccessor<char>(*xpMat), pos, NA_CHAR);
+        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, show_progress);
     case 2:
-        return vcf_parser_genotype<short>(vcf_file, MatrixAccessor<short>(*xpMat), pos, NA_SHORT);
+        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, show_progress);
     case 4:
-        return vcf_parser_genotype<int>(vcf_file, MatrixAccessor<int>(*xpMat), pos, NA_INTEGER);
+        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, show_progress);
     case 8:
-        return vcf_parser_genotype<double>(vcf_file, MatrixAccessor<double>(*xpMat), pos, NA_REAL);
+        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

@@ -18,14 +18,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // vcf_parser_genotype
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int pos);
-RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP posSEXP) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, bool show_progress);
+RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type vcf_file(vcf_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    Rcpp::traits::input_parameter< int >::type pos(posSEXP);
-    vcf_parser_genotype(vcf_file, pBigMat, pos);
+    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
+    vcf_parser_genotype(vcf_file, pBigMat, show_progress);
     return R_NilValue;
 END_RCPP
 }

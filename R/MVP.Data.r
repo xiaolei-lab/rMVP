@@ -142,7 +142,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    vcf_parser_genotype(vcf_file, bigmat@address, m_res$pos)
+    vcf_parser_genotype(vcf_file, bigmat@address)
 }
 
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char') {
