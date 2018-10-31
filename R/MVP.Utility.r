@@ -162,3 +162,16 @@ paste_label <- function(line, label, side = "right", margin = 2) {
     substr(line, start, end) <- label
     return(line)
 }
+
+
+times <- function(x)
+{
+    h <- x %/% 3600
+    m <- (x %% 3600) %/% 60
+    s <- ((x %% 3600) %% 60)
+    index <- which(c(h, m, s) != 0)
+    num <- c(h, m, s)[index]
+    num <- round(num, 0)
+    char <- c("h", "m", "s")[index]
+    return(paste0(num, char, collapse = ""))
+}
