@@ -25,7 +25,7 @@ write_bfile <- function(pBigMat, bed_file, show_progress = TRUE) {
     invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file, show_progress))
 }
 
-read_bfile <- function(bed_file, pBigMat, maxLine, show_progress = TRUE) {
-    invisible(.Call(`_MVP_read_bfile`, bed_file, pBigMat, maxLine, show_progress))
+read_bfile <- function(bed_file, pBigMat, maxLine, threads = 1L, show_progress = TRUE) {
+    invisible(.Call(`_MVP_read_bfile`, bed_file, pBigMat, maxLine, threads, show_progress))
 }
 

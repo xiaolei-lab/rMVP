@@ -77,15 +77,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // read_bfile
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, bool show_progress);
-RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP show_progressSEXP) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads, bool show_progress);
+RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< long >::type maxLine(maxLineSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
-    read_bfile(bed_file, pBigMat, maxLine, show_progress);
+    read_bfile(bed_file, pBigMat, maxLine, threads, show_progress);
     return R_NilValue;
 END_RCPP
 }
@@ -97,7 +98,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MVP_hapmap_parser_genotype", (DL_FUNC) &_MVP_hapmap_parser_genotype, 3},
     {"_MVP_numeric_scan", (DL_FUNC) &_MVP_numeric_scan, 1},
     {"_MVP_write_bfile", (DL_FUNC) &_MVP_write_bfile, 3},
-    {"_MVP_read_bfile", (DL_FUNC) &_MVP_read_bfile, 4},
+    {"_MVP_read_bfile", (DL_FUNC) &_MVP_read_bfile, 5},
     {NULL, NULL, 0}
 };
 

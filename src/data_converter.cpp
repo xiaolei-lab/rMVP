@@ -1,7 +1,13 @@
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include <Rcpp.h>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/progress.hpp>
+#include <progress.hpp>
+#include <progress_bar.hpp>
 #include <fstream>
 
 using namespace std;
@@ -9,6 +15,9 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(BH, bigmemory)]]
+// [[Rcpp::plugins(openmp)]]
+// [[Rcpp::depends(RcppProgress)]]
+
 #include <bigmemory/isna.hpp>
 #include <bigmemory/MatrixAccessor.hpp>
 
@@ -398,11 +407,18 @@ void write_bfile(SEXP pBigMat, std::string bed_file, bool show_progress=true) {
 }
 
 template <typename T>
-void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, bool show_progress=true) {
+void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=2, bool show_progress=true) {
     // check input
     string ending = ".bed";
     if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
         bed_file += ending;
+    
+    // openmp
+#ifdef _OPENMP
+    if ( threads > 0 )
+        omp_set_num_threads( threads );
+    Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
+#endif
     
     // define
     long n = pMat->ncol() / 4;  // 4 individual = 1 bit
@@ -434,55 +450,51 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     }
     
     // progress bar
-    boost::progress_display * progress = NULL;
-    if(show_progress) {
-        progress = new boost::progress_display((length - 3)/buffer_size);
-    }
+    int n_block = (length - 3) / buffer_size;
+    if ((length - 3) % buffer_size != 0) { n_block++; }
+    Progress progress(n_block, show_progress);
     
     // magic number of bfile
     buffer = new char [3];
     fin.read(buffer, 3);
     
     // loop file
-    size_t i = 0;
-    while (true) {
+#pragma omp parallel for schedule(dynamic) 
+    for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fin.read(buffer, buffer_size);
-        if (!fin) {break;}
+        
         size_t r, c;
         // i: current block start, j: current bit.
-        for (size_t j = 0; j < buffer_size && i + j < length - 3; j++) {
+        for (size_t j = 0; j < buffer_size && i * buffer_size + j < length - 3; j++) {
             // bit -> item in matrix
-            r = (i + j) / n;
-            c = (i + j) % n * 4;
+            r = (i * buffer_size + j) / n;
+            c = (i * buffer_size + j) % n * 4;
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < pMat->ncol(); x++) {
                 mat[c + x][r] = code[(p >> (2*x)) & 0x03];
             }
         }
-        i += buffer_size;
-        if(show_progress) {
-            ++(*progress);
-        }
+        progress.increment();
     }
     fin.close();
     return;
 }
 
 // [[Rcpp::export]]
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, bool show_progress=true) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=2, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return read_bfile<char>(bed_file, xpMat, maxLine, NA_CHAR, show_progress);
+        return read_bfile<char>(bed_file, xpMat, maxLine, NA_CHAR, threads, show_progress);
     case 2:
-        return read_bfile<short>(bed_file, xpMat, maxLine, NA_SHORT, show_progress);
+        return read_bfile<short>(bed_file, xpMat, maxLine, NA_SHORT, threads, show_progress);
     case 4:
-        return read_bfile<int>(bed_file, xpMat, maxLine, NA_INTEGER, show_progress);
+        return read_bfile<int>(bed_file, xpMat, maxLine, NA_INTEGER, threads, show_progress);
     case 8:
-        return read_bfile<double>(bed_file, xpMat, maxLine, NA_REAL, show_progress);
+        return read_bfile<double>(bed_file, xpMat, maxLine, NA_REAL, threads, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
