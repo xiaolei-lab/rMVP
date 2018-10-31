@@ -416,18 +416,19 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, MatrixAccessor<T> ma
         buffer = new char [buffer_size];
         fin.read(buffer, buffer_size);
         if (!fin) {break;}
-        
         size_t r, c;
-        for (size_t j = i; j < i + buffer_size && j < length; i++, j++) {
+        // i: current block start, j: current bit.
+        for (size_t j = 0; j < buffer_size && i + j < length - 3; j++) {
             // bit -> item in matrix
-            r = j / n;
-            c = j % n * 4;
+            r = (i + j) / n;
+            c = (i + j) % n * 4;
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < pMat->ncol(); x++) {
                 mat[c + x][r] = code[(p >> (2*x)) & 0x03];
             }
         }
+        i += buffer_size;
     }
     fin.close();
     return;
