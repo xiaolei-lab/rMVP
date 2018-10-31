@@ -110,7 +110,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     }
     # impute
     if (is.null(SNP.impute)) {
-    MVP.Data.impute(paste0(out, '.geno.desc'), out = paste0(out, '.imp'), method = SNP.impute)
+        MVP.Data.impute(paste0(out, '.geno.desc'), out = paste0(out, '.imp'), method = SNP.impute)
     }
     
     # get pc
@@ -123,7 +123,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 } # end of MVP.Data function
 
 
-MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
+MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', show_progress=T) {
+    t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -131,6 +132,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
+    cat("Reading file...\n")
     m_res <- vcf_parser_map(vcf_file, out)
     cat(paste0("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
     
@@ -144,10 +146,13 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char') {
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    vcf_parser_genotype(vcf_file, bigmat@address)
+    vcf_parser_genotype(vcf_file, bigmat@address, show_progress)
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
 
-MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char') {
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', show_progress=T) {
+    t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -155,28 +160,32 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
-    map <- MVP.Data.Map(paste0(bfile, '.bim'), out, c(2, 1, 4))
+    cat("Reading file...\n")
+    m <- MVP.Data.Map(map_file = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = F)
     
     # parser phenotype
-    fam <- read.delim(paste0(bfile, '.fam'), header = F)
+    n <- nrow(read.delim(paste0(bfile, '.fam'), header = F))
     
-    cat(paste0("inds: ", nrow(fam), "\tmarkers:", nrow(map), '\n'))
+    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = nrow(map),
-        ncol = nrow(fam),
+        nrow = m,
+        ncol = n,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    if (priority == "speed") {maxLine <- -1}
-    read_bfile(bfile, bigmat@address, maxLine)
+    if (priority == "speed") { maxLine <- -1 }
+    read_bfile(bfile, bigmat@address, maxLine, show_progress)
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
+MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', show_progress=T) {
+    t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -184,6 +193,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
+    cat("Reading file...\n")
     m_res <- hapmap_parser_map(hapmap_file, out)
     cat(paste0("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
     
@@ -197,10 +207,13 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char') {
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    hapmap_parser_genotype(hapmap_file, bigmat@address)
+    hapmap_parser_genotype(hapmap_file, bigmat@address, show_progress)
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
 
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', type.geno='char', auto_transpose=T) {
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', type.geno='char', auto_transpose=T, show_progress=T) {
+    t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -208,6 +221,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # detecte n(ind) and m(marker)
+    cat("Reading file...\n")
     scan <- numeric_scan(num_file)
     n <- scan$n
     m <- scan$m
@@ -243,7 +257,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
         
         # load geno
         suppressWarnings(
-            geno <- read.big.matrix(num_file, head = FALSE, sep = sep) 
+            geno <- read.big.matrix(num_file, head = FALSE, sep = sep)
         )
         if (transposed) {
             bigmat[, ] <- t(geno[, ])
@@ -283,9 +297,12 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     
     flush(bigmat)
     gc()
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
 
-MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink') {
+MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', show_progress=T) {
+    t1 <- as.numeric(Sys.time())
     # write bed file
     write_bfile(bigmatrix@address, out)
     
@@ -323,9 +340,12 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink') {
     #  6. Allele 2 (corresponding to set bits in .bed; usually major)
     bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
     write.table(fam, paste0(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
+    t2 <- as.numeric(Sys.time())
+    cat("Done within", format_time(t2-t1), "\n")
 }
 
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
+    t1 <- as.numeric(Sys.time())
     # read data
     if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
 
@@ -383,12 +403,12 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     
     # Output
     write.table(pheno, paste0(out, '.phe'), quote = F, sep = "\t", row.names = F, col.names = T)
-    
-    cat("Preparation for PHENOTYPE data is done!\n")
-    return(pheno)
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for PHENOTYPE data is Done within", format_time(t2-t1), "\n")
 }
 
 MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t') {
+    t1 <- as.numeric(Sys.time())
     map <- read.table(map_file, header = header)
     map <- map[, cols]
     colnames(map) <- c("SNP", "CHROM", "POS")
@@ -396,8 +416,10 @@ MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
     }
-    write.table(map, paste0(out, ".map"), row.names = F, col.names = T, sep = '\t', quote = F)
-    return(map)
+    table = write.table(map, paste0(out, ".map"), row.names = F, col.names = T, sep = '\t', quote = F)
+    t2 <- as.numeric(Sys.time())
+    cat("Preparation for MAP data is done within", format_time(t2 - t1), "\n")
+    return(nrow(map))
 }
 
 MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
@@ -479,18 +501,20 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
 MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
     cat("Imputing...\n")
     # input
-    bigmat  <- attach.big.matrix(mvp_file) -> outmat
+    bigmat  <- attach.big.matrix(mvp_file)
     options(bigmemory.typecast.warning = FALSE)
     if (is.null(ncpus)) ncpus <- detectCores()
     
     if (is.null(out)) {
         message("out is NULL, impute inplace.")
+        outmat <- attach.big.matrix(mvp_file)
     } else {
         # output to new genotype file.
         backingfile <- paste0(basename(out), ".geno.bin")
         descriptorfile <- paste0(basename(out), ".geno.desc")
         if (file.exists(backingfile)) file.remove(backingfile)
         if (file.exists(descriptorfile)) file.remove(descriptorfile)
+        
         outmat <- filebacked.big.matrix(
             nrow = nrow(bigmat),
             ncol = ncol(bigmat),
@@ -500,7 +524,7 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
             descriptorfile = descriptorfile,
             dimnames = c(NULL, NULL)
         )
-        outmat[] <- bigmat[]
+        outmat[, ] <- bigmat[, ]
     }
     
     # impute single marker

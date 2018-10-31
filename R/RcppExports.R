@@ -13,19 +13,19 @@ hapmap_parser_map <- function(hmp_file, out) {
     .Call(`_MVP_hapmap_parser_map`, hmp_file, out)
 }
 
-hapmap_parser_genotype <- function(hmp_file, pBigMat) {
-    invisible(.Call(`_MVP_hapmap_parser_genotype`, hmp_file, pBigMat))
+hapmap_parser_genotype <- function(hmp_file, pBigMat, show_progress = TRUE) {
+    invisible(.Call(`_MVP_hapmap_parser_genotype`, hmp_file, pBigMat, show_progress))
 }
 
 numeric_scan <- function(num_file) {
     .Call(`_MVP_numeric_scan`, num_file)
 }
 
-write_bfile <- function(pBigMat, bed_file) {
-    invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file))
+write_bfile <- function(pBigMat, bed_file, show_progress = TRUE) {
+    invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file, show_progress))
 }
 
-read_bfile <- function(bed_file, pBigMat, maxLine) {
-    invisible(.Call(`_MVP_read_bfile`, bed_file, pBigMat, maxLine))
+read_bfile <- function(bed_file, pBigMat, maxLine, show_progress = TRUE) {
+    invisible(.Call(`_MVP_read_bfile`, bed_file, pBigMat, maxLine, show_progress))
 }
 

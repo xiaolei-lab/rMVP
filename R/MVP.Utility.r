@@ -164,7 +164,7 @@ paste_label <- function(line, label, side = "right", margin = 2) {
 }
 
 
-times <- function(x)
+format_time <- function(x)
 {
     h <- x %/% 3600
     m <- (x %% 3600) %/% 60

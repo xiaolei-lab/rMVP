@@ -224,7 +224,7 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
 }
 
 template <typename T>
-void hapmap_parser_genotype(std::string hmp_file, MatrixAccessor<T> mat, double NA_C) {
+void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double NA_C, bool show_progress=true) {
     // define
     ifstream file(hmp_file);
     
@@ -233,6 +233,13 @@ void hapmap_parser_genotype(std::string hmp_file, MatrixAccessor<T> mat, double 
     vector<string> l;
     vector<char> markers;
     size_t m;
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    
+    // progress bar
+    boost::progress_display * progress = NULL;
+    if(show_progress) {
+        progress = new boost::progress_display(pMat->nrow());
+    }
     
     // Skip Header
     string prefix("rs#");
@@ -260,22 +267,25 @@ void hapmap_parser_genotype(std::string hmp_file, MatrixAccessor<T> mat, double 
             mat[i][m] = markers[i];
         }
         m++;
+        if(show_progress) {
+            ++(*progress);
+        }
     }
 }
 
 // [[Rcpp::export]]
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hapmap_parser_genotype<char>(hmp_file, MatrixAccessor<char>(*xpMat), NA_CHAR);
+        return hapmap_parser_genotype<char>(hmp_file, xpMat, NA_CHAR, show_progress);
     case 2:
-        return hapmap_parser_genotype<short>(hmp_file, MatrixAccessor<short>(*xpMat), NA_SHORT);
+        return hapmap_parser_genotype<short>(hmp_file, xpMat, NA_SHORT, show_progress);
     case 4:
-        return hapmap_parser_genotype<int>(hmp_file, MatrixAccessor<int>(*xpMat), NA_INTEGER);
+        return hapmap_parser_genotype<int>(hmp_file, xpMat, NA_INTEGER, show_progress);
     case 8:
-        return hapmap_parser_genotype<double>(hmp_file, MatrixAccessor<double>(*xpMat), NA_REAL);
+        return hapmap_parser_genotype<double>(hmp_file, xpMat, NA_REAL, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -310,32 +320,43 @@ List numeric_scan(std::string num_file) {
 // ***** BFILE *****
 
 template <typename T>
-void write_bfile(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, std::string bed_file, double NA_C) {
-    // Rcout << pMat->nrow() << std::endl;
-    // Rcout << pMat->ncol() << std::endl;
+void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool show_progress=true) {
+    // check input
     string ending = ".bed";
     if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending)) {
         bed_file += ending;
     }
     
+    // define
     T c;
     long m = pMat->nrow();
-    long n = pMat->ncol() / 4;  // 4 marker = 1 bit
+    long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
-        n++; 
+        n++;
     
     vector<uint8_t> geno(n);
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    
     ofstream fout(bed_file, ios::out | ios::binary);
     
+    // progress bar
+    boost::progress_display * progress = NULL;
+    if(show_progress) {
+        progress = new boost::progress_display(m);
+    }
+    
+    // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
     fout.write((char*)magic_bytes , 3);
     
+    // map
     std::map<T, int> code;
     code[0] = 3;
     code[1] = 2;
     code[2] = 0;
     code[static_cast<T>(NA_C)] = 1;
     
+    // write bfile
     for (size_t i = 0; i < m; i++) {
         for (size_t j = 0; j < n; j++) {
             uint8_t p = 0;
@@ -350,43 +371,48 @@ void write_bfile(XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, std::string bed_fi
             geno[j] = p;
         }
         fout.write((char*)geno.data(), geno.size());
+        if(show_progress) {
+            ++(*progress);
+        }
     }
     fout.close();
     return;
 }
 
 // [[Rcpp::export]]
-void write_bfile(SEXP pBigMat, std::string bed_file) {
+void write_bfile(SEXP pBigMat, std::string bed_file, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return write_bfile<char>(xpMat, MatrixAccessor<char>(*xpMat), bed_file, NA_CHAR);
+        return write_bfile<char>(xpMat, bed_file, NA_CHAR, show_progress);
     case 2:
-        return write_bfile<short>(xpMat, MatrixAccessor<short>(*xpMat), bed_file, NA_SHORT);
+        return write_bfile<short>(xpMat, bed_file, NA_SHORT, show_progress);
     case 4:
-        return write_bfile<int>(xpMat, MatrixAccessor<int>(*xpMat), bed_file, NA_INTEGER);
+        return write_bfile<int>(xpMat, bed_file, NA_INTEGER, show_progress);
     case 8:
-        return write_bfile<double>(xpMat, MatrixAccessor<double>(*xpMat), bed_file, NA_REAL);
+        return write_bfile<double>(xpMat, bed_file, NA_REAL, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
 }
 
 template <typename T>
-void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, MatrixAccessor<T> mat, long maxLine, double NA_C) {
+void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, bool show_progress=true) {
     // check input
     string ending = ".bed";
     if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
         bed_file += ending;
     
     // define
-    long n = pMat->ncol() / 4;  // 4 marker = 1 bit
+    long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
         n++; 
     char * buffer;
     long buffer_size;
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
+    // map
     std::map<int, T> code;
     code[3] = 0;
     code[2] = 1;
@@ -400,15 +426,22 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, MatrixAccessor<T> ma
     fin.seekg (0, fin.beg);
     
     // get buffer_size
-    if (maxLine == -1) {
+    if (maxLine <= 0) {
         buffer_size = length - 3;
+        show_progress = false;
     } else {    // memory
         buffer_size = maxLine * n;
     }
     
+    // progress bar
+    boost::progress_display * progress = NULL;
+    if(show_progress) {
+        progress = new boost::progress_display((length - 3)/buffer_size);
+    }
+    
     // magic number of bfile
     buffer = new char [3];
-    fin.read (buffer, 3);
+    fin.read(buffer, 3);
     
     // loop file
     size_t i = 0;
@@ -429,24 +462,27 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, MatrixAccessor<T> ma
             }
         }
         i += buffer_size;
+        if(show_progress) {
+            ++(*progress);
+        }
     }
     fin.close();
     return;
 }
 
 // [[Rcpp::export]]
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return read_bfile<char>(bed_file, xpMat, MatrixAccessor<char>(*xpMat), maxLine, NA_CHAR);
+        return read_bfile<char>(bed_file, xpMat, maxLine, NA_CHAR, show_progress);
     case 2:
-        return read_bfile<short>(bed_file, xpMat, MatrixAccessor<short>(*xpMat), maxLine, NA_SHORT);
+        return read_bfile<short>(bed_file, xpMat, maxLine, NA_SHORT, show_progress);
     case 4:
-        return read_bfile<int>(bed_file, xpMat, MatrixAccessor<int>(*xpMat), maxLine, NA_INTEGER);
+        return read_bfile<int>(bed_file, xpMat, maxLine, NA_INTEGER, show_progress);
     case 8:
-        return read_bfile<double>(bed_file, xpMat, MatrixAccessor<double>(*xpMat), maxLine, NA_REAL);
+        return read_bfile<double>(bed_file, xpMat, maxLine, NA_REAL, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

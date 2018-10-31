@@ -42,13 +42,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // hapmap_parser_genotype
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat);
-RcppExport SEXP _MVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool show_progress);
+RcppExport SEXP _MVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type hmp_file(hmp_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    hapmap_parser_genotype(hmp_file, pBigMat);
+    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
+    hapmap_parser_genotype(hmp_file, pBigMat, show_progress);
     return R_NilValue;
 END_RCPP
 }
@@ -64,25 +65,27 @@ BEGIN_RCPP
 END_RCPP
 }
 // write_bfile
-void write_bfile(SEXP pBigMat, std::string bed_file);
-RcppExport SEXP _MVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP) {
+void write_bfile(SEXP pBigMat, std::string bed_file, bool show_progress);
+RcppExport SEXP _MVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
-    write_bfile(pBigMat, bed_file);
+    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
+    write_bfile(pBigMat, bed_file, show_progress);
     return R_NilValue;
 END_RCPP
 }
 // read_bfile
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine);
-RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, bool show_progress);
+RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< long >::type maxLine(maxLineSEXP);
-    read_bfile(bed_file, pBigMat, maxLine);
+    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
+    read_bfile(bed_file, pBigMat, maxLine, show_progress);
     return R_NilValue;
 END_RCPP
 }
@@ -91,10 +94,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MVP_vcf_parser_map", (DL_FUNC) &_MVP_vcf_parser_map, 2},
     {"_MVP_vcf_parser_genotype", (DL_FUNC) &_MVP_vcf_parser_genotype, 3},
     {"_MVP_hapmap_parser_map", (DL_FUNC) &_MVP_hapmap_parser_map, 2},
-    {"_MVP_hapmap_parser_genotype", (DL_FUNC) &_MVP_hapmap_parser_genotype, 2},
+    {"_MVP_hapmap_parser_genotype", (DL_FUNC) &_MVP_hapmap_parser_genotype, 3},
     {"_MVP_numeric_scan", (DL_FUNC) &_MVP_numeric_scan, 1},
-    {"_MVP_write_bfile", (DL_FUNC) &_MVP_write_bfile, 2},
-    {"_MVP_read_bfile", (DL_FUNC) &_MVP_read_bfile, 3},
+    {"_MVP_write_bfile", (DL_FUNC) &_MVP_write_bfile, 3},
+    {"_MVP_read_bfile", (DL_FUNC) &_MVP_read_bfile, 4},
     {NULL, NULL, 0}
 };
 
