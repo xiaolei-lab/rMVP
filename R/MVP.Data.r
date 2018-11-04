@@ -339,7 +339,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', show
     #  5. Allele 1 (corresponding to clear bits in .bed; usually minor)
     #  6. Allele 2 (corresponding to set bits in .bed; usually major)
     bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
-    write.table(fam, paste0(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
+    write.table(bim, paste0(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
     t2 <- as.numeric(Sys.time())
     cat("Done within", format_time(t2-t1), "\n")
 }
