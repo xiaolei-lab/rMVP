@@ -96,34 +96,82 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     switch(flag,
            # fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
            TFFFFF = MVP.Data.MVP2MVP(),
-           FTFFFF = MVP.Data.VCF2MVP(fileVCF, out),
-           FFTFFF = MVP.Data.Hapmap2MVP(fileHMP, out),
-           FFFTFF = MVP.Data.Bfile2MVP(fileBed, out, maxLine, priority, type.geno),
-           FFFFTT = MVP.Data.Numeric2MVP(fileNum, out, maxLine, priority, type.geno, auto_transpose),
+           FTFFFF = 
+               MVP.Data.VCF2MVP(
+                   vcf_file = fileVCF, 
+                   out = out
+               ),
+           FFTFFF = 
+               MVP.Data.Hapmap2MVP(
+                   hapmap_file = fileHMP, 
+                   out = out
+               ),
+           FFFTFF = 
+               MVP.Data.Bfile2MVP(
+                   bfile = fileBed, 
+                   out = out, 
+                   maxLine = maxLine, 
+                   priority = priority, 
+                   type.geno = type.geno
+               ),
+           FFFFTT = 
+               MVP.Data.Numeric2MVP( 
+                   num_file = fileNum, 
+                   out = out, 
+                   maxLine = maxLine, 
+                   priority = priority, 
+                   type.geno = type.geno,
+                   auto_transpose = auto_transpose
+               ),
            error_input(geno_files)
     )
     cat("Preparation for Genotype File is done!\n")
     
     # phenotype
     if (!is.null(filePhe)) {
-        MVP.Data.Pheno(filePhe, out, pheno_cols, sep = sep.phe)
+        MVP.Data.Pheno(
+            pheno_file = filePhe, 
+            out = out, 
+            header = TRUE,
+            cols = pheno_cols, 
+            sep = sep.phe
+            # , missing = missing
+        )
     }
     # impute
-    if (is.null(SNP.impute)) {
-        MVP.Data.impute(paste0(out, '.geno.desc'), out = paste0(out, '.imp'), method = SNP.impute)
+    if (!is.null(SNP.impute)) {
+        out <- paste0(out, '.imp')
+        MVP.Data.impute(
+            paste0(out, '.geno.desc'), 
+            out = out, 
+            method = SNP.impute
+            # ,ncpus = ncpus
+        )
     }
     
     # get pc
-    MVP.Data.PC(filePC, out, perc, pcs.keep, sep.pc)
+    MVP.Data.PC(
+        filePC = filePC, 
+        mvp_prefix = out, 
+        perc = perc, 
+        pcs.keep = pcs.keep, 
+        sep = sep.pc
+    )
     
     # get kin
-    MVP.Data.Kin(fileKin, out, maxLine, priority, sep.kin)
+    MVP.Data.Kin(
+        fileKin = fileKin, 
+        mvp_prefix = out, 
+        maxLine = maxLine, 
+        priority = priority, 
+        sep = sep.kin
+    )
 
     cat("MVP data prepration accomplished successfully!\n")
 } # end of MVP.Data function
 
 
-MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', show_progress=T) {
+MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, show_progress=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -146,7 +194,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', show_progres
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    vcf_parser_genotype(vcf_file, bigmat@address, show_progress)
+    vcf_parser_genotype(vcf_file, bigmat@address, threads, show_progress)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
@@ -212,7 +260,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', show_p
     cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
 
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', type.geno='char', auto_transpose=T, show_progress=T) {
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=F, type.geno='char', auto_transpose=T, show_progress=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -271,7 +319,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     if (priority == "memory") {
         i <- 0
         con <- file(num_file, open = 'r')
-        if (col_name) { readLines(con, n = 1) }
+        if (col_names) { readLines(con, n = 1) }
         while (TRUE) {
             line = readLines(con, n = maxLine)
 

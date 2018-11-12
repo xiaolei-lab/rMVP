@@ -5,8 +5,8 @@ vcf_parser_map <- function(vcf_file, out) {
     .Call(`_MVP_vcf_parser_map`, vcf_file, out)
 }
 
-vcf_parser_genotype <- function(vcf_file, pBigMat, show_progress = TRUE) {
-    invisible(.Call(`_MVP_vcf_parser_genotype`, vcf_file, pBigMat, show_progress))
+vcf_parser_genotype <- function(vcf_file, pBigMat, threads = 2L, show_progress = TRUE) {
+    invisible(.Call(`_MVP_vcf_parser_genotype`, vcf_file, pBigMat, threads, show_progress))
 }
 
 hapmap_parser_map <- function(hmp_file, out) {
@@ -25,7 +25,7 @@ write_bfile <- function(pBigMat, bed_file, show_progress = TRUE) {
     invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file, show_progress))
 }
 
-read_bfile <- function(bed_file, pBigMat, maxLine, threads = 1L, show_progress = TRUE) {
+read_bfile <- function(bed_file, pBigMat, maxLine, threads = 2L, show_progress = TRUE) {
     invisible(.Call(`_MVP_read_bfile`, bed_file, pBigMat, maxLine, threads, show_progress))
 }
 

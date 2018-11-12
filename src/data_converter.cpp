@@ -92,7 +92,15 @@ T vcf_marker_parser(string m, double NA_C) {
 }
 
 template <typename T>
-void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, bool show_progress=true) {
+void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, int threads=2, bool show_progress=true) {
+    // openmp
+#ifdef _OPENMP
+    if(threads > 0) {
+        omp_set_num_threads( threads );
+        Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
+    }
+#endif
+    
     // define
     ifstream file(vcf_file);
     
@@ -102,11 +110,9 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
     size_t m;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
+    
     // progress bar
-    boost::progress_display * progress = NULL;
-    if(show_progress) {
-        progress = new boost::progress_display(pMat->nrow());
-    }
+    Progress progress(pMat->nrow(), show_progress);
     
     // Skip Header
     string prefix("#CHROM");
@@ -125,31 +131,29 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
             back_inserter(markers),
             boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
         );
+#pragma omp parallel for
         for (size_t i = 0; i < markers.size(); i++) {
-            // Rcout << m << ", " << i << "\t" << markers[i] << endl;
-            // mat[i][m] = markers[i] == MISSING ? static_cast<T>(NA_C) : markers[i];
             mat[i][m] = markers[i];
         }
         m++;
-        if(show_progress) {
-            ++(*progress);
-        }
+        progress.increment();
     }
 }
 
+
 // [[Rcpp::export]]
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, bool show_progress=true) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads=2, bool show_progress=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, show_progress);
+        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, threads, show_progress);
     case 2:
-        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, show_progress);
+        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, threads, show_progress);
     case 4:
-        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, show_progress);
+        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, threads, show_progress);
     case 8:
-        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, show_progress);
+        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, threads, show_progress);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -415,9 +419,10 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // openmp
 #ifdef _OPENMP
-    if ( threads > 0 )
+    if(threads > 0) {
         omp_set_num_threads( threads );
-    Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
+        Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
+    }
 #endif
     
     // define

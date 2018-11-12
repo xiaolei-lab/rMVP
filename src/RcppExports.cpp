@@ -18,14 +18,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // vcf_parser_genotype
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, bool show_progress);
-RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP show_progressSEXP) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads, bool show_progress);
+RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type vcf_file(vcf_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
-    vcf_parser_genotype(vcf_file, pBigMat, show_progress);
+    vcf_parser_genotype(vcf_file, pBigMat, threads, show_progress);
     return R_NilValue;
 END_RCPP
 }
@@ -93,7 +94,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_MVP_vcf_parser_map", (DL_FUNC) &_MVP_vcf_parser_map, 2},
-    {"_MVP_vcf_parser_genotype", (DL_FUNC) &_MVP_vcf_parser_genotype, 3},
+    {"_MVP_vcf_parser_genotype", (DL_FUNC) &_MVP_vcf_parser_genotype, 4},
     {"_MVP_hapmap_parser_map", (DL_FUNC) &_MVP_hapmap_parser_map, 2},
     {"_MVP_hapmap_parser_genotype", (DL_FUNC) &_MVP_hapmap_parser_genotype, 3},
     {"_MVP_numeric_scan", (DL_FUNC) &_MVP_numeric_scan, 1},
