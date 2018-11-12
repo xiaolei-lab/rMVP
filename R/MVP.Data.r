@@ -140,13 +140,13 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     }
     # impute
     if (!is.null(SNP.impute)) {
-        out <- paste0(out, '.imp')
         MVP.Data.impute(
-            paste0(out, '.geno.desc'), 
-            out = out, 
+            mvp_file = paste0(out, '.geno.desc'), 
+            out = paste0(out, '.imp'), 
             method = SNP.impute
             # ,ncpus = ncpus
         )
+        out <- paste0(out, '.imp')
     }
     
     # get pc
