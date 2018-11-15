@@ -411,16 +411,18 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     }
     phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
     
-    
     # read geno ind list
     geno.ind.file <- paste0(out, '.geno.ind')
     if (file.exists(geno.ind.file)) {
         # read from file
-        geno.ind <- read.table(geno.ind.file)
-        if (length(intersect(geno.ind, phe[, cols[1]])) == 0) {
-            print(paste0("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "..."))
-            print(paste0("Genotype individuals: ", paste(geno.ind[1:5], collapse = ", "), "..."))
+        geno.ind <- read.table(geno.ind.file, stringsAsFactors = FALSE)
+        overlap.ind <- intersect(geno.ind[, 1], phe[, cols[1]])
+        if (length(overlap.ind) == 0) {
+            cat(paste0("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "..."), "\n")
+            cat(paste0("Genotype individuals: ", paste(geno.ind[1:5, 1], collapse = ", "), "..."), "\n")
             stop("No common individuals between phenotype and genotype!")
+        } else {
+            cat(paste(length(overlap.ind), "common individuals between phenotype and genotype."), "\n")
         }
     } else {
         # use ind. name from phenotypefile
@@ -452,7 +454,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     # Output
     write.table(pheno, paste0(out, '.phe'), quote = F, sep = "\t", row.names = F, col.names = T)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for PHENOTYPE data is Done within", format_time(t2-t1), "\n")
+    cat("Preparation for PHENOTYPE data is Done within", format_time(t2 - t1), "\n")
 }
 
 MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t') {
