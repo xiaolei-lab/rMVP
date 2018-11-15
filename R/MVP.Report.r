@@ -1578,7 +1578,7 @@ MVP.Report <- function(
 						}
 					}
 				}
-				if(box)	box()
+				if(box)	{ box() }
 				if(file.output) dev.off()
 			}
 		}

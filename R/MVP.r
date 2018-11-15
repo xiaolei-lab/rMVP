@@ -243,10 +243,47 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         MVP.Hist(phe=phe, file=file, col=col, dpi=dpi)
         #plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
         plot3D <- TRUE
-        if(!is.null(nPC))	MVP.PCAplot(ipca[,1:3], col=col, plot3D=plot3D, Ncluster=Ncluster, file=file, dpi=dpi, box=box)
-        MVP.Report(MVP.return, col=col, box=box, plot.type=c("c","m","q","d"), file.output=TRUE, file=file, dpi=dpi, threshold=threshold/m, signal.cex=signal.cex, outward=outward)
-        if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2)	MVP.Report(MVP.return, col=col, plot.type=c("m","q"), multracks=TRUE, outward=outward, file.output=TRUE, file=file, dpi=dpi, box=box, threshold=threshold/m, signal.cex=signal.cex)
+        if(!is.null(nPC)){
+            MVP.PCAplot(
+                ipca[,1:3],
+                col=col,
+                plot3D=plot3D,
+                Ncluster=Ncluster,
+                file=file,
+                dpi=dpi,
+                box=box
+            )
+        }
+        
+        MVP.Report(
+            MVP.return,
+            col=col,
+            box=box,
+            plot.type=c("c","m","q","d"),
+            file.output=TRUE,
+            file=file,
+            dpi=dpi,
+            threshold=threshold/m,
+            signal.cex=signal.cex,
+            outward=outward
+        )
+        
+        if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2) {
+            MVP.Report(
+                MVP.return,
+                col=col,
+                plot.type=c("m","q"),
+                multracks=TRUE,
+                outward=outward,
+                file.output=TRUE,
+                file=file,
+                dpi=dpi,
+                box=box,
+                threshold=threshold/m,
+                signal.cex=signal.cex
+            )
+        }
     }
-    MVP.Version(FALSE)
+    MVP.Version(start = FALSE, width = 60)
     return(MVP.return)
 }#end of MVP function

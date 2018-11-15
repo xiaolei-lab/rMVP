@@ -14,7 +14,7 @@
 
 
 
-MVP.Version <- function(start=TRUE, width=NULL) {
+MVP.Version <- function(start=TRUE, width=60) {
 ##############################################################################################
 # MVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
 # Designed by Lilin Yin, Haohao Zhang, and Xiaolei Liu
