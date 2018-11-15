@@ -412,25 +412,25 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
     
     # read geno ind list
-    geno.ind.file <- paste0(out, '.geno.ind')
-    if (file.exists(geno.ind.file)) {
+    geno.id.file <- paste0(out, '.geno.id')
+    if (file.exists(geno.id.file)) {
         # read from file
-        geno.ind <- read.table(geno.ind.file, stringsAsFactors = FALSE)
-        overlap.ind <- intersect(geno.ind[, 1], phe[, cols[1]])
+        geno.id <- read.table(geno.id.file, stringsAsFactors = FALSE)
+        overlap.ind <- intersect(geno.id[, 1], phe[, cols[1]])
         if (length(overlap.ind) == 0) {
             cat(paste0("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "..."), "\n")
-            cat(paste0("Genotype individuals: ", paste(geno.ind[1:5, 1], collapse = ", "), "..."), "\n")
+            cat(paste0("Genotype individuals: ", paste(geno.id[1:5, 1], collapse = ", "), "..."), "\n")
             stop("No common individuals between phenotype and genotype!")
         } else {
             cat(paste(length(overlap.ind), "common individuals between phenotype and genotype."), "\n")
         }
     } else {
         # use ind. name from phenotypefile
-        geno.ind <- phe[, cols[1]]
+        geno.id <- phe[, cols[1]]
     }
     
     # merge
-    pheno <- merge(geno.ind, phe[, cols],  by = 1, all.x = T)
+    pheno <- merge(geno.id, phe[, cols],  by = 1, all.x = T)
     
     # rename header
     colnames(pheno)[1] <- 'Taxa'
