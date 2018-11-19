@@ -36,24 +36,28 @@ m <- nrow(geno)
 if(priority=="speed")	geno <- as.matrix(geno)
 
 ys <- as.numeric(as.matrix(phe[,2]))
-if(is.null(K)){
+if (is.null(K)) {
     print("Calculating Kinship...")
     K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
-    if(file.output){
-	filebck <- paste("MVP.", colnames(phe)[2], memo, ".kin.bin", sep="")
-	filedes <- paste("MVP.", colnames(phe)[2], memo, ".kin.desc", sep="")
-	if(file.exists(filebck) & file.exists(filedes)){
-	Kin.backed <- attach.big.matrix(filedes)
-	}else{
-        Kin.backed<-big.matrix(nrow(K), ncol(K), type="double", backingfile=filebck,
-        descriptorfile=filedes)
-	}
+    if (file.output) {
+        filebck <- paste0("MVP.", colnames(phe)[2], memo, ".kin.bin")
+        filedes <- paste0("MVP.", colnames(phe)[2], memo, ".kin.desc")
+        if (file.exists(filebck)) file.remove(filebck)
+        if (file.exists(filedes)) file.remove(filedes)
+        Kin.backed <- big.matrix(
+            nrow = nrow(K),
+            ncol = ncol(K),
+            type = "double",
+            backingfile = filebck,
+            descriptorfile = filedes
+        )
         Kin.backed[, ] <- K[, ]
         flush(Kin.backed)
-        rm(list=c("Kin.backed"))
+        rm(list = c("Kin.backed"))
         gc()
     }
-}else{
+} else {
+    # convert K to base:matrix
     K <- K[]
 }
 

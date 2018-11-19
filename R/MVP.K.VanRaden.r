@@ -42,20 +42,25 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         gc()
         #check.r <- "checkpoint" %in% rownames(installed.packages())
         if(!is.null(weight)) M <- M * sqrt(as.vector(weight))
-        # if(r.open){
-            K <- 0.5 * crossprod(M)/SUM
-        # }else{
-        #     K <- 0.5 * crossprodcpp(M)/SUM
-        # }
+        K <- 0.5 * crossprod(M)/SUM
     },
     "memory" = {
-        if(!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
+        if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
         n <- ncol(M)
         m <- nrow(M)
-        bac <- paste("Z", memo, ".temp.bin", sep="")
-        des <- paste("Z", memo, ".temp.desc", sep="")
+        bac <- paste0("Z", memo, ".temp.bin")
+        des <- paste0("Z", memo, ".temp.desc")
+        if (file.exists(bac)) file.remove(bac)
+        if (file.exists(des)) file.remove(des)
         #options(bigmemory.typecast.warning=FALSE)
-        Z<-big.matrix(nrow=m, ncol=n, type="double", backingfile=bac, descriptorfile=des, init=0.1)
+        Z <- big.matrix(
+            nrow = m,
+            ncol = n,
+            type = "double",
+            backingfile = bac, 
+            descriptorfile = des,
+            init = 0.1
+        )
         Pi <- NULL
         estimate.memory <- function(dat, integer=FALSE, raw=FALSE){
             cells.per.gb <- 2^27  # size of double() resulting in ~1GB of memory use by R 2.15
@@ -115,7 +120,7 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         K <- 0.5 * big.crossprod(Z)/SUM
         rm(Z)
         gc()
-        unlink(c(paste("Z", memo, ".temp.bin", sep=""), paste("Z", memo, ".temp.desc", sep="")), recursive = TRUE)
+        unlink(c(paste0("Z", memo, ".temp.bin"), paste0("Z", memo, ".temp.desc")), recursive = TRUE)
     }
     )
     #print("K Preparation is Done!")

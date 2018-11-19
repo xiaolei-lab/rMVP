@@ -75,7 +75,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #setMKLthreads(1)
     #}
     
-    MVP.Version(TRUE, 60)
+    MVP.Version(start = TRUE, width = 60)
     if(nrow(phe) != ncol(geno))	stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
@@ -139,21 +139,25 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         nPC <- NULL
     }
     
-    if(!is.null(nPC)){
-        ipca <- MVP.PCA(M=geno, perc=perc, pcs.keep=nPC)$PCs
-        if(file.output){
-        filebck <- paste("MVP.", colnames(phe)[2], memo, ".pc.bin", sep="")
-        filedes <- paste("MVP.", colnames(phe)[2], memo, ".pc.desc", sep="")
-        if(file.exists(filebck) & file.exists(filedes)){
-            PC.backed <- attach.big.matrix(filedes)
-        }else{
-                    PC.backed<-big.matrix(nrow(ipca), ncol(ipca), type="double", backingfile=filebck,
-                descriptorfile=filedes)
-        }
+    if (!is.null(nPC)) {
+        ipca <- MVP.PCA(M = geno, perc = perc, pcs.keep = nPC)$PCs
+        if (file.output) {
+            filebck <- paste0("MVP.", colnames(phe)[2], memo, ".pc.bin")
+            filedes <- paste0("MVP.", colnames(phe)[2], memo, ".pc.desc")
+            
+            if (file.exists(filebck)) file.remove(filebck)
+            if (file.exists(filedes)) file.remove(filedes)
+            PC.backed <- big.matrix(
+                nrow = nrow(ipca), 
+                ncol = ncol(ipca), 
+                type = "double", 
+                backingfile = filebck,
+                descriptorfile = filedes
+            )
+            
             PC.backed[, ] <- ipca[, ]
             flush(PC.backed)
-            #print("Preparation for PC matrix is done!")
-            rm(list=c("PC.backed"))
+            rm(list = c("PC.backed"))
         }
         #CV for GLM
         if(glm.run){
