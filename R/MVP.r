@@ -244,7 +244,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(file.output){
         print("Visualization Start...")
         print("Phenotype distribution Plotting...")
-        MVP.Hist(phe=phe, file=file, col=col, dpi=dpi)
+        MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
         #plot3D <- class(try(library("rgl"),silent=TRUE)) != "try-error"
         plot3D <- TRUE
         if(!is.null(nPC)){

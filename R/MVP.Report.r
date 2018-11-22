@@ -1651,28 +1651,38 @@ MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red")
 }
 
 
-MVP.Hist <- function(
-phe,
-col = c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
-breakNum=15,
-file="pdf",
-dpi=300
-)
-{
+MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
+                     breakNum = 15, file.type = "pdf", dpi = 300) {
     options(warn = -1)
+    w <- 6
+    h <- 6
     phex <- phe
+    
     for (i in 2:ncol(phe)) {
+        # create file
         trait <- colnames(phe)[i]
+        name <- paste0("MVP.Phe_Distribution.", paste(trait, collapse = "."))
+        if (file.type == "jpg")	{ jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
+        if (file.type == "pdf")	{ pdf(paste0(name, ".pdf"), width = w, height = h) }
+        if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
+        
         phe    <- phe[!is.na(phe[, i]), ]
-		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
-		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".pdf",sep=""), width = 6,height=6)
-		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
-		Breaks <- seq(min(phe[, i], na.rm=TRUE), max(phe[, i], na.rm=TRUE), length=breakNum)
-		xx <- hist(phe[, i], plot=FALSE, breaks=Breaks,xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
+        Breaks <- seq(min(phe[, i], na.rm = T), max(phe[, i], na.rm = T), length = breakNum)
+        
+        # hist
+        xx <- hist(x = phe[, i], plot = F, breaks = Breaks, xlab = "", ylab = "Density", freq = F, 
+                   col = colorRampPalette(col)(breakNum), font = 2, font.lab = 2, 
+                   main = paste0("Distribution of ", trait))
+        
         maxY <- max(max(xx$density),  max(density(phe[, i])$y))
-		hist(phe[, i], breaks=Breaks,xlab="",ylab="Density", ylim=c(0, maxY), freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
+        
+        hist(x = phe[, i], breaks = Breaks, xlab = "", ylab = "Density", ylim = c(0, maxY), freq = F, 
+             col = colorRampPalette(col)(breakNum), font = 2, font.lab = 2, 
+             main = paste0("Distribution of ", trait))
+        
         lines(density(phe[, i]), lwd = 2)
         
+        # test normal distribution
         if (length(phe[, i]) <= 5000) {
             norm.p <- round(shapiro.test(phe[, i])$p, 4)
             test.method <- "Shapiro-Wilk"
@@ -1680,9 +1690,11 @@ dpi=300
             norm.p <- round(ks.test(phe[, i],"pnorm")$p, 4)
             test.method <- "Kolmogorov-Smirnov"
         }
-		text(xx$breaks[1], y=maxY*0.95, labels=paste("Mean: ", round(mean(phe[, i]), 2), sep=""), font=2, adj=0)
-		text(xx$breaks[1], y=maxY*0.9, labels=paste("Sd: ", round(sd(phe[, i]), 2), sep=""), font=2, adj=0)
-		text(xx$breaks[1], y=maxY*0.85, labels=paste(test.method, ": ", norm.p, sep=""), font=2, adj=0)
+        
+        # draw text
+        text(xx$breaks[1], y = maxY*0.95, labels = paste0("Mean: ", round(mean(phe[, i]), 2)), font = 2, adj = 0)
+        text(xx$breaks[1], y = maxY*0.9, labels = paste0("Sd: ", round(sd(phe[, i]), 2)), font = 2, adj = 0)
+        text(xx$breaks[1], y = maxY*0.85, labels = paste0(test.method, ": ", norm.p), font = 2, adj = 0)
         dev.off()
         phe <- phex
     }
