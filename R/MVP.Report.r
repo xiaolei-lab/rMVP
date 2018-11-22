@@ -50,123 +50,6 @@ MVP.Report <- function(
 		curve(sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=add)
 		curve(-sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
-	
-	Densitplot <- function(
-		map,
-		col=c("darkgreen", "yellow", "red"),
-		main="SNP Density",
-		bin=1e6,
-		band=3,
-		width=5,
-		legend.len=10,
-		legend.max=NULL,
-		legend.pt.cex=3,
-		legend.cex=1,
-		legend.y.intersp=1,
-		legend.x.intersp=1,
-		plot=TRUE
-	)
-	{
-		map <- as.matrix(map)
-		map <- map[!is.na(map[, 2]), ]
-		map <- map[!is.na(map[, 3]), ]
-		map <- map[map[, 2] != 0, ]
-		#map <- map[map[, 3] != 0, ]
-		options(warn = -1)
-		max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE)
-		if(is.infinite(max.chr))	max.chr <- 0
-		map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
-		if(length(map.xy.index) != 0){
-			chr.xy <- unique(map[map.xy.index, 2])
-			for(i in 1:length(chr.xy)){
-				map[map[, 2] == chr.xy[i], 2] <- max.chr + i
-			}
-		}
-		map <- map[order(as.numeric(map[, 2]), as.numeric(map[, 3])), ]
-		chr <- as.numeric(map[, 2])
-		pos <- as.numeric(map[, 3])
-		chr.num <- unique(chr)
-		chorm.maxlen <- max(pos)
-		if(plot)	plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
-		pos.x <- list()
-		col.index <- list()
-		maxbin.num <- NULL
-		for(i in 1 : length(chr.num)){
-			pos.x[[i]] <- pos[which(chr == chr.num[i])]
-			cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
-			if(cut.len <= 1){
-				col.index[[i]] = 1
-			}else{
-				cut.r <- cut(pos.x[[i]], cut.len, labels=FALSE)
-				eachbin.num <- table(cut.r)
-				maxbin.num <- c(maxbin.num, max(eachbin.num))
-				col.index[[i]] <- rep(eachbin.num, eachbin.num)
-			}
-		}
-		Maxbin.num <- max(maxbin.num)
-		maxbin.num <- Maxbin.num
-		if(!is.null(legend.max)){
-			maxbin.num <- legend.max
-		}
-		col=colorRampPalette(col)(maxbin.num)
-		col.seg=NULL
-		for(i in 1 : length(chr.num)){
-			if(plot)	polygon(c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])), 
-				c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
-				width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey", border="grey")
-			if(!is.null(legend.max)){
-				if(legend.max < Maxbin.num){
-					col.index[[i]][col.index[[i]] > legend.max] <- legend.max
-				}
-			}
-			col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
-			if(plot)	segments(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]], width/5 - band * (i - length(chr.num) - 1), 
-			col=col[round(col.index[[i]] * length(col) / maxbin.num)], lwd=1)
-		}
-		if(length(map.xy.index) != 0){
-			for(i in 1:length(chr.xy)){
-				chr.num[chr.num == max.chr + i] <- chr.xy[i]
-			}
-		}
-		chr.num <- rev(chr.num)
-		if(plot)	mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=0.6, line=0.2)
-		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=c(NA, paste(round((seq(0, chorm.maxlen, length=10))[-1] / 1e6, 0), "Mb", sep="")),
-			font=1, cex.axis=0.8, tck=0.01, lwd=2, padj=1.2)
-		# image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
-		# round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
-		# t(matrix(0 : maxbin.num)), col=c("white", rev(heat.colors(maxbin.num))), add=TRUE)
-		legend.y <- round(seq(0, maxbin.num, length=legend.len))
-		len <- legend.y[2]
-		legend.y <- seq(0, maxbin.num, len)
-		if(!is.null(legend.max)){
-			if(legend.max < Maxbin.num){
-				if(!maxbin.num %in% legend.y){
-					legend.y <- c(legend.y, paste(">=", maxbin.num, sep=""))
-					legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
-				}else{
-					legend.y[length(legend.y)] <- paste(">=", maxbin.num, sep="")
-					legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
-				}
-			}else{
-				if(!maxbin.num %in% legend.y){
-					legend.y <- c(legend.y, maxbin.num)
-				}
-				legend.y.col <- c(legend.y[-1])
-			}
-		}else{
-			if(!maxbin.num %in% legend.y){
-				legend.y <- c(legend.y, paste(">", max(legend.y), sep=""))
-				legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
-			}else{
-				legend.y.col <- c(legend.y[-1])
-			}
-		}
-		legend.y.col <- as.numeric(legend.y.col)
-		legend.col <- c("grey", col[round(legend.y.col * length(col) / maxbin.num)])
-		if(plot)	legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=legend.col,
-			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
-		if(!plot)	return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
-	}
 
 	if(class(MVP) == "list"){
 		MVP.res <- cbind(MVP$glm.results, MVP$mlm.results, MVP$farmcpu.results)
@@ -177,35 +60,30 @@ MVP.Report <- function(
 		MVP.res <- cbind(MVP$map, MVP.res)
 		Pmap <- MVP.res
 		colnames(Pmap)[-c(1:3)] <- Cnames
-	}else{
+	} else {
 		Pmap <- MVP
 	}
 	
-	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
+	if (sum(plot.type %in% "b") == 1) { plot.type = c("c","m","q","d") }
 
-	taxa=colnames(Pmap)[-c(1:3)]
-	if(!is.null(memo) && memo != "")	memo <- paste("_", memo, sep="")
-	if(length(taxa) == 0)	taxa <- "Index"
-	taxa <- paste(taxa, memo, sep="")
+	taxa = colnames(Pmap)[-c(1:3)]
+	if (!is.null(memo) && memo != "") { memo <- paste0("_", memo) }
+	if (length(taxa) == 0) { taxa <- "Index" }
+	taxa <- paste0(taxa, memo)
 
 	#SNP-Density plot
-	if("d" %in% plot.type){
-		print("SNP_Density Plotting...")
-		if(file.output){
-			if(file=="jpg")	jpeg(paste("SNP_Density.",paste(taxa,collapse="."),".jpg",sep=""), width = 9*dpi,height=7*dpi,res=dpi,quality = 100)
-			if(file=="pdf")	pdf(paste("SNP_Density.",paste(taxa,collapse="."),".pdf",sep=""), width = 9,height=7)
-			if(file=="tiff")	tiff(paste("SNP_Density.",paste(taxa,collapse="."),".tiff",sep=""), width = 9*dpi,height=7*dpi,res=dpi)
-			par(xpd=TRUE)
-		}else{
-			if(is.null(dev.list()))	dev.new(width = 9,height=7)
-			par(xpd=TRUE)
-		}
-
-		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, legend.max=bin.max, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
-		if(file.output)	dev.off()
+	if ("d" %in% plot.type) {
+	    MVP.Report.Density(Pmap = Pmap, 
+	                       taxa = taxa, 
+	                       col = col, 
+	                       bin.size = bin.size, 
+	                       bin.max = bin.max, 
+	                       dpi = dpi, 
+	                       file.type = file,
+	                       file.output = file.output)
 	}
 
-	if(length(plot.type) !=1 | (!"d" %in% plot.type)){
+	if (length(plot.type) != 1 | (!"d" %in% plot.type)) {
 	
 		#order Pmap by the name of SNP
 		#Pmap=Pmap[order(Pmap[,1]),]
@@ -374,7 +252,7 @@ MVP.Report <- function(
 	}
 	
 	#plot circle Manhattan
-	if("c" %in% plot.type){
+	if ("c" %in% plot.type) {
 		#print("Starting Circular-Manhattan plot!",quote=F)
 		if(file.output){
 			if(file=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
@@ -823,7 +701,7 @@ MVP.Report <- function(
 		#print("Circular-Manhattan has been finished!",quote=F)
 	}
 
-	if("m" %in% plot.type){
+	if ("m" %in% plot.type) {
 		if(multracks==FALSE){
 			#print("Starting Rectangular-Manhattan plot!",quote=F)
 			for(i in 1:R){
@@ -1336,7 +1214,7 @@ MVP.Report <- function(
 		}
 	}
 		
-	if("q" %in% plot.type){
+	if ("q" %in% plot.type) {
 		#print("Starting QQ-plot!",quote=F)
 		if(multracks){
 			if(file.output){
@@ -1586,42 +1464,229 @@ MVP.Report <- function(
 }
 
 
+Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP Density", bin = 1e6,
+                       band = 3, width = 5, legend.len = 10, legend.max = NULL, legend.pt.cex = 3,
+                       legend.cex = 1, legend.x.intersp = 1, legend.y.intersp = 1, plot = TRUE) {
+    options(warn = -1)
+    ## Step 1: preprocess map
+    # filter map
+    map <- as.matrix(map)
+    map <- map[!is.na(map[, 2]), ]
+    map <- map[!is.na(map[, 3]), ]
+    map <- map[map[, 2] != 0, ]
+
+    # get the number of chromosomes
+    max.chr <- max(as.numeric(map[, 2]), na.rm = T)
+    if (is.infinite(max.chr)) { max.chr <- 0 }
+    
+    # deal with x,y
+    map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0:max.chr))
+    if (length(map.xy.index) != 0) {
+        chr.xy <- unique(map[map.xy.index, 2])
+        for (i in 1:length(chr.xy)) {
+            map[map[, 2] == chr.xy[i], 2] <- max.chr + i
+        }
+    }
+    
+    # sort map
+    map <- map[order(as.numeric(map[, 2]), as.numeric(map[, 3])), ]
+    chr <- as.numeric(map[, 2])
+    pos <- as.numeric(map[, 3])
+    chr.num <- unique(chr)
+    chorm.maxlen <- max(pos)
+    
+    # Step 2: count SNP
+    pos.x      <- list()
+    col.index  <- list()
+    maxbin.num <- NULL
+    for (i in 1:length(chr.num)) {
+        pos.x[[i]] <- pos[which(chr == chr.num[i])]
+        cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
+        if (cut.len <= 1) {
+            col.index[[i]] = 1
+        } else {
+            cut.r          <- cut(pos.x[[i]], cut.len, labels = FALSE)
+            eachbin.num    <- table(cut.r)
+            maxbin.num     <- c(maxbin.num, max(eachbin.num))
+            col.index[[i]] <- rep(eachbin.num, eachbin.num)
+        }
+    }
+    Maxbin.num <- max(maxbin.num)
+    maxbin.num <- Maxbin.num
+    if (!is.null(legend.max)) {
+        maxbin.num <- legend.max
+    }
+    col = colorRampPalette(col)(maxbin.num)
+    col.seg = NULL
+    for (i in 1:length(chr.num)) {
+        if (!is.null(legend.max)) {
+            if (legend.max < Maxbin.num) {
+                col.index[[i]][col.index[[i]] > legend.max] <- legend.max
+            }
+        }
+        col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
+    }
+    if (length(map.xy.index) != 0) {
+        for (i in 1:length(chr.xy)) {
+            chr.num[chr.num == max.chr + i] <- chr.xy[i]
+        }
+    }
+    chr.num <- rev(chr.num)
+
+    # image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
+    # round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
+    # t(matrix(0 : maxbin.num)), col=c("white", rev(heat.colors(maxbin.num))), add=TRUE)
+    
+    ## Step 3: Deal with legend label and color.
+    len      <- round(seq(0, maxbin.num, length = legend.len))[2]
+    legend.y <- seq(0, maxbin.num, len)
+
+    if (!is.null(legend.max)) {
+        if (legend.max < Maxbin.num) {
+            if (!maxbin.num %in% legend.y) {
+                legend.y <- c(legend.y, paste0(">=", maxbin.num))
+            } else {
+                legend.y[length(legend.y)] <- paste0(">=", maxbin.num)
+            }
+            legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
+        } else {
+            if (!maxbin.num %in% legend.y) { 
+                legend.y <- c(legend.y, maxbin.num) 
+            }
+            legend.y.col <- c(legend.y[-1])
+        }
+    } else {
+        if (!maxbin.num %in% legend.y) {
+            legend.y     <- c(legend.y, paste0(">", max(legend.y)))
+            legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
+        } else {
+            legend.y.col <- c(legend.y[-1])
+        }
+    }
+    
+    legend.y.col <- as.numeric(legend.y.col)
+    legend.col   <- c("grey", col[round(legend.y.col * length(col) / maxbin.num)])
+    
+    ## Step 4: Plot or Return
+    if (plot) {
+        # draw a canvas
+        plot(NULL,
+             xlim = c(0, chorm.maxlen + chorm.maxlen/10),
+             ylim = c(0, length(chr.num) * band + band), 
+             main = main,
+             axes = FALSE,
+             xlab = "",
+             ylab = "",
+             xaxs = "i",
+             yaxs = "i")
+        
+        # draw each Chr
+        for (i in 1:length(chr.num)) {
+            # draw bg
+            polygon(x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
+                    y = c(-width/5 - band * (i - length(chr.num) - 1),
+                          width/5 - band * (i - length(chr.num) - 1),
+                          width/5 - band * (i - length(chr.num) - 1),
+                          -width/5 - band * (i - length(chr.num) - 1)),
+                    col = "grey",
+                    border = "grey")
+            # draw fg
+            segments(x0 = pos.x[[i]],
+                     y0 = -width/5 - band * (i - length(chr.num) - 1),
+                     x1 = pos.x[[i]],
+                     y1 = width/5 - band * (i - length(chr.num) - 1),
+                     col = col[round(col.index[[i]] * length(col) / maxbin.num)],
+                     lwd = 1)
+        }
+        # draw Chr label
+        mtext(at = seq(band, length(chr.num) * band, band), 
+              text = paste0("Chr", chr.num),
+              side = 2, las = 2, font = 1, cex = 0.6, line = 0.2)
+        
+        # draw physical distance ruler
+        axis(side = 3, 
+             at = seq(0, chorm.maxlen, length = 10), 
+             labels = c(NA, paste0(round((seq(0, chorm.maxlen, length = 10))[-1] / 1e6, 0), "Mb")),
+             font = 1, cex.axis = 0.8, tck = 0.01, lwd = 2, padj = 1.2)
+        
+        # draw legend
+        legend(x = (chorm.maxlen + chorm.maxlen/100),
+               y = (-width/2.5 - band * (length(chr.num) - length(chr.num) - 1)),
+               legend = legend.y,
+               col = legend.col,
+               pch = 15,
+               bty = "n",
+               cex = legend.cex,
+               pt.cex = legend.pt.cex,
+               xjust = 0,
+               yjust = 0,
+               x.intersp = legend.x.intersp,
+               y.intersp = legend.y.intersp,
+               title = "",
+               xpd = TRUE)
+    } else {
+        return(list(den.col = col.seg, legend.col = legend.col, legend.y = legend.y))
+    }
+}
+
+MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
+                               bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE) {
+    print("SNP_Density Plotting...")
+    w <- 9
+    h <- 7
+    if (file.output) {
+        name <- paste0("SNP_Density.", paste(taxa, collapse = "."))
+        if (file.type == "jpg")	{ jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
+        if (file.type == "pdf")	{ pdf(paste0(name, ".pdf"), width = w, height = h) }
+        if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
+        par(xpd = TRUE)
+    } else {
+        if (is.null(dev.list())) { dev.new(width = w, height = h) }
+        par(xpd = TRUE)
+    }
+    
+        Densitplot(map = Pmap[,c(1:3)], col = col, bin = bin.size, legend.max = bin.max, main = paste0("The number of SNPs within ", bin.size / 1e6, "Mb window size"))
+    
+    if (file.output) { dev.off() }
+}
+
+
 MVP.Hist <- function(
 phe,
-col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
+col = c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
 breakNum=15,
 file="pdf",
 dpi=300
 )
 {
-	options(warn = -1)
-	phex <- phe
-	for(i in 2: ncol(phe)){
-		trait <- colnames(phe)[i]
-		phe <- phe[!is.na(phe[, i]), ]
+    options(warn = -1)
+    phex <- phe
+    for (i in 2:ncol(phe)) {
+        trait <- colnames(phe)[i]
+        phe    <- phe[!is.na(phe[, i]), ]
 		if(file=="jpg")	jpeg(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".jpg",sep=""), width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
 		if(file=="pdf")	pdf(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".pdf",sep=""), width = 6,height=6)
 		if(file=="tiff")	tiff(paste("MVP.Phe_Distribution.",paste(trait,collapse="."),".tiff",sep=""), width = 6*dpi,height=6*dpi,res=dpi)
 		Breaks <- seq(min(phe[, i], na.rm=TRUE), max(phe[, i], na.rm=TRUE), length=breakNum)
 		xx <- hist(phe[, i], plot=FALSE, breaks=Breaks,xlab="",ylab="Density", freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
-		maxY <- max(max(xx$density),  max(density(phe[, i])$y))
+        maxY <- max(max(xx$density),  max(density(phe[, i])$y))
 		hist(phe[, i], breaks=Breaks,xlab="",ylab="Density", ylim=c(0, maxY), freq=FALSE, col=colorRampPalette(col)(breakNum), font=2, font.lab=2, main=paste("Distribution of ", trait, sep=""))
-	    lines(density(phe[, i]), lwd=2)
-	
-		if(length(phe[, i]) <= 5000){
-			norm.p <- round(shapiro.test(phe[, i])$p, 4)
-			test.method <- "Shapiro-Wilk"
-		}else{
-			norm.p <- round(ks.test(phe[, i],"pnorm")$p, 4)
-			test.method <- "Kolmogorov-Smirnov"
-		}
+        lines(density(phe[, i]), lwd = 2)
+        
+        if (length(phe[, i]) <= 5000) {
+            norm.p <- round(shapiro.test(phe[, i])$p, 4)
+            test.method <- "Shapiro-Wilk"
+        } else {
+            norm.p <- round(ks.test(phe[, i],"pnorm")$p, 4)
+            test.method <- "Kolmogorov-Smirnov"
+        }
 		text(xx$breaks[1], y=maxY*0.95, labels=paste("Mean: ", round(mean(phe[, i]), 2), sep=""), font=2, adj=0)
 		text(xx$breaks[1], y=maxY*0.9, labels=paste("Sd: ", round(sd(phe[, i]), 2), sep=""), font=2, adj=0)
 		text(xx$breaks[1], y=maxY*0.85, labels=paste(test.method, ": ", norm.p, sep=""), font=2, adj=0)
-	    dev.off()
-		phe <- phex
-	}
-	options(warn = 0)
+        dev.off()
+        phe <- phex
+    }
+    options(warn = 0)
 }
 
 MVP.PCAplot <- function(
