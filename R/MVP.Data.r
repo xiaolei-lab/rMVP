@@ -199,7 +199,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, s
     cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
 }
 
-MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', show_progress=T) {
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=2, show_progress=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -227,7 +227,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         dimnames = c(NULL, NULL)
     )
     if (priority == "speed") { maxLine <- -1 }
-    read_bfile(bfile, bigmat@address, maxLine, show_progress)
+    read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, show_progress = show_progress)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
