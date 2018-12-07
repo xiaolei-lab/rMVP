@@ -19,9 +19,7 @@
 #include <Rcpp.h>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/progress.hpp>
 #include <progress.hpp>
-#include <progress_bar.hpp>
 #include <fstream>
 
 using namespace std;
@@ -134,27 +132,19 @@ T vcf_marker_parser(string m, double NA_C) {
 }
 
 template <typename T>
-void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, int threads=2, bool show_progress=true) {
-    // openmp
-#ifdef _OPENMP
-    if(threads > 0) {
-        omp_set_num_threads( threads );
-        Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
-    }
-#endif
-    
+void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, int threads=0, bool verbose=true) {
     // define
     ifstream file(vcf_file);
     
+    omp_setup(threads, verbose);
     string line;
     vector<string> l;
     vector<char> markers;
     size_t m;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
-    
     // progress bar
-    Progress progress(pMat->nrow(), show_progress);
+    Progress progress(pMat->nrow(), verbose);
     
     // Skip Header
     string prefix("#CHROM");
@@ -181,7 +171,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
             back_inserter(markers),
             boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
         );
-#pragma omp parallel for
+        #pragma omp parallel for
         for (size_t i = 0; i < markers.size(); i++) {
             mat[i][m] = markers[i];
         }
@@ -191,18 +181,18 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
 }
 
 // [[Rcpp::export]]
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads=2, bool show_progress=true) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, threads, show_progress);
+        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, threads, verbose);
     case 2:
-        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, threads, show_progress);
+        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, threads, verbose);
     case 4:
-        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, threads, show_progress);
+        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, threads, verbose);
     case 8:
-        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, threads, show_progress);
+        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -290,7 +280,7 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
 }
 
 template <typename T>
-void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double NA_C, bool show_progress=true) {
+void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double NA_C, bool verbose=true) {
     // define
     ifstream file(hmp_file);
     
@@ -302,10 +292,7 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // progress bar
-    boost::progress_display * progress = NULL;
-    if(show_progress) {
-        progress = new boost::progress_display(pMat->nrow());
-    }
+    Progress progress(pMat->nrow(), verbose);
     
     // Skip Header
     string prefix("rs#");
@@ -341,25 +328,23 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
             mat[i][m] = markers[i];
         }
         m++;
-        if(show_progress) {
-            ++(*progress);
-        }
+        progress.increment();
     }
 }
 
 // [[Rcpp::export]]
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool show_progress=true) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hapmap_parser_genotype<char>(hmp_file, xpMat, NA_CHAR, show_progress);
+        return hapmap_parser_genotype<char>(hmp_file, xpMat, NA_CHAR, verbose);
     case 2:
-        return hapmap_parser_genotype<short>(hmp_file, xpMat, NA_SHORT, show_progress);
+        return hapmap_parser_genotype<short>(hmp_file, xpMat, NA_SHORT, verbose);
     case 4:
-        return hapmap_parser_genotype<int>(hmp_file, xpMat, NA_INTEGER, show_progress);
+        return hapmap_parser_genotype<int>(hmp_file, xpMat, NA_INTEGER, verbose);
     case 8:
-        return hapmap_parser_genotype<double>(hmp_file, xpMat, NA_REAL, show_progress);
+        return hapmap_parser_genotype<double>(hmp_file, xpMat, NA_REAL, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

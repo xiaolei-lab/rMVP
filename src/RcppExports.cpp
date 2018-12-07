@@ -18,15 +18,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // vcf_parser_genotype
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads, bool show_progress);
-RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP show_progressSEXP) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads, bool verbose);
+RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type vcf_file(vcf_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
-    vcf_parser_genotype(vcf_file, pBigMat, threads, show_progress);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    vcf_parser_genotype(vcf_file, pBigMat, threads, verbose);
     return R_NilValue;
 END_RCPP
 }
@@ -43,14 +43,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // hapmap_parser_genotype
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool show_progress);
-RcppExport SEXP _MVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP show_progressSEXP) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose);
+RcppExport SEXP _MVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type hmp_file(hmp_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
-    hapmap_parser_genotype(hmp_file, pBigMat, show_progress);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    hapmap_parser_genotype(hmp_file, pBigMat, verbose);
     return R_NilValue;
 END_RCPP
 }

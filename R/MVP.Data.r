@@ -171,7 +171,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 } # end of MVP.Data function
 
 
-MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, show_progress=T) {
+MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, vebose=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -181,7 +181,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, s
     
     # parser map
     cat("Reading file...\n")
-    m_res <- vcf_parser_map(vcf_file, out)
+    m_res <- vcf_parser_map(vcf_file = vcf_file, out = out)
     cat(paste0("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
     
     # parse genotype
@@ -194,12 +194,12 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', type.geno='char', threads=1, s
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    vcf_parser_genotype(vcf_file, bigmat@address, threads, show_progress)
+    vcf_parser_genotype(vcf_file = vcf_file, pBigMat = bigmat@address, threads = threads, vebose = vebose)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
+    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=2, show_progress=T) {
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, vebose=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -227,12 +227,12 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         dimnames = c(NULL, NULL)
     )
     if (priority == "speed") { maxLine <- -1 }
-    read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, show_progress = show_progress)
+    read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, vebose = vebose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', show_progress=T) {
+MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', vebose=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -255,12 +255,12 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', show_p
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    hapmap_parser_genotype(hapmap_file, bigmat@address, show_progress)
+    hapmap_parser_genotype(hapmap_file, bigmat@address, vebose)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
+    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=F, type.geno='char', auto_transpose=T, show_progress=T) {
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=F, type.geno='char', auto_transpose=T, vebose=T) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -346,10 +346,10 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     flush(bigmat)
     gc()
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2-t1), "\n")
+    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', show_progress=T) {
+MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', vebose=T) {
     t1 <- as.numeric(Sys.time())
     # write bed file
     write_bfile(bigmatrix@address, out)
@@ -389,7 +389,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', show
     bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
     write.table(bim, paste0(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
     t2 <- as.numeric(Sys.time())
-    cat("Done within", format_time(t2-t1), "\n")
+    cat("Done within", format_time(t2 - t1), "\n")
 }
 
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
