@@ -54,7 +54,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     
     // Get num of ind / marker
     n = ind.size();
-    
+
     // unsigned m = count(                 // 3-4s per 100Mb
     //     istream_iterator<char>(file),
     //     istream_iterator<char>(),
@@ -67,7 +67,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     while (getline(file, line)) {
         string tmp = line.substr(0, MAP_INFO_N);
         boost::split(l, tmp, boost::is_any_of("\t"));
-        
+
         // map
         if (l[2] == ".") {      // snp name missing
             l[2] = l[0] + '-' + l[1];
@@ -349,8 +349,8 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     
     vector<uint8_t> geno(n);
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    
-    ofstream fout(bed_file, ios::out | ios::binary);
+    FILE *fout;
+    fout = fopen(bed_file.c_str(), "wb");
     
     // progress bar
     boost::progress_display * progress = NULL;
@@ -360,7 +360,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
-    fout.write((char*)magic_bytes , 3);
+    fwrite((char*)magic_bytes, 1, 3, fout);
     
     // map
     std::map<T, int> code;
@@ -383,12 +383,12 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
             }
             geno[j] = p;
         }
-        fout.write((char*)geno.data(), geno.size());
+        fwrite((char*)geno.data(), 1, geno.size(), fout);
         if(show_progress) {
             ++(*progress);
         }
     }
-    fout.close();
+    fclose(fout);
     return;
 }
 
@@ -421,7 +421,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
 #ifdef _OPENMP
     if(threads > 0) {
         omp_set_num_threads( threads );
-        Rcerr << "Number of threads=" << omp_get_max_threads() << endl;
+        Rcerr << "Number of threads: " << omp_get_max_threads() << endl;
     }
 #endif
     
@@ -441,10 +441,11 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     code[0] = 2;
     
     // open file
-    ifstream fin(bed_file, ios::in | ios::binary);
-    fin.seekg (0, fin.end);
-    long length = fin.tellg();
-    fin.seekg (0, fin.beg);
+    FILE *fin;
+    fin = fopen(bed_file.c_str(), "rb");
+    fseek(fin, 0, SEEK_END);
+    long length = ftell(fin);
+    rewind(fin);
     
     // get buffer_size
     if (maxLine <= 0) {
@@ -461,13 +462,13 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // magic number of bfile
     buffer = new char [3];
-    fin.read(buffer, 3);
+    fread(buffer, 1, 3, fin);
     
     // loop file
-#pragma omp parallel for schedule(dynamic) 
+#pragma omp parallel for
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
-        fin.read(buffer, buffer_size);
+        fread(buffer, 1, buffer_size, fin);
         
         size_t r, c;
         // i: current block start, j: current bit.
@@ -483,7 +484,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         }
         progress.increment();
     }
-    fin.close();
+    fclose(fin);
     return;
 }
 
@@ -504,6 +505,8 @@ void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=2,
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
 }
+
+
 
 /*** R
 # setwd("~/code/MVP/src")
