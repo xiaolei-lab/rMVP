@@ -78,16 +78,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // read_bfile
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads, bool show_progress);
-RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP show_progressSEXP) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads, bool verbose);
+RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< long >::type maxLine(maxLineSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    Rcpp::traits::input_parameter< bool >::type show_progress(show_progressSEXP);
-    read_bfile(bed_file, pBigMat, maxLine, threads, show_progress);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    read_bfile(bed_file, pBigMat, maxLine, threads, verbose);
     return R_NilValue;
 END_RCPP
 }

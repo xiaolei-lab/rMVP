@@ -36,6 +36,30 @@ using namespace Rcpp;
 #include <bigmemory/MatrixAccessor.hpp>
 
 
+// *** Utility ***
+int omp_setup(int threads=0, bool verbose=true) {
+    int t = 1;
+#ifdef _OPENMP
+    if (threads == 0) {
+        t = omp_get_num_procs() - 1;
+        t = t > 0 ? t : 1;
+    } else if (threads > 0) {
+        t = threads;
+    }
+    omp_set_num_threads(t);
+    
+    if (verbose) {
+        Rcerr << "Number of threads: " << omp_get_max_threads() << endl;
+    }
+#else
+    if (verbose) {
+        Rcerr << "Number of threads: 1 (No OpneMP detected)" << endl;
+    }
+#endif
+    return t;
+}
+
+
 // ***** VCF *****
 
 // [[Rcpp::export]]
@@ -165,7 +189,6 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
         progress.increment();
     }
 }
-
 
 // [[Rcpp::export]]
 void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads=2, bool show_progress=true) {
@@ -395,7 +418,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     if(show_progress) {
         progress = new boost::progress_display(m);
     }
-    
+
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
     fwrite((char*)magic_bytes, 1, 3, fout);
@@ -449,21 +472,14 @@ void write_bfile(SEXP pBigMat, std::string bed_file, bool show_progress=true) {
 }
 
 template <typename T>
-void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=2, bool show_progress=true) {
+void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // check input
     string ending = ".bed";
     if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
         bed_file += ending;
     
-    // openmp
-#ifdef _OPENMP
-    if(threads > 0) {
-        omp_set_num_threads( threads );
-        Rcerr << "Number of threads: " << omp_get_max_threads() << endl;
-    }
-#endif
-    
     // define
+    omp_setup(threads);
     long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
         n++; 
@@ -486,24 +502,19 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     rewind(fin);
     
     // get buffer_size
-    if (maxLine <= 0) {
-        buffer_size = length - 3;
-        show_progress = false;
-    } else {    // memory
-        buffer_size = maxLine * n;
-    }
+    buffer_size = maxLine > 0 ? (maxLine * n) : (length - 3);
     
     // progress bar
     int n_block = (length - 3) / buffer_size;
     if ((length - 3) % buffer_size != 0) { n_block++; }
-    Progress progress(n_block, show_progress);
+    Progress progress(n_block, verbose);
     
     // magic number of bfile
     buffer = new char [3];
     fread(buffer, 1, 3, fin);
     
     // loop file
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fread(buffer, 1, buffer_size, fin);
@@ -527,18 +538,18 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
 }
 
 // [[Rcpp::export]]
-void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=2, bool show_progress=true) {
+void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return read_bfile<char>(bed_file, xpMat, maxLine, NA_CHAR, threads, show_progress);
+        return read_bfile<char>(bed_file, xpMat, maxLine, NA_CHAR, threads, verbose);
     case 2:
-        return read_bfile<short>(bed_file, xpMat, maxLine, NA_SHORT, threads, show_progress);
+        return read_bfile<short>(bed_file, xpMat, maxLine, NA_SHORT, threads, verbose);
     case 4:
-        return read_bfile<int>(bed_file, xpMat, maxLine, NA_INTEGER, threads, show_progress);
+        return read_bfile<int>(bed_file, xpMat, maxLine, NA_INTEGER, threads, verbose);
     case 8:
-        return read_bfile<double>(bed_file, xpMat, maxLine, NA_REAL, threads, show_progress);
+        return read_bfile<double>(bed_file, xpMat, maxLine, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -559,12 +570,11 @@ library(bigmemory)
 
 c <- big.matrix(3093, 279)
 read_bfile('demo.data/bed/plink.bed', c@address, -1)
-c[1, 1:20]
 library(plink2R)
 a <- read_plink('demo.data/bed/plink')
-b <- t(as.matrix(a$bed))
-c <- as.matrix(c)
-b[1, 1:10]
+b <- unname(t(as.matrix(a$bed)))
+b[1, 1:20]
 c[1, 1:20]
+write_bfile(c@address, 'test.bed')
 # numeric_scan('/Users/hyacz/code/MVP/demo.data/numeric/mvp.hmp.Numeric.txt')
 */
