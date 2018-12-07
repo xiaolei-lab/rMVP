@@ -394,7 +394,7 @@ List numeric_scan(std::string num_file) {
 // ***** BFILE *****
 
 template <typename T>
-void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool show_progress=true) {
+void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int threads=0, bool verbose=true) {
     // check input
     string ending = ".bed";
     if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending)) {
@@ -403,6 +403,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     
     // define
     T c;
+    omp_setup(threads, verbose);
     long m = pMat->nrow();
     long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
@@ -414,11 +415,8 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     fout = fopen(bed_file.c_str(), "wb");
     
     // progress bar
-    boost::progress_display * progress = NULL;
-    if(show_progress) {
-        progress = new boost::progress_display(m);
-    }
-
+    Progress progress(n, verbose);
+    
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
     fwrite((char*)magic_bytes, 1, 3, fout);
@@ -432,6 +430,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
     
     // write bfile
     for (size_t i = 0; i < m; i++) {
+    #pragma omp parallel for
         for (size_t j = 0; j < n; j++) {
             uint8_t p = 0;
             for (size_t x = 0; x < 4 && (4 * j + x) < pMat->ncol(); x++) {
@@ -445,27 +444,25 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool s
             geno[j] = p;
         }
         fwrite((char*)geno.data(), 1, geno.size(), fout);
-        if(show_progress) {
-            ++(*progress);
-        }
+        progress.increment();
     }
     fclose(fout);
     return;
 }
 
 // [[Rcpp::export]]
-void write_bfile(SEXP pBigMat, std::string bed_file, bool show_progress=true) {
+void write_bfile(SEXP pBigMat, std::string bed_file, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return write_bfile<char>(xpMat, bed_file, NA_CHAR, show_progress);
+        return write_bfile<char>(xpMat, bed_file, NA_CHAR, threads, verbose);
     case 2:
-        return write_bfile<short>(xpMat, bed_file, NA_SHORT, show_progress);
+        return write_bfile<short>(xpMat, bed_file, NA_SHORT, threads, verbose);
     case 4:
-        return write_bfile<int>(xpMat, bed_file, NA_INTEGER, show_progress);
+        return write_bfile<int>(xpMat, bed_file, NA_INTEGER, threads, verbose);
     case 8:
-        return write_bfile<double>(xpMat, bed_file, NA_REAL, show_progress);
+        return write_bfile<double>(xpMat, bed_file, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

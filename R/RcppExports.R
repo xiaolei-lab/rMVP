@@ -21,8 +21,8 @@ numeric_scan <- function(num_file) {
     .Call(`_MVP_numeric_scan`, num_file)
 }
 
-write_bfile <- function(pBigMat, bed_file, show_progress = TRUE) {
-    invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file, show_progress))
+write_bfile <- function(pBigMat, bed_file, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_MVP_write_bfile`, pBigMat, bed_file, threads, verbose))
 }
 
 read_bfile <- function(bed_file, pBigMat, maxLine, threads = 0L, verbose = TRUE) {
