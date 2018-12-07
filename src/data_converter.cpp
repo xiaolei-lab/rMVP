@@ -39,21 +39,26 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     
     // Skip Header
     string prefix("#CHROM");
-    while (getline(file, line)) {
-        if (!line.compare(0, prefix.size(), prefix)) { break; }
+    bool have_header = false;
+    while (file) {
+        getline(file, line);
+        if (!line.compare(0, prefix.size(), prefix)) {
+            have_header = true;
+            break; 
+        }
+    }
+    if (!have_header) {
+        Rcpp::stop("ERROR: Wrong VCF file, no line begin with \"#CHROM\".");
     }
     
-    // Get inds
+    // Write inds to file.
     boost::split(ind, line, boost::is_any_of("\t"));
     vector<string>(ind.begin() + 9, ind.end()).swap(ind);   // delete first 9 columns
     for (int i = 0; i < ind.size(); i++) {
         indfile << ind[i] << endl;
     }
-    indfile.close();
-    
-    
-    // Get num of ind / marker
     n = ind.size();
+    indfile.close();
 
     // unsigned m = count(                 // 3-4s per 100Mb
     //     istream_iterator<char>(file),
@@ -61,14 +66,13 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     //     '\n');
     // file.seekg(pos);
     
-    // Map
+    // Write inds to file.
     map << "SNP\tCHROM\tPOS"<< endl;
     m = 0;
     while (getline(file, line)) {
         string tmp = line.substr(0, MAP_INFO_N);
         boost::split(l, tmp, boost::is_any_of("\t"));
 
-        // map
         if (l[2] == ".") {      // snp name missing
             l[2] = l[0] + '-' + l[1];
         }
@@ -116,8 +120,16 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
     
     // Skip Header
     string prefix("#CHROM");
-    while (getline(file, line)) {
-        if (!line.compare(0, prefix.size(), prefix)) { break; }
+    bool have_header = false;
+    while (file) {
+        getline(file, line);
+        if (!line.compare(0, prefix.size(), prefix)) {
+            have_header = true;
+            break; 
+        }
+    }
+    if (!have_header) {
+        Rcpp::stop("ERROR: Wrong VCF file, no line begin with \"#CHROM\".");
     }
     
     // parser genotype
@@ -175,35 +187,39 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     size_t n;
     size_t m;
     
-    for (int i = 0; i < hmp_file.size(); i++) {
+    for (int i = 0; i < hmp_file.size(); i++) { // TODO(haohao): Support mulit hmp file.
         ifstream file(hmp_file(i));
         
         // Skip Header
         string prefix("rs#");
-        while (true) {
+        bool have_header = false;
+        while (file) {
             getline(file, line);
-            if (!line.compare(0, prefix.size(), prefix)) { break; }
+            if (!line.compare(0, prefix.size(), prefix)) {
+                have_header = true;
+                break; 
+            }
+        }
+        if (!have_header) {
+            Rcpp::stop("ERROR: Wrong HAPMAP file, no line begin with \"rs#\".");
         }
         
-        // Get inds
+        // Write inds to file.
         boost::split(ind, line, boost::is_any_of("\t"));
         vector<string>(ind.begin() + 11, ind.end()).swap(ind);   // delete first 11 columns
         for (int i = 0; i < ind.size(); i++) {
             indfile << ind[i] << endl;
         }
+        n = ind.size();
         indfile.close();
         
-        // Get num of ind / marker
-        n = ind.size();
-        
-        // Map
+        // Write SNPs to map file.
         map << "SNP\tCHROM\tPOS"<< endl;
         m = 0;
         while (getline(file, line)) {
             string tmp = line.substr(0, MAP_INFO_N);
             boost::split(l, tmp, boost::is_any_of("\t"));
             
-            // map
             if (l[0] == ".") {      // snp name missing
                 l[0] = l[2] + '-' + l[3];
             }
@@ -256,9 +272,17 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
     
     // Skip Header
     string prefix("rs#");
-    while (true) {
+    bool have_header = false;
+    while (file) {
         getline(file, line);
-        if (!line.compare(0, prefix.size(), prefix)) { break; }
+        if (!line.compare(0, prefix.size(), prefix)) {
+            have_header = true;
+            break; 
+        }
+    }
+
+    if (!have_header) {
+        Rcpp::stop("ERROR: Wrong HAPMAP file, no line begin with \"rs#\".");
     }
     
     // parser genotype
