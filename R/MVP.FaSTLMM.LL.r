@@ -87,7 +87,7 @@
         beta4<-beta4/delta
         
         #######get final beta
-        zw1 <- geninv(beta1+beta2)
+        zw1 <- MASS::ginv(beta1+beta2)
         #zw1 <- try(solve(beta1+beta2))
         #if(inherits(zw1, "try-error")){
         #zw1 <- ginv(beta1+beta2)
