@@ -132,7 +132,7 @@ T vcf_marker_parser(string m, double NA_C) {
 }
 
 template <typename T>
-void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C, int threads=0, bool verbose=true) {
+void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // define
     ifstream file(vcf_file);
     
@@ -153,7 +153,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
         getline(file, line);
         if (!line.compare(0, prefix.size(), prefix)) {
             have_header = true;
-            break; 
+            break;
         }
     }
     if (!have_header) {
@@ -162,37 +162,47 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, double NA_C
     
     // parser genotype
     m = 0;
-    while (getline(file, line)) {
-        boost::split(l, line, boost::is_any_of("\t"));
-        vector<string>(l.begin() + 9, l.end()).swap(l);
-        markers.clear();
-        transform(
-            l.begin(), l.end(), 
-            back_inserter(markers),
-            boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
-        );
-        #pragma omp parallel for
-        for (size_t i = 0; i < markers.size(); i++) {
-            mat[i][m] = markers[i];
+    vector<string> buffer;
+    while (file) {
+        buffer.clear();
+        for (int i = 0; file && (maxLine <= 0 || i < maxLine); i++) {
+            getline(file, line);
+            if (line.length() > 1) {    // Handling the blank line at the end of the file.
+                buffer.push_back(line);
+            }
         }
-        m++;
-        progress.increment();
+        #pragma omp parallel for private(l, markers)
+        for (int i = 0; i < buffer.size(); i++) {
+            boost::split(l, buffer[i], boost::is_any_of("\t"));
+            vector<string>(l.begin() + 9, l.end()).swap(l);
+            markers.clear();
+            transform(
+                l.begin(), l.end(), 
+                back_inserter(markers),
+                boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
+            );
+            for (int j = 0; j < markers.size(); j++) {
+                mat[j][m + i] = markers[j];
+            }
+            progress.increment();
+        }
+        m += buffer.size();
     }
 }
 
 // [[Rcpp::export]]
-void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, int threads=0, bool verbose=true) {
+void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return vcf_parser_genotype<char>(vcf_file, xpMat, NA_CHAR, threads, verbose);
+        return vcf_parser_genotype<char>(vcf_file, xpMat, maxLine, NA_CHAR, threads, verbose);
     case 2:
-        return vcf_parser_genotype<short>(vcf_file, xpMat, NA_SHORT, threads, verbose);
+        return vcf_parser_genotype<short>(vcf_file, xpMat, maxLine, NA_SHORT, threads, verbose);
     case 4:
-        return vcf_parser_genotype<int>(vcf_file, xpMat, NA_INTEGER, threads, verbose);
+        return vcf_parser_genotype<int>(vcf_file, xpMat, maxLine, NA_INTEGER, threads, verbose);
     case 8:
-        return vcf_parser_genotype<double>(vcf_file, xpMat, NA_REAL, threads, verbose);
+        return vcf_parser_genotype<double>(vcf_file, xpMat, maxLine, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

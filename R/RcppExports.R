@@ -5,8 +5,8 @@ vcf_parser_map <- function(vcf_file, out) {
     .Call(`_MVP_vcf_parser_map`, vcf_file, out)
 }
 
-vcf_parser_genotype <- function(vcf_file, pBigMat, threads = 0L, verbose = TRUE) {
-    invisible(.Call(`_MVP_vcf_parser_genotype`, vcf_file, pBigMat, threads, verbose))
+vcf_parser_genotype <- function(vcf_file, pBigMat, maxLine, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_MVP_vcf_parser_genotype`, vcf_file, pBigMat, maxLine, threads, verbose))
 }
 
 hapmap_parser_map <- function(hmp_file, out) {
