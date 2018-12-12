@@ -26,9 +26,9 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     
     n <- ncol(geno)
     m <- nrow(geno)
-	
-	if(priority=="speed")	geno <- as.matrix(geno)
-	
+    
+    if(priority=="speed")	geno <- as.matrix(geno)
+    
     ys <- as.numeric(as.matrix(phe[,2]))
     
     if(is.null(CV)){
@@ -52,7 +52,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
 
     #parallel function for GLM model
     eff.glm <- function(i){
-		if(bar)	print.f(i)
+        if(bar)	print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
@@ -90,32 +90,32 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     }
     
     if(cpu == 1){
-	    	math.cpu <- try(getMKLthreads(), silent=TRUE)
-	    	mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
+            math.cpu <- try(getMKLthreads(), silent=TRUE)
+            mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
                 try(setMKLthreads(mkl.cpu), silent=TRUE)
-		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.glm)
-	try(setMKLthreads(math.cpu), silent=TRUE)
+    try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
             if(wind){
-				print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+                print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
                 cl <- makeCluster(getOption("cl.cores", cpu))
                 clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
                 Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
                 results <- parLapply(cl, 1:m, eff.glm)
                 stopCluster(cl)
             }else{
-		tmpf.name <- tempfile()
-		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
-		writeBin(0, tmpf)
-		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+        tmpf.name <- tempfile()
+        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+        writeBin(0, tmpf)
+        print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
                 R.ver <- Sys.info()[['sysname']]
                 if(R.ver == 'Linux') {
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
                     try(setMKLthreads(1), silent=TRUE)
                 }
                 results <- mclapply(1:m, eff.glm, mc.cores=cpu)
-		close(tmpf); unlink(tmpf.name); cat('\n');
+        close(tmpf); unlink(tmpf.name); cat('\n');
                 if(R.ver == 'Linux') {
                     try(setMKLthreads(math.cpu), silent=TRUE)
                 }

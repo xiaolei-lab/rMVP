@@ -70,7 +70,7 @@ if(is.null(CV)){
 #number of fixed effects
 nf <- ncol(X0) + 1
     if(is.null(REML)){
-	print("Variance components...")   
+    print("Variance components...")   
         if(vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if(vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
     }
@@ -99,7 +99,7 @@ nf <- ncol(X0) + 1
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
-		if(bar)	print.f(i)
+        if(bar)	print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
@@ -132,37 +132,37 @@ nf <- ncol(X0) + 1
     }
     
     #Paralleled MLM
-	if(cpu == 1){
-		math.cpu <- try(getMKLthreads(), silent=TRUE)
-	    	mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
+    if(cpu == 1){
+        math.cpu <- try(getMKLthreads(), silent=TRUE)
+            mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
                 try(setMKLthreads(mkl.cpu), silent=TRUE)
-		print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.mlm.parallel)
-	try(setMKLthreads(math.cpu), silent=TRUE)
+    try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
         if(wind){
-			print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory),library(rfunctions)))
             results <- parLapply(cl, 1:m, eff.mlm.parallel)
             stopCluster(cl)
         }else{
-		tmpf.name <- tempfile()
-		tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
-		writeBin(0, tmpf)
-		print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            	R.ver <- Sys.info()[['sysname']]
-            	if(R.ver == 'Linux') {
-                	math.cpu <- try(getMKLthreads(), silent=TRUE)
-               	 try(setMKLthreads(1), silent=TRUE)
-            	}
-            	results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
-            	if(R.ver == 'Linux') {
-                	try(setMKLthreads(math.cpu), silent=TRUE)
-				#try(setMKLthreads(1), silent=TRUE)
-           	 }
-		close(tmpf); unlink(tmpf.name); cat('\n');
+        tmpf.name <- tempfile()
+        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+        writeBin(0, tmpf)
+        print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+                R.ver <- Sys.info()[['sysname']]
+                if(R.ver == 'Linux') {
+                    math.cpu <- try(getMKLthreads(), silent=TRUE)
+                    try(setMKLthreads(1), silent=TRUE)
+                }
+                results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
+                if(R.ver == 'Linux') {
+                    try(setMKLthreads(math.cpu), silent=TRUE)
+                #try(setMKLthreads(1), silent=TRUE)
+                }
+        close(tmpf); unlink(tmpf.name); cat('\n');
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
