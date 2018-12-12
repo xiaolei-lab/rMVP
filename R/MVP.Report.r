@@ -51,7 +51,7 @@ MVP.Report <- function(
 		curve(-sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
 
-	if(class(MVP) == "list"){
+	if (is(MVP, "list")) {
 		MVP.res <- cbind(MVP$glm.results, MVP$mlm.results, MVP$farmcpu.results)
 		Cnames <- colnames(MVP.res)
 		Cnames <- Cnames[seq(2, ncol(MVP.res), 2)]
