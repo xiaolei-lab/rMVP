@@ -1,5 +1,5 @@
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = F), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 )
 {
@@ -83,17 +83,17 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(!is.null(CV.GLM)){
         CV.GLM <- as.matrix(CV.GLM)
     if(nrow(CV.GLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
-        na.index <- c(na.index, which(is.na(CV.GLM), arr.ind=T)[, 1])
+        na.index <- c(na.index, which(is.na(CV.GLM), arr.ind=TRUE)[, 1])
     }
     if(!is.null(CV.MLM)){
         CV.MLM <- as.matrix(CV.MLM)
         if(nrow(CV.MLM) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
-       na.index <- c(na.index, which(is.na(CV.MLM), arr.ind=T)[, 1])
+       na.index <- c(na.index, which(is.na(CV.MLM), arr.ind=TRUE)[, 1])
     }
     if(!is.null(CV.FarmCPU)){
         CV.FarmCPU <- as.matrix(CV.FarmCPU)
         if(nrow(CV.FarmCPU) != ncol(geno))	stop("The number of individuals in covariates and genotype doesn't match!")
-        na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind=T)[, 1])
+        na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind=TRUE)[, 1])
     }
     na.index <- unique(na.index)
     
@@ -225,12 +225,12 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         i=1
             for(i in 1:permutation.rep){
             index = 1:nrow(phe)
-            index.shuffle = sample(index,length(index),replace=F)
+            index.shuffle = sample(index,length(index),replace=FALSE)
             myY.shuffle = phe
             myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
             #GWAS using t.test...
             myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, cpu=ncpus)
-            pvalue = min(myPermutation[,2],na.rm=T)
+            pvalue = min(myPermutation[,2],na.rm=TRUE)
             if(i==1){
                     pvalue.final=pvalue
                }else{

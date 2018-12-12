@@ -253,7 +253,7 @@ MVP.Report <- function(
 	
 	#plot circle Manhattan
 	if ("c" %in% plot.type) {
-		#print("Starting Circular-Manhattan plot!",quote=F)
+		#print("Starting Circular-Manhattan plot!",quote=FALSE)
 		if(file.output){
 			if(file=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
 			if(file=="pdf")	pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 10,height=10)
@@ -266,9 +266,9 @@ MVP.Report <- function(
 		par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
 		RR <- r+H*R+cir.band*R
 		if(cir.density){
-			plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
+		    plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
 		}else{
-			plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
+		    plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
 		}
 		if(!is.null(signal.line)){
 			if(!is.null(signal.line.index)){
@@ -698,12 +698,12 @@ MVP.Report <- function(
 			}
 		}
 		if(file.output) dev.off()
-		#print("Circular-Manhattan has been finished!",quote=F)
+		#print("Circular-Manhattan has been finished!",quote=FALSE)
 	}
 
 	if ("m" %in% plot.type) {
 		if(multracks==FALSE){
-			#print("Starting Rectangular-Manhattan plot!",quote=F)
+			#print("Starting Rectangular-Manhattan plot!",quote=FALSE)
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
@@ -756,28 +756,28 @@ MVP.Report <- function(
 						}
 						if(Max<=1){
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+							    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}
 						}else{
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+							    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
+							    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}
 						}
 					}else{
 						Max <- max(ylim)
 						if(cir.density){
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, max(ylim)),ylab=ylab,
+						    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, max(ylim)),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}else{
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
+						    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}
 					}
@@ -894,10 +894,10 @@ MVP.Report <- function(
 				#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min(threshold)/max(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 				if(file.output)  dev.off()
 			}
-			#print("Rectangular-Manhattan has been finished!",quote=F)
+			#print("Rectangular-Manhattan has been finished!",quote=FALSE)
 		}else{
-			#print("Starting Rectangular-Manhattan plot!",quote=F)
-			#print("Plotting in multiple tracks!",quote=F)
+			#print("Starting Rectangular-Manhattan plot!",quote=FALSE)
+			#print("Plotting in multiple tracks!",quote=FALSE)
 			if(file.output){
 				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
@@ -949,10 +949,10 @@ MVP.Report <- function(
 					}
 					xn <- ifelse(R == 1, R, R * 2/3)
 					if(Max<=1){
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+					    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+1),ylab=ylab,
+					    plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(0,Max+1),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}
 				}else{
@@ -1099,28 +1099,28 @@ MVP.Report <- function(
 				}
 				if(Max<=1){
 					if(cir.density){
-						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+					    plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
 					}else{
-						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+					    plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot")
 					}
 				}else{
 					if(cir.density){
-						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+					    plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 					}else{
-						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
+					    plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(0,Max+1),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 					}
 				}
 			}else{
 				Max <- max(ylim)
 				if(cir.density){
-					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+				    plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
 						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 				}else{
-					plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
+				    plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 				}
 			}
@@ -1215,7 +1215,7 @@ MVP.Report <- function(
 	}
 		
 	if ("q" %in% plot.type) {
-		#print("Starting QQ-plot!",quote=F)
+		#print("Starting QQ-plot!",quote=FALSE)
 		if(multracks){
 			if(file.output){
 				if(file=="jpg")	jpeg(paste("Multracks.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = R*2.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
@@ -1476,7 +1476,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     map <- map[map[, 2] != 0, ]
 
     # get the number of chromosomes
-    max.chr <- max(as.numeric(map[, 2]), na.rm = T)
+    max.chr <- max(as.numeric(map[, 2]), na.rm = TRUE)
     if (is.infinite(max.chr)) { max.chr <- 0 }
     
     # deal with x,y
@@ -1571,13 +1571,13 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     if (plot) {
         # draw a canvas
         plot(NULL,
-             xlim = c(0, chorm.maxlen + chorm.maxlen/10),
-             ylim = c(0, length(chr.num) * band + band), 
-             main = main,
-             axes = FALSE,
-             xlab = "",
-             ylab = "",
-             xaxs = "i",
+            xlim = c(0, chorm.maxlen + chorm.maxlen / 10),
+            ylim = c(0, length(chr.num) * band + band),
+            main = main,
+            axes = FALSE,
+            xlab = "",
+            ylab = "",
+            xaxs = "i",
              yaxs = "i")
         
         # draw each Chr
@@ -1586,43 +1586,43 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
             polygon(x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
                     y = c(-width/5 - band * (i - length(chr.num) - 1),
                           width/5 - band * (i - length(chr.num) - 1),
-                          width/5 - band * (i - length(chr.num) - 1),
+                    width / 5 - band * (i - length(chr.num) - 1),
                           -width/5 - band * (i - length(chr.num) - 1)),
-                    col = "grey",
+                col = "grey",
                     border = "grey")
             # draw fg
             segments(x0 = pos.x[[i]],
-                     y0 = -width/5 - band * (i - length(chr.num) - 1),
-                     x1 = pos.x[[i]],
-                     y1 = width/5 - band * (i - length(chr.num) - 1),
-                     col = col[round(col.index[[i]] * length(col) / maxbin.num)],
+                y0 = -width / 5 - band * (i - length(chr.num) - 1),
+                x1 = pos.x[[i]],
+                y1 = width / 5 - band * (i - length(chr.num) - 1),
+                col = col[round(col.index[[i]] * length(col) / maxbin.num)],
                      lwd = 1)
         }
         # draw Chr label
         mtext(at = seq(band, length(chr.num) * band, band), 
-              text = paste0("Chr", chr.num),
+            text = paste0("Chr", chr.num),
               side = 2, las = 2, font = 1, cex = 0.6, line = 0.2)
         
         # draw physical distance ruler
         axis(side = 3, 
-             at = seq(0, chorm.maxlen, length = 10), 
+            at = seq(0, chorm.maxlen, length = 10),
              labels = c(NA, paste0(round((seq(0, chorm.maxlen, length = 10))[-1] / 1e6, 0), "Mb")),
              font = 1, cex.axis = 0.8, tck = 0.01, lwd = 2, padj = 1.2)
         
         # draw legend
         legend(x = (chorm.maxlen + chorm.maxlen/100),
-               y = (-width/2.5 - band * (length(chr.num) - length(chr.num) - 1)),
-               legend = legend.y,
-               col = legend.col,
-               pch = 15,
-               bty = "n",
-               cex = legend.cex,
-               pt.cex = legend.pt.cex,
-               xjust = 0,
-               yjust = 0,
-               x.intersp = legend.x.intersp,
-               y.intersp = legend.y.intersp,
-               title = "",
+            y = (-width / 2.5 - band * (length(chr.num) - length(chr.num) - 1)),
+            legend = legend.y,
+            col = legend.col,
+            pch = 15,
+            bty = "n",
+            cex = legend.cex,
+            pt.cex = legend.pt.cex,
+            xjust = 0,
+            yjust = 0,
+            x.intersp = legend.x.intersp,
+            y.intersp = legend.y.intersp,
+            title = "",
                xpd = TRUE)
     } else {
         return(list(den.col = col.seg, legend.col = legend.col, legend.y = legend.y))
@@ -1650,7 +1650,7 @@ MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red")
     if (file.output) { dev.off() }
 }
 
-
+        
 MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
                      breakNum = 15, file.type = "pdf", dpi = 300) {
     options(warn = -1)
@@ -1661,13 +1661,13 @@ MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgo
     for (i in 2:ncol(phe)) {
         # create file
         trait <- colnames(phe)[i]
-        name <- paste0("MVP.Phe_Distribution.", paste(trait, collapse = "."))
+        name  <- paste0("MVP.Phe_Distribution.", paste(trait, collapse = "."))
         if (file.type == "jpg")	{ jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
         if (file.type == "pdf")	{ pdf(paste0(name, ".pdf"), width = w, height = h) }
         if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
         
         phe    <- phe[!is.na(phe[, i]), ]
-        Breaks <- seq(min(phe[, i], na.rm = T), max(phe[, i], na.rm = T), length = breakNum)
+        Breaks <- seq(min(phe[, i], na.rm = TRUE), max(phe[, i], na.rm = TRUE), length = breakNum)
         
         # hist
         xx <- hist(x = phe[, i], plot = F, breaks = Breaks, xlab = "", ylab = "Density", freq = F, 
@@ -1703,15 +1703,15 @@ MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgo
 
 MVP.PCAplot <- function(
 PCA,
-col=NULL,
-pch=NULL,
-class=NULL,
-legend.pos="topright",
-Ncluster=3,
-plot3D=TRUE,
-file="pdf",
-dpi=300,
-box=FALSE
+                        col = NULL,
+                        pch = NULL,
+                        class = NULL,
+                        legend.pos = "topright",
+                        Ncluster = 3,
+                        plot3D = TRUE,
+                        file = "pdf",
+                        dpi = 300,
+                        box = FALSE
 )
 {
 	if(!is.null(class)){if(length(class) != nrow(PCA)) stop("the length of 'class' differs from the row of 'PCA'");	Ncluster <- length(unique(class))}

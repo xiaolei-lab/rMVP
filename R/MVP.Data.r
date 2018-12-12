@@ -58,9 +58,10 @@
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
-                     filePhe = NULL, fileInd = NULL, fileKin = T, filePC = T, out = "mvp", sep.num = "\t", auto_transpose = T,
-                     sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t", type.geno = "char", pheno_cols = NULL,
-                     SNP.impute = "Major", maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5, ...) {
+                     filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
+                     auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
+                     type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
+                     perc = 1, pcs.keep = 5, ...) {
     
     cat("Preparing data for MVP...\n")
     
@@ -171,7 +172,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 } # end of MVP.Data function
 
 
-MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=T) {
+MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -199,7 +200,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=T) {
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -209,10 +210,10 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     
     # parser map
     cat("Reading file...\n")
-    m <- MVP.Data.Map(map_file = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = F)
+    m <- MVP.Data.Map(map_file = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
     
     # parser phenotype
-    n <- nrow(read.delim(paste0(bfile, '.fam'), header = F))
+    n <- nrow(read.delim(paste0(bfile, '.fam'), header = FALSE))
     
     cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
@@ -232,7 +233,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbose=T) {
+MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -260,7 +261,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=F, type.geno='char', auto_transpose=T, verbose=T) {
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -349,7 +350,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verbose=T) {
+MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
     write_bfile(bigmatrix@address, out)
@@ -377,7 +378,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
     }
     
     fam <- cbind(ind, ind, 0, 0, 0, pheno)
-    write.table(fam, paste0(out, '.fam'), quote = F, row.names = F, col.names = F, sep = '\t')
+    write.table(fam, paste0(out, '.fam'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
     
     # write bim
     #  1. Chromosome code (either an integer, or 'X'/'Y'/'XY'/'MT'; '0' indicates unknown) or name
@@ -387,12 +388,12 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
     #  5. Allele 1 (corresponding to clear bits in .bed; usually minor)
     #  6. Allele 2 (corresponding to set bits in .bed; usually major)
     bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
-    write.table(bim, paste0(out, '.bim'), quote = F, row.names = F, col.names = F, sep = '\t')
+    write.table(bim, paste0(out, '.bim'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
     t2 <- as.numeric(Sys.time())
     cat("Done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
+MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
     t1 <- as.numeric(Sys.time())
     # read data
     if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
@@ -430,7 +431,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     }
     
     # merge
-    pheno <- merge(geno.id, phe[, cols],  by = 1, all.x = T)
+    pheno <- merge(geno.id, phe[, cols],  by = 1, all.x = TRUE)
     
     # rename header
     colnames(pheno)[1] <- 'Taxa'
@@ -452,12 +453,12 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=T, sep='\t',
     }
     
     # Output
-    write.table(pheno, paste0(out, '.phe'), quote = F, sep = "\t", row.names = F, col.names = T)
+    write.table(pheno, paste0(out, '.phe'), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for PHENOTYPE data is Done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t') {
+MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
     t1 <- as.numeric(Sys.time())
     map <- read.table(map_file, header = header)
     map <- map[, cols]
@@ -466,7 +467,7 @@ MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=T, sep='\t
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
     }
-    table = write.table(map, paste0(out, ".map"), row.names = F, col.names = T, sep = '\t', quote = F)
+    table = write.table(map, paste0(out, ".map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for MAP data is done within", format_time(t2 - t1), "\n")
     return(nrow(map))
@@ -520,7 +521,7 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
     
     # get kin
     if (is.character(fileKin)) {
-        myKin <- read.big.matrix(fileKin, head = F, type = 'double', sep = sep)
+        myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
         cat("Calculate KINSHIP using Vanraden method...\n")
@@ -607,25 +608,25 @@ MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hw
         if (is.null(ncpus)) ncpus <- detectCores()
         
         # qc marker
-        marker_index <- rep(T, nrow(bigmat))
+        marker_index <- rep(TRUE, nrow(bigmat))
         if (!is.null(geno)) {
             qc_marker <- function(i, cutoff) {
                 c <- table(bigmat[i, ])
-                if (c[NA] > cutoff) {return(F)} else {return(T)}
+                if (c[NA] > cutoff) {return(FALSE)} else {return(TRUE)}
         }
             marker_index <- cbind(mclapply(1:nrow(bigmat), qc_marker, mc.cores = ncpus, cutoff = (geno * nrow(bigmat))))
-            cat(paste0(length(marker_index[marker_index == F, ])), "markers are filtered because the missing ratio is higher than", geno, "\n")
+            cat(paste0(length(marker_index[marker_index == FALSE, ])), "markers are filtered because the missing ratio is higher than", geno, "\n")
         }
         
         # qc individual
-        ind_index <- rep(T, ncol(bigmat))
+        ind_index <- rep(TRUE, ncol(bigmat))
         if (!is.null(mind)) {
             qc_ind <- function(i, cutoff) {
                 c <- table(bigmat[, i])
-                if (c[NA] > cutoff) {return(F)} else {return(T)}
+                if (c[NA] > cutoff) {return(FALSE)} else {return(TRUE)}
         }
             ind_index <- cbind(mclapply(1:ncol(bigmat), qc_ind, mc.cores = ncpus, cutoff = (mind * ncol(bigmat))))
-            cat(paste0(length(marker_index[marker_index == F, ])), "individuals are filtered because the missing ratio is higher than", mind, "\n")
+            cat(paste0(length(marker_index[marker_index == FALSE, ])), "individuals are filtered because the missing ratio is higher than", mind, "\n")
         }
         
         # TODO: support hwe
