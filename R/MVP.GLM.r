@@ -102,7 +102,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
                 cl <- makeCluster(getOption("cl.cores", cpu))
                 clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
                 Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-                results <- parallel::parLapply(cl, 1:m, eff.glm)
+                results <- parLapply(cl, 1:m, eff.glm)
                 stopCluster(cl)
             }else{
 		tmpf.name <- tempfile()
@@ -114,7 +114,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
                     try(setMKLthreads(1), silent=TRUE)
                 }
-                results <- parallel::mclapply(1:m, eff.glm, mc.cores=cpu)
+                results <- mclapply(1:m, eff.glm, mc.cores=cpu)
 		close(tmpf); unlink(tmpf.name); cat('\n');
                 if(R.ver == 'Linux') {
                     try(setMKLthreads(math.cpu), silent=TRUE)

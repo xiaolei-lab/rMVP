@@ -145,7 +145,7 @@ nf <- ncol(X0) + 1
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory),library(rfunctions)))
-            results <- parallel::parLapply(cl, 1:m, eff.mlm.parallel)
+            results <- parLapply(cl, 1:m, eff.mlm.parallel)
             stopCluster(cl)
         }else{
 		tmpf.name <- tempfile()
@@ -157,7 +157,7 @@ nf <- ncol(X0) + 1
                 	math.cpu <- try(getMKLthreads(), silent=TRUE)
                	 try(setMKLthreads(1), silent=TRUE)
             	}
-            	results <- parallel::mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
+            	results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
             	if(R.ver == 'Linux') {
                 	try(setMKLthreads(math.cpu), silent=TRUE)
 				#try(setMKLthreads(1), silent=TRUE)

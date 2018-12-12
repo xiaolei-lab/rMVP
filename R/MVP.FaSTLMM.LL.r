@@ -87,7 +87,7 @@
         beta4<-beta4/delta
         
         #######get final beta
-        zw1 <- MASS::ginv(beta1+beta2)
+        zw1 <- ginv(beta1+beta2)
         #zw1 <- try(solve(beta1+beta2))
         #if(inherits(zw1, "try-error")){
         #zw1 <- ginv(beta1+beta2)
@@ -143,7 +143,7 @@
         try(setMKLthreads(1), silent=TRUE)
     }
     
-    llresults <- parallel::mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
+    llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
         try(setMKLthreads(math.cpu), silent=TRUE)

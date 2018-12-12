@@ -165,7 +165,7 @@
 				try(setMKLthreads(1), silent=TRUE)
 			}
 			
-			llresults <- parallel::mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
+			llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
 			
 			if(R.ver == 'Linux') {
 				try(setMKLthreads(math.cpu), silent=TRUE)
@@ -207,7 +207,7 @@
 				return(list(seqQTN=seqQTN,myREML=myREML))
 			}
 			
-			llresults <- parallel::mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
+			llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
 			
 			for(i in 1:m){
 				if(i == 1){

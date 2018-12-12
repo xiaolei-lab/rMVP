@@ -167,7 +167,7 @@ MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE
 
     # multiroot
 	if(root){
-		mult.res = multiroot(LogRL_dev1, start = log_sigma2, parms=list(y = y,K = K,X = X),rtol = rtol, atol = atol, ctol = ctol, maxiter=1000)
+		mult.res = rootSolve::multiroot(LogRL_dev1, start = log_sigma2, parms=list(y = y,K = K,X = X),rtol = rtol, atol = atol, ctol = ctol, maxiter=1000)
 		vg = exp(mult.res$root[1])
 		ve = exp(mult.res$root[2])
 		delta = ve / vg
