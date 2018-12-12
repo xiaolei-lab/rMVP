@@ -1570,7 +1570,8 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     ## Step 4: Plot or Return
     if (plot) {
         # draw a canvas
-        plot(NULL,
+        plot(
+            NULL,
             xlim = c(0, chorm.maxlen + chorm.maxlen / 10),
             ylim = c(0, length(chr.num) * band + band),
             main = main,
@@ -1578,39 +1579,61 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
             xlab = "",
             ylab = "",
             xaxs = "i",
-             yaxs = "i")
+            yaxs = "i"
+        )
         
         # draw each Chr
         for (i in 1:length(chr.num)) {
             # draw bg
-            polygon(x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
-                    y = c(-width/5 - band * (i - length(chr.num) - 1),
-                          width/5 - band * (i - length(chr.num) - 1),
+            polygon(
+                x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
+                y = c(
+                    -width / 5 - band * (i - length(chr.num) - 1),
                     width / 5 - band * (i - length(chr.num) - 1),
-                          -width/5 - band * (i - length(chr.num) - 1)),
+                    width / 5 - band * (i - length(chr.num) - 1),-width /
+                        5 - band * (i - length(chr.num) - 1)
+                ),
                 col = "grey",
-                    border = "grey")
+                border = "grey"
+            )
             # draw fg
-            segments(x0 = pos.x[[i]],
+            segments(
+                x0 = pos.x[[i]],
                 y0 = -width / 5 - band * (i - length(chr.num) - 1),
                 x1 = pos.x[[i]],
                 y1 = width / 5 - band * (i - length(chr.num) - 1),
                 col = col[round(col.index[[i]] * length(col) / maxbin.num)],
-                     lwd = 1)
+                lwd = 1
+            )
         }
         # draw Chr label
-        mtext(at = seq(band, length(chr.num) * band, band), 
+        mtext(
+            at = seq(band, length(chr.num) * band, band),
             text = paste0("Chr", chr.num),
-              side = 2, las = 2, font = 1, cex = 0.6, line = 0.2)
+            side = 2,
+            las = 2,
+            font = 1,
+            cex = 0.6,
+            line = 0.2
+        )
         
         # draw physical distance ruler
-        axis(side = 3, 
+        axis(
+            side = 3,
             at = seq(0, chorm.maxlen, length = 10),
-             labels = c(NA, paste0(round((seq(0, chorm.maxlen, length = 10))[-1] / 1e6, 0), "Mb")),
-             font = 1, cex.axis = 0.8, tck = 0.01, lwd = 2, padj = 1.2)
+            labels = c(NA, paste0(round((
+                seq(0, chorm.maxlen, length = 10)
+            )[-1] / 1e6, 0), "Mb")),
+            font = 1,
+            cex.axis = 0.8,
+            tck = 0.01,
+            lwd = 2,
+            padj = 1.2
+        )
         
         # draw legend
-        legend(x = (chorm.maxlen + chorm.maxlen/100),
+        legend(
+            x = (chorm.maxlen + chorm.maxlen / 100),
             y = (-width / 2.5 - band * (length(chr.num) - length(chr.num) - 1)),
             legend = legend.y,
             col = legend.col,
@@ -1623,7 +1646,8 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
             x.intersp = legend.x.intersp,
             y.intersp = legend.y.intersp,
             title = "",
-               xpd = TRUE)
+            xpd = TRUE
+        )
     } else {
         return(list(den.col = col.seg, legend.col = legend.col, legend.y = legend.y))
     }
@@ -1650,9 +1674,18 @@ MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red")
     if (file.output) { dev.off() }
 }
 
+
+MVP.Hist <-
+    function(phe,
+             col = c("dodgerblue4",
+                     "olivedrab4",
+                     "violetred",
+                     "darkgoldenrod1",
+                     "purple4"),
+             breakNum = 15,
+             file.type = "pdf",
+             dpi = 300) {
         
-MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"),
-                     breakNum = 15, file.type = "pdf", dpi = 300) {
     options(warn = -1)
     w <- 6
     h <- 6
@@ -1670,15 +1703,34 @@ MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgo
         Breaks <- seq(min(phe[, i], na.rm = TRUE), max(phe[, i], na.rm = TRUE), length = breakNum)
         
         # hist
-        xx <- hist(x = phe[, i], plot = F, breaks = Breaks, xlab = "", ylab = "Density", freq = F, 
-                   col = colorRampPalette(col)(breakNum), font = 2, font.lab = 2, 
-                   main = paste0("Distribution of ", trait))
+        xx <-
+            hist(
+                x = phe[, i],
+                plot = FALSE,
+                breaks = Breaks,
+                xlab = "",
+                ylab = "Density",
+                freq = FALSE,
+                col = colorRampPalette(col)(breakNum),
+                font = 2,
+                font.lab = 2,
+                main = paste0("Distribution of ", trait)
+            )
         
         maxY <- max(max(xx$density),  max(density(phe[, i])$y))
         
-        hist(x = phe[, i], breaks = Breaks, xlab = "", ylab = "Density", ylim = c(0, maxY), freq = F, 
-             col = colorRampPalette(col)(breakNum), font = 2, font.lab = 2, 
-             main = paste0("Distribution of ", trait))
+        hist(
+            x = phe[, i],
+            breaks = Breaks,
+            xlab = "",
+            ylab = "Density",
+            ylim = c(0, maxY),
+            freq = FALSE,
+            col = colorRampPalette(col)(breakNum),
+            font = 2,
+            font.lab = 2,
+            main = paste0("Distribution of ", trait)
+        )
         
         lines(density(phe[, i]), lwd = 2)
         
@@ -1701,8 +1753,7 @@ MVP.Hist <- function(phe, col = c("dodgerblue4","olivedrab4","violetred","darkgo
     options(warn = 0)
 }
 
-MVP.PCAplot <- function(
-PCA,
+MVP.PCAplot <- function(PCA,
                         col = NULL,
                         pch = NULL,
                         class = NULL,
@@ -1712,8 +1763,7 @@ PCA,
                         file = "pdf",
                         dpi = 300,
                         box = FALSE
-)
-{
+) {
 	if(!is.null(class)){if(length(class) != nrow(PCA)) stop("the length of 'class' differs from the row of 'PCA'");	Ncluster <- length(unique(class))}
 	if(!is.null(col)){
 		col <- rep(col, Ncluster)
