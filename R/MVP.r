@@ -221,7 +221,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
     
     if(permutation.threshold){
-        set.seed(12345)
+        # set.seed(12345)
         i=1
             for(i in 1:permutation.rep){
             index = 1:nrow(phe)
