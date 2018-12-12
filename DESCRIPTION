@@ -8,7 +8,7 @@ Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
 Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS
 License: Apache License | file LICENSE
 SystemRequirements: C++11
-Depends: R (>= 3.0), Rcpp, RcppProgress, BH, bigmemory, biganalytics, snpStats, parallel, MASS, cli
+Depends: R (>= 3.0), Rcpp, RcppProgress, BH, bigmemory, biganalytics, snpStats, parallel, MASS
 LinkingTo: Rcpp, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: testthat

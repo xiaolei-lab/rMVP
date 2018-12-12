@@ -12,36 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 MVP.Version <- function(start=TRUE, width=60) {
 ##############################################################################################
 # MVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
 # Designed by Lilin Yin, Haohao Zhang, and Xiaolei Liu
 # Reriten by Haohao Zhang
 # Build date: Aug 30, 2017
-# Last update: Oct 22, 2018
+# Last update: Dec 12, 2018
 ##############################################################################################
     
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
     authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
     contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
-    logo_l  <- c(" __  ____      _______",
-                 "|  \\/  \\ \\    / /  __ \\",
-                 "| \\  / |\\ \\  / /| |__) |",
-                 "| |\\/| | \\ \\/ / |  ___/",
-                 "| |  | |  \\  /  | |",
-                 "|_|  |_|   \\/   |_|")
     logo_s  <- c(" __  __  __   __  ___",
                  "|  \\/  | \\ \\ / / | _ \\",
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
     if (start) {
-        print.info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, line = '=', width = width)
+        print.info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
     } else {
-        rule(center = "MVP ACCOMPLISHED", width = width)
+        make_line("MVP ACCOMPLISHED", width = width, linechar = '=')
     }
 }
 
@@ -61,7 +53,7 @@ MVP.Version <- function(start=TRUE, width=60) {
 #' @author Haohao Zhang
 #' @Build_date: Oct 22, 2018
 #' @Last_update: Oct 22, 2018
-print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, line = 1, width=NULL) {
+print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
     msg <- c()
     # width
     if (is.null(width)) { width <- getOption('width') }
@@ -81,7 +73,7 @@ print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
             welcome <- paste0("Welcome to ", getPackageName())
         }
     }
-    msg <- c(msg, rule(center = welcome, line = line, width = width))
+    msg <- c(msg, make_line(welcome, line = linechar, width = width))
     # title
     if (!is.null(title)) {
         msg <- c(msg, rule_wrap(string = title, width = width, align = "center"))
@@ -90,11 +82,8 @@ print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # align logo
     logo_width <- max(sapply(logo, nchar))
     for (i in 1:length(logo)) {
-        # l <- stringr::str_pad(logo[i], "right", width = logo_width)
         l <- paste0(logo[i], paste(rep(" ", logo_width - nchar(logo[i])), collapse = ""))
-        # blank <- stringr::str_match(logo[i], "^\\s+")
-        l <- rule(center = l, line = " ", width = width)
-        # if (!is.na(blank)) { l <- paste0(blank, substr(l, 1, nchar(l) - nchar(blank))) }
+        l <- make_line(l, width)
         msg <- c(msg, l)
     }
     
@@ -109,43 +98,65 @@ print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     
     # authors
     if (!is.null(authors)) {
-        msg <- c(msg, rule_wrap(string = authors, align = "left", line = " ", width = width))
+        msg <- c(msg, rule_wrap(string = authors, align = "left", linechar = " ", width = width))
     }
     # contact
     if (!is.null(contact)) {
-        msg <- c(msg, rule_wrap(string = contact, align = "left", line = " ", width = width))
+        msg <- c(msg, rule_wrap(string = contact, align = "left", linechar = " ", width = width))
     }
     # bottom line
-    msg <- c(msg, rule(line = line, width = width))
+    msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
     cat(msg, sep = "\n")
 }
 
+#' make line
+#' @author Haohao Zhang
+#' @Build_date: Dec 12, 2018
+#' @Last_update: Dec 12, 2018
+make_line <- function(string, width, linechar = " ", align = "center", margin = 1) {
+    string <- paste0(paste0(rep(" ", margin), collapse = ""),
+                     string,
+                     paste0(rep(" ", margin), collapse = ""))
+    
+    if (align == "center") {
+        if (width > nchar(string)) {
+            left_width <- (width - nchar(string)) %/% 2
+            right_width <- width - nchar(string) - left_width
+            string <-
+                paste0(paste0(rep(linechar, left_width), collapse = ""),
+                       string,
+                       paste0(rep(linechar, right_width), collapse = ""))
+        }
+    } else if (align == "left") {
+        if (width > nchar(string)) {
+            string <-
+                paste0(linechar,
+                       string,
+                       paste0(rep(linechar, width - nchar(string) - 1), collapse = ""))
+        }
+    }
+    return(string)
+}
 
 #' wrap text to multiple line, align left, right or center.
 #' 
-#' by using base::strwarp and cli::rule.
+#' by using base::strwarp.
 #' @author Haohao Zhang
 #' @Build_date: Oct 22, 2018
-#' @Last_update: Oct 22, 2018
-rule_wrap <- function(string, width, align = "center", line = " ", margin = 2, ...) {
+#' @Last_update: Dec 12, 2018
+rule_wrap <- function(string, width, align = "center", linechar = " ") {
     # define
     msg <- c()
-    lines <- strwrap(string, width = width - margin * 2)
-    args <- list(width = width, line = line, ...)    # to cli::rule()
-    
+    lines <- strwrap(string, width = width - 4)
+
     # wrap
     for (i in 1:length(lines)) {
-        args[[align]] <- lines[i]
-        l <- do.call(rule, args)
-        if (line == " " && align == "left" && substr(l, 1, 1) == " ") {
-            l <- paste0(substring(l, 2), " ")
-        }
+        l <- make_line(lines[i], width = width, linechar = linechar, align = align)
         msg <- c(msg, l)
     }
     return(msg)
 }
-
 
 #' Paste label to a line
 #' @author Haohao Zhang
@@ -163,9 +174,7 @@ paste_label <- function(line, label, side = "right", margin = 2) {
     return(line)
 }
 
-
-format_time <- function(x)
-{
+format_time <- function(x) {
     h <- x %/% 3600
     m <- (x %% 3600) %/% 60
     s <- ((x %% 3600) %% 60)
