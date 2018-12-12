@@ -31,7 +31,7 @@ MVP.Version <- function(start=TRUE, width=60) {
                  "|_|  |_|   \\_/   |_|")
 
     if (start) {
-        print.info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
+        print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
     } else {
         make_line("MVP ACCOMPLISHED", width = width, linechar = '=')
     }
@@ -53,7 +53,7 @@ MVP.Version <- function(start=TRUE, width=60) {
 #' @author Haohao Zhang
 #' @Build_date: Oct 22, 2018
 #' @Last_update: Oct 22, 2018
-print.info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
+print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
     msg <- c()
     # width
     if (is.null(width)) { width <- getOption('width') }
