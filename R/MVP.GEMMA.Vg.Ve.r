@@ -1,19 +1,23 @@
-MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE){
-##########################################################################################################
-#Object: To estimate variance component using HE regression
-#Input:
-#y: phenotype
-#X: genotype
-#K: kinship matrix
-#rtol, atol, ctol, root: parameters for HE regression, no changes is recommended
-#Output: vg, ve, and delta
-#Author: Xiang Zhou
-#Translated from GEMMA (C++) to R by: Haohao Zhang
-#Modified by: Lilin Yin and Xiaolei Liu
-#Build date: Feb 2, 2017
-#Last update: Feb 2, 2017
-##########################################################################################################
-
+#' To estimate variance component using HE regression
+#' 
+#' Build date: Feb 2, 2017
+#' Last update: Feb 2, 2017
+#' 
+#' @author Translated from C++(GEMMA, Xiang Zhou) to R by: Haohao Zhang
+#' 
+#' @param y phenotype
+#' @param X genotype
+#' @param K kinship matrix
+#' @param rtol parameters for HE regression, no changes is recommended
+#' @param atol parameters for HE regression, no changes is recommended
+#' @param ctol parameters for HE regression, no changes is recommended
+#' @param root parameters for HE regression, no changes is recommended
+#'
+#' @return vg, ve, and delta
+#' @export
+#'
+#' @examples
+MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE) {
     #try(setMKLthreads(1),silent = TRUE)
     K = K[]
     n = nrow(K)

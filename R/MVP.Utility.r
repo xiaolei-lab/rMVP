@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MVP.Version <- function(start=TRUE, width=60) {
-##############################################################################################
-# MVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
-# Designed by Lilin Yin, Haohao Zhang, and Xiaolei Liu
-# Reriten by Haohao Zhang
-# Build date: Aug 30, 2017
-# Last update: Dec 12, 2018
-##############################################################################################
-    
+
+#' Print MVP Banner
+#'
+#' Build date: Aug 30, 2017
+#' Last update: Dec 12, 2018
+#' 
+#' @author Lilin Yin, Haohao Zhang, and Xiaolei Liu
+#' 
+#' @param width the width of the message
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples
+#' MVP.version()
+MVP.Version <- function(width=60) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
     authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
@@ -30,17 +37,23 @@ MVP.Version <- function(start=TRUE, width=60) {
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
-    if (start) {
-        print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
-    } else {
-        make_line("MVP ACCOMPLISHED", width = width, linechar = '=')
-    }
+    print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = 60)
 }
 
 
+print_accomplished <- function(width = 60) {
+    cat(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+}
+
 #' Print R Package information, include title, short_title, logo, version, authors, contact
 #'
-#' @param welcome "Welcom to <Packagename>"
+#' Build date: Oct 22, 2018
+#' Last update: Oct 22, 2018
+#' 
+#' @keywords internal
+#' @author Haohao Zhang
+#' 
+#' @param welcome welcome text, for example: "Welcom to <Packagename>"
 #' @param title long text to introduct package
 #' @param short_title short label, top-left of logo
 #' @param logo logo
@@ -50,9 +63,16 @@ MVP.Version <- function(start=TRUE, width=60) {
 #' @param line 1, 2, or char
 #' @param width banner width
 #'
-#' @author Haohao Zhang
-#' @Build_date: Oct 22, 2018
-#' @Last_update: Oct 22, 2018
+#' @examples
+#' welcome <- "Welcome to MVP"
+#' title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
+#' authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
+#' contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
+#' logo_s  <- c(" __  __  __   __  ___",
+#'              "|  \/  | \ \ / / | _ \",
+#'              "| |\/| |  \ V /  |  _/",
+#'              "|_|  |_|   \_/   |_|")
+#' print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
     msg <- c()
     # width
@@ -111,9 +131,12 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
 }
 
 #' make line
+#' 
+#' Build date: Dec 12, 2018
+#' Last update: Dec 12, 2018
+#' 
+#' @keywords internal
 #' @author Haohao Zhang
-#' @Build_date: Dec 12, 2018
-#' @Last_update: Dec 12, 2018
 make_line <- function(string, width, linechar = " ", align = "center", margin = 1) {
     string <- paste0(paste0(rep(" ", margin), collapse = ""),
                      string,
@@ -141,10 +164,12 @@ make_line <- function(string, width, linechar = " ", align = "center", margin = 
 
 #' wrap text to multiple line, align left, right or center.
 #' 
+#' Build date: Oct 22, 2018
+#' Last update: Dec 12, 2018
 #' by using base::strwarp.
+#' 
+#' @keywords internal
 #' @author Haohao Zhang
-#' @Build_date: Oct 22, 2018
-#' @Last_update: Dec 12, 2018
 rule_wrap <- function(string, width, align = "center", linechar = " ") {
     # define
     msg <- c()
@@ -159,9 +184,17 @@ rule_wrap <- function(string, width, align = "center", linechar = " ") {
 }
 
 #' Paste label to a line
+#' 
+#' Build date: Oct 22, 2018
+#' Last update: Oct 22, 2018
+#' 
+#' @param line long text
+#' @param label short label
+#' @param side "right" or "left"
+#' @param margin default 2
+#' 
+#' @keywords internal
 #' @author Haohao Zhang
-#' @Build_date: Oct 22, 2018
-#' @Last_update: Oct 22, 2018
 paste_label <- function(line, label, side = "right", margin = 2) {
     if (side == "right") {
         end   <- nchar(line) - margin
@@ -174,6 +207,12 @@ paste_label <- function(line, label, side = "right", margin = 2) {
     return(line)
 }
 
+#' format time
+#' 
+#' @param x seconds
+#' 
+#' @keywords internal
+#' @author Lilin Yin
 format_time <- function(x) {
     h <- x %/% 3600
     m <- (x %% 3600) %/% 60
