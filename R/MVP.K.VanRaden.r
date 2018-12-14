@@ -24,7 +24,7 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
     }
     
     if(!is.null(weight)){
-        if(sum(is.na(weight)) != 0)	stop("'NA' is not allowed in weight")
+        if(sum(is.na(weight)) != 0) stop("'NA' is not allowed in weight")
     }
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(

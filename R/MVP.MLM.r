@@ -33,7 +33,7 @@ math.cpu <- try(getMKLthreads(), silent=TRUE)
 
 n <- ncol(geno)
 m <- nrow(geno)
-if(priority=="speed")	geno <- as.matrix(geno)
+if(priority=="speed") geno <- as.matrix(geno)
 
 ys <- as.numeric(as.matrix(phe[,2]))
 if (is.null(K)) {
@@ -99,11 +99,11 @@ nf <- ncol(X0) + 1
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
-        if(bar)	print.f(i)
+        if(bar) print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
-        #if(cpu>1 & r.open)	setMKLthreads(math.cpu)
+        #if(cpu>1 & r.open) setMKLthreads(math.cpu)
 
         SNP <- geno[i, ]
         xst <- crossprod(U, SNP)
@@ -149,7 +149,7 @@ nf <- ncol(X0) + 1
             stopCluster(cl)
         }else{
         tmpf.name <- tempfile()
-        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
         writeBin(0, tmpf)
         print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
                 R.ver <- Sys.info()[['sysname']]

@@ -27,7 +27,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     n <- ncol(geno)
     m <- nrow(geno)
     
-    if(priority=="speed")	geno <- as.matrix(geno)
+    if(priority=="speed") geno <- as.matrix(geno)
     
     ys <- as.numeric(as.matrix(phe[,2]))
     
@@ -52,7 +52,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
 
     #parallel function for GLM model
     eff.glm <- function(i){
-        if(bar)	print.f(i)
+        if(bar) print.f(i)
         # if(i%%1000==0){
             # print(paste("****************", i, "****************",sep=""))
         # }
@@ -106,7 +106,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
                 stopCluster(cl)
             }else{
         tmpf.name <- tempfile()
-        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
         writeBin(0, tmpf)
         print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
                 R.ver <- Sys.info()[['sysname']]
