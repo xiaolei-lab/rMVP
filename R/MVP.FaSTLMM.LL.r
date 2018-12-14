@@ -1,16 +1,19 @@
+#' Evaluation of the maximum likelihood using FaST-LMM method
+#'
+#' Last update: January 11, 2017
+#' 
+#' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
+#' 
+#' @param pheno phenotype
+#' @param snp.pool SNP matrix
+#' @param X0 covariates matrix
+#' @param ncpus number of CPUs used for parallel computation
+#'
+#' @return LL
+#' @export
+#'
+#' @examples
 `MVP.FaSTLMM.LL` <- function(pheno, snp.pool,X0=NULL,ncpus=2){
-    #Evaluation of the maximum likelihood using FaST-LMM method
-    #Input: ys, xs, vg, delta, Z, X0, snp.pool
-    #pheno: phenotype
-    #snp.pool: SNP matrix
-    #X0: covariates matrix
-    #ncpus: number of CPUs used for parallel computation
-    #Output: LL
-    #Authors: Qishan Wang, Feng Tian and Zhiwu Zhang
-    #Modified by Xiaolei Liu
-    #Last update: January 11, 2017
-    ################################################################################
-    #print("MVP.FaSTLMM.LL started")
     y=pheno
     p=0
     deltaExpStart = -5

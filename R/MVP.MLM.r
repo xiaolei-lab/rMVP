@@ -1,30 +1,30 @@
+#' To perform GWAS with GLM and MLM model and get the P value of SNPs
+#'
+#' Build date: Aug 30, 2016
+#' Last update: Aug 30, 2016
+#' 
+#' @author Lilin Yin and Xiaolei Liu
+#' 
+#' @param phe phenotype, n * 2 matrix
+#' @param geno genotype, m * n, m is marker size, n is population size
+#' @param K Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite
+#' @param CV covariates
+#' @param REML a list that contains ve and vg
+#' @param priority speed or memory
+#' @param cpu number of cpus used for parallel computation
+#' @param bar 
+#' @param vc.method the methods for estimating variance component("emma" or "gemma")
+#' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
+#' @param file.output whether to output files or not
+#' @param memo a marker on output file name
+#'
+#' @return
+#' results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
+#' @export
+#'
+#' @examples
 MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
-##########################################################################################################
-# Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
-#
-# Input:
-# phe: phenotype, n * 2 matrix
-# geno: genotype, m * n, m is marker size, n is population size
-# CV: covariates
-# K: Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite
-# REML: a list that contains ve and vg
-# priority: speed or memory
-# genoName: name of genotype file, when priority is memory, it is used for attach bigmatrix under windows platform
-# cpu: number of cpus used for parallel computation
-# vc.method: the methods for estimating variance component("emma" or "gemma")
-# maxLine: when the priority is 'memory', users can change this parameter to limit the memory
-# file.output: whether to output files or not
-# memo: a marker on output file name
-#
-# Output:
-# results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
-#
-# Authors: Lilin Yin and Xiaolei Liu
-# Build date: Aug 30, 2016
-# Last update: Aug 30, 2016
-##########################################################################################################
-
 R.ver <- Sys.info()[['sysname']]
 wind <- R.ver == 'Windows'
 #taxa <- colnames(phe)[2]

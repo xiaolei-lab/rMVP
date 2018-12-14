@@ -30,13 +30,11 @@
 #' @param filePC 
 #' @param out A marker on output file name
 #' @param sep.vcf seperator for hapmap, numeric, map, phenotype, kinship and PC files, respectively
-#' @param sep.hmp 
 #' @param sep.num 
 #' @param sep.map 
 #' @param sep.phe 
 #' @param sep.kin 
 #' @param sep.pc 
-#' @param vcf.jump 
 #' @param type.geno type parameter in bigmemory, genotype data
 #' @param type.kin type parameter in bigmemory, Kinship
 #' @param type.pc type parameter in bigmemory, PC

@@ -1,18 +1,24 @@
+#' Estimate variance components using EMMA
+#'
+#' Build date: August 30, 2016
+#' Last update: January 27, 2017
+#' 
+#' @author EMMA (Kang et. al. Genetics, 2008), Modified only for speed up by Xiaolei Liu and Lilin Yin
+#' 
+#' @param y phenotype
+#' @param X covariate matrix, the first column is 1s
+#' @param K Kinship matrix
+#' @param ngrids parameters for estimating vg and ve
+#' @param llim parameters for estimating vg and ve
+#' @param ulim parameters for estimating vg and ve
+#' @param esp parameters for estimating vg and ve
+#'
+#' @return
+#' @export
+#'
+#' @examples
 MVP.EMMA.Vg.Ve <-
-function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10){
-##########################################################################################################
-# Object: Estimate variance components using EMMA
-# Input:
-# y: phenotype
-# X: covariate matrix, the first column is 1s
-# K: Kinship matrix
-# ngrids, llim, ulim, and esp: parameters for estimating vg and ve
-# Authors: EMMA (Kang et. al. Genetics, 2008)
-# Modified only for speed up by Xiaolei Liu and Lilin Yin
-# Build date: August 30, 2016
-# Last update: January 27, 2017
-##########################################################################################################
-
+function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     if(!is.numeric(y))	y <- as.numeric(as.character(y))
     emma.delta.REML.LL.wo.Z <- function(logdelta, lambda, etas)
     {

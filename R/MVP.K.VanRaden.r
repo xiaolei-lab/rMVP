@@ -1,18 +1,21 @@
+#' Calculate Kinship matrix by VanRaden method
+#'
+#' Build date: Dec 12, 2016
+#' Last update: Dec 12, 2016
+#' 
+#' @param M Genotype, m * n, m is marker size, n is population size
+#' @param weight vector, the weights for makers
+#' @param priority speed or memory
+#' @param memo 
+#' @param SUM 
+#' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
+#'
+#' @return K, n * n matrix
+#' @export
+#'
+#' @examples
 MVP.K.VanRaden <-
 function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, maxLine=1000){
-##########################################################################################################
-# Object: Calculate Kinship matrix by VanRaden method
-# Input:
-# M: Genotype, m * n, m is marker size, n is population size
-# weight: vector, the weights for makers
-# priority: speed or memory
-# maxLine: when the priority is 'memory', users can change this parameter to limit the memory
-# Output:
-# K, n * n matrix
-# Authors: Xiaolei Liu and Lilin Yin
-# Build date: Dec 12, 2016
-# Last update: Dec 12, 2016
-##########################################################################################################
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'

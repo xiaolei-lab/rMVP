@@ -1,23 +1,24 @@
+#' To perform GWAS with GLM and MLM model and get the P value of SNPs
+#'
+#' Build date: Aug 30, 2016
+#' Last update: May 25, 2017
+#'
+#' @author Lilin Yin and Xiaolei Liu
+#' 
+#' @param phe phenotype, n * 2 matrix
+#' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
+#' @param CV Covariance, design matrix(n * x) for the fixed effects
+#' @param cpu number of cpus used for parallel computation
+#' @param priority 
+#' @param memo a marker on output file name
+#' @param bar 
+#'
+#' @returna m * 2 matrix, the first column is the SNP effect, the second column is the P values
+#' @export
+#'
+#' @examples
 MVP.GLM <-
 function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
-##########################################################################################################
-# Object: To perform GWAS with GLM and MLM model and get the P value of SNPs
-#
-# Input:
-# phe: phenotype, n * 2 matrix
-# geno: Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
-# CV: Covariance, design matrix(n * x) for the fixed effects
-# cpu: number of cpus used for parallel computation
-# memo: a marker on output file name
-#
-# Output:
-# results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
-#
-# Authors: Lilin Yin and Xiaolei Liu
-# Build date: Aug 30, 2016
-# Last update: May 25, 2017
-##########################################################################################################
-    
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
