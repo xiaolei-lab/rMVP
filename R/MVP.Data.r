@@ -261,7 +261,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
+MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -328,7 +328,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
             if (len == 0) { break }
 
             line <- do.call(rbind, strsplit(line, '\\s+'))
-            if (row_name) { line <- line[, 2:ncol(line)]}
+            if (row_names) { line <- line[, 2:ncol(line)]}
             if (transposed) {
                 bigmat[, (i + 1):(i + length(line))] <- line
                 i <- i + length(line)
