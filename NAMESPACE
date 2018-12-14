@@ -1,5 +1,5 @@
 useDynLib(MVP, .registration=TRUE)
-exportPattern("^[[:alpha:]]+")
+exportPattern("^MVP[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
 export(MVP)
 import(utils)
