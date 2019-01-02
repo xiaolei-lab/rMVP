@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 #' MVP.Data: To prepare data for MVP package
 #' Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
 #' Build date: Aug 30, 2016
@@ -55,6 +54,42 @@
 #' k.desc, k.bin: Kinship matrix in bigmemory format
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
+
+#' MVP.Data: To prepare data for MVP package
+#' 
+#' 
+#' @author Xiaolei Liu, Lilin Yin and Haohao Zhang
+#' 
+#' @param fileMVP 
+#' @param fileVCF File path of genotype in VCF format
+#' @param fileHMP File path of genotype in hapmap format
+#' @param fileBed File path of genotype in PLINK v1.9 binary format (.bed/.bim/.fam)
+#' @param fileNum File path of genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
+#' @param fileMap File path of SNP map information, three columns: SNP name, Chr, Pos
+#' @param filePhe File path of phenotype, two columns, the first column is taxa name, the second column is trait
+#' @param fileInd File path of individual name, one columns, 
+#' @param fileKin Kinship, n * n matrix, n is sample size
+#' @param filePC 
+#' @param out 
+#' @param sep.num 
+#' @param auto_transpose 
+#' @param sep.map 
+#' @param sep.phe 
+#' @param sep.kin 
+#' @param sep.pc 
+#' @param type.geno 
+#' @param pheno_cols 
+#' @param SNP.impute "Left", "Middle", "Right"
+#' @param maxLine 
+#' @param priority 
+#' @param perc 
+#' @param pcs.keep 
+#' @param ... 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",

@@ -1,3 +1,20 @@
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 #' Perform GWAS using FarmCPU method
 #'
 #' Date build: Febuary 24, 2013
@@ -604,7 +621,7 @@ FarmCPU.LM <-
             P = pvalue[-1]
             return(list(B=B,P=P))
         }
-        print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.farmcpu.parallel)
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
         return(list(P=results[,-1],betapred=betapred,B=results[,1]))

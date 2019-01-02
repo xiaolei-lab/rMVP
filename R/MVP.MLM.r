@@ -1,3 +1,20 @@
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 #' To perform GWAS with GLM and MLM model and get the P value of SNPs
 #'
 #' Build date: Aug 30, 2016
@@ -136,12 +153,12 @@ nf <- ncol(X0) + 1
         math.cpu <- try(getMKLthreads(), silent=TRUE)
             mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
                 try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.mlm.parallel)
     try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
         if(wind){
-            print.f <- function(i){MVP.Bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory),library(rfunctions)))
@@ -151,7 +168,7 @@ nf <- ncol(X0) + 1
         tmpf.name <- tempfile()
         tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
         writeBin(0, tmpf)
-        print.f <- function(i){MVP.Bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+        print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
                 R.ver <- Sys.info()[['sysname']]
                 if(R.ver == 'Linux') {
                     math.cpu <- try(getMKLthreads(), silent=TRUE)
