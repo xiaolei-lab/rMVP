@@ -71,9 +71,8 @@
 #' @param Ncluster: number of colors used for drawing PC 1 and PC 2
 #' @param signal.cex: point size on output figures
 #' @param box: logical, if TRUE, the box frame will be added in output figure
-#'
-#' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export
+#' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
 #' Output: MVP.return$glm.results - p-values obtained by GLM method
 #' Output: MVP.return$mlm.results - p-values obtained by MLM method

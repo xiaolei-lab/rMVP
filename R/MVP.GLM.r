@@ -30,7 +30,7 @@
 #' @param memo a marker on output file name
 #' @param bar whether to show the progress bar
 #'
-#' @returna m * 2 matrix, the first column is the SNP effect, the second column is the P values
+#' @return m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export
 #'
 #' @examples

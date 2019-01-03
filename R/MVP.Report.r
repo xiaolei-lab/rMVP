@@ -15,8 +15,7 @@
 # limitations under the License.
 
 
-#' Title
-#'
+#' MVP.Report
 #' @param MVP: Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers
 #' @param col: Vector or matrix. If ‘col’ is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If ‘col’ is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
 #' @param bin.size: Number. Number of markers will be counted for each marker window and used for plotting marker density
@@ -60,7 +59,6 @@
 #' @param dpi: Number. Dots per inch for .jpg and .tiff files
 #' @param memo: Character. A text marker on output files
 #'
-#' @return
 #' @export
 #'
 #' @examples
@@ -1762,177 +1760,6 @@ MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red")
     if (file.output) { dev.off() }
 }
 
-MVP.Report.Multracks.QQplot <- function() {
-if (multracks) {
-    w <- R * 2.5
-    h <- 5.5
-    if (file.output) {
-        name <- paste0("Multracks.QQplot.", paste(taxa, collapse = "."))
-        if (file.type == "jpg") { jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
-        if (file.type == "pdf") { pdf(paste0(name, ".pdf"), width = w, height = h) }
-        if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
-        par(mfcol = c(1, R), mar = c(0, 1, 4, 1.5), oma = c(3, 5, 0, 0), xpd = TRUE)
-    } else {
-        if (is.null(dev.list())) { dev.new(width = w, height = h) }
-        par(xpd = TRUE)
-    }
-    for (i in 1:R) {
-        print(paste0("Multracks_QQ Plotting ", taxa[i], "..."))
-        P.values = as.numeric(Pmap[,i+2])
-        P.values = P.values[!is.na(P.values)]
-        if(LOG10){
-            P.values=P.values[P.values>0]
-            P.values=P.values[P.values<=1]
-            N=length(P.values)
-            P.values=P.values[order(P.values)]
-        }else{
-            N=length(P.values)
-            P.values=P.values[order(P.values,decreasing=TRUE)]
-        }
-        p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
-        log.Quantiles <- -log10(p_value_quantiles)
-        if(LOG10){
-            log.P.values <- -log10(P.values)
-        }else{
-            log.P.values <- P.values
-        }
-        
-        #calculate the confidence interval of QQ-plot
-        if(conf.int){
-            N1=length(log.Quantiles)
-            c95 <- rep(NA,N1)
-            c05 <- rep(NA,N1)
-            for(j in 1:N1){
-                xi=ceiling((10^-log.Quantiles[j])*N)
-                if(xi==0)xi=1
-                c95[j] <- qbeta(0.95,xi,N-xi+1)
-                c05[j] <- qbeta(0.05,xi,N-xi+1)
-            }
-            index=length(c95):1
-        }else{
-            c05 <- 1
-            c95 <- 1
-        }
-        
-        YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), floor(max(log.P.values)+1))
-        plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,YlimMax),xlab ="", ylab="", main = taxa[i])
-        axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-        axis(2, at=seq(0,YlimMax,ceiling(YlimMax/10)), labels=seq(0,YlimMax,ceiling(YlimMax/10)), cex.axis=cex.axis)
-        
-        #plot the confidence interval of QQ-plot
-        if(conf.int) polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
-        
-        if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
-        points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
-        if(!is.null(threshold)){
-            if(sum(threshold!=0)==length(threshold)){
-                thre.line=-log10(min(threshold))
-                if(amplify==TRUE){
-                    thre.index=which(log.P.values>=thre.line)
-                    if(length(thre.index)!=0){
-                        
-                        #cover the points that exceed the threshold with the color "white"
-                        points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
-                        if(is.null(signal.col)){
-                            points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch[1],cex=signal.cex[1])
-                        }else{
-                            points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col[1],pch=signal.pch[1],cex=signal.cex[1])
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if(box) box()
-    if(file.output) dev.off()
-    if(R > 1){
-        signal.col <- NULL
-        if(file.output){
-            if(file=="jpg") jpeg(paste("Multraits.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
-            if(file=="pdf") pdf(paste("Multraits.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = 5.5,height=5.5)
-            if(file=="tiff") tiff(paste("Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
-            par(mar = c(5,5,4,2),xpd=TRUE)
-        }else{
-            dev.new(width = 5.5, height = 5.5)
-            par(xpd=TRUE)
-        }
-        p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
-        log.Quantiles <- -log10(p_value_quantiles)
-        
-        # calculate the confidence interval of QQ-plot
-        if((i == 1) & conf.int){
-            N1=length(log.Quantiles)
-            c95 <- rep(NA,N1)
-            c05 <- rep(NA,N1)
-            for(j in 1:N1){
-                xi=ceiling((10^-log.Quantiles[j])*N)
-                if(xi==0)xi=1
-                c95[j] <- qbeta(0.95,xi,N-xi+1)
-                c05[j] <- qbeta(0.05,xi,N-xi+1)
-            }
-            index=length(c95):1
-        }
-        
-        if(!conf.int){c05 <- 1; c95 <- 1}
-        
-        Pmap.min <- Pmap[,3:(R+2)]
-        YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), -log10(min(Pmap.min[Pmap.min > 0])))
-        plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
-        legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
-        axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-        axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
-        
-        # plot the confidence interval of QQ-plot
-        if(conf.int) polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
-        
-        for(i in 1:R){
-            print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
-            P.values=as.numeric(Pmap[,i+2])
-            P.values=P.values[!is.na(P.values)]
-            if(LOG10){
-                P.values=P.values[P.values>=0]
-                P.values=P.values[P.values<=1]
-                N=length(P.values)
-                P.values=P.values[order(P.values)]
-            }else{
-                N=length(P.values)
-                P.values=P.values[order(P.values,decreasing=TRUE)]
-            }
-            if(LOG10){
-                log.P.values <- -log10(P.values)
-            }else{
-                log.P.values <- P.values
-            }
-            
-            
-            if((i == 1) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
-            points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
-            
-            if(!is.null(threshold)){
-                if(sum(threshold!=0)==length(threshold)){
-                    thre.line=-log10(min(threshold))
-                    if(amplify==TRUE){
-                        thre.index=which(log.P.values>=thre.line)
-                        if(length(thre.index)!=0){
-                            
-                            # cover the points that exceed the threshold with the color "white"
-                            points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
-                            if(is.null(signal.col)){
-                                points(log.Quantiles[thre.index],log.P.values[thre.index],col = t(col)[i],pch=signal.pch[1],cex=signal.cex[1])
-                            }else{
-                                points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col[1],pch=signal.pch[1],cex=signal.cex[1])
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if(box) box()
-        if(file.output) dev.off()
-    }
-}
-}
-
 filter.points <- function(x, y, w, h, dpi=300, scale=1) {
     x <- ceiling((x - min(x)) / (max(x) - min(x)) * w * dpi / scale)
     y <- ceiling((y - min(y)) / (max(y) - min(y)) * h * dpi / scale)
@@ -1987,7 +1814,7 @@ MVP.Report.QQplot <-
     quantiles <- -log10((1:N) / (N + 1))
     
     # filter
-    is_visable <- filter_points(quantiles, P.values, w, h, dpi)
+    is_visable <- filter.points(quantiles, P.values, w, h, dpi)
     
     # calculate the confidence interval of QQ-plot
     c95 <- 1
@@ -2059,160 +1886,160 @@ MVP.Report.QQplot <-
     if (!is.null(file.type)) { dev.off() }
 }
 
-MVP.Report.ManhattanPlot <- function(file.type="jpg") {
-    colx <- col[i,]
-    colx <- colx[!is.na(colx)]
-    
-    print(paste0("Rectangular_Manhattan Plotting ", taxa_name, "..."))
-    w <- 14
-    h <- 5
-    
-    # setup output device
-    if (!is.null(file.type)) {
-        name <- paste0(memo, ".Rectangular-Manhattan.", taxa_name)
-        switch(file.type,
-               jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
-               pdf = pdf(paste0(name, ".pdf"), width = w, height = h),
-               tiff = tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi)
-        )
-        par(mar = c(5, 6, 4, 3), xaxs = xaxs, yaxs = yaxs, xpd = TRUE)
-    } else {
-        if (is.null(dev.list())) { dev.new(width = w, height = h) }
-        par(xpd = TRUE)
-    }
-    
-    pvalue <- pvalueT[,i]
-    logpvalue <- logpvalueT[,i]
-
-    YlimMax <- ceiling(max(-log10(pvalue[pvalue != 0])))
-
-    if (!is.null(threshold) && !(0 %in% threshold)) {
-        YlimMax <- ceiling(max(YlimMax, -log10(threshold)))
-    }
-
-    xlim <- c(0, max(pvalue.posN))
-    ylim <- c(0, YlimMax)
-    if (cir.density) {
-        xlim <- c(0, 1.01 * max(pvalue.posN))
-        ylim <- c(-YlimMax / den.fold, YlimMax)
-    }
-    plot(
-        pvalue.posN,
-        logpvalue,
-        pch = pch,
-        cex = cex[2],
-        col = rep(rep(colx, N[i]), add[[i]]),
-        xlim = xlim,
-        ylim = ylim,
-        ylab = ylab,
-        cex.axis = cex.axis,
-        cex.lab = 2,
-        font = 2,
-        axes = FALSE,
-        xlab = xlab,
-        main = paste("Manhattan plot of", taxa[i])
-    )
-
-    
-    if (is.null(chr.labels)) {
-        chr.labels <- chr.ori
-    }
-    
-    axis(1, at = c(0, ticks), cex.axis = cex.axis, font = 2, labels = c("Chr",chr.labels))
-
-    axis(
-        2,
-        at = seq(0, YlimMax, ceiling(YlimMax / 10)),
-        cex.axis = cex.axis,
-        font = 2,
-        labels = seq(0, YlimMax, ceiling(YlimMax / 10))
-    )
-    legend.y <- tail(seq(0, YlimMax, ceiling(YlimMax / 10)), 1)
-
-    if (!is.null(threshold) && !(0 %in% threshold)) {
-            for (thr in 1:length(threshold)) {
-                h <- -log10(threshold[thr])
-                abline(h = h, col = threshold.col[thr], lty = threshold.lty[thr], lwd = threshold.lwd[thr], xpd = FALSE)
-            }
-            if (amplify == TRUE) {
-                threshold <- sort(threshold)
-                sgline1 <- -log10(max(threshold))
-
-                sgindex=which(logpvalue>=sgline1)
-                HY1=logpvalue[sgindex]
-                HX1=pvalue.posN[sgindex]
-                
-                #cover the points that exceed the threshold with the color "white"
-                points(HX1,HY1,pch=pch,cex=cex[2],col="white")
-                
-                for (ll in 1:length(threshold)) {
-                    if (ll == 1) {
-                        sgline1 <- -log10(threshold[ll])
-                        sgindex <- (logpvalue >= sgline1)
-                    }else{
-                        sgline0 <- -log10(threshold[ll - 1])
-                        sgline1 <- -log10(threshold[ll])
-                        sgindex <- (logpvalue >= sgline1 & logpvalue < sgline0)
-                    }
-                    HY1 <- logpvalue[sgindex]
-                    HX1 <- pvalue.posN[sgindex]
-                    
-                    if (is.null(signal.col)) {
-                        i.col <- rep(rep(colx, N[i]), add[[i]])[sgindex]
-                    } else{
-                        i.col <- signal.col[ll]
-                    }
-                    
-                    points(HX1,
-                           HY1,
-                           pch = signal.pch[ll],
-                           cex = signal.cex[ll] * cex[2],
-                           col = signal.col[ll])
-                }
-            }
-        }
-
-    if (cir.density) {
-        for (yll in 1:length(pvalue.posN.list)) {
-            x <- c(min(pvalue.posN.list[[yll]]), 
-                   min(pvalue.posN.list[[yll]]), 
-                   max(pvalue.posN.list[[yll]]),
-                   max(pvalue.posN.list[[yll]]))
-            y <- c(-0.5 * YlimMax / den.fold,
-                   -1.5 * YlimMax / den.fold,
-                   -1.5 * YlimMax / den.fold,
-                   -0.5 * YlimMax / den.fold)
-            polygon(x, y, col = "grey", border = "grey")
-        }
-        segments(
-            x0 = pvalue.posN,
-            y0 = -0.5 * YlimMax / den.fold,
-            x1 = pvalue.posN,
-            y1 = -1.5 * YlimMax / den.fold,
-            col = density.list$den.col,
-            lwd = 0.1
-        )
-        legend(
-            x = max(pvalue.posN) + band,
-            y = legend.y,
-            title = "",
-            legend = density.list$legend.y,
-            pch = 15,
-            pt.cex = 2.5,
-            col = density.list$legend.col,
-            cex = 0.8,
-            bty = "n",
-            y.intersp = 1,
-            x.intersp = 1,
-            yjust = 1,
-            xjust = 0,
-            xpd = TRUE
-        )
-    }
-    
-    if (box) { box() }
-    if (!is.null(file.type)) { dev.off() }
-}
+# MVP.Report.ManhattanPlot <- function(file.type="jpg") {
+#     colx <- col[i,]
+#     colx <- colx[!is.na(colx)]
+#     
+#     print(paste0("Rectangular_Manhattan Plotting ", taxa_name, "..."))
+#     w <- 14
+#     h <- 5
+#     
+#     # setup output device
+#     if (!is.null(file.type)) {
+#         name <- paste0(memo, ".Rectangular-Manhattan.", taxa_name)
+#         switch(file.type,
+#                jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
+#                pdf = pdf(paste0(name, ".pdf"), width = w, height = h),
+#                tiff = tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi)
+#         )
+#         par(mar = c(5, 6, 4, 3), xaxs = xaxs, yaxs = yaxs, xpd = TRUE)
+#     } else {
+#         if (is.null(dev.list())) { dev.new(width = w, height = h) }
+#         par(xpd = TRUE)
+#     }
+#     
+#     pvalue <- pvalueT[,i]
+#     logpvalue <- logpvalueT[,i]
+# 
+#     YlimMax <- ceiling(max(-log10(pvalue[pvalue != 0])))
+# 
+#     if (!is.null(threshold) && !(0 %in% threshold)) {
+#         YlimMax <- ceiling(max(YlimMax, -log10(threshold)))
+#     }
+# 
+#     xlim <- c(0, max(pvalue.posN))
+#     ylim <- c(0, YlimMax)
+#     if (cir.density) {
+#         xlim <- c(0, 1.01 * max(pvalue.posN))
+#         ylim <- c(-YlimMax / den.fold, YlimMax)
+#     }
+#     plot(
+#         pvalue.posN,
+#         logpvalue,
+#         pch = pch,
+#         cex = cex[2],
+#         col = rep(rep(colx, N[i]), add[[i]]),
+#         xlim = xlim,
+#         ylim = ylim,
+#         ylab = ylab,
+#         cex.axis = cex.axis,
+#         cex.lab = 2,
+#         font = 2,
+#         axes = FALSE,
+#         xlab = xlab,
+#         main = paste("Manhattan plot of", taxa[i])
+#     )
+# 
+#     
+#     if (is.null(chr.labels)) {
+#         chr.labels <- chr.ori
+#     }
+#     
+#     axis(1, at = c(0, ticks), cex.axis = cex.axis, font = 2, labels = c("Chr",chr.labels))
+# 
+#     axis(
+#         2,
+#         at = seq(0, YlimMax, ceiling(YlimMax / 10)),
+#         cex.axis = cex.axis,
+#         font = 2,
+#         labels = seq(0, YlimMax, ceiling(YlimMax / 10))
+#     )
+#     legend.y <- tail(seq(0, YlimMax, ceiling(YlimMax / 10)), 1)
+# 
+#     if (!is.null(threshold) && !(0 %in% threshold)) {
+#             for (thr in 1:length(threshold)) {
+#                 h <- -log10(threshold[thr])
+#                 abline(h = h, col = threshold.col[thr], lty = threshold.lty[thr], lwd = threshold.lwd[thr], xpd = FALSE)
+#             }
+#             if (amplify == TRUE) {
+#                 threshold <- sort(threshold)
+#                 sgline1 <- -log10(max(threshold))
+# 
+#                 sgindex=which(logpvalue>=sgline1)
+#                 HY1=logpvalue[sgindex]
+#                 HX1=pvalue.posN[sgindex]
+#                 
+#                 #cover the points that exceed the threshold with the color "white"
+#                 points(HX1,HY1,pch=pch,cex=cex[2],col="white")
+#                 
+#                 for (ll in 1:length(threshold)) {
+#                     if (ll == 1) {
+#                         sgline1 <- -log10(threshold[ll])
+#                         sgindex <- (logpvalue >= sgline1)
+#                     }else{
+#                         sgline0 <- -log10(threshold[ll - 1])
+#                         sgline1 <- -log10(threshold[ll])
+#                         sgindex <- (logpvalue >= sgline1 & logpvalue < sgline0)
+#                     }
+#                     HY1 <- logpvalue[sgindex]
+#                     HX1 <- pvalue.posN[sgindex]
+#                     
+#                     if (is.null(signal.col)) {
+#                         i.col <- rep(rep(colx, N[i]), add[[i]])[sgindex]
+#                     } else{
+#                         i.col <- signal.col[ll]
+#                     }
+#                     
+#                     points(HX1,
+#                            HY1,
+#                            pch = signal.pch[ll],
+#                            cex = signal.cex[ll] * cex[2],
+#                            col = signal.col[ll])
+#                 }
+#             }
+#         }
+# 
+#     if (cir.density) {
+#         for (yll in 1:length(pvalue.posN.list)) {
+#             x <- c(min(pvalue.posN.list[[yll]]), 
+#                    min(pvalue.posN.list[[yll]]), 
+#                    max(pvalue.posN.list[[yll]]),
+#                    max(pvalue.posN.list[[yll]]))
+#             y <- c(-0.5 * YlimMax / den.fold,
+#                    -1.5 * YlimMax / den.fold,
+#                    -1.5 * YlimMax / den.fold,
+#                    -0.5 * YlimMax / den.fold)
+#             polygon(x, y, col = "grey", border = "grey")
+#         }
+#         segments(
+#             x0 = pvalue.posN,
+#             y0 = -0.5 * YlimMax / den.fold,
+#             x1 = pvalue.posN,
+#             y1 = -1.5 * YlimMax / den.fold,
+#             col = density.list$den.col,
+#             lwd = 0.1
+#         )
+#         legend(
+#             x = max(pvalue.posN) + band,
+#             y = legend.y,
+#             title = "",
+#             legend = density.list$legend.y,
+#             pch = 15,
+#             pt.cex = 2.5,
+#             col = density.list$legend.col,
+#             cex = 0.8,
+#             bty = "n",
+#             y.intersp = 1,
+#             x.intersp = 1,
+#             yjust = 1,
+#             xjust = 0,
+#             xpd = TRUE
+#         )
+#     }
+#     
+#     if (box) { box() }
+#     if (!is.null(file.type)) { dev.off() }
+# }
 
 
 MVP.Hist <-

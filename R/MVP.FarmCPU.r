@@ -240,8 +240,6 @@
 #' Output: ve - residual variance
 #' 
 #' @export
-#'
-#' @examples
 `FarmCPU.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0
@@ -454,8 +452,6 @@
 #' Output: seqQTN - an s by 1 vecter for index of QTNs on GM file
 #'
 #' @keywords internal
-#' 
-#' @examples
 FarmCPU.BIN <-
     function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
         #print("FarmCPU.BIN Started")
@@ -653,8 +649,6 @@ FarmCPU.BIN <-
 #' @param MaxBP maximum base pairs for each chromosome
 #'
 #' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not
-#'
-#' @examples
 FarmCPU.Specify <-
     function(GI=NULL, GP=NULL, bin.size=10000000, inclosure.size=NULL, MaxBP=1e10){
         #print("Specification in process...")
@@ -742,8 +736,6 @@ FarmCPU.Specify <-
 #' Output: B - effect of each SNP
 #' 
 #' @keywords internal
-#'
-#' @examples
 FarmCPU.LM <-
     function(y, w=NULL, GDP, ncpus=2, npc=0, bar=TRUE){
         #print("FarmCPU.LM started")
@@ -872,8 +864,6 @@ FarmCPU.LM <-
 #' Output: delta - exp(root)
 #' 
 #' @keywords internal
-#'
-#' @examples
 FarmCPU.Burger <-
     function(Y=NULL,CV=NULL,GK=NULL,ncpus=2, method="FaST-LMM"){
         if(!is.null(CV)){
@@ -930,10 +920,6 @@ FarmCPU.Burger <-
 #' @return 
 #' Output: GLM$P - Updated p-values by substitution process
 #' Output: GLM$B - Updated effects by substitution process
-#'
-#' @export
-#'
-#' @examples
 FarmCPU.SUB <-
     function(GM=NULL,GLM=NULL,QTN=NULL,method="mean"){
         if(is.null(GLM$P)) return(NULL)  #P is required
@@ -994,8 +980,6 @@ FarmCPU.SUB <-
 #' Output: seqQTN - s0 by 1 vecter for index of QTN on GM
 #' Relationship: bin=GDP[,c(seqQTN)], binmap=GM[seqQTN,], s0<=s
 #' @keywords internal
-#'
-#' @examples
 FarmCPU.Remove <-
     function(GDP=NULL, GM=NULL, seqQTN=NULL, seqQTN.p=NULL, threshold=.99){
         if(is.null(seqQTN))return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -1086,8 +1070,6 @@ FarmCPU.Remove <-
 #' Output: P - updated P value by prior information
 #' 
 #' @keywords internal
-#'
-#' @examples
 FarmCPU.Prior <-
     function(GM, P=NULL, Prior=NULL){
         #print("FarmCPU.Prior Started")

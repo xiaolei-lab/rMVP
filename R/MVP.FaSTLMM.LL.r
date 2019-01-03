@@ -34,8 +34,6 @@
 #' Output: ve - residual variance
 #' 
 #' @export
-#'
-#' @examples
 `MVP.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0

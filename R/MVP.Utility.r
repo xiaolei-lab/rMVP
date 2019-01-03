@@ -54,10 +54,7 @@ MVP.Version <- function(width=60) {
 #' @param points the setted points which will be printed
 #' @param symbol.len the total length of progress bar
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 print_bar <- function(i,
                     n,
                     type = c("type1", "type2", "type3"),

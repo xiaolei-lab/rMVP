@@ -227,202 +227,202 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
 #' rm(bmat2) 
 #' unlink(c("testMyBig2.bck","testMyBig2.dsc"))
 #' setwd(orig.dir)
-big.PCA <- function(bigMat, dir=getwd(), pcs.to.keep=50, thin=FALSE, SVD=TRUE, LAP=FALSE, center=TRUE,
-                    save.pcs=FALSE, use.bigalgebra=TRUE, pcs.fn="PCsEVsFromPCA.RData", return.loadings=FALSE,
-                    verbose=FALSE, delete.existing=getOption("deleteFileBacked"), ...) {
-    # run principle components analysis on the SNP subset of the LRR snp x sample matrix
-    # various methods to choose from with pro/cons of speed/memory, etc.
-    #  must use SNP-subset to avoid LD, destroying main effects, +avoid huge memory requirements
-    #dir <- validate.dir.for(dir,c("big","pc"))
-    if (exists("validate.dir.for",mode = "function")) {
-        ## plumbCNV specific code ##
-        dir <- do.call("validate.dir.for",list(dir = dir,elements = c("big","pc"), warn = FALSE))  
-    } else {
-        # otherwise
-        dir <- list(big = dir, pc = dir)
-    }
-    #must.use.package(c("irlba"),TRUE)
-    if (thin) {
-        if (verbose) {  prv.big.matrix(bigMat) }
-        bigMat <- thin(bigMat, dir = dir,...)
-        if (verbose) {  prv.big.matrix(bigMat) }
-    } 
-    pcaMat <- get.big.matrix(bigMat,dir)
-    #print(dim(pcaMat))
-    if (verbose & !thin) { prv.big.matrix(pcaMat,name = "pcaMat") }
-    est.mem <- estimate.memory(pcaMat)
-    if (est.mem > 1) {
-        cat(" estimated memory required for", nrow(pcaMat), "x", ncol(pcaMat), "matrix:", round(est.mem,2),
-            "GB. If this exceeds available,\n  then expect PCA to take a long time or fail!\n")
-    }
-    #print(packages.loaded())
-    subMat <- pcaMat[1:nrow(pcaMat),1:ncol(pcaMat)] # must convert bigmatrix to plain matrix here, no pca yet takes a bigmatrix
-    rm(pcaMat)
-    # center using row means
-    if (length(center) > 1) {
-        if (length(center) == nrow(subMat)) {
-            CM <- center
-            center <- TRUE
-            rm.sub <- function(X) { 
-                mmm <-  matrix(rep(CM, times = ncol(subMat)), ncol = ncol(subMat),byrow = FALSE)
-                prv(mmm)
-                return(mmm)
-            }
-        } else {
-            rm.sub <- rowMeans ; warning("center vector didn't match number of rows of 'bigMat', data left uncentered")
-            center <- FALSE
-        }
-    } else { 
-        rm.sub <- rowMeans # a bit hacky?
-    }
-    if (center) {
-        if (verbose) { cat(" centering data by row means...") }
-        subMat <- subMat - rm.sub(subMat)  #matrix(rep(rowMeans(subMat),times=ncol(subMat)),ncol=ncol(subMat))
-        subMat[is.na(subMat)] <- 0 # replace missing with the mean
-        cat(" means for first 10 snps:\n")
-        print(round(head(rowMeans(subMat),10))) # show that centering has worked
-    } else {
-        subMat <- apply(subMat,1,row.rep)
-    }
-    if (verbose) { cat(" replaced missing data with mean (PCA cannot handle missing data)\n") }
-    #subMat <- t(subMat) # transpose
-    dimz <- dim(subMat)
-    if (!is.numeric(pcs.to.keep) | is.integer(pcs.to.keep)) { pcs.to.keep <- NA }
-    if (is.na(pcs.to.keep)) { pcs.to.keep <- min(dimz) }
-    if (pcs.to.keep > min(dimz)) { 
-        # ensure not trying to extract too many pcs
-        warning(paste0("selected too many PCs to keep [",pcs.to.keep,"], changing to ", min(dimz), "\n")) 
-        pcs.to.keep <- min(dimz)
-    } 
-    if (!SVD & (dimz[2] > dimz[1])) {
-        if (verbose) { cat(" PCA using 'princomp' (only for datasets with more samples than markers)\n") }
-        print(system.time(result <- princomp(t(subMat))))
-        PCs <- result$scores[,1:pcs.to.keep]
-        loadings <- result$loadings[,1:pcs.to.keep]
-        Evalues <- result$sdev^2 # sds are sqrt of eigenvalues
-    } else {
-        if (!SVD) {
-            if (verbose) {
-                cat(" PCA by crossproduct and solving eigenvectors\n")
-                cat(" obtaining crossproduct of the matrix and transpose XtX...")
-            }
-            uu <- (system.time(xtx <- crossprod(subMat)))
-            if (verbose) { 
-                cat("took",round(uu[3]/60,1),"minutes\n")
-                cat(" obtaining eigen vectors of the crossproduct XtX...")
-            }
-            uu <- (system.time(result <- eigen((xtx/nrow(subMat)),symmetric = TRUE)))
-            if (verbose) {  cat("took",round(uu[3]/60,1), "minutes\n") }
-            PCs <- result$vectors[,1:pcs.to.keep]
-            Evalues <- result$values
-            loadings <- NULL
-        } else {
-            pt <- "package:"; pkgset <- gsub(pt,"",search()[grep(pt,search())])
-            do.fast <- (!LAP & (all(c("irlba","bigalgebra") %in% pkgset)))
-            if (!use.bigalgebra) { do.fast <- FALSE }
-            if (verbose) {
-                cat(" PCA by singular value decomposition...") # La.svd gives result with reversed dims. (faster?)
-            } 
-            if (return.loadings)  { nU <- pcs.to.keep } else { nU <- 0 }
-            if (!LAP) {
-                if (do.fast) {
-                    uu <- (system.time(result <- irlba(subMat, nv = pcs.to.keep, nu = nU, mult = matmul))) 
-                } else {
-                    if (use.bigalgebra & verbose) {
-                        warning("[without 'bigalgebra' package, PCA runs slowly for large datasets,see 'big.algebra.install.help()']\n")
-                    }
-                    uu <- (system.time(result <- svd(subMat, nv = pcs.to.keep, nu = nU)))
-                }
-                if (verbose) { cat("took",round(uu[3]/60,1), "minutes\n") }
-                PCs <- result$v[,1:pcs.to.keep]
-                #print("thus ones"); prv(result,return.loadings,nU)
-                if (return.loadings) {
-                    loadings <- result$u[,1:pcs.to.keep]
-                } else {
-                    loadings <- NULL
-                }
-                Evalues <- result$d^2 # singular values are the sqrt of eigenvalues 
-            } else {
-                if (verbose) { cat("\n [using LAPACK alternative with La.svd]") }
-                uu <- (system.time(result <- La.svd(subMat,nv = pcs.to.keep,nu = nU)))
-                if (verbose) { cat("took",round(uu[3]/60,1),"minutes\n") }
-                PCs <- t(result$vt)[,1:pcs.to.keep]  ##?
-                # print("thOs ones")
-                if (return.loadings) {
-                    loadings <- result$u[,1:pcs.to.keep] 
-                } else {
-                    loadings <- NULL
-                }
-                Evalues <- result$d^2 # singular values are the sqrt of eigenvalues
-            }
-        }
-    }
-    rownames(PCs) <- colnames(subMat)
-    colnames(PCs) <- paste("PC",1:pcs.to.keep,sep = "")
-    if (save.pcs) {
-        ofn <- cat.path(dir$pc,pcs.fn)
-        cat(paste("~wrote PC data to file:",ofn,"\n"))
-        save(PCs,Evalues,loadings,file = ofn) }
-    if (return.loadings & exists("loadings")) {
-        colnames(loadings) <- paste("PC",1:pcs.to.keep,sep = "")
-        rownames(loadings) <- rownames(subMat)
-        out.dat <- list(PCs,Evalues,loadings)
-        names(out.dat) <- c("PCs","Evalues","loadings")
-    } else {
-        out.dat <- list(PCs,Evalues)
-        names(out.dat) <- c("PCs","Evalues")
-    }
-    return(out.dat)
-}
-
-
-get.big.matrix <- function(fn, dir="", verbose = FALSE)
-{
-    # loads a big.matrix either using an big.matrix description object
-    # , or this object in a binary file or text file, or points to a bigmatrix or matrix
-    if (all(dir == "")) { dir <- getwd() }
-
-    dir.big <- dir
-    if (is.list(dir)) { if (!is.null(dir[["big"]])) { dir.big <- dir$big } }
-
-    if (is(fn)[1] == "big.matrix.descriptor") {
-        bigMat2 <- attach.big.matrix(fn, path = dir.big)
-    } else {
-        if (is(fn)[1] == "big.matrix" | is(fn)[1] == "matrix") {
-            if (is(fn)[1] == "matrix") {
-                bigMat2 <- as.big.matrix(fn, descriptorfile = "TEMPBIG", backingpath = dir.big)
-            } else {
-                bigMat2 <- fn
-            }
-        } else {
-            lastchar <- substr(dir.big,nchar(dir.big),nchar(dir.big))
-            if (length(grep(".RData",fn)) == 0) {
-                fn <- basename(fn)
-                if (!fn %in% list.files(dir.big)) { 
-                    stop(paste("Error: big.matrix file '",fn,"' not in 'dir.big'",sep = ""))
-                }
-                if (verbose) { cat(" loading big matrix using text description\n") }
-                if (lastchar == "/") { dir.big <- substr(dir.big, 1, nchar(dir.big) - 1) }
-                bigMat2 <- attach.big.matrix(fn, path = dir.big)
-            } else {
-                if (verbose) { cat(" loading big matrix using RData description\n") }
-                if (lastchar != "/") { dir.big <- paste(dir.big,"/",sep = "") }
-                filenm <- cat.path(dir.big, fn, must.exist = TRUE)
-                dscnm <- paste(load(filenm))
-                big.fn <- NULL
-                for (ii in 1:length(dscnm)) {
-                    if ("big.matrix.descriptor" %in% is(get(dscnm[ii]))) {
-                        big.fn <- dscnm[ii]
-                    } 
-                }
-                if (!is.null(big.fn)) {
-                    descr <- get(big.fn) 
-                } else {
-                    stop(paste("Error: didn't find bigmatrix descriptor in file",fn))
-                }
-                bigMat2 <- attach.big.matrix(descr, path = dir.big) 
-            }
-        }
-    }
-    return(bigMat2)
-}
+# big.PCA <- function(bigMat, dir=getwd(), pcs.to.keep=50, thin=FALSE, SVD=TRUE, LAP=FALSE, center=TRUE,
+#                     save.pcs=FALSE, use.bigalgebra=TRUE, pcs.fn="PCsEVsFromPCA.RData", return.loadings=FALSE,
+#                     verbose=FALSE, delete.existing=getOption("deleteFileBacked"), ...) {
+#     # run principle components analysis on the SNP subset of the LRR snp x sample matrix
+#     # various methods to choose from with pro/cons of speed/memory, etc.
+#     #  must use SNP-subset to avoid LD, destroying main effects, +avoid huge memory requirements
+#     #dir <- validate.dir.for(dir,c("big","pc"))
+#     if (exists("validate.dir.for",mode = "function")) {
+#         ## plumbCNV specific code ##
+#         dir <- do.call("validate.dir.for",list(dir = dir,elements = c("big","pc"), warn = FALSE))  
+#     } else {
+#         # otherwise
+#         dir <- list(big = dir, pc = dir)
+#     }
+#     #must.use.package(c("irlba"),TRUE)
+#     if (thin) {
+#         if (verbose) {  prv.big.matrix(bigMat) }
+#         bigMat <- thin(bigMat, dir = dir,...)
+#         if (verbose) {  prv.big.matrix(bigMat) }
+#     } 
+#     pcaMat <- get.big.matrix(bigMat,dir)
+#     #print(dim(pcaMat))
+#     if (verbose & !thin) { prv.big.matrix(pcaMat,name = "pcaMat") }
+#     est.mem <- estimate.memory(pcaMat)
+#     if (est.mem > 1) {
+#         cat(" estimated memory required for", nrow(pcaMat), "x", ncol(pcaMat), "matrix:", round(est.mem,2),
+#             "GB. If this exceeds available,\n  then expect PCA to take a long time or fail!\n")
+#     }
+#     #print(packages.loaded())
+#     subMat <- pcaMat[1:nrow(pcaMat),1:ncol(pcaMat)] # must convert bigmatrix to plain matrix here, no pca yet takes a bigmatrix
+#     rm(pcaMat)
+#     # center using row means
+#     if (length(center) > 1) {
+#         if (length(center) == nrow(subMat)) {
+#             CM <- center
+#             center <- TRUE
+#             rm.sub <- function(X) { 
+#                 mmm <-  matrix(rep(CM, times = ncol(subMat)), ncol = ncol(subMat),byrow = FALSE)
+#                 prv(mmm)
+#                 return(mmm)
+#             }
+#         } else {
+#             rm.sub <- rowMeans ; warning("center vector didn't match number of rows of 'bigMat', data left uncentered")
+#             center <- FALSE
+#         }
+#     } else { 
+#         rm.sub <- rowMeans # a bit hacky?
+#     }
+#     if (center) {
+#         if (verbose) { cat(" centering data by row means...") }
+#         subMat <- subMat - rm.sub(subMat)  #matrix(rep(rowMeans(subMat),times=ncol(subMat)),ncol=ncol(subMat))
+#         subMat[is.na(subMat)] <- 0 # replace missing with the mean
+#         cat(" means for first 10 snps:\n")
+#         print(round(head(rowMeans(subMat),10))) # show that centering has worked
+#     } else {
+#         subMat <- apply(subMat,1,row.rep)
+#     }
+#     if (verbose) { cat(" replaced missing data with mean (PCA cannot handle missing data)\n") }
+#     #subMat <- t(subMat) # transpose
+#     dimz <- dim(subMat)
+#     if (!is.numeric(pcs.to.keep) | is.integer(pcs.to.keep)) { pcs.to.keep <- NA }
+#     if (is.na(pcs.to.keep)) { pcs.to.keep <- min(dimz) }
+#     if (pcs.to.keep > min(dimz)) { 
+#         # ensure not trying to extract too many pcs
+#         warning(paste0("selected too many PCs to keep [",pcs.to.keep,"], changing to ", min(dimz), "\n")) 
+#         pcs.to.keep <- min(dimz)
+#     } 
+#     if (!SVD & (dimz[2] > dimz[1])) {
+#         if (verbose) { cat(" PCA using 'princomp' (only for datasets with more samples than markers)\n") }
+#         print(system.time(result <- princomp(t(subMat))))
+#         PCs <- result$scores[,1:pcs.to.keep]
+#         loadings <- result$loadings[,1:pcs.to.keep]
+#         Evalues <- result$sdev^2 # sds are sqrt of eigenvalues
+#     } else {
+#         if (!SVD) {
+#             if (verbose) {
+#                 cat(" PCA by crossproduct and solving eigenvectors\n")
+#                 cat(" obtaining crossproduct of the matrix and transpose XtX...")
+#             }
+#             uu <- (system.time(xtx <- crossprod(subMat)))
+#             if (verbose) { 
+#                 cat("took",round(uu[3]/60,1),"minutes\n")
+#                 cat(" obtaining eigen vectors of the crossproduct XtX...")
+#             }
+#             uu <- (system.time(result <- eigen((xtx/nrow(subMat)),symmetric = TRUE)))
+#             if (verbose) {  cat("took",round(uu[3]/60,1), "minutes\n") }
+#             PCs <- result$vectors[,1:pcs.to.keep]
+#             Evalues <- result$values
+#             loadings <- NULL
+#         } else {
+#             pt <- "package:"; pkgset <- gsub(pt,"",search()[grep(pt,search())])
+#             do.fast <- (!LAP & (all(c("irlba","bigalgebra") %in% pkgset)))
+#             if (!use.bigalgebra) { do.fast <- FALSE }
+#             if (verbose) {
+#                 cat(" PCA by singular value decomposition...") # La.svd gives result with reversed dims. (faster?)
+#             } 
+#             if (return.loadings)  { nU <- pcs.to.keep } else { nU <- 0 }
+#             if (!LAP) {
+#                 if (do.fast) {
+#                     uu <- (system.time(result <- irlba(subMat, nv = pcs.to.keep, nu = nU, mult = matmul))) 
+#                 } else {
+#                     if (use.bigalgebra & verbose) {
+#                         warning("[without 'bigalgebra' package, PCA runs slowly for large datasets,see 'big.algebra.install.help()']\n")
+#                     }
+#                     uu <- (system.time(result <- svd(subMat, nv = pcs.to.keep, nu = nU)))
+#                 }
+#                 if (verbose) { cat("took",round(uu[3]/60,1), "minutes\n") }
+#                 PCs <- result$v[,1:pcs.to.keep]
+#                 #print("thus ones"); prv(result,return.loadings,nU)
+#                 if (return.loadings) {
+#                     loadings <- result$u[,1:pcs.to.keep]
+#                 } else {
+#                     loadings <- NULL
+#                 }
+#                 Evalues <- result$d^2 # singular values are the sqrt of eigenvalues 
+#             } else {
+#                 if (verbose) { cat("\n [using LAPACK alternative with La.svd]") }
+#                 uu <- (system.time(result <- La.svd(subMat,nv = pcs.to.keep,nu = nU)))
+#                 if (verbose) { cat("took",round(uu[3]/60,1),"minutes\n") }
+#                 PCs <- t(result$vt)[,1:pcs.to.keep]  ##?
+#                 # print("thOs ones")
+#                 if (return.loadings) {
+#                     loadings <- result$u[,1:pcs.to.keep] 
+#                 } else {
+#                     loadings <- NULL
+#                 }
+#                 Evalues <- result$d^2 # singular values are the sqrt of eigenvalues
+#             }
+#         }
+#     }
+#     rownames(PCs) <- colnames(subMat)
+#     colnames(PCs) <- paste("PC",1:pcs.to.keep,sep = "")
+#     if (save.pcs) {
+#         ofn <- cat.path(dir$pc,pcs.fn)
+#         cat(paste("~wrote PC data to file:",ofn,"\n"))
+#         save(PCs,Evalues,loadings,file = ofn) }
+#     if (return.loadings & exists("loadings")) {
+#         colnames(loadings) <- paste("PC",1:pcs.to.keep,sep = "")
+#         rownames(loadings) <- rownames(subMat)
+#         out.dat <- list(PCs,Evalues,loadings)
+#         names(out.dat) <- c("PCs","Evalues","loadings")
+#     } else {
+#         out.dat <- list(PCs,Evalues)
+#         names(out.dat) <- c("PCs","Evalues")
+#     }
+#     return(out.dat)
+# }
+# 
+# 
+# get.big.matrix <- function(fn, dir="", verbose = FALSE)
+# {
+#     # loads a big.matrix either using an big.matrix description object
+#     # , or this object in a binary file or text file, or points to a bigmatrix or matrix
+#     if (all(dir == "")) { dir <- getwd() }
+# 
+#     dir.big <- dir
+#     if (is.list(dir)) { if (!is.null(dir[["big"]])) { dir.big <- dir$big } }
+# 
+#     if (is(fn)[1] == "big.matrix.descriptor") {
+#         bigMat2 <- attach.big.matrix(fn, path = dir.big)
+#     } else {
+#         if (is(fn)[1] == "big.matrix" | is(fn)[1] == "matrix") {
+#             if (is(fn)[1] == "matrix") {
+#                 bigMat2 <- as.big.matrix(fn, descriptorfile = "TEMPBIG", backingpath = dir.big)
+#             } else {
+#                 bigMat2 <- fn
+#             }
+#         } else {
+#             lastchar <- substr(dir.big,nchar(dir.big),nchar(dir.big))
+#             if (length(grep(".RData",fn)) == 0) {
+#                 fn <- basename(fn)
+#                 if (!fn %in% list.files(dir.big)) { 
+#                     stop(paste("Error: big.matrix file '",fn,"' not in 'dir.big'",sep = ""))
+#                 }
+#                 if (verbose) { cat(" loading big matrix using text description\n") }
+#                 if (lastchar == "/") { dir.big <- substr(dir.big, 1, nchar(dir.big) - 1) }
+#                 bigMat2 <- attach.big.matrix(fn, path = dir.big)
+#             } else {
+#                 if (verbose) { cat(" loading big matrix using RData description\n") }
+#                 if (lastchar != "/") { dir.big <- paste(dir.big,"/",sep = "") }
+#                 filenm <- cat.path(dir.big, fn, must.exist = TRUE)
+#                 dscnm <- paste(load(filenm))
+#                 big.fn <- NULL
+#                 for (ii in 1:length(dscnm)) {
+#                     if ("big.matrix.descriptor" %in% is(get(dscnm[ii]))) {
+#                         big.fn <- dscnm[ii]
+#                     } 
+#                 }
+#                 if (!is.null(big.fn)) {
+#                     descr <- get(big.fn) 
+#                 } else {
+#                     stop(paste("Error: didn't find bigmatrix descriptor in file",fn))
+#                 }
+#                 bigMat2 <- attach.big.matrix(descr, path = dir.big) 
+#             }
+#         }
+#     }
+#     return(bigMat2)
+# }
