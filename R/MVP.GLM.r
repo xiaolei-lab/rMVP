@@ -34,6 +34,14 @@
 #' @export
 #'
 #' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' glm <- MVP.GLM(phe=phenotype, geno=genotype)
+#' str(glm)
 MVP.GLM <-
 function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     R.ver <- Sys.info()[['sysname']]

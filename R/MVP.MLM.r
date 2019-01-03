@@ -40,6 +40,15 @@
 #' @export
 #'
 #' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
+#' mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)
+#' str(mlm)
 MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
 R.ver <- Sys.info()[['sysname']]
@@ -87,9 +96,10 @@ if(is.null(CV)){
 #number of fixed effects
 nf <- ncol(X0) + 1
     if(is.null(REML)){
-    print("Variance components...")   
+		print("Variance components...")   
         if(vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if(vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
+		print("Variance components is Done!")
     }
 
     q0 <- ncol(X0)
@@ -99,7 +109,7 @@ nf <- ncol(X0) + 1
     ves <- REML$ve
     vgs <- REML$vg
     lambda <- ves/vgs
-    print("Eigen-Decomposition...")
+    print("Eigen Decomposition...")
     eig <- eigen(K, symmetric=TRUE); rm(K); gc()
     print("Eigen-Decomposition is Done!")
     

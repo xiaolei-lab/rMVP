@@ -80,6 +80,16 @@
 #' Output: MVP.return$farmcpu.results - p-values obtained by FarmCPU method
 #'
 #' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
+#' map <- read.table("mvp.map" , head = TRUE)
+#' mvp <- MVP(phe=phenotype, geno=genotype, map=map, method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE)
+#' str(mvp)
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE

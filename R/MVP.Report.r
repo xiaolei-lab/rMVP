@@ -64,6 +64,9 @@
 #' @export
 #'
 #' @examples
+#' data(pig60K)
+#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=/nrow(pig60K))
+#' MVP.Report(pig60K, plot.type="c", threshold=/nrow(pig60K))
 MVP.Report <- function(
     MVP,
     col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
@@ -233,18 +236,18 @@ MVP.Report <- function(
         }
 
         pvalueT <- as.matrix(Pmap[,-c(1:2)])
-        pos <- Pmap[, 2]
+        pvalue.pos <- Pmap[, 2]
         p0.index <- Pmap[, 1] == 0
         if(sum(p0.index) != 0){
-            pos[p0.index] <- 1:sum(p0.index)
+            pvalue.pos[p0.index] <- 1:sum(p0.index)
         }
-        pos.list <- tapply(pos, Pmap[, 1], list)
+        pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
         
         #scale the space parameter between chromosomes
         if(!missing(band)){
-            band <- floor(band*(sum(sapply(pos.list, max))/100))
+            band <- floor(band*(sum(sapply(pvalue.pos.list, max))/100))
         }else{
-            band <- floor((sum(sapply(pos.list, max))/100))
+            band <- floor((sum(sapply(pvalue.pos.list, max))/100))
         }
         if(band==0) band=1
         

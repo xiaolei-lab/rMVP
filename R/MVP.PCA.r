@@ -32,6 +32,11 @@
 #' @export
 #'
 #' @examples
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' pca <- MVP.PCA(M=genotype)
+#' str(pca)
 MVP.PCA <-
 function(M, perc=1, pcs.keep=5, memo=NULL){
     R.ver <- Sys.info()[['sysname']]

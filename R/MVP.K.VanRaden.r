@@ -31,6 +31,10 @@
 #' @export
 #'
 #' @examples
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
 MVP.K.VanRaden <-
 function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, maxLine=1000){
     R.ver <- Sys.info()[['sysname']]

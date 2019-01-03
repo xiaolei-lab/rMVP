@@ -34,6 +34,15 @@
 #' @export
 #'
 #' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
+#' vc <- MVP.GEMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K, root=FALSE)
+#' print(vc)
 MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE) {
     #try(setMKLthreads(1),silent = TRUE)
     K = K[]

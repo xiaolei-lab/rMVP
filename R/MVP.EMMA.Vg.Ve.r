@@ -39,6 +39,15 @@
 #' @export
 #'
 #' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
+#' vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
+#' print(vc)
 MVP.EMMA.Vg.Ve <-
 function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     if(!is.numeric(y))	y <- as.numeric(as.character(y))
