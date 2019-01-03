@@ -21,16 +21,22 @@
 #' 
 #' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
 #' 
-#' @param pheno phenotype
-#' @param snp.pool SNP matrix
+#' @param pheno a two-column phenotype matrix
+#' @param snp.pool matrix for pseudo QTNs
 #' @param X0 covariates matrix
-#' @param ncpus number of CPUs used for parallel computation
+#' @param ncpus number of threads used for parallel computation
 #'
-#' @return LL
+#' @return
+#' Output: beta - beta effect
+#' Output: delta - delta value
+#' Output: LL - log-likelihood
+#' Output: vg - genetic variance
+#' Output: ve - residual variance
+#' 
 #' @export
 #'
 #' @examples
-`MVP.FaSTLMM.LL` <- function(pheno, snp.pool,X0=NULL,ncpus=2){
+`MVP.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0
     deltaExpStart = -5
@@ -213,5 +219,5 @@
     sigma_a<- 1/n*(sigma_a1+sigma_a2)
     sigma_e<-delta*sigma_a
     
-    return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a,ve=sigma_e))
+    return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a, ve=sigma_e))
 }

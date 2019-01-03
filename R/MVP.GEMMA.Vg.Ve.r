@@ -28,7 +28,7 @@
 #' @param rtol parameters for HE regression, no changes is recommended
 #' @param atol parameters for HE regression, no changes is recommended
 #' @param ctol parameters for HE regression, no changes is recommended
-#' @param root parameters for HE regression, no changes is recommended
+#' @param root whether to loop iteration for the output of HE
 #'
 #' @return vg, ve, and delta
 #' @export

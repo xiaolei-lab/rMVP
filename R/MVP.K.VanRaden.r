@@ -23,8 +23,8 @@
 #' @param M Genotype, m * n, m is marker size, n is population size
 #' @param weight vector, the weights for makers
 #' @param priority speed or memory
-#' @param memo 
-#' @param SUM 
+#' @param memo add a character to the name of temporary files
+#' @param SUM the scaled value to kinship matrix
 #' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
 #'
 #' @return K, n * n matrix

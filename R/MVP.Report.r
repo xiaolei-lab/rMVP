@@ -17,48 +17,48 @@
 
 #' Title
 #'
-#' @param MVP 
-#' @param col 
-#' @param bin.size 
-#' @param bin.max 
-#' @param pch 
-#' @param band 
-#' @param cir.band 
-#' @param H 
-#' @param ylim 
-#' @param cex.axis 
-#' @param plot.type 
-#' @param multracks 
-#' @param cex 
-#' @param r 
-#' @param xlab 
-#' @param ylab 
-#' @param xaxs 
-#' @param yaxs 
-#' @param outward 
-#' @param threshold 
-#' @param threshold.col 
-#' @param threshold.lwd 
-#' @param threshold.lty 
-#' @param amplify 
-#' @param chr.labels 
-#' @param signal.cex 
-#' @param signal.pch 
-#' @param signal.col 
-#' @param signal.line 
-#' @param cir.chr 
-#' @param cir.chr.h 
-#' @param chr.den.col 
-#' @param cir.legend 
-#' @param cir.legend.cex 
-#' @param cir.legend.col 
-#' @param LOG10 
-#' @param box 
-#' @param conf.int.col 
-#' @param file.output 
-#' @param file 
-#' @param dpi 
-#' @param memo 
+#' @param MVP: Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers
+#' @param col: Vector or matrix. If ‘col’ is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If ‘col’ is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
+#' @param bin.size: Number. Number of markers will be counted for each marker window and used for plotting marker density
+#' @param bin.max: Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than ‘bin.max’ will use the same color as ‘bin.max’
+#' @param pch: Number. Type of points, same as ‘pch’ in <plot> R function
+#' @param band: Number. The space among chromosomes.
+#' @param cir.band: Number. The space between circles when plotting Manhattan plot in circular manner
+#' @param H: Number. The height for each circle when plotting multiple-group GWAS results using Manhattan plot in circular manner
+#' @param ylim: Vector. The range of Y-axis when plotting Manhattan plot, same as "ylim" in <plot> R function
+#' @param cex.axis: Number. The size of Chromosome ID and labels when plotting Manhattan plot in circular manner
+#' @param plot.type: Character or Vector, options are “d”, “c”, “m”, “q”, and “b”. If plot.type=“d”, marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type=“m”, Manhattan plot in rectangular manner will be plotted; if plot.type=“q”, Q-Q plot will be plotted; if plot.type=“b”, both Manhattan plot and Q-Q plot will be plotted
+#' @param multracks: Logical value. If FALSE, multiple-group GWAS results will be plotted on multiple tracks; if TRUE, multiple-group GWAS results will be plotted on a single track
+#' @param cex: Number or Vector. The size of points. It is the same as “size” in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively
+#' @param r: Number. The radius of the inside circle when plotting Manhattan plot in circular manner
+#' @param xlab: Character. The label of X axis
+#' @param ylab: Character. The label of Y axis
+#' @param xaxs: Character. Options are "r", and "i". It is the same as “xaxs” in <plot> R function
+#' @param yaxs: Character. Options are "r", and "i". It is the same as “yaxs” in <plot> R function
+#' @param outward: Logical value. If TRUE, all points will be plotted from inside toward outside; otherwise, all points will be plotted from outside toward inside
+#' @param threshold: Number or Vector. The cutoff line on Manhattan plot, e.g. Bonfferoni correction. More than one significant line can be added onto one figure. If threshold=0 or NULL, the threshold line will not be added
+#' @param threshold.col: Character or Vector. The colors of threshold lines
+#' @param threshold.lwd: Number or Vector. The widths of threshold lines
+#' @param threshold.lty: Number or Vector. The type of threshold line
+#' @param amplify: Logical value. If TRUE, the points that passed the threshold line will be highlighted
+#' @param chr.labels: Vector. The labels for the Chromosome IDs on Manhattan plot in circular manner
+#' @param signal.cex: Number. If “amplify” is TRUE, “signal.cex” is used to set the size of significant points
+#' @param signal.pch: Number. If “amplify” is TRUE, users can set the type of significant points
+#' @param signal.col: Character. If “amplify” is TRUE, “signal.col” is used to set the color of significant points, if “signal.col” is NULL, the colors of significant points will not be changed
+#' @param signal.line: Number. The width of dotted lines used for marking significant points
+#' @param cir.chr: Logical value. If TRUE, a band that represents marker density information will be added onto Manhattan plot in circular manner
+#' @param cir.chr.h: Number. If “cir.chr=TRUE”, it can be used to set the width of marker density band
+#' @param chr.den.col: Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If “chr.den.col=NULL”, it will use the colors in parameter ‘col’
+#' @param cir.legend: Logical value. If TRUE, legends will be added on each circle of Manhattan plot in circular manner
+#' @param cir.legend.cex: Number. The size of legend on Manhattan plot in circular manner
+#' @param cir.legend.col: Character. The color of legends on Manhattan plot in circular manner
+#' @param LOG10: Logical value. If TRUE, the p values of GWAS results will be scaled by log10
+#' @param box: Logical value. If TRUE, the border line of Manhattan plot will be added
+#' @param conf.int.col: Character. The color of confidence interval on QQ-plot 
+#' @param file.output: Logical value. If TRUE, the figures will be generated. 
+#' @param file: Character. Options are jpg, pdf, and tiff
+#' @param dpi: Number. Dots per inch for .jpg and .tiff files
+#' @param memo: Character. A text marker on output files
 #'
 #' @return
 #' @export
@@ -273,7 +273,7 @@ MVP.Report <- function(
         for(i in 1:R){
             colx <- col[i,]
             colx <- colx[!is.na(colx)]
-            N[i] <- ceiling(Nchr / length(colx))
+            N[i] <- ceiling(Nchr/length(colx))
         }
         
         #insert the space into chromosomes and return the midpoint of each chromosome
@@ -1958,7 +1958,7 @@ MVP.Report.QQplot <-
     print(paste0("Q_Q Plotting ", taxa_name, "..."))
     w <- 5.5
     h <- 5.5
-    paste("QQplot of", taxa_name)
+    
     # setup output device
     if (!is.null(file.type)) {
         name <- paste0(memo, ".QQplot.", taxa_name)
@@ -1984,10 +1984,7 @@ MVP.Report.QQplot <-
     quantiles <- -log10((1:N) / (N + 1))
     
     # filter
-    is_visable <- filter.points(quantiles, P.values, w, h, dpi)
-    # print(N)
-    # print(sum(is_visable))
-    
+    is_visable <- filter_points(quantiles, P.values, w, h, dpi)
     
     # calculate the confidence interval of QQ-plot
     c95 <- 1
@@ -2017,7 +2014,7 @@ MVP.Report.QQplot <-
         cex.lab = 1.2,
         xlab = expression(Expected~~-log[10](italic(p))),
         ylab = expression(Observed~~-log[10](italic(p))),
-        main = title
+        main = paste("QQplot of", taxa_name)
     )
     axis(
         1,
@@ -2059,79 +2056,7 @@ MVP.Report.QQplot <-
     if (!is.null(file.type)) { dev.off() }
 }
 
-MVP.Report.ManhattanPlot <- function(
-    
-    file.type="jpg"
-) {
-    #scale and adjust the parameters
-    cir.chr.h <- cir.chr.h / 5
-    cir.band <- cir.band / 5
-    if (!is.null(threshold)) {
-        n.thr <- length(threshold)
-        threshold.col <- rep(threshold.col, n.thr)
-        threshold.lwd <- rep(threshold.lwd, n.thr)
-        threshold.lty <- rep(threshold.lty, n.thr)
-        signal.col <- rep(signal.col, n.thr)
-        signal.pch <- rep(signal.pch, n.thr)
-        signal.cex <- rep(signal.cex, n.thr)
-    }
-    if (length(cex) != 3) { cex <- rep(cex,3) }
-    
-    
-    #scale the space parameter between chromosomes
-    if (!missing(band)) {
-        band <- floor(band*(sum(sapply(pos.list, max))/100))
-    }else{
-        band <- ceiling((sum(sapply(pos.list, max))/100))
-    }
-    
-    pvalueT[pvalueT <= 0] <- 1
-    pvalueT[pvalueT > 1] <- 1
-    
-    # set the colors for the plot
-    if(is.vector(col)){
-        col <- matrix(col, R, length(col), byrow=TRUE)
-    }
-    if(is.matrix(col)){
-        #try to transform the colors into matrix for all traits
-        col <- matrix(as.vector(t(col)), R, dim(col)[2], byrow=TRUE)
-    }
-    
-    Num <- as.numeric(table(Pmap[,1]))
-    Nchr <- length(chr)
-    N <- NULL
-    
-    
-    add <- list()
-    for(i in 1:R){
-        colx <- col[i,]
-        colx <- colx[!is.na(colx)]
-        add[[i]] <- c(Num,rep(0,N[i]*length(colx)-Nchr))
-    }
-    
-    TotalN <- max(posN)
-    
-    if(length(chr.den.col) > 1){
-        cir.density=TRUE
-        den.fold <- 20
-        density.list <- Densitplot(map=Pmap[,c(1,1,2)], col=chr.den.col, plot=FALSE, bin=bin.size, legend.max=bin.max)
-        #list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
-    }else{
-        cir.density=FALSE
-    }
-    
-    signal.line.index <- NULL
-    if(!is.null(threshold)){
-        if(!is.null(signal.line)){
-            for(l in 1:R){
-                    signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)))
-            }
-            signal.line.index <- unique(signal.line.index)
-        }
-    }
-    signal.line.index <- posN[signal.line.index]
-    
-    
+MVP.Report.ManhattanPlot <- function(file.type="jpg") {
     colx <- col[i,]
     colx <- colx[!is.na(colx)]
     
@@ -2162,14 +2087,14 @@ MVP.Report.ManhattanPlot <- function(
         YlimMax <- ceiling(max(YlimMax, -log10(threshold)))
     }
 
-    xlim <- c(0, max(posN))
+    xlim <- c(0, max(pvalue.posN))
     ylim <- c(0, YlimMax)
     if (cir.density) {
-        xlim <- c(0, 1.01 * max(posN))
+        xlim <- c(0, 1.01 * max(pvalue.posN))
         ylim <- c(-YlimMax / den.fold, YlimMax)
     }
     plot(
-        posN,
+        pvalue.posN,
         logpvalue,
         pch = pch,
         cex = cex[2],
@@ -2210,12 +2135,12 @@ MVP.Report.ManhattanPlot <- function(
                 threshold <- sort(threshold)
                 sgline1 <- -log10(max(threshold))
 
-                sgindex <- (logpvalue >= sgline1)
-                HY1 <- logpvalue[sgindex]
-                HX1 <- posN[sgindex]
+                sgindex=which(logpvalue>=sgline1)
+                HY1=logpvalue[sgindex]
+                HX1=pvalue.posN[sgindex]
                 
                 #cover the points that exceed the threshold with the color "white"
-                points(HX1, HY1, pch = pch, cex = cex[2], col = "white")
+                points(HX1,HY1,pch=pch,cex=cex[2],col="white")
                 
                 for (ll in 1:length(threshold)) {
                     if (ll == 1) {
@@ -2227,7 +2152,7 @@ MVP.Report.ManhattanPlot <- function(
                         sgindex <- (logpvalue >= sgline1 & logpvalue < sgline0)
                     }
                     HY1 <- logpvalue[sgindex]
-                    HX1 <- posN[sgindex]
+                    HX1 <- pvalue.posN[sgindex]
                     
                     if (is.null(signal.col)) {
                         i.col <- rep(rep(colx, N[i]), add[[i]])[sgindex]
@@ -2245,11 +2170,11 @@ MVP.Report.ManhattanPlot <- function(
         }
 
     if (cir.density) {
-        for (yll in 1:length(posN.list)) {
-            x <- c(min(posN.list[[yll]]), 
-                   min(posN.list[[yll]]), 
-                   max(posN.list[[yll]]),
-                   max(posN.list[[yll]]))
+        for (yll in 1:length(pvalue.posN.list)) {
+            x <- c(min(pvalue.posN.list[[yll]]), 
+                   min(pvalue.posN.list[[yll]]), 
+                   max(pvalue.posN.list[[yll]]),
+                   max(pvalue.posN.list[[yll]]))
             y <- c(-0.5 * YlimMax / den.fold,
                    -1.5 * YlimMax / den.fold,
                    -1.5 * YlimMax / den.fold,
@@ -2257,15 +2182,15 @@ MVP.Report.ManhattanPlot <- function(
             polygon(x, y, col = "grey", border = "grey")
         }
         segments(
-            x0 = posN,
+            x0 = pvalue.posN,
             y0 = -0.5 * YlimMax / den.fold,
-            x1 = posN,
+            x1 = pvalue.posN,
             y1 = -1.5 * YlimMax / den.fold,
             col = density.list$den.col,
             lwd = 0.1
         )
         legend(
-            x = max(posN) + band,
+            x = max(pvalue.posN) + band,
             y = legend.y,
             title = "",
             legend = density.list$legend.y,
@@ -2283,238 +2208,6 @@ MVP.Report.ManhattanPlot <- function(
     }
     
     if (box) { box() }
-    if (!is.null(file.type)) { dev.off() }
-}
-
-
-
-MVP.Report.ManhattanPlot <-
-    function(Pmap,
-             taxa.name,
-             memo = NULL,
-             show.density = TRUE,
-             bin.size = 1e6,
-             bin.max = NULL,
-             chr.den.col=c("darkgreen", "yellow", "red"),
-             pch = 19,
-             cex = c(0.5, 0.8, 1),
-             col = c("dodgerblue4","deepskyblue"),
-             signal.pch = 19,
-             signal.cex = 1,
-             signal.col = "red",
-             threshold = NULL,
-             threshold.col = "red",
-             threshold.lty = 2,
-             threshold.lwd = 1,
-             cex.axis = 1,
-             title=NULL,
-             xlab=NULL,
-             ylab=NULL,
-             amplify = TRUE,
-             file.type = "jpg",
-             dpi = 300) {
-        
-    # === Argument parsing & Definition =============
-    print(paste0("Rectangular_Manhattan Plotting ", taxa.name, "..."))
-    
-    w <- 14          # width of figure(inches)
-    h <- 5           # height of figure(inches)
-    den.fold <- 20   # Ratio of Manhattan plot height to SNP density plot height 
-    
-    if (is.null(title)) { title <- paste("Manhattan plot of", taxa.name) }
-    if (is.null(xlab)) { xlab <- "Chromosome" }
-    if (is.null(ylab)) { ylab <- expression(-log[10](italic(p))) }
-    
-    if (0 %in% threshold) { threshold <- threshold[threshold != 0]}
-    
-    # setup output device
-    if (!is.null(file.type)) {
-        name <- paste(memo, "Rectangular-Manhattan", taxa.name, sep = ".")
-        switch(file.type,
-               jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
-               pdf = pdf(paste0(name, ".pdf"), width = w, height = h),
-               tiff = tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi)
-        )
-        par(mar = c(5, 6, 4, 3), xaxs = xaxs, yaxs = yaxs, xpd = TRUE)
-    } else {
-        if (is.null(dev.list())) { dev.new(width = w, height = h) }
-        par(xpd = TRUE)
-    }
-    
-    # === Data preprocessing ========================
-    # Get digitally encoded chromosome
-    chr       <- Pmap[, 1]
-    is.num    <- suppressWarnings(!is.na(as.numeric(chr)))
-    chr.max   <- max(as.numeric(chr[is.num]))
-    chr.max   <- ifelse(is.infinite(chr.max), 0, chr.max)
-    chr.other <- sort(unique(chr[!is.num]))
-    chr.n     <- length(unique(chr))
-    
-    Pmap[, 1] <- as.numeric(replace(chr,
-                                    chr == chr.other,
-                                    (chr.max + 1):(chr.max + length(chr.other))))
-    
-    # Order Pmap
-    Pmap <- apply(Pmap, 2, as.numeric)
-    Pmap <- Pmap[order(Pmap[, 1], Pmap[, 2]), ]
-    
-    # Convert chromosome position to absolute coordinates
-    pos.list  <- tapply(Pmap[, 2], Pmap[, 1], list)
-    chr.len   <- sapply(pos.list, max)
-    band      <- ceiling((sum(chr.len) / 100))
-    Pmap[, 2] <- unlist(lapply(1:length(pos.list), function(x) {
-        return(pos.list[[x]] + sum(chr.len[seq_len(x - 1)]) + (x - 1) * band)
-    }))
-    
-    # -log10
-    Pmap[, 3] <- -log10(Pmap[, 3])
-    if (!is.null(threshold)) { threshold <- -log10(sort(threshold)) }
-    
-    # 
-    pos.list      <- tapply(Pmap[, 2], Pmap[, 1], list)
-    chr.label     <- c(sort(unique(chr[is.num])), chr.other)
-    chr.label.pos <- sapply(pos.list, function(x) {(max(x) + min(x)) / 2})
-    
-    # Filter points
-    is.visable <- filter.points(Pmap[, 2], Pmap[, 3], w, h, dpi)
-    Pmap <- Pmap[is.visable, ]
-    
-    # Get point style
-    point.style <- NULL
-    style.pch   <- NULL
-    style.cex   <- NULL
-    style.col   <- NULL
-    is.amplify  <- rep(FALSE, nrow(Pmap))
-    
-    # get signal point style
-    if (amplify && !is.null(signal.col) && !is.null(threshold)) {
-        point.style <- matrix(NA, nrow(Pmap), length(threshold) + 1)
-        th <- c(Inf, threshold)
-        for (t in 2:(length(th) - 1)) {
-            point.style[, t - 1] <- (Pmap[, 3] >= th[t] && Pmap[, 3] < th[t - 1])
-        }
-        is.amplify <- apply(point.style, 1, any)
-        style.pch <- rep_len(signal.pch, length(threshold))
-        style.cex  <- rep_len(signal.cex * cex[2], length(threshold))
-        style.col  <- rep_len(signal.col, length(threshold)) 
-    }
-
-    # get normal point style
-    point.style <- cbind(point.style,
-                         sapply(unique(Pmap[, 1]), function(x) {
-                             i <- rep(FALSE, nrow(Pmap))
-                             i[Pmap[!is.amplify, 1] == x] <- TRUE
-                             return(i)
-                         }))
-
-    style.pch <- c(style.pch, rep_len(pch, chr.n))
-    style.cex <- c(style.cex, rep_len(cex[1], chr.n))
-    style.col <- c(style.col, rep_len(col, chr.n))
-    
-    # === Drawing ===================================
-    # Calculate canvas size
-    xlim.max <- max(Pmap[, 2])
-    ylim.max <- ceiling(max(Pmap[, 3]))
-    
-    if (!is.null(threshold) && !(0 %in% threshold)) {
-        ylim.max <- ceiling(max(ylim.max, -log10(threshold)))
-    }
-    
-    xlim <- c(0, xlim.max)
-    ylim <- c(0, ylim.max)
-    if (show.density) {
-        xlim <- c(0, 1.01 * xlim.max)
-        ylim <- c(-ylim.max / den.fold, ylim.max)
-    }
-    
-    # Draw canvas and axis
-    plot(
-        NULL,
-        xlim = xlim,
-        ylim = ylim,
-        xlab = xlab,
-        ylab = ylab,
-        cex.axis = cex.axis,
-        cex.lab = 2,
-        font = 2,
-        axes = FALSE,
-        main = title
-    )
-    
-    y.at     <- seq(0, ylim.max, ceiling(ylim.max / 10))
-    y.legend <- tail(y.at, 1)
-    
-    axis(1, at = c(0, chr.label.pos), cex.axis = cex.axis, font = 2, labels = c("Chr", chr.label))
-    axis(2, at = y.at, cex.axis = cex.axis, font = 2, labels = y.at)
-    
-    # Draw SNP density
-    if (show.density) {
-        # Get density data
-        density.list <- Densitplot(
-            map = Pmap[, c(1, 1, 2)],
-            col = chr.den.col,
-            plot = FALSE,
-            bin = bin.size,
-            legend.max = bin.max
-        )
-        # draw chromosome grey background
-        for (chr.pos in pos.list) {
-            x  <- c(min(chr.pos), min(chr.pos), max(chr.pos), max(chr.pos))
-            y0 <- -0.5 * ylim.max / den.fold
-            y1 <- -1.5 * ylim.max / den.fold
-            y  <- c(y0, y1, y1, y0)
-            polygon(x, y, col = "grey", border = "grey")
-        }
-        segments(
-            x0 = Pmap[, 2],
-            y0 = y0,
-            x1 = Pmap[, 2],
-            y1 = y1,
-            col = density.list$den.col,
-            lwd = 0.1
-        )
-        legend(
-            x = max(Pmap[, 2]) + band,
-            y = y.legend,
-            title = "",
-            legend = density.list$legend.y,
-            pch = 15,
-            pt.cex = 2.5,
-            col = density.list$legend.col,
-            cex = 0.8,
-            bty = "n",
-            y.intersp = 1,
-            x.intersp = 1,
-            yjust = 1,
-            xjust = 0,
-            xpd = TRUE
-        )
-    }
-    
-    # Draw threshold
-    if (!is.null(threshold)) {
-        for (thr in 1:length(threshold)) {
-            abline(
-                h = threshold[thr],
-                col = threshold.col[thr],
-                lty = threshold.lty[thr],
-                lwd = threshold.lwd[thr],
-                xpd = FALSE
-            )
-        }
-    }
-    
-    # Draw points
-    print(paste(head(style.pch), head(style.cex), head(style.col)))
-    for (s in 1:ncol(point.style)) {
-        p <- point.style[, s]
-        points(Pmap[p, 2],
-               Pmap[p, 3],
-               pch = style.pch[s],
-               cex = style.cex[s],
-               col = style.col[s])
-    }
-    
     if (!is.null(file.type)) { dev.off() }
 }
 
@@ -2656,5 +2349,4 @@ MVP.PCAplot <- function(PCA,
         # setwd("../")
     }
 }
-
 

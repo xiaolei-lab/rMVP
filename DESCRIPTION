@@ -1,4 +1,4 @@
-Package: MVP
+Package: rMVP
 Type: Package
 Title: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
 Version: 1.2.0

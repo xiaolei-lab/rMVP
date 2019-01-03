@@ -23,30 +23,30 @@
 #' 
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param phe phenotype
-#' @param geno genotype, n by m matrix. This is Genotype Data Pure (GD). THERE IS NOT COLUMN FOR TAXA.
-#' @param map SNP map information
-#' @param CV covariates
-#' @param priority speed or memory
-#' @param P a start p value for each SNP
-#' @param method.sub method used in substitution process
-#' @param method.sub.final method used in substitution process
-#' @param method.bin EMMA or FaSTLMM
-#' @param bin.size window size in genome
-#' @param bin.selection a vector, how many windows selected
+#' @param phe phenotype, n by t matrix, n is sample size, t is number of phenotypes
+#' @param geno genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
+#' @param map SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
+#' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
+#' @param priority modes, two options: 'speed' or 'memory'
+#' @param P start p values for all SNPs
+#' @param method.sub method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
+#' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
+#' @param method.bin method for selecting the most appropriate bins, two options: 'EMMA' or 'FaSTLMM'
+#' @param bin.size bin sizes for all iterations, a vector, the bin size is always from large to small
+#' @param bin.selection number of selected bins in each iteration, a vector
 #' @param memo a marker on output file name
-#' @param Prior four columns, SNP name, Chr, Pos, P
-#' @param ncpus number of cpus used for parallele
-#' @param bar 
+#' @param Prior prior information, four columns, which are SNP_ID, Chr, Pos, P-value
+#' @param ncpus number of threads used for parallele computation
+#' @param bar if TRUE, the progress bar will be drawn on the terminal
 #' @param maxLoop maximum number of iterations
-#' @param threshold.output output GWAS results only for SNPs with p value lower than the threshold.output
-#' @param converge an indicator for when loops stop
-#' @param iteration.output whether to output results for FarmCPU iterations
-#' @param p.threshold if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
-#' @param QTN.threshold Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
-#' @param bound maximum number of SNPs selected as pseudo QTNs for each iteration
+#' @param threshold.output only the GWAS results with p-values lower than threshold.output will be output
+#' @param converge a number, 0 to 1, if selected pseudo QTNs in the last and the second last iterations have a certain probality (the probability is converge) of overlap, the loop will stop
+#' @param iteration.output whether to output results of all iterations
+#' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
+#' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
+#' @param bound maximum number of SNPs selected as pseudo QTNs in each iteration
 #'
-#' @return p values for each marker
+#' @return a m by 4 results matrix, m is marker size, the four columns are SNP_ID, Chr, Pos, and p-value
 #' @export
 #'
 #' @examples
@@ -207,38 +207,36 @@
         return(results)
 }#The MVP.FarmCPU function ends here
 
+
 #' FarmCPU.BIN
 #'
 #' Last update: March 28, 2017
-#' Requirement: Y, GDP and CV have same taxa order. GDP and GM have the same order on SNP
+#' Requirement: Y, GDP, and CV must have same taxa order. GDP and GM must have the same order on SNP
 #' Requirement: P and GM are in the same order
 #' Requirement: No missing data
 #' 
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param Y n by 2 matrix with fist column as taxa name and second as trait
-#' @param GDP n by m+1 matrix. The first colum is taxa name. The rest are m genotype
-#' @param GM m by 3  matrix for SNP name, chromosome and BP
-#' @param CV n by t matrix for t covariate variables.
-#' @param P m by 1 matrix containing probability
-#' @param method options are "static", "optimum"
-#' @param b vecter of length>=1 for bin size
-#' @param s vecter of length>=1 for size of complexity (number of QTNs)
-#' @param theLoop 
-#' @param bound 
-#' @param ncpus 
+#' @param Y a n by 2 matrix, the fist column is taxa id and the second is trait
+#' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA
+#' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
+#' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
+#' @param P start p values for all SNPs
+#' @param method two options, 'static' or 'optimum'
+#' @param b bin sizes for all iterations, a vector, the bin size is always from large to small
+#' @param s number of selected bins in each iteration, a vector
+#' @param theLoop iteration number
+#' @param bound maximum number of SNPs selected as pseudo QTNs in each iteration
+#' @param ncpus number of threads used for parallele computation
 #'
 #' @return
-#' Output: bin - n by s matrix of genotype
-#' Output: binmap - s by 3 matrix for map of bin
-#' Output: seqQTN - s by 1 vecter for index of QTN on GM (+1 for GDP column wise)
-#' Relationship: bin=GDP[,c(seqQTN)], binmap=GM[seqQTN,]
+#' Output: seqQTN - an s by 1 vecter for index of QTNs on GM file
 #'
 #' @keywords internal
 #' 
 #' @examples
 FarmCPU.BIN <-
-    function(Y=NULL,GDP=NULL,GM=NULL,CV=NULL,P=NULL,method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
+    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
         #print("FarmCPU.BIN Started")
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -415,10 +413,11 @@ FarmCPU.BIN <-
         return(list(seqQTN=seqQTN.save))
     }#The function FarmCPU.BIN ends here
 
+
 #' To get indicator (TURE or FALSE) for GI based on GP
 #' 
 #' Last update: January 26, 2017
-#' Straitegy
+#' Strategy
 #' 1.set bins for all snps in GP
 #' 2.keep the snp with smallest P value in each bin, record SNP ID
 #' 3.Search GI for SNP with SNP ID from above
@@ -427,16 +426,16 @@ FarmCPU.BIN <-
 #' @author Zhiwu Zhang
 #' 
 #' @param GI Data frame with three columns (SNP name, chr and base position)
-#' @param GP Data frame with seven columns (SNP name, chr and base position, P, MAF,N,effect)
-#' @param bin.size 
-#' @param inclosure.size 
-#' @param MaxBP 
+#' @param GP Data frame with seven columns (SNP name, chr and base position, P, MAF, N, effect)
+#' @param bin.size a value of @param b in 'FarmCPU.bin' function
+#' @param inclosure.size a value of @param s in 'FarmCPU.bin' function
+#' @param MaxBP maximum base pairs for each chromosome
 #'
-#' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not)
+#' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not
 #'
 #' @examples
 FarmCPU.Specify <-
-    function(GI=NULL,GP=NULL,bin.size=10000000,inclosure.size=NULL,MaxBP=1e10){
+    function(GI=NULL, GP=NULL, bin.size=10000000, inclosure.size=NULL, MaxBP=1e10){
         #print("Specification in process...")
         if(is.null(GP))return (list(index=NULL,BP=NULL))
         
@@ -501,7 +500,7 @@ FarmCPU.Specify <-
 #'
 #' Start  date: March 1, 2013
 #' Last update: March 6, 2013
-#' Straitegy:
+#' Strategy:
 #' 1. Separate constant covariates (w) and dynamic coveriates (x)
 #' 2. Build non-x related only once
 #' 3. Use apply to iterate x
@@ -510,18 +509,22 @@ FarmCPU.Specify <-
 #' 
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param y dependent variable
-#' @param w independent variable
-#' @param GDP independent variable of substitution (GDP)
-#' @param ncpus 
-#' @param npc 
+#' @param y one column matrix, dependent variable
+#' @param w covariates, n by c matrix, n is sample size, c is number of covariates
+#' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
+#' @param ncpus number of threads used for parallele computation
+#' @param npc number of covariates without pseudo QTNs
 #'
 #' @return
+#' Output: P - p-value of each SNP
+#' Output: betapred - effects of pseudo QTNs
+#' Output: B - effect of each SNP
+#' 
 #' @keywords internal
 #'
 #' @examples
 FarmCPU.LM <-
-    function(y,w=NULL,GDP,ncpus=2,npc=0){
+    function(y, w=NULL, GDP, ncpus=2, npc=0){
         #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
@@ -619,12 +622,12 @@ FarmCPU.LM <-
             }
             B = beta[length(beta)]
             P = pvalue[-1]
-            return(list(B=B,P=P))
+            return(list(B=B, P=P))
         }
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.farmcpu.parallel)
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-        return(list(P=results[,-1],betapred=betapred,B=results[,1]))
+        return(list(P=results[,-1], betapred=betapred, B=results[,1]))
     } #end of FarmCPU.LM function
 
 
@@ -635,21 +638,26 @@ FarmCPU.LM <-
 #'
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param Y phenotype with columns of taxa,Y1,Y2...
-#' @param CV covariate variables with columns of taxa,v1,v2...
-#' @param GK Genotype data in numerical format, taxa goes to row and snp go to columns. the first column is taxa (same as GAPIT.bread)
-#' @param ncpus 
-#' @param method two options for estimating REML, "FaST-LMM" and "EMMA"
+#' @param Y phenotype, n by t matrix, n is sample size, t is number of phenotypes
+#' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
+#' @param GK Genotype data in numerical format, taxa goes to row and snp go to columns
+#' @param ncpus number of threads used for parallele computation
+#' @param method two options for estimating variance components, 'FaST-LMM' or 'EMMA'
 #'
-#' @return P value
+#' @return
+#' Output: REMLs - maximum log likelihood
+#' Output: vg - genetic variance
+#' Output: ve - residual variance
+#' Output: delta - exp(root)
+#' 
 #' @keywords internal
 #'
 #' @examples
 FarmCPU.Burger <-
     function(Y=NULL,CV=NULL,GK=NULL,ncpus=2, method="FaST-LMM"){
         if(!is.null(CV)){
-            CV=as.matrix(CV)#change CV to a matrix when it is a vector xiaolei changed here
-            theCV=as.matrix(cbind(matrix(1,nrow(CV),1),CV)) ###########for FarmCPU
+            CV=as.matrix(CV)#change CV to a matrix when it is a vector
+            theCV=as.matrix(cbind(matrix(1,nrow(CV),1),CV))
         }else{
             theCV=matrix(1,nrow(Y),1)
         }
@@ -682,7 +690,7 @@ FarmCPU.Burger <-
         }
         
         #print("FarmCPU.Burger succeed!")
-        return (list(REMLs=REMLs,vg=vg,ve=ve,delta=delta))
+        return (list(REMLs=REMLs, vg=vg, ve=ve, delta=delta))
     } #end of FarmCPU.Burger
 
 
@@ -693,12 +701,15 @@ FarmCPU.Burger <-
 #'
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param GM 
+#' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param GLM FarmCPU.GLM object
 #' @param QTN s by 3  matrix for SNP name, chromosome and BP
 #' @param method options are "penalty", "reward","mean","median",and "onsite"
 #'
-#' @return GLM with the last column of P updated by the substituded p values
+#' @return 
+#' Output: GLM$P - Updated p-values by substitution process
+#' Output: GLM$B - Updated effects by substitution process
+#'
 #' @export
 #'
 #' @examples
@@ -736,8 +747,8 @@ FarmCPU.SUB <-
                 if(method=="onsite") P.QTN=GLM$P0[(length(GLM$P0)-nqtn+1):length(GLM$P0)]
             }
             #replace SNP pvalues with QTN pvalue
-            GLM$P[position,spot]=P.QTN
-            GLM$B[position,]=GLM$betapred
+            GLM$P[position,spot] = P.QTN
+            GLM$B[position,] = GLM$betapred
         }
         return(GLM)
     }#The function FarmCPU.SUB ends here
@@ -748,24 +759,24 @@ FarmCPU.SUB <-
 #' Last update: March 4, 2013
 #' Requirement: GDP and GM have the same order on SNP
 #' 
-#' @author Zhiwu Zhang
+#' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param GDP n by m+1 matrix. The first colum is taxa name. The rest are m genotype
-#' @param GM m by 3  matrix for SNP name, chromosome and BP
-#' @param seqQTN s by 1 vecter for index of QTN on GM (+1 for GDP column wise)
-#' @param seqQTN.p 
-#' @param threshold 
+#' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA
+#' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
+#' @param seqQTN s by 1 vecter for index of QTN on GM
+#' @param seqQTN.p p value of each @param seqQTN
+#' @param threshold pearson correlation threshold for remove correlated markers
 #'
 #' @return
 #' Output: bin - n by s0 matrix of genotype
 #' Output: binmap - s0 by 3 matrix for map of bin
-#' Output: seqQTN - s0 by 1 vecter for index of QTN on GM (+1 for GDP column wise)
+#' Output: seqQTN - s0 by 1 vecter for index of QTN on GM
 #' Relationship: bin=GDP[,c(seqQTN)], binmap=GM[seqQTN,], s0<=s
 #' @keywords internal
 #'
 #' @examples
 FarmCPU.Remove <-
-    function(GDP=NULL,GM=NULL,seqQTN=NULL,seqQTN.p=NULL,threshold=.99){
+    function(GDP=NULL, GM=NULL, seqQTN=NULL, seqQTN.p=NULL, threshold=.99){
         if(is.null(seqQTN))return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
         seqQTN=seqQTN[order(seqQTN.p)]
         
@@ -787,9 +798,7 @@ FarmCPU.Remove <-
         
         #print("Number of bins after chr and bp fillter")
         n=length(seqQTN) #update n
-        #print(n)
-        #print(date())
-        
+
         #Set sample
         ratio=.1
         maxNum=100000
@@ -837,7 +846,7 @@ FarmCPU.Remove <-
         
         binmap=GM[seqQTN,]
         
-        return(list(bin=bin,binmap=binmap,seqQTN=seqQTN))
+        return(list(bin=bin, binmap=binmap, seqQTN=seqQTN))
     }#The function FarmCPU.Remove ends here
 
 
@@ -846,18 +855,20 @@ FarmCPU.Remove <-
 #' Last update: March 10, 2013
 #' Requirement: P and GM are in the same order, Prior is part of GM except P value
 #' 
-#' @author Zhiwu Zhang
+#' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param GM m by 3  matrix for SNP name, chromosome and BP
-#' @param P m by 1 matrix containing probability
-#' @param Prior s by 4  matrix for SNP name, chromosome, BP and Pvalue
+#' @param GM an m by 3  matrix for SNP name, chromosome and BP
+#' @param P an m by 1 matrix containing probability
+#' @param Prior an s by 4  matrix for SNP name, chromosome, BP and p-value
 #'
-#' @return P
+#' @return
+#' Output: P - updated P value by prior information
+#' 
 #' @keywords internal
 #'
 #' @examples
 FarmCPU.Prior <-
-    function(GM,P=NULL,Prior=NULL){
+    function(GM, P=NULL, Prior=NULL){
         #print("FarmCPU.Prior Started")
         
         if(is.null(Prior)& is.null(P))return(P)

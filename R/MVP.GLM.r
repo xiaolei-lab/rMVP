@@ -26,9 +26,9 @@
 #' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
 #' @param cpu number of cpus used for parallel computation
-#' @param priority 
+#' @param priority 'memory' or 'speed'
 #' @param memo a marker on output file name
-#' @param bar 
+#' @param bar whether to show the progress bar
 #'
 #' @returna m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export

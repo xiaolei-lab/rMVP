@@ -29,7 +29,7 @@
 #' @param REML a list that contains ve and vg
 #' @param priority speed or memory
 #' @param cpu number of cpus used for parallel computation
-#' @param bar 
+#' @param bar whether to show the progress bar
 #' @param vc.method the methods for estimating variance component("emma" or "gemma")
 #' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
 #' @param file.output whether to output files or not
@@ -75,7 +75,7 @@ if (is.null(K)) {
     }
 } else {
     # convert K to base:matrix
-    K <- K[]
+    K <- K[, ]
 }
 
 if(is.null(CV)){

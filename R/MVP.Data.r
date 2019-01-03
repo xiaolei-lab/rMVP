@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 #' MVP.Data: To prepare data for MVP package
 #' Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
 #' Build date: Aug 30, 2016
@@ -23,10 +24,10 @@
 #' @param fileHMP Genotype in hapmap format
 #' @param fileBed Genotype in PLINK binary format
 #' @param fileNum Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
-#' @param filePhe Phenotype, two columns, the first column is taxa name, the second column is trait
-#' @param fileMap SNP map information, three columns: SNP name, Chr, Pos
-#' @param fileKin Kinship, n * n matrix, n is sample size
-#' @param filePC 
+#' @param filePhe Phenotype, the first column is taxa name, the subsequent columns are traits
+#' @param fileMap SNP map information, there are three columns, including SNP_ID, Chromosome, and Position
+#' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
+#' @param filePC Principal components, n*npc, n is sample size, npc is number of top columns of principal components
 #' @param out A marker on output file name
 #' @param sep.vcf seperator for hapmap, numeric, map, phenotype, kinship and PC files, respectively
 #' @param sep.num 
@@ -54,42 +55,6 @@
 #' k.desc, k.bin: Kinship matrix in bigmemory format
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
-
-#' MVP.Data: To prepare data for MVP package
-#' 
-#' 
-#' @author Xiaolei Liu, Lilin Yin and Haohao Zhang
-#' 
-#' @param fileMVP 
-#' @param fileVCF File path of genotype in VCF format
-#' @param fileHMP File path of genotype in hapmap format
-#' @param fileBed File path of genotype in PLINK v1.9 binary format (.bed/.bim/.fam)
-#' @param fileNum File path of genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
-#' @param fileMap File path of SNP map information, three columns: SNP name, Chr, Pos
-#' @param filePhe File path of phenotype, two columns, the first column is taxa name, the second column is trait
-#' @param fileInd File path of individual name, one columns, 
-#' @param fileKin Kinship, n * n matrix, n is sample size
-#' @param filePC 
-#' @param out 
-#' @param sep.num 
-#' @param auto_transpose 
-#' @param sep.map 
-#' @param sep.phe 
-#' @param sep.kin 
-#' @param sep.pc 
-#' @param type.geno 
-#' @param pheno_cols 
-#' @param SNP.impute "Left", "Middle", "Right"
-#' @param maxLine 
-#' @param priority 
-#' @param perc 
-#' @param pcs.keep 
-#' @param ... 
-#'
-#' @return
-#' @export
-#'
-#' @examples
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
@@ -204,7 +169,21 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     cat("MVP data prepration accomplished successfully!\n")
 } # end of MVP.Data function
 
-
+#' MVP.Data.VCF2MVP: To transform vcf data to MVP package
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param vcf_file Genotype in VCF format
+#' @param out the name of output file
+#' @param maxLine the max number of line to write to big matrix for each loop
+#' @param type.geno the type of genotype elements
+#' @param threads number of thread for transforming
+#' @param verbose whether to print the reminder
+#'
+#' Output files:
+#' genotype.desc, genotype.bin: genotype file in bigmemory format
+#' phenotype.phe: ordered phenotype file, same taxa order with genotype file
+#' map.map: SNP information
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -233,6 +212,22 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.Bfile2MVP: To transform plink binary data to MVP package
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param bfile Genotype in binary format (.bed, .bim, .fam)
+#' @param out the name of output file
+#' @param maxLine the max number of line to write to big matrix for each loop
+#' @param priority 'memory' or 'speed'
+#' @param type.geno the type of genotype elements
+#' @param threads number of thread for transforming
+#' @param verbose whether to print the reminder
+#'
+#' Output files:
+#' genotype.desc, genotype.bin: genotype file in bigmemory format
+#' phenotype.phe: ordered phenotype file, same taxa order with genotype file
+#' map.map: SNP information
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -266,6 +261,19 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.Hapmap2MVP: To transform Hapmap data to MVP package
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param hapmap_file Genotype in Hapmap format
+#' @param out the name of output file
+#' @param type.geno the type of genotype elements
+#' @param verbose whether to print the reminder
+#'
+#' Output files:
+#' genotype.desc, genotype.bin: genotype file in bigmemory format
+#' phenotype.phe: ordered phenotype file, same taxa order with genotype file
+#' map.map: SNP information
 MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -294,6 +302,24 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.Numeric2MVP: To transform Numeric data to MVP package
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param num_file Genotype in Numeric format (0,1,2)
+#' @param out the name of output file
+#' @param maxLine the max number of line to write to big matrix for each loop
+#' @param priority 'memory' or 'speed'
+#' @param row_names whether the numeric genotype has row names
+#' @param col_names whether the numeric genotype has column names
+#' @param type.geno the type of genotype elements
+#' @param auto_transpose whether to detecte the row and column
+#' @param verbose whether to print the reminder
+#'
+#' Output files:
+#' genotype.desc, genotype.bin: genotype file in bigmemory format
+#' phenotype.phe: ordered phenotype file, same taxa order with genotype file
+#' map.map: SNP information
 MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -383,6 +409,18 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.MVP2Bfile: To transform MVP data to binary format
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param bigmatrix Genotype in bigmatrix format (0,1,2)
+#' @param map the map file
+#' @param pheno the phenotype file
+#' @param out the name of output file
+#' @param verbose whether to print the reminder
+#'
+#' Output files:
+#' .bed, .bim, .fam
 MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
@@ -426,6 +464,19 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
     cat("Done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.Pheno: To clean up phenotype file
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param pheno_file the name of phenotype file
+#' @param out the name of output file
+#' @param cols selected columns
+#' @param header whether the file contains header
+#' @param sep seperator of the file
+#' @param missing the missing value
+#'
+#' Output files:
+#' cleaned phenotype file
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
     t1 <- as.numeric(Sys.time())
     # read data
@@ -491,6 +542,15 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     cat("Preparation for PHENOTYPE data is Done within", format_time(t2 - t1), "\n")
 }
 
+#' MVP.Data.Map: To check map file
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param map_file the name of map file
+#' @param out the name of output file
+#' @param cols selected columns
+#' @param header whether the file contains header
+#' @param sep seperator of the file
 MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
     t1 <- as.numeric(Sys.time())
     map <- read.table(map_file, header = header)
@@ -581,6 +641,17 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
     cat("Preparation for Kinship matrix is done!\n")
 }
 
+#' MVP.Data.impute: To impute the missing genotype
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param mvp_file the name of mvp file
+#' @param out the name of output file
+#' @param method 'Major', 'Minor', "Middle"
+#' @param ncpus number of threads for imputing
+#'
+#' Output files:
+#' imputed genotype file
 # A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
     cat("Imputing...\n")
@@ -633,6 +704,20 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
 }
 
+#' MVP.Data.QC: quality control of genotype
+#' Author: Haohao Zhang
+#' Build date: Sep 12, 2018
+#' 
+#' @param mvp_file the name of genotype file
+#' @param out the name of output file
+#' @param geno the threshold of calling rate of markers
+#' @param mind the threshold of calling rate of individuals
+#' @param maf the threshold of minor allel frequency
+#' @param hwe the threshold of hwe
+#' @param ncpus the number of threads for quality control
+#'
+#' Output files:
+#' cleaned genotype file
 MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
         cat("Quality control...\n")
         # input

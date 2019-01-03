@@ -22,11 +22,13 @@
 #' @author Xiaolei Liu, Lilin Yin and Haohao Zhang
 #' 
 #' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
-#' @param perc percentage of total SNPs selected for PCA
-#' @param pcs.keep maximum number of PCs
+#' @param perc percentage of total SNPs selected for calculate principal components
+#' @param pcs.keep maximum number of PCs for output
 #' @param memo a marker on output file name
 #'
-#' @return PCs
+#' @return
+#' Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep 
+#' 
 #' @export
 #'
 #' @examples
@@ -70,7 +72,7 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
 
     PCs <- prcomp(big.geno)$x[, 1:pcs.keep]
 
-    return(list(PCs = PCs))
+    return(list(PCs=PCs))
 }#end of MVP.PCA function
 
 

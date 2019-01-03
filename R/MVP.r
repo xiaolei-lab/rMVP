@@ -25,7 +25,7 @@
 #' Build date: Aug 30, 2017
 #' Last update: Dec 14, 2018
 #' 
-#' @author Lilin Yin and Xiaolei Liu
+#' @author Lilin Yin, Haohao Zhang, and Xiaolei Liu
 #' 
 #' @param phe phenotype, n * 2 matrix, n is sample size
 #' @param geno Genotype in bigmatrix format; m * n, m is marker size, n is sample size
@@ -61,19 +61,23 @@
 #' @param outward: the direction of circular Manhattan plot
 #' @param permutation.threshold: if use a permutation cutoff or not (bonferroni cutoff)
 #' @param permutation.rep: number of permutation replicates
-#' @param bar 
+#' @param bar: if TRUE, the progress bar will be drawn on the terminal
 #' @param col: for color of points in each chromosome on manhattan plot
 #' @param plot.type: "b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)
 #' @param file.output: whether to output files or not
 #' @param file: figure formats, "jpg", "tiff"
-#' @param dpi: resolution
+#' @param dpi: resolution for output figures
 #' @param threshold: a cutoff line on manhattan plot, 0.05/marker size
 #' @param Ncluster: number of colors used for drawing PC 1 and PC 2
 #' @param signal.cex: point size on output figures
-#' @param box 
+#' @param box: logical, if TRUE, the box frame will be added in output figure
 #'
 #' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export
+#' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
+#' Output: MVP.return$glm.results - p-values obtained by GLM method
+#' Output: MVP.return$mlm.results - p-values obtained by MLM method
+#' Output: MVP.return$farmcpu.results - p-values obtained by FarmCPU method
 #'
 #' @examples
 MVP <-

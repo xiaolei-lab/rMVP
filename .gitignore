@@ -1,3 +1,4 @@
+inst/doc
 .Rproj.user
 .Rhistory
 .RData
@@ -7,3 +8,4 @@ MVP.Rproj
 *.o
 *.so
 demo.data/
+.vscode

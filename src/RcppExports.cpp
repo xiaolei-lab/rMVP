@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // vcf_parser_map
 List vcf_parser_map(std::string vcf_file, std::string out);
-RcppExport SEXP _MVP_vcf_parser_map(SEXP vcf_fileSEXP, SEXP outSEXP) {
+RcppExport SEXP _rMVP_vcf_parser_map(SEXP vcf_fileSEXP, SEXP outSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // vcf_parser_genotype
 void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, long maxLine, int threads, bool verbose);
-RcppExport SEXP _MVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _rMVP_vcf_parser_genotype(SEXP vcf_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type vcf_file(vcf_fileSEXP);
@@ -33,7 +33,7 @@ END_RCPP
 }
 // hapmap_parser_map
 List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out);
-RcppExport SEXP _MVP_hapmap_parser_map(SEXP hmp_fileSEXP, SEXP outSEXP) {
+RcppExport SEXP _rMVP_hapmap_parser_map(SEXP hmp_fileSEXP, SEXP outSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -45,7 +45,7 @@ END_RCPP
 }
 // hapmap_parser_genotype
 void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose);
-RcppExport SEXP _MVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _rMVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type hmp_file(hmp_fileSEXP);
@@ -57,7 +57,7 @@ END_RCPP
 }
 // numeric_scan
 List numeric_scan(std::string num_file);
-RcppExport SEXP _MVP_numeric_scan(SEXP num_fileSEXP) {
+RcppExport SEXP _rMVP_numeric_scan(SEXP num_fileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -68,7 +68,7 @@ END_RCPP
 }
 // write_bfile
 void write_bfile(SEXP pBigMat, std::string bed_file, int threads, bool verbose);
-RcppExport SEXP _MVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _rMVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
@@ -81,7 +81,7 @@ END_RCPP
 }
 // read_bfile
 void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads, bool verbose);
-RcppExport SEXP _MVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _rMVP_read_bfile(SEXP bed_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
@@ -95,17 +95,17 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_MVP_vcf_parser_map", (DL_FUNC) &_MVP_vcf_parser_map, 2},
-    {"_MVP_vcf_parser_genotype", (DL_FUNC) &_MVP_vcf_parser_genotype, 5},
-    {"_MVP_hapmap_parser_map", (DL_FUNC) &_MVP_hapmap_parser_map, 2},
-    {"_MVP_hapmap_parser_genotype", (DL_FUNC) &_MVP_hapmap_parser_genotype, 3},
-    {"_MVP_numeric_scan", (DL_FUNC) &_MVP_numeric_scan, 1},
-    {"_MVP_write_bfile", (DL_FUNC) &_MVP_write_bfile, 4},
-    {"_MVP_read_bfile", (DL_FUNC) &_MVP_read_bfile, 5},
+    {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
+    {"_rMVP_vcf_parser_genotype", (DL_FUNC) &_rMVP_vcf_parser_genotype, 5},
+    {"_rMVP_hapmap_parser_map", (DL_FUNC) &_rMVP_hapmap_parser_map, 2},
+    {"_rMVP_hapmap_parser_genotype", (DL_FUNC) &_rMVP_hapmap_parser_genotype, 3},
+    {"_rMVP_numeric_scan", (DL_FUNC) &_rMVP_numeric_scan, 1},
+    {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
+    {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_MVP(DllInfo *dll) {
+RcppExport void R_init_rMVP(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

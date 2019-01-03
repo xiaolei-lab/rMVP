@@ -22,7 +22,7 @@
 #' 
 #' @author EMMA (Kang et. al. Genetics, 2008), Modified only for speed up by Xiaolei Liu and Lilin Yin
 #' 
-#' @param y phenotype
+#' @param y phenotype, n * 2
 #' @param X covariate matrix, the first column is 1s
 #' @param K Kinship matrix
 #' @param ngrids parameters for estimating vg and ve
@@ -31,6 +31,11 @@
 #' @param esp parameters for estimating vg and ve
 #'
 #' @return
+#' Output: REML - maximum log likelihood
+#' Output: delta - exp(root)
+#' Output: ve - residual variance
+#' Output: vg - genetic variance
+#' 
 #' @export
 #'
 #' @examples
