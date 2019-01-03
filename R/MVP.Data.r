@@ -333,7 +333,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
 #' map.map: SNP information
 #' @examples 
-#' numericPath <- system.file("extdata", "mvp.txt", package = "rMVP")
+#' numericPath <- system.file("extdata", "mvp.num", package = "rMVP")
 #' MVP.Data.Numeric2MVP(numericPath)
 MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
