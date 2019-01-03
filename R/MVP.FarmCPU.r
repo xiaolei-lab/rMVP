@@ -200,7 +200,7 @@
                 }
                 theCV=cbind(CV,myRemove$bin)
             }
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc)
+            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc,bar=bar)
             
             #Step 4: Background unit substitution
             if(!isDone){
@@ -745,7 +745,7 @@ FarmCPU.Specify <-
 #'
 #' @examples
 FarmCPU.LM <-
-    function(y, w=NULL, GDP, ncpus=2, npc=0){
+    function(y, w=NULL, GDP, ncpus=2, npc=0, bar=TRUE){
         #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
