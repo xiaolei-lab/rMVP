@@ -392,7 +392,8 @@ template <typename T>
 void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int threads=0, bool verbose=true) {
     // check input
     string ending = ".bed";
-    if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending)) {
+    if (bed_file.length() <= ending.length() ||
+        0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending)) {
         bed_file += ending;
     }
     
@@ -467,7 +468,8 @@ template <typename T>
 void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // check input
     string ending = ".bed";
-    if (0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
+    if (bed_file.length() <= ending.length() ||
+        0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
         bed_file += ending;
     
     // define
