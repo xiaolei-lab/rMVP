@@ -1,4 +1,4 @@
-# MVP [![](https://img.shields.io/badge/Issues-16%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) [![](https://img.shields.io/badge/Release-v1.0.1-blue.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master)
+# MVP [![](https://img.shields.io/badge/Issues-n%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) [![](https://img.shields.io/badge/Github-v1.0.1-blue.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master) [![](https://img.shields.io/badge/Bioconductor-v1.2-red.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master)
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
