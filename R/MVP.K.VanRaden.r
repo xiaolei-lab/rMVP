@@ -54,18 +54,18 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
     switch(
     match.arg(priority),
     "speed" = {
-        if(!is.matrix(M)) M <- as.matrix(M)
+        if (!is.matrix(M)) M <- as.matrix(M)
         n <- ncol(M)
         m <- nrow(M)
         Pi <- 0.5 * rowMeans(M)
-        M <- M-2 * Pi
-        if(is.null(SUM)){
-            SUM <- sum(Pi * (1-Pi))
+        M <- M - 2 * Pi
+        if (is.null(SUM)) {
+            SUM <- sum(Pi * (1 - Pi))
         }
         rm("Pi")
         gc()
         #check.r <- "checkpoint" %in% rownames(installed.packages())
-        if(!is.null(weight)) M <- M * sqrt(as.vector(weight))
+        if (!is.null(weight)) M <- M * sqrt(as.vector(weight))
         K <- 0.5 * crossprod(M)/SUM
     },
     "memory" = {

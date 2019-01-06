@@ -62,9 +62,9 @@
 #' @export
 #'
 #' @examples
-#' data(pig60K)
-#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=/nrow(pig60K))
-#' MVP.Report(pig60K, plot.type="c", threshold=/nrow(pig60K))
+#' data(pig60K, package = "rMVP")
+#' #MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
+#' #MVP.Report(pig60K, plot.type="c", threshold=0.05/nrow(pig60K))
 MVP.Report <- function(
     MVP,
     col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
@@ -1886,162 +1886,6 @@ MVP.Report.QQplot <-
     if (!is.null(file.type)) { dev.off() }
 }
 
-# MVP.Report.ManhattanPlot <- function(file.type="jpg") {
-#     colx <- col[i,]
-#     colx <- colx[!is.na(colx)]
-#     
-#     print(paste0("Rectangular_Manhattan Plotting ", taxa_name, "..."))
-#     w <- 14
-#     h <- 5
-#     
-#     # setup output device
-#     if (!is.null(file.type)) {
-#         name <- paste0(memo, ".Rectangular-Manhattan.", taxa_name)
-#         switch(file.type,
-#                jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
-#                pdf = pdf(paste0(name, ".pdf"), width = w, height = h),
-#                tiff = tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi)
-#         )
-#         par(mar = c(5, 6, 4, 3), xaxs = xaxs, yaxs = yaxs, xpd = TRUE)
-#     } else {
-#         if (is.null(dev.list())) { dev.new(width = w, height = h) }
-#         par(xpd = TRUE)
-#     }
-#     
-#     pvalue <- pvalueT[,i]
-#     logpvalue <- logpvalueT[,i]
-# 
-#     YlimMax <- ceiling(max(-log10(pvalue[pvalue != 0])))
-# 
-#     if (!is.null(threshold) && !(0 %in% threshold)) {
-#         YlimMax <- ceiling(max(YlimMax, -log10(threshold)))
-#     }
-# 
-#     xlim <- c(0, max(pvalue.posN))
-#     ylim <- c(0, YlimMax)
-#     if (cir.density) {
-#         xlim <- c(0, 1.01 * max(pvalue.posN))
-#         ylim <- c(-YlimMax / den.fold, YlimMax)
-#     }
-#     plot(
-#         pvalue.posN,
-#         logpvalue,
-#         pch = pch,
-#         cex = cex[2],
-#         col = rep(rep(colx, N[i]), add[[i]]),
-#         xlim = xlim,
-#         ylim = ylim,
-#         ylab = ylab,
-#         cex.axis = cex.axis,
-#         cex.lab = 2,
-#         font = 2,
-#         axes = FALSE,
-#         xlab = xlab,
-#         main = paste("Manhattan plot of", taxa[i])
-#     )
-# 
-#     
-#     if (is.null(chr.labels)) {
-#         chr.labels <- chr.ori
-#     }
-#     
-#     axis(1, at = c(0, ticks), cex.axis = cex.axis, font = 2, labels = c("Chr",chr.labels))
-# 
-#     axis(
-#         2,
-#         at = seq(0, YlimMax, ceiling(YlimMax / 10)),
-#         cex.axis = cex.axis,
-#         font = 2,
-#         labels = seq(0, YlimMax, ceiling(YlimMax / 10))
-#     )
-#     legend.y <- tail(seq(0, YlimMax, ceiling(YlimMax / 10)), 1)
-# 
-#     if (!is.null(threshold) && !(0 %in% threshold)) {
-#             for (thr in 1:length(threshold)) {
-#                 h <- -log10(threshold[thr])
-#                 abline(h = h, col = threshold.col[thr], lty = threshold.lty[thr], lwd = threshold.lwd[thr], xpd = FALSE)
-#             }
-#             if (amplify == TRUE) {
-#                 threshold <- sort(threshold)
-#                 sgline1 <- -log10(max(threshold))
-# 
-#                 sgindex=which(logpvalue>=sgline1)
-#                 HY1=logpvalue[sgindex]
-#                 HX1=pvalue.posN[sgindex]
-#                 
-#                 #cover the points that exceed the threshold with the color "white"
-#                 points(HX1,HY1,pch=pch,cex=cex[2],col="white")
-#                 
-#                 for (ll in 1:length(threshold)) {
-#                     if (ll == 1) {
-#                         sgline1 <- -log10(threshold[ll])
-#                         sgindex <- (logpvalue >= sgline1)
-#                     }else{
-#                         sgline0 <- -log10(threshold[ll - 1])
-#                         sgline1 <- -log10(threshold[ll])
-#                         sgindex <- (logpvalue >= sgline1 & logpvalue < sgline0)
-#                     }
-#                     HY1 <- logpvalue[sgindex]
-#                     HX1 <- pvalue.posN[sgindex]
-#                     
-#                     if (is.null(signal.col)) {
-#                         i.col <- rep(rep(colx, N[i]), add[[i]])[sgindex]
-#                     } else{
-#                         i.col <- signal.col[ll]
-#                     }
-#                     
-#                     points(HX1,
-#                            HY1,
-#                            pch = signal.pch[ll],
-#                            cex = signal.cex[ll] * cex[2],
-#                            col = signal.col[ll])
-#                 }
-#             }
-#         }
-# 
-#     if (cir.density) {
-#         for (yll in 1:length(pvalue.posN.list)) {
-#             x <- c(min(pvalue.posN.list[[yll]]), 
-#                    min(pvalue.posN.list[[yll]]), 
-#                    max(pvalue.posN.list[[yll]]),
-#                    max(pvalue.posN.list[[yll]]))
-#             y <- c(-0.5 * YlimMax / den.fold,
-#                    -1.5 * YlimMax / den.fold,
-#                    -1.5 * YlimMax / den.fold,
-#                    -0.5 * YlimMax / den.fold)
-#             polygon(x, y, col = "grey", border = "grey")
-#         }
-#         segments(
-#             x0 = pvalue.posN,
-#             y0 = -0.5 * YlimMax / den.fold,
-#             x1 = pvalue.posN,
-#             y1 = -1.5 * YlimMax / den.fold,
-#             col = density.list$den.col,
-#             lwd = 0.1
-#         )
-#         legend(
-#             x = max(pvalue.posN) + band,
-#             y = legend.y,
-#             title = "",
-#             legend = density.list$legend.y,
-#             pch = 15,
-#             pt.cex = 2.5,
-#             col = density.list$legend.col,
-#             cex = 0.8,
-#             bty = "n",
-#             y.intersp = 1,
-#             x.intersp = 1,
-#             yjust = 1,
-#             xjust = 0,
-#             xpd = TRUE
-#         )
-#     }
-#     
-#     if (box) { box() }
-#     if (!is.null(file.type)) { dev.off() }
-# }
-
-
 MVP.Hist <-
     function(phe,
              col = c("dodgerblue4",
@@ -2159,10 +2003,6 @@ MVP.PCAplot <- function(PCA,
     }
     axis(2, font.axis=2)
     if(box) box()
-    #kc <- kmeans(PCA[,c(2,3)], Ncluster)
-    #plot(PCA[,2],PCA[,3],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC2",ylab="PC3")
-    #kc <- kmeans(PCA[,c(1,3)], Ncluster)
-    #plot(PCA[,1],PCA[,3],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC3")
     dev.off()
     if(plot3D){
         print("The 3D PCA map has been temporarily disabled, and we will improve this feature in subsequent versions.")
