@@ -223,7 +223,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     vcf_parser_genotype(vcf_file = vcf_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
-    return(c(m, n))
+    return(invisible(c(m, n)))
 }
 
 #' MVP.Data.Bfile2MVP: To transform plink binary data to MVP package
@@ -280,7 +280,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
-    return(c(m, n))
+    return(invisible(c(m, n)))
 }
 
 #' MVP.Data.Hapmap2MVP: To transform Hapmap data to MVP package
@@ -326,7 +326,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     hapmap_parser_genotype(hapmap_file, bigmat@address, verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
-    return(c(m, n))
+    return(invisible(c(m, n)))
 }
 
 #' MVP.Data.Numeric2MVP: To transform Numeric data to MVP package
@@ -438,7 +438,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     gc()
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
-    return(c(m, n))
+    return(invisible(c(m, n)))
 }
 
 #' MVP.Data.MVP2Bfile: To transform MVP data to binary format
