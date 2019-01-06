@@ -17,23 +17,23 @@
 
 #' MVP.Report
 #' @param MVP: Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers
-#' @param col: Vector or matrix. If ‘col’ is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If ‘col’ is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
+#' @param col: Vector or matrix. If 'col' is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If 'col' is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
 #' @param bin.size: Number. Number of markers will be counted for each marker window and used for plotting marker density
-#' @param bin.max: Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than ‘bin.max’ will use the same color as ‘bin.max’
-#' @param pch: Number. Type of points, same as ‘pch’ in <plot> R function
+#' @param bin.max: Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than 'bin.max' will use the same color as 'bin.max'
+#' @param pch: Number. Type of points, same as 'pch' in <plot> R function
 #' @param band: Number. The space among chromosomes.
 #' @param cir.band: Number. The space between circles when plotting Manhattan plot in circular manner
 #' @param H: Number. The height for each circle when plotting multiple-group GWAS results using Manhattan plot in circular manner
 #' @param ylim: Vector. The range of Y-axis when plotting Manhattan plot, same as "ylim" in <plot> R function
 #' @param cex.axis: Number. The size of Chromosome ID and labels when plotting Manhattan plot in circular manner
-#' @param plot.type: Character or Vector, options are “d”, “c”, “m”, “q”, and “b”. If plot.type=“d”, marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type=“m”, Manhattan plot in rectangular manner will be plotted; if plot.type=“q”, Q-Q plot will be plotted; if plot.type=“b”, both Manhattan plot and Q-Q plot will be plotted
+#' @param plot.type: Character or Vector, options are "d", "c", "m", "q", and "b". If plot.type="d", marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type="m", Manhattan plot in rectangular manner will be plotted; if plot.type="q", Q-Q plot will be plotted; if plot.type="b", both Manhattan plot and Q-Q plot will be plotted
 #' @param multracks: Logical value. If FALSE, multiple-group GWAS results will be plotted on multiple tracks; if TRUE, multiple-group GWAS results will be plotted on a single track
-#' @param cex: Number or Vector. The size of points. It is the same as “size” in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively
+#' @param cex: Number or Vector. The size of points. It is the same as "size" in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively
 #' @param r: Number. The radius of the inside circle when plotting Manhattan plot in circular manner
 #' @param xlab: Character. The label of X axis
 #' @param ylab: Character. The label of Y axis
-#' @param xaxs: Character. Options are "r", and "i". It is the same as “xaxs” in <plot> R function
-#' @param yaxs: Character. Options are "r", and "i". It is the same as “yaxs” in <plot> R function
+#' @param xaxs: Character. Options are "r", and "i". It is the same as "xaxs" in <plot> R function
+#' @param yaxs: Character. Options are "r", and "i". It is the same as "yaxs" in <plot> R function
 #' @param outward: Logical value. If TRUE, all points will be plotted from inside toward outside; otherwise, all points will be plotted from outside toward inside
 #' @param threshold: Number or Vector. The cutoff line on Manhattan plot, e.g. Bonfferoni correction. More than one significant line can be added onto one figure. If threshold=0 or NULL, the threshold line will not be added
 #' @param threshold.col: Character or Vector. The colors of threshold lines
@@ -41,13 +41,13 @@
 #' @param threshold.lty: Number or Vector. The type of threshold line
 #' @param amplify: Logical value. If TRUE, the points that passed the threshold line will be highlighted
 #' @param chr.labels: Vector. The labels for the Chromosome IDs on Manhattan plot in circular manner
-#' @param signal.cex: Number. If “amplify” is TRUE, “signal.cex” is used to set the size of significant points
-#' @param signal.pch: Number. If “amplify” is TRUE, users can set the type of significant points
-#' @param signal.col: Character. If “amplify” is TRUE, “signal.col” is used to set the color of significant points, if “signal.col” is NULL, the colors of significant points will not be changed
+#' @param signal.cex: Number. If "amplify" is TRUE, "signal.cex" is used to set the size of significant points
+#' @param signal.pch: Number. If "amplify" is TRUE, users can set the type of significant points
+#' @param signal.col: Character. If "amplify" is TRUE, "signal.col" is used to set the color of significant points, if "signal.col" is NULL, the colors of significant points will not be changed
 #' @param signal.line: Number. The width of dotted lines used for marking significant points
 #' @param cir.chr: Logical value. If TRUE, a band that represents marker density information will be added onto Manhattan plot in circular manner
-#' @param cir.chr.h: Number. If “cir.chr=TRUE”, it can be used to set the width of marker density band
-#' @param chr.den.col: Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If “chr.den.col=NULL”, it will use the colors in parameter ‘col’
+#' @param cir.chr.h: Number. If "cir.chr=TRUE", it can be used to set the width of marker density band
+#' @param chr.den.col: Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If "chr.den.col=NULL", it will use the colors in parameter 'col'
 #' @param cir.legend: Logical value. If TRUE, legends will be added on each circle of Manhattan plot in circular manner
 #' @param cir.legend.cex: Number. The size of legend on Manhattan plot in circular manner
 #' @param cir.legend.col: Character. The color of legends on Manhattan plot in circular manner
