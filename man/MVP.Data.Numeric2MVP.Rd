@@ -27,12 +27,14 @@ MVP.Data.Numeric2MVP(num_file, out = "mvp", maxLine = 10000,
 
 \item{auto_transpose}{whether to detecte the row and column}
 
-\item{verbose}{whether to print the reminder
-
+\item{verbose}{whether to print the reminder}
+}
+\value{
+number of individuals and markers.
 Output files:
 genotype.desc, genotype.bin: genotype file in bigmemory format
 phenotype.phe: ordered phenotype file, same taxa order with genotype file
-map.map: SNP information}
+map.map: SNP information
 }
 \description{
 MVP.Data.Numeric2MVP: To transform Numeric data to MVP package
@@ -40,6 +42,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-numericPath <- system.file("extdata", "mvp.txt", package = "rMVP")
+numericPath <- system.file("extdata", "mvp.num", package = "rMVP")
 MVP.Data.Numeric2MVP(numericPath)
 }

@@ -13,7 +13,8 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
   sep.num = "\\t", auto_transpose = TRUE, sep.map = "\\t",
   sep.phe = "\\t", sep.kin = "\\t", sep.pc = "\\t",
   type.geno = "char", pheno_cols = NULL, SNP.impute = "Major",
-  maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5, ...)
+  maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5,
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{fileVCF}{Genotype in VCF format}
@@ -54,7 +55,9 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
 
 \item{perc}{Percentage of markers used to calculate PCA}
 
-\item{pcs.keep}{how many PCs to keep
+\item{pcs.keep}{how many PCs to keep}
+
+\item{verbose}{whether to print
 
 Output files:
 genotype.desc, genotype.bin: genotype file in bigmemory format
@@ -85,5 +88,6 @@ Build date: Aug 30, 2016
 Last update: Sep 12, 2018
 }
 \examples{
-MVP.Data
+bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+MVP.Data(fileBed=bfilePath)
 }

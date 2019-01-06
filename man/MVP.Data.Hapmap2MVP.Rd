@@ -16,12 +16,14 @@ MVP.Data.Hapmap2MVP(hapmap_file, out = "mvp", type.geno = "char",
 
 \item{type.geno}{the type of genotype elements}
 
-\item{verbose}{whether to print the reminder
-
+\item{verbose}{whether to print the reminder}
+}
+\value{
+number of individuals and markers.
 Output files:
 genotype.desc, genotype.bin: genotype file in bigmemory format
 phenotype.phe: ordered phenotype file, same taxa order with genotype file
-map.map: SNP information}
+map.map: SNP information
 }
 \description{
 MVP.Data.Hapmap2MVP: To transform Hapmap data to MVP package

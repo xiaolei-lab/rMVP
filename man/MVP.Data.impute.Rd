@@ -27,6 +27,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-numericPath <- system.file("extdata", "mvp.txt", package = "rMVP")
-MVP.Data.Numeric2MVP(numericPath)
+mvpPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+MVP.Data.impute(mvpPath)
 }

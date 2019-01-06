@@ -20,12 +20,14 @@ MVP.Data.VCF2MVP(vcf_file, out = "mvp", maxLine = 10000,
 
 \item{threads}{number of thread for transforming}
 
-\item{verbose}{whether to print the reminder
-
+\item{verbose}{whether to print the reminder}
+}
+\value{
+number of individuals and markers.
 Output files:
 genotype.desc, genotype.bin: genotype file in bigmemory format
 phenotype.phe: ordered phenotype file, same taxa order with genotype file
-map.map: SNP information}
+map.map: SNP information
 }
 \description{
 MVP.Data.VCF2MVP: To transform vcf data to MVP package

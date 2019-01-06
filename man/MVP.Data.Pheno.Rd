@@ -20,10 +20,12 @@ MVP.Data.Pheno(pheno_file, out = "mvp", cols = NULL, header = TRUE,
 
 \item{sep}{seperator of the file}
 
-\item{missing}{the missing value
-
+\item{missing}{the missing value}
+}
+\value{
+NULL
 Output files:
-cleaned phenotype file}
+cleaned phenotype file
 }
 \description{
 MVP.Data.Pheno: To clean up phenotype file
