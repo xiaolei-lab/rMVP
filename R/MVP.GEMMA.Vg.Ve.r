@@ -28,7 +28,6 @@
 #' @param rtol parameters for HE regression, no changes is recommended
 #' @param atol parameters for HE regression, no changes is recommended
 #' @param ctol parameters for HE regression, no changes is recommended
-#' @param root whether to loop iteration for the output of HE
 #'
 #' @return vg, ve, and delta
 #' @export
@@ -43,7 +42,7 @@
 #' K <- MVP.K.VanRaden(genotype)
 #' vc <- MVP.GEMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K, root=FALSE)
 #' print(vc)
-MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE) {
+MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8) {
     #try(setMKLthreads(1),silent = TRUE)
     K = K[]
     n = nrow(K)
@@ -195,17 +194,10 @@ MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8, root=FALSE
             para2 = (-0.5 * sum(diag(P)) + 0.5 * crossprod(Py)) * exp(log_sigma2[2]))
     }
 
-    # multiroot
-    if(root){
-        mult.res = rootSolve::multiroot(LogRL_dev1, start = log_sigma2, parms=list(y = y,K = K,X = X),rtol = rtol, atol = atol, ctol = ctol, maxiter=1000)
-        vg = exp(mult.res$root[1])
-        ve = exp(mult.res$root[2])
-        delta = ve / vg
-    }else{
-        vg = exp(log_sigma2[1])
-        ve = exp(log_sigma2[2])
-        delta = ve / vg
-    }
+    vg = exp(log_sigma2[1])
+    ve = exp(log_sigma2[2])
+    delta = ve / vg
+    
     print("Variance Components Estimation is Done!")
     return(list(vg=vg, ve=ve, delta=delta))
 }
