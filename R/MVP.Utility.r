@@ -45,7 +45,7 @@ MVP.Version <- function(width=60) {
 #'
 #' @param i the current loop number
 #' @param n max loop number
-#' @param type type1 for "for" function, type2 for "mclapply" function
+#' @param type type1 for "for" function
 #' @param symbol the symbol for the rate of progress
 #' @param tmp.file the opened file of "fifo" function
 #' @param symbol.head the head for the bar
@@ -57,7 +57,7 @@ MVP.Version <- function(width=60) {
 #' @keywords internal
 print_bar <- function(i,
                     n,
-                    type = c("type1", "type2", "type3"),
+                    type = c("type1", "type3"),
                     symbol = "-",
                     tmp.file = NULL,
                     symbol.head = "|",
@@ -105,30 +105,30 @@ print_bar <- function(i,
                 }
             }
         },
-        "type2"={
-            if(inherits(parallel:::mcfork(), "masterProcess")) {
-                progress <- 0.0
-                while(progress < n && !isIncomplete(tmp.file)){
-                    msg <- readBin(tmp.file, "double")
-                    progress <- progress + as.numeric(msg)
-                    print.len <- round(symbol.len * progress / n)
-                    if(fixed.points){
-                        if(progress %in% round(points * n / 100)){
-                            cat(paste("\r", 
-                                      paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                                      paste(rep(" ", symbol.len-print.len), collapse=""),
-                                      sprintf("%.2f%%", progress * 100 / n), sep=""))
-                        }
-                    }else{
-                        cat(paste("\r", 
-                                  paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                                  paste(rep(" ", symbol.len-print.len), collapse=""),
-                                  sprintf("%.2f%%", progress * 100 / n), sep=""))
-                    }
-                }
-                parallel:::mcexit()
-            }
-        },
+        # "type2"={
+        #     if(inherits(parallel:::mcfork(), "masterProcess")) {
+        #         progress <- 0.0
+        #         while(progress < n && !isIncomplete(tmp.file)){
+        #             msg <- readBin(tmp.file, "double")
+        #             progress <- progress + as.numeric(msg)
+        #             print.len <- round(symbol.len * progress / n)
+        #             if(fixed.points){
+        #                 if(progress %in% round(points * n / 100)){
+        #                     cat(paste("\r", 
+        #                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
+        #                               paste(rep(" ", symbol.len-print.len), collapse=""),
+        #                               sprintf("%.2f%%", progress * 100 / n), sep=""))
+        #                 }
+        #             }else{
+        #                 cat(paste("\r", 
+        #                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
+        #                           paste(rep(" ", symbol.len-print.len), collapse=""),
+        #                           sprintf("%.2f%%", progress * 100 / n), sep=""))
+        #             }
+        #         }
+        #         parallel:::mcexit()
+        #     }
+        # },
         "type3"={
             progress <- readBin(tmp.file, "double") + 1
             writeBin(progress, tmp.file)
