@@ -47,6 +47,7 @@
 #' @param priority "speed" or "memory"
 #' @param perc Percentage of markers used to calculate PCA
 #' @param pcs.keep how many PCs to keep
+#' @param verbose whether to print
 #'
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
@@ -56,12 +57,13 @@
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 #' @examples 
-#' MVP.Data
+#' bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+#' MVP.Data(fileBed=bfilePath)
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
                      type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
-                     perc = 1, pcs.keep = 5, ...) {
+                     perc = 1, pcs.keep = 5, verbose = TRUE, ...) {
     
     cat("Preparing data for MVP...\n")
     
@@ -101,12 +103,14 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
            FTFFFF = 
                MVP.Data.VCF2MVP(
                    vcf_file = fileVCF, 
-                   out = out
+                   out = out,
+                   verbose = verbose
                ),
            FFTFFF = 
                MVP.Data.Hapmap2MVP(
                    hapmap_file = fileHMP, 
-                   out = out
+                   out = out,
+                   verbose = verbose
                ),
            FFFTFF = 
                MVP.Data.Bfile2MVP(
@@ -114,7 +118,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    out = out, 
                    maxLine = maxLine, 
                    priority = priority, 
-                   type.geno = type.geno
+                   type.geno = type.geno,
+                   verbose = verbose
                ),
            FFFFTT = 
                MVP.Data.Numeric2MVP( 
@@ -123,7 +128,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    maxLine = maxLine, 
                    priority = priority, 
                    type.geno = type.geno,
-                   auto_transpose = auto_transpose
+                   auto_transpose = auto_transpose,
+                   verbose = verbose
                ),
            error_input(geno_files)
     )
@@ -183,6 +189,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
 #'
+#' @return number of individuals and markers.
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
@@ -216,6 +223,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     vcf_parser_genotype(vcf_file = vcf_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    return(c(m, n))
 }
 
 #' MVP.Data.Bfile2MVP: To transform plink binary data to MVP package
@@ -230,6 +238,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
 #'
+#' @return number of individuals and markers.
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
@@ -249,8 +258,10 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     cat("Reading file...\n")
     m <- MVP.Data.Map(map_file = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
     
-    # parser phenotype
-    n <- nrow(read.delim(paste0(bfile, '.fam'), header = FALSE))
+    # parser phenotype, ind file
+    fam <- read.table(paste0(bfile, '.fam'), header = FALSE)
+    n <- nrow(fam)
+    write.table(fam[, 2], paste0( out, '.geno.ind'), col.names = FALSE, quote = FALSE)
     
     cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
@@ -264,10 +275,12 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
+    
     if (priority == "speed") { maxLine <- -1 }
     read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    return(c(m, n))
 }
 
 #' MVP.Data.Hapmap2MVP: To transform Hapmap data to MVP package
@@ -279,6 +292,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' @param type.geno the type of genotype elements
 #' @param verbose whether to print the reminder
 #'
+#' @return number of individuals and markers.
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
@@ -312,6 +326,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     hapmap_parser_genotype(hapmap_file, bigmat@address, verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    return(c(m, n))
 }
 
 #' MVP.Data.Numeric2MVP: To transform Numeric data to MVP package
@@ -328,6 +343,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
 #' @param auto_transpose whether to detecte the row and column
 #' @param verbose whether to print the reminder
 #'
+#' @return number of individuals and markers.
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
@@ -422,6 +438,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     gc()
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    return(c(m, n))
 }
 
 #' MVP.Data.MVP2Bfile: To transform MVP data to binary format
@@ -434,6 +451,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
 #' @param out the name of output file
 #' @param verbose whether to print the reminder
 #'
+#' @return NULL
 #' Output files:
 #' .bed, .bim, .fam
 #' 
@@ -441,10 +459,10 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
 #' bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 #' map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
 #' MVP.Data.MVP2Bfile(bigmat, map)
-MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
+MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
-    write_bfile(bigmatrix@address, out)
+    write_bfile(bigmat@address, out)
     
     # write fam
     #  1. Family ID ('FID')
@@ -454,12 +472,12 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
     #  5. Sex code ('1' = male, '2' = female, '0' = unknown)
     #  6. Phenotype value ('1' = control, '2' = case, '-9'/'0'/non-numeric = missing data if case/control)
     if (is.null(pheno)) {
-        ind <- paste0("ind", 1:ncol(bigmatrix))
-        pheno <- rep(-9, nrow(ind))
+        ind <- paste0("ind", 1:ncol(bigmat))
+        pheno <- rep(-9, ncol(bigmat))
         message("pheno is NULL, automatically named individuals.")
     } else if (ncol(pheno) == 1) {
         ind <- pheno[, 1]
-        pheno <- rep(-9, nrow(ind))
+        pheno <- rep(-9, ncol(bigmat))
     } else if (ncol(pheno) >= 2) {
         ind <- pheno[, 1]
         pheno <- pheno[, 2]
@@ -469,7 +487,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
     }
     
     fam <- cbind(ind, ind, 0, 0, 0, pheno)
-    write.table(fam, paste0(out, '.fam'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
+    write.table(fam, paste0(out, '.fam'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ' ')
     
     # write bim
     #  1. Chromosome code (either an integer, or 'X'/'Y'/'XY'/'MT'; '0' indicates unknown) or name
@@ -495,6 +513,7 @@ MVP.Data.MVP2Bfile <- function(bigmatrix, map, pheno=NULL, out='mvp.plink', verb
 #' @param sep seperator of the file
 #' @param missing the missing value
 #'
+#' @return NULL
 #' Output files:
 #' cleaned phenotype file
 #' @examples 
@@ -574,6 +593,9 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' @param cols selected columns
 #' @param header whether the file contains header
 #' @param sep seperator of the file
+#' 
+#' @return NULL
+#' 
 #' @examples 
 #' mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
 #' MVP.Data.Map(mvp.map)
@@ -679,8 +701,8 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
 #' Output files:
 #' imputed genotype file
 #' @examples 
-#' numericPath <- system.file("extdata", "mvp.txt", package = "rMVP")
-#' MVP.Data.Numeric2MVP(numericPath)
+#' mvpPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' MVP.Data.impute(mvpPath)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
     cat("Imputing...\n")
@@ -722,7 +744,7 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
         else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
         
         # impute
-        if (length(A) > 1) { A <- sample(A, 1) }
+        if (length(A) > 1) { A <- A[1] }
         outmat[i, is.na(outmat[i, ])] <- A
     }
     
