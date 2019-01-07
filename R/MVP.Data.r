@@ -48,7 +48,7 @@
 #' @param perc Percentage of markers used to calculate PCA
 #' @param pcs.keep how many PCs to keep
 #' @param verbose whether to print
-#'
+#' @return NULL
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
@@ -149,7 +149,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     # impute
     if (!is.null(SNP.impute)) {
         MVP.Data.impute(
-            mvp_file = paste0(out, '.geno.desc'), 
+            mvp_prefix = paste0(out, '.geno.desc'), 
             out = paste0(out, '.imp'), 
             method = SNP.impute
             # ,ncpus = ncpus
@@ -182,6 +182,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' Author: Haohao Zhang
 #' Build date: Sep 12, 2018
 #' 
+#' Accept the | or / separated markers, any variant sites that are not 0 or 1 will be considered NA.
+#' 
 #' @param vcf_file Genotype in VCF format
 #' @param out the name of output file
 #' @param maxLine the max number of line to write to big matrix for each loop
@@ -207,13 +209,15 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     
     # parser map
     cat("Reading file...\n")
-    m_res <- vcf_parser_map(vcf_file = vcf_file, out = out)
-    cat(paste0("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
+    scan <- vcf_parser_map(vcf_file = vcf_file, out = out)
+    m <- scan$m
+    n <- scan$n
+    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = m_res$m,
-        ncol = m_res$n,
+        nrow = m,
+        ncol = n,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -256,12 +260,12 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     
     # parser map
     cat("Reading file...\n")
-    m <- MVP.Data.Map(map_file = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
+    m <- MVP.Data.Map(mvp_prefix = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
     
     # parser phenotype, ind file
     fam <- read.table(paste0(bfile, '.fam'), header = FALSE)
     n <- nrow(fam)
-    write.table(fam[, 2], paste0( out, '.geno.ind'), col.names = FALSE, quote = FALSE)
+    write.table(fam[, 2], paste0( out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
     
     cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
@@ -310,13 +314,15 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     
     # parser map
     cat("Reading file...\n")
-    m_res <- hapmap_parser_map(hapmap_file, out)
-    cat(paste0("inds: ", m_res$n, "\tmarkers:", m_res$m, '\n'))
+    scan <- hapmap_parser_map(hapmap_file, out)
+    m <- scan$m
+    n <- scan$n
+    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = m_res$m,
-        ncol = m_res$n,
+        nrow = m,
+        ncol = n,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -462,7 +468,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
 MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
-    write_bfile(bigmat@address, out)
+    write_bfile(bigmat@address, out, verbose = verbose)
     
     # write fam
     #  1. Family ID ('FID')
@@ -599,16 +605,18 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' @examples 
 #' mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
 #' MVP.Data.Map(mvp.map)
-MVP.Data.Map <- function(map_file, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
+MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
     t1 <- as.numeric(Sys.time())
-    map <- read.table(map_file, header = header)
+    if (is.character(map) && !is.data.frame(map)) {
+        map <- read.table(map, header = header)
+    }
     map <- map[, cols]
     colnames(map) <- c("SNP", "CHROM", "POS")
     if (length(unique(map[, 1])) != nrow(map)) {
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
     }
-    table = write.table(map, paste0(out, ".map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
+    write.table(map, paste0(out, ".map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for MAP data is done within", format_time(t2 - t1), "\n")
     return(nrow(map))
@@ -693,27 +701,28 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
 #' Author: Haohao Zhang
 #' Build date: Sep 12, 2018
 #' 
-#' @param mvp_file the name of mvp file
-#' @param out the name of output file
+#' @param mvp_prefix the prefix of mvp file
+#' @param out the prefix of output file
 #' @param method 'Major', 'Minor', "Middle"
 #' @param ncpus number of threads for imputing
-#'
+#' @return NULL
 #' Output files:
 #' imputed genotype file
 #' @examples 
 #' mvpPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
 #' MVP.Data.impute(mvpPath)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
-MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL) {
+MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
     cat("Imputing...\n")
     # input
-    bigmat  <- attach.big.matrix(mvp_file)
+    desc <- paste0(mvp_prefix, ".geno.desc")
+    bigmat <- attach.big.matrix(desc)
     options(bigmemory.typecast.warning = FALSE)
     if (is.null(ncpus)) ncpus <- detectCores()
     
     if (is.null(out)) {
         message("out is NULL, impute inplace.")
-        outmat <- attach.big.matrix(mvp_file)
+        outmat <- attach.big.matrix(desc)
     } else {
         # output to new genotype file.
         backingfile <- paste0(basename(out), ".geno.bin")
@@ -759,48 +768,83 @@ MVP.Data.impute <- function(mvp_file, out='mvp.imp', method='Major', ncpus=NULL)
 #' Author: Haohao Zhang
 #' Build date: Sep 12, 2018
 #' 
-#' @param mvp_file the name of genotype file
-#' @param out the name of output file
+#' @param mvp_prefix the prefix of genotype file
+#' @param out the prefix of output file
 #' @param geno the threshold of calling rate of markers
 #' @param mind the threshold of calling rate of individuals
 #' @param maf the threshold of minor allel frequency
 #' @param hwe the threshold of hwe
 #' @param ncpus the number of threads for quality control
 #'
+#' @return NULL
 #' Output files:
 #' cleaned genotype file
-MVP.Data.QC <- function(mvp_file, out='mvp.qc', geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
-        cat("Quality control...\n")
-        # input
-        bigmat  <- attach.big.matrix(mvp_file)
-        options(bigmemory.typecast.warning = FALSE)
-        if (is.null(ncpus)) ncpus <- detectCores()
-        
-        # qc marker
-        marker_index <- rep(TRUE, nrow(bigmat))
-        if (!is.null(geno)) {
-            qc_marker <- function(i, cutoff) {
-                c <- table(bigmat[i, ])
-                if (c[NA] > cutoff) {return(FALSE)} else {return(TRUE)}
-        }
-            marker_index <- cbind(mclapply(1:nrow(bigmat), qc_marker, mc.cores = ncpus, cutoff = (geno * nrow(bigmat))))
-            cat(paste0(length(marker_index[marker_index == FALSE, ])), "markers are filtered because the missing ratio is higher than", geno, "\n")
-        }
-        
-        # qc individual
-        ind_index <- rep(TRUE, ncol(bigmat))
-        if (!is.null(mind)) {
-            qc_ind <- function(i, cutoff) {
-                c <- table(bigmat[, i])
-                if (c[NA] > cutoff) {return(FALSE)} else {return(TRUE)}
-        }
-            ind_index <- cbind(mclapply(1:ncol(bigmat), qc_ind, mc.cores = ncpus, cutoff = (mind * ncol(bigmat))))
-            cat(paste0(length(marker_index[marker_index == FALSE, ])), "individuals are filtered because the missing ratio is higher than", mind, "\n")
-        }
-        
-        # TODO: support hwe
-        # TODO: qc report
-        
-        bigmat <- bigmat[marker_index, ind_index]
- }
+MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
+    cat("Quality control...\n")
+    options(bigmemory.typecast.warning = FALSE)
+    
+    # input
+    bigmat <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+    map <- read.table(paste0(mvp_prefix, ".map"), header = TRUE)
+    ind <- read.table(paste0(mvp_prefix, ".geno.ind"))
+    if (is.null(out)) { out <- paste0(mvp_prefix, ".qc")}
+    if (is.null(ncpus)) ncpus <- detectCores() - 1
+    
+    is.valid <- function(i, margin, cutoff) {
+        switch(margin,
+            r = {
+                tab <- table(bigmat[i, ])
+                cutoff <- cutoff * nrow(bigmat)
+            },
+            c = {
+                tab <- table(bigmat[, i])
+                cutoff <- cutoff * col(bigmat)
+            }
+        )
+        return(tab[NA] < cutoff)
+    }
 
+    # qc marker
+    marker_index <- rep(TRUE, nrow(bigmat))
+    if (!is.null(geno)) {
+        marker_index <- cbind(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
+        cat(paste0(length(marker_index[marker_index == FALSE, ])), 
+            "markers are filtered because the missing ratio is higher than", geno, "\n")
+    }
+    
+    # qc individual
+    ind_index <- rep(TRUE, ncol(bigmat))
+    if (!is.null(mind)) {
+        ind_index <- cbind(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
+        cat(paste0(length(marker_index[marker_index == FALSE, ])),
+            "individuals are filtered because the missing ratio is higher than", mind, "\n")
+    }
+    
+    # TODO: support hwe
+    # TODO: qc report
+    
+    bigmat <- bigmat[marker_index, ind_index]
+    
+    # output to new genotype file.
+    backingfile <- paste0(basename(out), ".geno.bin")
+    descriptorfile <- paste0(basename(out), ".geno.desc")
+    if (file.exists(backingfile)) file.remove(backingfile)
+    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    
+    outmat <- filebacked.big.matrix(
+        nrow = nrow(bigmat),
+        ncol = ncol(bigmat),
+        type = typeof(bigmat),
+        backingfile = backingfile,
+        backingpath = dirname(out),
+        descriptorfile = descriptorfile,
+        dimnames = c(NULL, NULL)
+    )
+    outmat[, ] <- bigmat[, ]
+    
+    # output new map
+    MVP.Data.Map(map = map[marker_index,], out = out)
+    
+    # output new ind
+    write.table(ind[ind_index], paste0(out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
+ }

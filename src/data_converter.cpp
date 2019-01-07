@@ -124,7 +124,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
 
 template <typename T>
 T vcf_marker_parser(string m, double NA_C) {
-    if (m[0] != '.' && m[2] != '.') {
+    if (('0' == m[0] || '1' == m[0]) && ('0' == m[2] || '1' == m[2])) {
         return static_cast<T>(m[0] - '0' + m[2] - '0');
     } else {
         return static_cast<T>(NA_C);
@@ -174,13 +174,20 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         #pragma omp parallel for private(l, markers)
         for (int i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of("\t"));
-            vector<string>(l.begin() + 9, l.end()).swap(l);
             markers.clear();
-            transform(
-                l.begin(), l.end(), 
-                back_inserter(markers),
-                boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
-            );
+            // There is only one char in REF and ALT
+            if (l[3].length() == 1 && l[4].length() == 1) {  
+                vector<string>(l.begin() + 9, l.end()).swap(l);
+                transform(
+                    l.begin(), l.end(), 
+                    back_inserter(markers),
+                    boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
+                );
+            } else {
+                // Delete multiple variant sites
+                fill_n(markers.begin(), NA_C, l.size() - 9); 
+            }
+            
             for (int j = 0; j < markers.size(); j++) {
                 mat[j][m + i] = markers[j];
             }
@@ -275,17 +282,15 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
 
 template <typename T>
 T hapmap_marker_parser(string m, char major, double NA_C) {
-    int number = 0;
     if (m.length() != 2 || 
-        // m[0] == 'N' || m[1] == 'N' ||
         (m[0] != 'A' && m[0] != 'T' && m[0] != 'G' && m[0] != 'C') ||
         (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')
     ) {
         return static_cast<T>(NA_C);
     } else {
-        number += (m[0] == major)?0:1;
-        number += (m[1] == major)?0:1;
-        return static_cast<T>(number);
+        return static_cast<T>(
+            ((m[0] == major)?0:1) + ((m[1] == major)?0:1)
+        );
     }
 }
 
@@ -324,6 +329,9 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
     while (getline(file, line)) {
         boost::split(l, line, boost::is_any_of("\t"));
         major = l[1][0];
+        if (l[1].length() > 3) {
+            major = 'N';
+        }
         vector<string>(l.begin() + 11, l.end()).swap(l);
         markers.clear();
         transform(
@@ -333,8 +341,6 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
             boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
         );
         for (size_t i = 0; i < markers.size(); i++) {
-            // Rcout << m << ", " << i << "\t" << markers[i] << endl;
-            // mat[i][m] = markers[i] == MISSING ? static_cast<T>(NA_C) : markers[i];
             mat[i][m] = markers[i];
         }
         m++;
@@ -473,7 +479,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         bed_file += ending;
     
     // define
-    omp_setup(threads);
+    omp_setup(threads, verbose);
     long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
         n++; 
