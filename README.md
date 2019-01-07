@@ -42,6 +42,7 @@
 <!-- /TOC -->
 
 ---
+
 # Installation
 **[back to top](#contents)**  
 
@@ -49,12 +50,11 @@
 
 **MVP** can be installed on Windows and Linux/Mac with following steps, respectively:
 
-***Online installation(Windows only)***
+***Online installation(Recommended, Linux/Windows)***
 
 MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-> devtools::install_version('RcppEigen', version = "0.3.2.9.0")
 > devtools::install_github("hclimente/snpStats")
 > devtools::install_github("jaredhuling/rfunctions")
 > devtools::install_github("xiaoleiLiubio/MVP")
@@ -107,14 +107,18 @@ If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh
 **priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
 **maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
 ```r
+# Full-featured function (Recommended)
 MVP.Data(fileBed="plink",
          filePhe=NULL,
          fileKin=FALSE,
          filePC=FALSE,
          out="mvp.plink",         
-         #priority="memory",
+         #priority="speed",
          #maxLine=10000,
          )
+         
+# Only convert genotypes
+MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed')
 ```
 
 ## VCF
@@ -122,13 +126,12 @@ MVP.Data(fileBed="plink",
 If you have genotype data in **VCF** format:  
 **fileVCF**, name of genotype data in VCF format  
 **filePhe**, name of phenotype data  
-**vcf.jump**, number of annotation (Header) rows in VCF file  
-**sep.vcf**, seperator of vcf file  
+**vcf.jump**, [DEPRECATED] number of annotation (Header) rows in VCF file  
+**sep.vcf**, [DEPRECATED] seperator of vcf file  
 **sep.phe**, seperator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
-**maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
 
 ```
 ##fileformat=VCFv4.2
@@ -146,16 +149,16 @@ If you have genotype data in **VCF** format:
 ```
 
 ```r
+# Full-featured function (Recommended)
 MVP.Data(fileVCF="myVCF.vcf",
          #filePhe="Phenotype.txt",
-         vcf.jump=6,
-         sep.vcf="\t",
-         #sep.phe="\t",
          fileKin=FALSE,
          filePC=FALSE,
-         out="mvp.vcf",
-         #maxLine=10000
+         out="mvp.vcf"
          )
+
+# Only convert genotypes
+MVP.Data.VCF2MVP("myVCF.vcf", out='mvp')
 ```
 
 ## Hapmap
@@ -164,9 +167,9 @@ If you have genotype data in **Hapmap** format:
 
 **fileHMP**, a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", "chr3.hmp.txt")  
 **filePhe**, name of phenotype file  
-**sep.hmp**, seperator of hapmap file  
+**sep.hmp**, [DEPRECATED] seperator of hapmap file  
 **sep.phe**, seperator of phenotype file  
-**SNP.effect**, "Add" or "Dom"  
+**SNP.effect**, [DEPRECATED] "Add" or "Dom"  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
@@ -185,6 +188,7 @@ If you have genotype data in **Hapmap** format:
 
 
 ```r
+# Full-featured function (Recommended)
 MVP.Data(fileHMP="hapmap.txt",
          filePhe="Phenotype.txt",
          sep.hmp="\t",
@@ -196,9 +200,13 @@ MVP.Data(fileHMP="hapmap.txt",
          #priority="memory",
          #maxLine=10000
          )
+
+# Only convert genotypes
+MVP.Data.Hapmap2MVP("hapmap.txt", out='mvp')
 ```
 
 If you have **more than one** hapmap file, such as **"hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", ... , "hmp.chr10.txt"**  
+**[Supported only in older versions]**
 
 ```r
 MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt", "hmp.chr5.txt", "hmp.chr6.txt", "hmp.chr7.txt", "hmp.chr8.txt", "hmp.chr9.txt", "hmp.chr10.txt"),
@@ -229,6 +237,7 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 **out**, the prefix of output file  
 **priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
 **maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
+**auto_transpose**, bool, if **auto_transpose = TRUE**, it is automatically transposed to ensure that the number of rows (markers) is greater than the number of columns (individuals).  
 
 <table>
 <tbody>
@@ -327,19 +336,22 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 </tr></tbody></table>
 
 ```r
+# Full-featured function (Recommended)
 MVP.Data(fileNum="Numeric.txt",
          filePhe="Phenotype.txt",
          fileMap="Map.txt",
-         sep.num="\t",
+         sep.num="\t",
          sep.map="\t", 
          sep.phe="\t",
-         type.geno="char",
          fileKin=FALSE,
          filePC=FALSE,
          out="mvp.num",
          #priority="memory"，
          #maxLine=10000
          )
+
+# Only convert genotypes
+MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', auto_transpose=T)
 ```
 
 ## Kinship
@@ -347,7 +359,7 @@ MVP.Data(fileNum="Numeric.txt",
 If you have Kinship matrix data that represents the relationship among individuals  
 
 **fileKin**, name of Kinship matrix data, the dimension is n * n (n is sample size), no taxa names included  
-**type.kin**, type of data in Kinship matrix file, "char", "integer", or "double" and "double" is default  
+**type.kin**, [DEPRECATED] type of data in Kinship matrix file, "char", "integer", or "double" and "double" is default  
 **sep.kin**, seperator of Kinship file  
 
 > `mvp.kin.txt`
@@ -419,10 +431,11 @@ If you have Kinship matrix data that represents the relationship among individua
 </tr></tbody></table>
 
 ```r
-MVP.Data(fileKin="mvp.kin.txt", 
-         type.kin="double",
-         sep.kin="\t"
-         )
+# read from file
+MVP.Data.Kin("mvp.kin.txt", out="mvp", maxLine=1e4, priority='memory', sep='\t')
+
+# calculate from mvp_geno_file
+MVP.Data.Kin(TRUE, mvp_prefix='mvp', out='mvp')
 ```
 
 ## Principal Components
@@ -430,7 +443,7 @@ MVP.Data(fileKin="mvp.kin.txt",
 If you have Principal Components data  
 
 **filePC**, name of Principal Components matrix data, the dimension is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
-**type.pc**, type of data in Principal Components matrix file, "char", "integer", or "double", default is "double"  
+**type.pc**, [DEPRECATED] type of data in Principal Components matrix file, "char", "integer", or "double", default is "double"  
 **sep.pc**, seperator of Principal Components file  
 
 > `mvp.pc.txt`
@@ -469,10 +482,11 @@ If you have Principal Components data
 </tr></tbody></table>
 
 ```r
-MVP.Data(filePC="mvp.pc.txt", 
-     type.pc="double",
-     sep.pc="\t"
-     )
+# read from file
+MVP.Data.PC("mvp.pc.txt", mvp_prefix='mvp', out=NULL, sep='\t')
+
+# calculate from mvp_geno_file
+MVP.Data.PC(TRUE, out='mvp', perc=1, pcs.keep=5)
 ```
 
 ---

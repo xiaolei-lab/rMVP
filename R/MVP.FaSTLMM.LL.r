@@ -1,16 +1,40 @@
-`MVP.FaSTLMM.LL` <- function(pheno, snp.pool,X0=NULL,ncpus=2){
-    #Evaluation of the maximum likelihood using FaST-LMM method
-    #Input: ys, xs, vg, delta, Z, X0, snp.pool
-    #pheno: phenotype
-    #snp.pool: SNP matrix
-    #X0: covariates matrix
-    #ncpus: number of CPUs used for parallel computation
-    #Output: LL
-    #Authors: Qishan Wang, Feng Tian and Zhiwu Zhang
-    #Modified by Xiaolei Liu
-    #Last update: January 11, 2017
-    ################################################################################
-    #print("MVP.FaSTLMM.LL started")
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+#' Evaluation of the maximum likelihood using FaST-LMM method
+#'
+#' Last update: January 11, 2017
+#' 
+#' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
+#' 
+#' @param pheno a two-column phenotype matrix
+#' @param snp.pool matrix for pseudo QTNs
+#' @param X0 covariates matrix
+#' @param ncpus number of threads used for parallel computation
+#'
+#' @return
+#' Output: beta - beta effect
+#' Output: delta - delta value
+#' Output: LL - log-likelihood
+#' Output: vg - genetic variance
+#' Output: ve - residual variance
+#' 
+#' @export
+`MVP.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0
     deltaExpStart = -5
@@ -62,7 +86,7 @@
         beta2=0
         for(i in 1:nrow(U1)){
             one=matrix(IUX[i,], nrow=1)
-            beta=crossprodcpp(one)
+            beta = crossprod(one)
             beta2= beta2+beta
         }
         beta2<-beta2/delta
@@ -87,7 +111,7 @@
         beta4<-beta4/delta
         
         #######get final beta
-        zw1 <- geninv(beta1+beta2)
+        zw1 <- ginv(beta1+beta2)
         #zw1 <- try(solve(beta1+beta2))
         #if(inherits(zw1, "try-error")){
         #zw1 <- ginv(beta1+beta2)
@@ -143,7 +167,7 @@
         try(setMKLthreads(1), silent=TRUE)
     }
     
-    llresults <- parallel::mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
+    llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
         try(setMKLthreads(math.cpu), silent=TRUE)
@@ -193,5 +217,5 @@
     sigma_a<- 1/n*(sigma_a1+sigma_a2)
     sigma_e<-delta*sigma_a
     
-    return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a,ve=sigma_e))
+    return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a, ve=sigma_e))
 }

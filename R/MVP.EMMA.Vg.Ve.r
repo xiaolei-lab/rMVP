@@ -1,18 +1,55 @@
-MVP.EMMA.Vg.Ve <-
-function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10){
-##########################################################################################################
-# Object: Estimate variance components using EMMA
-# Input:
-# y: phenotype
-# X: covariate matrix, the first column is 1s
-# K: Kinship matrix
-# ngrids, llim, ulim, and esp: parameters for estimating vg and ve
-# Authors: EMMA (Kang et. al. Genetics, 2008)
-# Modified only for speed up by Xiaolei Liu and Lilin Yin
-# Build date: August 30, 2016
-# Last update: January 27, 2017
-##########################################################################################################
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+
+#' Estimate variance components using EMMA
+#'
+#' Build date: August 30, 2016
+#' Last update: January 27, 2017
+#' 
+#' @author EMMA (Kang et. al. Genetics, 2008), Modified only for speed up by Xiaolei Liu and Lilin Yin
+#' 
+#' @param y phenotype, n * 2
+#' @param X covariate matrix, the first column is 1s
+#' @param K Kinship matrix
+#' @param ngrids parameters for estimating vg and ve
+#' @param llim parameters for estimating vg and ve
+#' @param ulim parameters for estimating vg and ve
+#' @param esp parameters for estimating vg and ve
+#'
+#' @return
+#' Output: REML - maximum log likelihood
+#' Output: delta - exp(root)
+#' Output: ve - residual variance
+#' Output: vg - genetic variance
+#' 
+#' @export
+#'
+#' @examples
+#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phenotype <- read.table(phePath, header=TRUE)
+#' print(dim(phenotype))
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
+#' vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
+#' print(vc)
+MVP.EMMA.Vg.Ve <-
+function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     if(!is.numeric(y))	y <- as.numeric(as.character(y))
     emma.delta.REML.LL.wo.Z <- function(logdelta, lambda, etas)
     {
@@ -28,7 +65,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10){
         iXX <- try(solve(XX), silent = TRUE)
         if(inherits(iXX, "try-error")){
             #library(MASS)
-            iXX <- geninv(XX)
+            iXX <- ginv(XX)
         }
 
         SS1 <- X %*% iXX

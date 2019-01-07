@@ -1,18 +1,42 @@
+# Data pre-processing module
+# 
+# Copyright (C) 2016-2018 by Xiaolei Lab
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+#' Calculate Kinship matrix by VanRaden method
+#'
+#' Build date: Dec 12, 2016
+#' Last update: Dec 12, 2016
+#' 
+#' @param M Genotype, m * n, m is marker size, n is population size
+#' @param weight vector, the weights for makers
+#' @param priority speed or memory
+#' @param memo add a character to the name of temporary files
+#' @param SUM the scaled value to kinship matrix
+#' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
+#'
+#' @return K, n * n matrix
+#' @export
+#'
+#' @examples
+#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' K <- MVP.K.VanRaden(genotype)
 MVP.K.VanRaden <-
 function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, maxLine=1000){
-##########################################################################################################
-# Object: Calculate Kinship matrix by VanRaden method
-# Input:
-# M: Genotype, m * n, m is marker size, n is population size
-# weight: vector, the weights for makers
-# priority: speed or memory
-# maxLine: when the priority is 'memory', users can change this parameter to limit the memory
-# Output:
-# K, n * n matrix
-# Authors: Xiaolei Liu and Lilin Yin
-# Build date: Dec 12, 2016
-# Last update: Dec 12, 2016
-##########################################################################################################
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
@@ -24,38 +48,43 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
     }
     
     if(!is.null(weight)){
-        if(sum(is.na(weight)) != 0)	stop("'NA' is not allowed in weight")
+        if(sum(is.na(weight)) != 0) stop("'NA' is not allowed in weight")
     }
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
     match.arg(priority),
     "speed" = {
-        if(!is.matrix(M)) M <- as.matrix(M)
+        if (!is.matrix(M)) M <- as.matrix(M)
         n <- ncol(M)
         m <- nrow(M)
         Pi <- 0.5 * rowMeans(M)
-        M <- M-2 * Pi
-        if(is.null(SUM)){
-            SUM <- sum(Pi * (1-Pi))
+        M <- M - 2 * Pi
+        if (is.null(SUM)) {
+            SUM <- sum(Pi * (1 - Pi))
         }
         rm("Pi")
         gc()
         #check.r <- "checkpoint" %in% rownames(installed.packages())
-        if(!is.null(weight)) M <- M * sqrt(as.vector(weight))
-        if(r.open){
-            K <- 0.5 * crossprod(M)/SUM
-        }else{
-            K <- 0.5 * crossprodcpp(M)/SUM
-        }
+        if (!is.null(weight)) M <- M * sqrt(as.vector(weight))
+        K <- 0.5 * crossprod(M)/SUM
     },
     "memory" = {
-        if(!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
+        if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
         n <- ncol(M)
         m <- nrow(M)
-        bac <- paste("Z", memo, ".temp.bin", sep="")
-        des <- paste("Z", memo, ".temp.desc", sep="")
+        bac <- paste0("Z", memo, ".temp.bin")
+        des <- paste0("Z", memo, ".temp.desc")
+        if (file.exists(bac)) file.remove(bac)
+        if (file.exists(des)) file.remove(des)
         #options(bigmemory.typecast.warning=FALSE)
-        Z<-big.matrix(nrow=m, ncol=n, type="double", backingfile=bac, descriptorfile=des, init=0.1)
+        Z <- big.matrix(
+            nrow = m,
+            ncol = n,
+            type = "double",
+            backingfile = bac, 
+            descriptorfile = des,
+            init = 0.1
+        )
         Pi <- NULL
         estimate.memory <- function(dat, integer=FALSE, raw=FALSE){
             cells.per.gb <- 2^27  # size of double() resulting in ~1GB of memory use by R 2.15
@@ -112,10 +141,10 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         if(!fl.suc){ stop("flush failed\n") } 
         RR <- describe(Z); rm(list=c("Z", "Pi", "means")); gc()
         Z <- attach.big.matrix(RR)
-        K <- 0.5 * big.crossprod(Z)/SUM
+        K <- 0.5 * crossprod(Z[])/SUM
         rm(Z)
         gc()
-        unlink(c(paste("Z", memo, ".temp.bin", sep=""), paste("Z", memo, ".temp.desc", sep="")), recursive = TRUE)
+        unlink(c(paste0("Z", memo, ".temp.bin"), paste0("Z", memo, ".temp.desc")), recursive = TRUE)
     }
     )
     #print("K Preparation is Done!")
