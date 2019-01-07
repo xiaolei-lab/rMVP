@@ -20,6 +20,9 @@ MVP.Data.Map(map_file, out = "mvp", cols = c(1, 2, 3), header = TRUE,
 
 \item{sep}{seperator of the file}
 }
+\value{
+NULL
+}
 \description{
 MVP.Data.Map: To check map file
 Author: Haohao Zhang

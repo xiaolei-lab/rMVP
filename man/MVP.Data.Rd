@@ -57,15 +57,7 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
 
 \item{pcs.keep}{how many PCs to keep}
 
-\item{verbose}{whether to print
-
-Output files:
-genotype.desc, genotype.bin: genotype file in bigmemory format
-phenotype.phe: ordered phenotype file, same taxa order with genotype file
-map.map: SNP information
-k.desc, k.bin: Kinship matrix in bigmemory format
-pc.desc, pc.bin: PC matrix in bigmemory format
-Requirement: fileHMP, fileBed, and fileNum can not input at the same time}
+\item{verbose}{whether to print}
 
 \item{sep.vcf}{seperator for vcf file.}
 
@@ -80,6 +72,16 @@ Requirement: fileHMP, fileBed, and fileNum can not input at the same time}
 \item{maxRecord}{maximum number for markers}
 
 \item{maxInd}{maximum number for individuals}
+}
+\value{
+NULL
+Output files:
+genotype.desc, genotype.bin: genotype file in bigmemory format
+phenotype.phe: ordered phenotype file, same taxa order with genotype file
+map.map: SNP information
+k.desc, k.bin: Kinship matrix in bigmemory format
+pc.desc, pc.bin: PC matrix in bigmemory format
+Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 }
 \description{
 MVP.Data: To prepare data for MVP package

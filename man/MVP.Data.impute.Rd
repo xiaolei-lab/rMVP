@@ -16,10 +16,12 @@ MVP.Data.impute(mvp_file, out = "mvp.imp", method = "Major",
 
 \item{method}{'Major', 'Minor', "Middle"}
 
-\item{ncpus}{number of threads for imputing
-
+\item{ncpus}{number of threads for imputing}
+}
+\value{
+NULL
 Output files:
-imputed genotype file}
+imputed genotype file
 }
 \description{
 MVP.Data.impute: To impute the missing genotype

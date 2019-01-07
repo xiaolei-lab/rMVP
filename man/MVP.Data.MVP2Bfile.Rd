@@ -6,22 +6,24 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.MVP2Bfile(bigmatrix, map, pheno = NULL, out = "mvp.plink",
+MVP.Data.MVP2Bfile(bigmat, map, pheno = NULL, out = "mvp.plink",
   verbose = TRUE)
 }
 \arguments{
-\item{bigmatrix}{Genotype in bigmatrix format (0,1,2)}
-
 \item{map}{the map file}
 
 \item{pheno}{the phenotype file}
 
 \item{out}{the name of output file}
 
-\item{verbose}{whether to print the reminder
+\item{verbose}{whether to print the reminder}
 
+\item{bigmatrix}{Genotype in bigmatrix format (0,1,2)}
+}
+\value{
+NULL
 Output files:
-.bed, .bim, .fam}
+.bed, .bim, .fam
 }
 \description{
 MVP.Data.MVP2Bfile: To transform MVP data to binary format

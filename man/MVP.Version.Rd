@@ -16,6 +16,9 @@ Last update: Dec 12, 2018
 \examples{
 MVP.version()
 }
+\value{
+NULL
+}
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu
 }
