@@ -185,7 +185,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
                 );
             } else {
                 // Delete multiple variant sites
-                fill_n(markers.begin(), NA_C, l.size() - 9); 
+                fill_n(markers.begin(), l.size() - 9, NA_C);
             }
             
             for (int j = 0; j < markers.size(); j++) {
