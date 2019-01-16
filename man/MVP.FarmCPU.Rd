@@ -74,7 +74,10 @@ genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
 map <- read.table("mvp.map" , head = TRUE)
-farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
+farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
+  ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
+  method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
+  Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
 str(farmcpu)
 }
 \author{

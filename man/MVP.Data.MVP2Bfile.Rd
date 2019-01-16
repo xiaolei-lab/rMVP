@@ -10,6 +10,8 @@ MVP.Data.MVP2Bfile(bigmat, map, pheno = NULL, out = "mvp.plink",
   verbose = TRUE)
 }
 \arguments{
+\item{bigmat}{Genotype in bigmatrix format (0,1,2)}
+
 \item{map}{the map file}
 
 \item{pheno}{the phenotype file}
@@ -17,8 +19,6 @@ MVP.Data.MVP2Bfile(bigmat, map, pheno = NULL, out = "mvp.plink",
 \item{out}{the name of output file}
 
 \item{verbose}{whether to print the reminder}
-
-\item{bigmatrix}{Genotype in bigmatrix format (0,1,2)}
 }
 \value{
 NULL

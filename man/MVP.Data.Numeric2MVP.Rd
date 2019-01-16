@@ -42,6 +42,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-numericPath <- system.file("extdata", "mvp.num", package = "rMVP")
+numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 MVP.Data.Numeric2MVP(numericPath)
 }

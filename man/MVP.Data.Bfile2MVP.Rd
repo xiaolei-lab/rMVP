@@ -38,6 +38,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 MVP.Data.Bfile2MVP(bfilePath)
 }

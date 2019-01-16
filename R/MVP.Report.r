@@ -16,51 +16,52 @@
 
 
 #' MVP.Report
-#' @param MVP: Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers
-#' @param col: Vector or matrix. If 'col' is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If 'col' is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
-#' @param bin.size: Number. Number of markers will be counted for each marker window and used for plotting marker density
-#' @param bin.max: Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than 'bin.max' will use the same color as 'bin.max'
-#' @param pch: Number. Type of points, same as 'pch' in <plot> R function
-#' @param band: Number. The space among chromosomes.
-#' @param cir.band: Number. The space between circles when plotting Manhattan plot in circular manner
-#' @param H: Number. The height for each circle when plotting multiple-group GWAS results using Manhattan plot in circular manner
-#' @param ylim: Vector. The range of Y-axis when plotting Manhattan plot, same as "ylim" in <plot> R function
-#' @param cex.axis: Number. The size of Chromosome ID and labels when plotting Manhattan plot in circular manner
-#' @param plot.type: Character or Vector, options are "d", "c", "m", "q", and "b". If plot.type="d", marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type="m", Manhattan plot in rectangular manner will be plotted; if plot.type="q", Q-Q plot will be plotted; if plot.type="b", both Manhattan plot and Q-Q plot will be plotted
-#' @param multracks: Logical value. If FALSE, multiple-group GWAS results will be plotted on multiple tracks; if TRUE, multiple-group GWAS results will be plotted on a single track
-#' @param cex: Number or Vector. The size of points. It is the same as "size" in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively
-#' @param r: Number. The radius of the inside circle when plotting Manhattan plot in circular manner
-#' @param xlab: Character. The label of X axis
-#' @param ylab: Character. The label of Y axis
-#' @param xaxs: Character. Options are "r", and "i". It is the same as "xaxs" in <plot> R function
-#' @param yaxs: Character. Options are "r", and "i". It is the same as "yaxs" in <plot> R function
-#' @param outward: Logical value. If TRUE, all points will be plotted from inside toward outside; otherwise, all points will be plotted from outside toward inside
-#' @param threshold: Number or Vector. The cutoff line on Manhattan plot, e.g. Bonfferoni correction. More than one significant line can be added onto one figure. If threshold=0 or NULL, the threshold line will not be added
-#' @param threshold.col: Character or Vector. The colors of threshold lines
-#' @param threshold.lwd: Number or Vector. The widths of threshold lines
-#' @param threshold.lty: Number or Vector. The type of threshold line
-#' @param amplify: Logical value. If TRUE, the points that passed the threshold line will be highlighted
-#' @param chr.labels: Vector. The labels for the Chromosome IDs on Manhattan plot in circular manner
-#' @param signal.cex: Number. If "amplify" is TRUE, "signal.cex" is used to set the size of significant points
-#' @param signal.pch: Number. If "amplify" is TRUE, users can set the type of significant points
-#' @param signal.col: Character. If "amplify" is TRUE, "signal.col" is used to set the color of significant points, if "signal.col" is NULL, the colors of significant points will not be changed
-#' @param signal.line: Number. The width of dotted lines used for marking significant points
-#' @param cir.chr: Logical value. If TRUE, a band that represents marker density information will be added onto Manhattan plot in circular manner
-#' @param cir.chr.h: Number. If "cir.chr=TRUE", it can be used to set the width of marker density band
-#' @param chr.den.col: Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If "chr.den.col=NULL", it will use the colors in parameter 'col'
-#' @param cir.legend: Logical value. If TRUE, legends will be added on each circle of Manhattan plot in circular manner
-#' @param cir.legend.cex: Number. The size of legend on Manhattan plot in circular manner
-#' @param cir.legend.col: Character. The color of legends on Manhattan plot in circular manner
-#' @param LOG10: Logical value. If TRUE, the p values of GWAS results will be scaled by log10
-#' @param box: Logical value. If TRUE, the border line of Manhattan plot will be added
-#' @param conf.int.col: Character. The color of confidence interval on QQ-plot 
-#' @param file.output: Logical value. If TRUE, the figures will be generated. 
-#' @param file: Character. Options are jpg, pdf, and tiff
-#' @param dpi: Number. Dots per inch for .jpg and .tiff files
-#' @param memo: Character. A text marker on output files
+#' 
+#' @param MVP Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers
+#' @param col Vector or matrix. If 'col' is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If 'col' is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)
+#' @param bin.size Number. Number of markers will be counted for each marker window and used for plotting marker density
+#' @param bin.max Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than 'bin.max' will use the same color as 'bin.max'
+#' @param pch Number. Type of points, same as 'pch' in <plot> R function
+#' @param band Number. The space among chromosomes.
+#' @param cir.band Number. The space between circles when plotting Manhattan plot in circular manner
+#' @param H Number. The height for each circle when plotting multiple-group GWAS results using Manhattan plot in circular manner
+#' @param ylim Vector. The range of Y-axis when plotting Manhattan plot, same as "ylim" in <plot> R function
+#' @param cex.axis Number. The size of Chromosome ID and labels when plotting Manhattan plot in circular manner
+#' @param plot.type Character or Vector, options are "d", "c", "m", "q", and "b". If plot.type="d", marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type="m", Manhattan plot in rectangular manner will be plotted; if plot.type="q", Q-Q plot will be plotted; if plot.type="b", both Manhattan plot and Q-Q plot will be plotted
+#' @param multracks Logical value. If FALSE, multiple-group GWAS results will be plotted on multiple tracks; if TRUE, multiple-group GWAS results will be plotted on a single track
+#' @param cex Number or Vector. The size of points. It is the same as "size" in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively
+#' @param r Number. The radius of the inside circle when plotting Manhattan plot in circular manner
+#' @param xlab Character. The label of X axis
+#' @param ylab Character. The label of Y axis
+#' @param xaxs Character. Options are "r", and "i". It is the same as "xaxs" in <plot> R function
+#' @param yaxs Character. Options are "r", and "i". It is the same as "yaxs" in <plot> R function
+#' @param outward Logical value. If TRUE, all points will be plotted from inside toward outside; otherwise, all points will be plotted from outside toward inside
+#' @param threshold Number or Vector. The cutoff line on Manhattan plot, e.g. Bonfferoni correction. More than one significant line can be added onto one figure. If threshold=0 or NULL, the threshold line will not be added
+#' @param threshold.col Character or Vector. The colors of threshold lines
+#' @param threshold.lwd Number or Vector. The widths of threshold lines
+#' @param threshold.lty Number or Vector. The type of threshold line
+#' @param amplify Logical value. If TRUE, the points that passed the threshold line will be highlighted
+#' @param chr.labels Vector. The labels for the Chromosome IDs on Manhattan plot in circular manner
+#' @param signal.cex Number. If "amplify" is TRUE, "signal.cex" is used to set the size of significant points
+#' @param signal.pch Number. If "amplify" is TRUE, users can set the type of significant points
+#' @param signal.col Character. If "amplify" is TRUE, "signal.col" is used to set the color of significant points, if "signal.col" is NULL, the colors of significant points will not be changed
+#' @param signal.line Number. The width of dotted lines used for marking significant points
+#' @param cir.chr Logical value. If TRUE, a band that represents marker density information will be added onto Manhattan plot in circular manner
+#' @param cir.chr.h Number. If "cir.chr=TRUE", it can be used to set the width of marker density band
+#' @param chr.den.col Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If "chr.den.col=NULL", it will use the colors in parameter 'col'
+#' @param cir.legend Logical value. If TRUE, legends will be added on each circle of Manhattan plot in circular manner
+#' @param cir.legend.cex Number. The size of legend on Manhattan plot in circular manner
+#' @param cir.legend.col Character. The color of legends on Manhattan plot in circular manner
+#' @param LOG10 Logical value. If TRUE, the p values of GWAS results will be scaled by log10
+#' @param box Logical value. If TRUE, the border line of Manhattan plot will be added
+#' @param conf.int.col Character. The color of confidence interval on QQ-plot 
+#' @param file.output Logical value. If TRUE, the figures will be generated. 
+#' @param file Character. Options are jpg, pdf, and tiff
+#' @param dpi Number. Dots per inch for .jpg and .tiff files
+#' @param memo Character. A text marker on output files
 #'
 #' @export
-#'
+#' @return NULL
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' #MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
@@ -1676,8 +1677,8 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
                 y = c(
                     -width / 5 - band * (i - length(chr.num) - 1),
                     width / 5 - band * (i - length(chr.num) - 1),
-                    width / 5 - band * (i - length(chr.num) - 1),-width /
-                        5 - band * (i - length(chr.num) - 1)
+                    width / 5 - band * (i - length(chr.num) - 1),
+                    -width / 5 - band * (i - length(chr.num) - 1)
                 ),
                 col = "grey",
                 border = "grey"
@@ -1739,6 +1740,23 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     }
 }
 
+#' SNP Density
+#'
+#' @param Pmap P value Map
+#' @param taxa The identifier of the output file.
+#' @param col The color vector
+#' @param dpi Number. Dots per inch for .jpg and .tiff files
+#' @param bin.size the window size for counting SNP number
+#' @param bin.max maximum SNP number, for winows, which has more SNPs than bin.max, will be painted in same color
+#' @param file.type format of output figure
+#' @param file.output Whether to output the file
+#'
+#' @export
+#' @return NULL
+#'
+#' @examples
+#' data(pig60K, package = "rMVP")
+#' MVP.Report.Density(pig60K, "mvp")
 MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE) {
     print("SNP_Density Plotting...")
@@ -1766,6 +1784,45 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
     index <- !duplicated(cbind(x, y))
 }
 
+#' QQ Plot
+#'
+#' @param P.values P values
+#' @param taxa_name The identifier of the phenotype will be used to generate a
+#'    portion of the image file name. If the title parameter is NULL, it will 
+#'    also be part of the title.
+#' @param col default color is "blue"
+#' @param cex A numerical value giving the amount by which plotting text and
+#'    symbols should be magnified relative to the default. This starts as 1 
+#'    when a device is opened, and is reset when the layout is changed, e.g. 
+#'    by setting mfrow. see \code{\link[graphics]{par}}. 
+#' @param threshold Number or Vector. The cutoff line on Manhattan plot, 
+#'    e.g. Bonfferoni correction. More than one significant line can be added
+#'    onto one figure. If threshold=0 or NULL, the threshold line will not be
+#'    added.
+#' @param amplify Logical value. If TRUE, the points that passed the threshold line will be highlighted
+#' @param signal.cex Number. If "amplify" is TRUE, "signal.cex" is used to set the size of significant points
+#' @param signal.pch Number. If "amplify" is TRUE, users can set the type of significant points
+#' @param signal.col Character. If "amplify" is TRUE, "signal.col" is used to set the color of significant points, if "signal.col" is NULL, the colors of significant points will not be changed
+#' @param conf.int Whether to draw a confidence interval
+#' @param cex.axis a number, controls the size of numbers of X-axis and the size of labels of circle plot.
+#' @param conf.int.col a character, the color of the confidence interval on QQ-plot.
+#' @param threshold.col Character or Vector. The colors of threshold lines
+#' @param file.type A string or NULL is used to determine the type of output 
+#'    file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use 
+#'    \code{\link[grDevices:dev]{dev.new()}} to create a new graphics device 
+#'    in the current environment, which may be RStudioGD or the default 
+#'    device of the system.
+#' @param memo the prefix of the output image file.
+#' @param box A Boolean value that controls whether to draw a box around
+#'    QQplot.
+#' @param dpi a number, the picture element for .jpg and .tiff files. The default is 300.
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples
+#' data(pig60K, package = "rMVP")
+#' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
 MVP.Report.QQplot <-
     function(P.values,
              taxa_name,
@@ -1886,6 +1943,29 @@ MVP.Report.QQplot <-
     if (!is.null(file.type)) { dev.off() }
 }
 
+#' Phenotype distribution histogram
+#'
+#' @param phe phenotype data
+#' @param col The color vector of the histogram. If the number of colors is 
+#'    less than break.n, the color will be reused. If the number of colors is 
+#'    greater than break.n, only the previous break.n colors will be used.
+#' @param breakNum the number of cells for the histogram. The default value 
+#'    is 15.
+#' @param file.type A string or NULL is used to determine the type of output 
+#'    file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use 
+#'    \code{\link[grDevices:dev]{dev.new()}} to create a new graphics device 
+#'    in the current environment, which may be RStudioGD or the default 
+#'    device of the system.
+#' @param dpi The resolution of the image, specifying how many pixels 
+#'    per inch.
+#'
+#' @export
+#' @return NULL
+#'
+#' @examples
+#' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
+#' phe <- read.table(phePath, header=TRUE)
+#' MVP.Hist(phe)
 MVP.Hist <-
     function(phe,
              col = c("dodgerblue4",
@@ -1964,6 +2044,30 @@ MVP.Hist <-
     options(warn = 0)
 }
 
+#' PCA Plot
+#'
+#' @param PCA Principal component analysis result, 2-column matrix
+#' @param col colors for each cluster
+#' @param pch Either an integer specifying a symbol or a single character to be 
+#'    used as the default in plotting points. See \code{\link[graphics]{points}} 
+#'    for possible values and their interpretation. Note that only integers and
+#'    single-character strings can be set as a graphics parameter (and not NA 
+#'    nor NULL).
+#' @param class the class of all individuals, for example: "breed", "location"...
+#' @param legend.pos position of legend. default is "topright"
+#' @param Ncluster cluster number
+#' @param plot3D (DEPRECATED)if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead
+#' @param file Character. Options are jpg, pdf, and tiff
+#' @param dpi Number. Dots per inch for .jpg and .tiff files
+#' @param box Logical value. If TRUE, the border line of Manhattan plot will be added
+#'
+#' @export
+#' @return NULL
+#'
+#' @examples
+#' PCPath <- system.file("extdata", "07_other", "mvp.imp.pc.desc", package = "rMVP")
+#' pca <- attach.big.matrix(PCPath)[, 1:3]
+#' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
 MVP.PCAplot <- function(PCA,
                         col = NULL,
                         pch = NULL,

@@ -31,6 +31,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-hapmapPath <- system.file("extdata", "mvp.hmp", package = "rMVP")
+hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
 MVP.Data.Hapmap2MVP(hapmapPath)
 }

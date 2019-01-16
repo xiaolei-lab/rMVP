@@ -19,35 +19,39 @@
 #' Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
 #' Build date: Aug 30, 2016
 #' Last update: Sep 12, 2018
-#' 
+#'
+#' @param fileMVP Genotype in MVP format
 #' @param fileVCF Genotype in VCF format
 #' @param fileHMP Genotype in hapmap format
 #' @param fileBed Genotype in PLINK binary format
+#' @param fileInd Individual name file
 #' @param fileNum Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
 #' @param filePhe Phenotype, the first column is taxa name, the subsequent columns are traits
 #' @param fileMap SNP map information, there are three columns, including SNP_ID, Chromosome, and Position
 #' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
 #' @param filePC Principal components, n*npc, n is sample size, npc is number of top columns of principal components
-#' @param out A marker on output file name
-#' @param sep.vcf seperator for vcf file.
+#' @param out prefix of output file name
 #' @param sep.num seperator for numeric file.
+#' @param auto_transpose Whether to automatically transpose numeric genotypes,
+#' the default is True, which will identify the most one of the rows or 
+#' columns as a marker, If set to False, the row represents the marker and
+#' the column represents the individual.
 #' @param sep.map seperator for map file.
 #' @param sep.phe seperator for phenotype file.
 #' @param sep.kin seperator for Kinship file.
 #' @param sep.pc seperator for PC file.
-#' @param type.geno type parameter in bigmemory, genotype data
-#' @param type.kin type parameter in bigmemory, Kinship
-#' @param type.pc type parameter in bigmemory, PC
-#' @param type.map type parameter in bigmemory, PC
-#' @param SNP.effect "Add" or "Dom"
-#' @param SNP.impute "Left", "Middle", "Right"
+#' @param type.geno type parameter in bigmemory, genotype data. The default is char, it is highly recommended *NOT* to modify this parameter.
+#' @param pheno_cols Extract which columns of the phenotype file (including individual IDs)
+#' @param SNP.impute "Left", "Middle", "Right", or NULL for skip impute.
 #' @param maxLine number of SNPs, only used for saving memory when calculate kinship matrix
-#' @param maxRecord maximum number for markers
-#' @param maxInd maximum number for individuals
 #' @param priority "speed" or "memory"
 #' @param perc Percentage of markers used to calculate PCA
 #' @param pcs.keep how many PCs to keep
-#' @param verbose whether to print
+#' @param verbose whether to print detail.
+#' @param ... Compatible with DEPRECATED parameters.
+#'
+#' @export
+#' 
 #' @return NULL
 #' Output files:
 #' genotype.desc, genotype.bin: genotype file in bigmemory format
@@ -57,7 +61,7 @@
 #' pc.desc, pc.bin: PC matrix in bigmemory format
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 #' @examples 
-#' bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+#' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 #' MVP.Data(fileBed=bfilePath)
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
@@ -149,7 +153,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     # impute
     if (!is.null(SNP.impute)) {
         MVP.Data.impute(
-            mvp_prefix = paste0(out, '.geno.desc'), 
+            mvp_prefix = out, 
             out = paste0(out, '.imp'), 
             method = SNP.impute
             # ,ncpus = ncpus
@@ -197,7 +201,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
 #' map.map: SNP information
 #' @examples 
-#' vcfPath <- system.file("extdata", "mvp.vcf", package = "rMVP")
+#' vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 #' MVP.Data.VCF2MVP(vcfPath)
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -248,7 +252,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
 #' map.map: SNP information
 #' @examples 
-#' bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+#' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 #' MVP.Data.Bfile2MVP(bfilePath)
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -260,7 +264,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     
     # parser map
     cat("Reading file...\n")
-    m <- MVP.Data.Map(mvp_prefix = paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
+    m <- MVP.Data.Map(paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
     
     # parser phenotype, ind file
     fam <- read.table(paste0(bfile, '.fam'), header = FALSE)
@@ -302,7 +306,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
 #' map.map: SNP information
 #' @examples 
-#' hapmapPath <- system.file("extdata", "mvp.hmp", package = "rMVP")
+#' hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
 #' MVP.Data.Hapmap2MVP(hapmapPath)
 MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -355,7 +359,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
 #' phenotype.phe: ordered phenotype file, same taxa order with genotype file
 #' map.map: SNP information
 #' @examples 
-#' numericPath <- system.file("extdata", "mvp.num", package = "rMVP")
+#' numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 #' MVP.Data.Numeric2MVP(numericPath)
 MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -451,7 +455,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
 #' Author: Haohao Zhang
 #' Build date: Sep 12, 2018
 #' 
-#' @param bigmatrix Genotype in bigmatrix format (0,1,2)
+#' @param bigmat Genotype in bigmatrix format (0,1,2)
 #' @param map the map file
 #' @param pheno the phenotype file
 #' @param out the name of output file
@@ -523,7 +527,7 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose
 #' Output files:
 #' cleaned phenotype file
 #' @examples 
-#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' MVP.Data.Pheno(phePath)
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
     t1 <- as.numeric(Sys.time())
@@ -594,7 +598,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' Author: Haohao Zhang
 #' Build date: Sep 12, 2018
 #' 
-#' @param map_file the name of map file
+#' @param map the name of map file or map object(data.frame or matrix)
 #' @param out the name of output file
 #' @param cols selected columns
 #' @param header whether the file contains header
@@ -603,7 +607,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' @return NULL
 #' 
 #' @examples 
-#' mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
+#' mapPath <- ssystem.file("extdata", "07_other", "mvp.map", package = "rMVP")
 #' MVP.Data.Map(mvp.map)
 MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
     t1 <- as.numeric(Sys.time())
@@ -622,7 +626,21 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
     return(nrow(map))
 }
 
-MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
+#' Principal component analysis
+#'
+#' @param filePC Principal components, n*npc, n is sample size, npc is number of top columns of principal components
+#' @param mvp_prefix Prefix for mvp format files
+#' @param out prefix of output file name
+#' @param perc Percentage of markers used to calculate PCA
+#' @param pcs.keep how many PCs to keep
+#' @param sep seperator for PC file.
+#' 
+#' @export
+#' @return NULL
+#' @examples
+#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+#' MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
+MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
@@ -659,7 +677,21 @@ MVP.Data.PC <- function(filePC, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, 
     cat("Preparation for PC matrix is done!\n")
 }
 
-MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
+#' Kinship
+#'
+#' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
+#' @param mvp_prefix Prefix for mvp format files
+#' @param out prefix of output file name
+#' @param maxLine number of SNPs, only used for saving memory when calculate kinship matrix
+#' @param priority "speed" or "memory"
+#' @param sep seperator for Kinship file.
+#'
+#' @export
+#' @return NULL
+#' @examples
+#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out="myKin")
+MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
@@ -709,7 +741,7 @@ MVP.Data.Kin <- function(fileKin, mvp_prefix='mvp', out=NULL, maxLine=1e4, prior
 #' Output files:
 #' imputed genotype file
 #' @examples 
-#' mvpPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' mvpPath <- system.file("extdata", "05_mvp", "mvp.geno.desc", package = "rMVP")
 #' MVP.Data.impute(mvpPath)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
@@ -779,6 +811,9 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
 #' @return NULL
 #' Output files:
 #' cleaned genotype file
+#' @examples 
+#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+#' MVP.Data.QC(geno, out="myKin")
 MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
     cat("Quality control...\n")
     options(bigmemory.typecast.warning = FALSE)
@@ -787,7 +822,7 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     bigmat <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
     map <- read.table(paste0(mvp_prefix, ".map"), header = TRUE)
     ind <- read.table(paste0(mvp_prefix, ".geno.ind"))
-    if (is.null(out)) { out <- paste0(mvp_prefix, ".qc")}
+    if (is.null(out)) { out <- paste0(basename(mvp_prefix), ".qc")}
     if (is.null(ncpus)) ncpus <- detectCores() - 1
     
     is.valid <- function(i, margin, cutoff) {

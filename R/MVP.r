@@ -32,45 +32,46 @@
 #' @param map SNP map information, SNP name, Chr, Pos
 #' @param K Kinship, Covariance matrix(n * n) for random effects, must be positive semi-definite
 #' @param nPC.GLM number of PCs added as fixed effects in GLM
-
-#' @param nPC.MLM: number of PCs added as fixed effects in MLM
-#' @param nPC.FarmCPU: number of PCs added as fixed effects in FarmCPU
-#' @param perc: percentage of total SNPs selected for PCA
-#' @param CV.GLM: covariates added in GLM
-#' @param CV.MLM: covariates added in MLM
-#' @param CV.FarmCPU: covariates added in FarmCPU
-#' @param REML: a list contains ve and vg
-#' @param priority: speed or memory
-#' @param ncpuc: number of cpus used for parallel
-#' @param vc.method: methods for estimating variance component("EMMA" or "GEMMA")
-#' @param method: the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
-#' @param maxLine: when the priority is 'memory', users can change this parameter to limit the memory
-#' @param memo: a marker added on output file name
-#' @param P: a start p value for each SNP
-#' @param method.sub, method.sub.final: method used in substitution process
-#' @param method.bin: EMMA or FaSTLMM
-#' @param bin.size: window size in genome
-#' @param bin.selection: a vector, how many windows selected
-#' @param Prior: four columns, SNP name, Chr, Pos, P
-#' @param maxLoop: maximum number of iterations
-#' @param threshold.output: output GWAS results only for SNPs with p value lower than the threshold.output
-#' @param iteration.output: whether to output results for FarmCPU iterations
-#' @param p.threshold: if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
-#' @param QTN.threshold: Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
-#' @param bound: maximum number of SNPs selected as pseudo QTNs for each iteration
-#' @param outward: the direction of circular Manhattan plot
-#' @param permutation.threshold: if use a permutation cutoff or not (bonferroni cutoff)
-#' @param permutation.rep: number of permutation replicates
-#' @param bar: if TRUE, the progress bar will be drawn on the terminal
-#' @param col: for color of points in each chromosome on manhattan plot
-#' @param plot.type: "b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)
-#' @param file.output: whether to output files or not
-#' @param file: figure formats, "jpg", "tiff"
-#' @param dpi: resolution for output figures
-#' @param threshold: a cutoff line on manhattan plot, 0.05/marker size
-#' @param Ncluster: number of colors used for drawing PC 1 and PC 2
-#' @param signal.cex: point size on output figures
-#' @param box: logical, if TRUE, the box frame will be added in output figure
+#' @param nPC.MLM number of PCs added as fixed effects in MLM
+#' @param nPC.FarmCPU number of PCs added as fixed effects in FarmCPU
+#' @param perc percentage of total SNPs selected for PCA
+#' @param CV.GLM covariates added in GLM
+#' @param CV.MLM covariates added in MLM
+#' @param CV.FarmCPU covariates added in FarmCPU
+#' @param REML a list contains ve and vg
+#' @param priority speed or memory
+#' @param ncpus number of cpus used for parallel
+#' @param vc.method methods for estimating variance component("EMMA" or "GEMMA")
+#' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
+#' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
+#' @param memo a marker added on output file name
+#' @param P a start p value for each SNP
+#' @param method.sub, method.sub.final method used in substitution process
+#' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
+#' @param method.bin EMMA or FaSTLMM
+#' @param bin.size window size in genome
+#' @param bin.selection a vector, how many windows selected
+#' @param Prior four columns, SNP name, Chr, Pos, P
+#' @param maxLoop maximum number of iterations
+#' @param threshold.output output GWAS results only for SNPs with p value lower than the threshold.output
+#' @param iteration.output whether to output results for FarmCPU iterations
+#' @param p.threshold if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
+#' @param QTN.threshold Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
+#' @param bound maximum number of SNPs selected as pseudo QTNs for each iteration
+#' @param outward the direction of circular Manhattan plot
+#' @param permutation.threshold if use a permutation cutoff or not (bonferroni cutoff)
+#' @param permutation.rep number of permutation replicates
+#' @param bar if TRUE, the progress bar will be drawn on the terminal
+#' @param col for color of points in each chromosome on manhattan plot
+#' @param plot.type "b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)
+#' @param file.output whether to output files or not
+#' @param file figure formats, "jpg", "tiff"
+#' @param dpi resolution for output figures
+#' @param threshold a cutoff line on manhattan plot, 0.05/marker size
+#' @param Ncluster number of colors used for drawing PC 1 and PC 2
+#' @param signal.cex point size on output figures
+#' @param box logical, if TRUE, the box frame will be added in output figure
+#'
 #' @export
 #' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
@@ -87,7 +88,8 @@
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
 #' map <- read.table("mvp.map" , head = TRUE)
-#' mvp <- MVP(phe=phenotype, geno=genotype, map=map, method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE)
+#' mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
+#'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE)
 #' str(mvp)
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,

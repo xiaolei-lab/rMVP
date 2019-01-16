@@ -6,13 +6,13 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.impute(mvp_file, out = "mvp.imp", method = "Major",
+MVP.Data.impute(mvp_prefix, out = "mvp.imp", method = "Major",
   ncpus = NULL)
 }
 \arguments{
-\item{mvp_file}{the name of mvp file}
+\item{mvp_prefix}{the prefix of mvp file}
 
-\item{out}{the name of output file}
+\item{out}{the prefix of output file}
 
 \item{method}{'Major', 'Minor', "Middle"}
 
@@ -29,6 +29,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-mvpPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+mvpPath <- system.file("extdata", "05_mvp", "mvp.geno.desc", package = "rMVP")
 MVP.Data.impute(mvpPath)
 }
