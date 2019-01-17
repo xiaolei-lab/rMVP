@@ -823,36 +823,36 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     map <- read.table(paste0(mvp_prefix, ".map"), header = TRUE)
     ind <- read.table(paste0(mvp_prefix, ".geno.ind"))
     if (is.null(out)) { out <- paste0(basename(mvp_prefix), ".qc")}
-    if (is.null(ncpus)) ncpus <- detectCores() - 1
+    if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
     
     is.valid <- function(i, margin, cutoff) {
         switch(margin,
             r = {
-                tab <- table(bigmat[i, ])
+                na.n <- sum(is.na(bigmat[i, ]))
                 cutoff <- cutoff * nrow(bigmat)
             },
             c = {
-                tab <- table(bigmat[, i])
-                cutoff <- cutoff * col(bigmat)
+                na.n <- sum(is.na(bigmat[, i]))
+                cutoff <- cutoff * ncol(bigmat)
             }
         )
-        return(tab[NA] < cutoff)
+        return(na.n < cutoff)
     }
 
     # qc marker
     marker_index <- rep(TRUE, nrow(bigmat))
-    if (!is.null(geno)) {
-        marker_index <- cbind(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
-        cat(paste0(length(marker_index[marker_index == FALSE, ])), 
-            "markers are filtered because the missing ratio is higher than", geno, "\n")
+    if (!is.null(geno) && geno > 0) {
+        marker_index <- unlist(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
+        cat(paste0(length(marker_index[marker_index == FALSE])), 
+            "markers are filtered. missing ratio > ", geno, "\n")
     }
     
     # qc individual
     ind_index <- rep(TRUE, ncol(bigmat))
-    if (!is.null(mind)) {
-        ind_index <- cbind(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
-        cat(paste0(length(marker_index[marker_index == FALSE, ])),
-            "individuals are filtered because the missing ratio is higher than", mind, "\n")
+    if (!is.null(mind) && mind > 0) {
+        ind_index <- unlist(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
+        cat(paste0(length(ind_index[ind_index == FALSE])),
+            "individuals are filtered. missing ratio > ", mind, "\n")
     }
     
     # TODO: support hwe
@@ -881,5 +881,5 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     MVP.Data.Map(map = map[marker_index,], out = out)
     
     # output new ind
-    write.table(ind[ind_index], paste0(out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
+    write.table(ind[ind_index, ], paste0(out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
  }
