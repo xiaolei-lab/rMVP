@@ -34,11 +34,14 @@
 #' @export
 #'
 #' @examples
-#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' phenotype <- read.table(phePath, header=TRUE)
+#' idx <- !is.na(phenotype[, 2])
+#' phenotype <- phenotype[idx, ]
 #' print(dim(phenotype))
-#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
+#' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' glm <- MVP.GLM(phe=phenotype, geno=genotype)
 #' str(glm)

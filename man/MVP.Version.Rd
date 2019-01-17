@@ -9,15 +9,15 @@ MVP.Version(width = 60)
 \arguments{
 \item{width}{the width of the message}
 }
+\value{
+version number.
+}
 \description{
 Build date: Aug 30, 2017
 Last update: Dec 12, 2018
 }
 \examples{
-MVP.version()
-}
-\value{
-NULL
+MVP.Version()
 }
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu

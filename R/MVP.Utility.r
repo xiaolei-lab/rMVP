@@ -22,11 +22,11 @@
 #' 
 #' @param width the width of the message
 #'
-#' @return NULL
+#' @return version number.
 #' @export
 #'
 #' @examples
-#' MVP.version()
+#' MVP.Version()
 MVP.Version <- function(width=60) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
@@ -37,7 +37,8 @@ MVP.Version <- function(width=60) {
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
-    print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = 60)
+    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = 60)
+    return(invisible(version))
 }
 
 
@@ -238,6 +239,8 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
     cat(msg, sep = "\n")
+    
+    return(version)
 }
 
 #' make line

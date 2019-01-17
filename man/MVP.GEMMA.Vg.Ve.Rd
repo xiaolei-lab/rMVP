@@ -4,8 +4,7 @@
 \alias{MVP.GEMMA.Vg.Ve}
 \title{To estimate variance component using HE regression}
 \usage{
-MVP.GEMMA.Vg.Ve(y, X, K, rtol = 1e-06, atol = 1e-08, ctol = 1e-08,
-  root = FALSE)
+MVP.GEMMA.Vg.Ve(y, X, K, rtol = 1e-06, atol = 1e-08, ctol = 1e-08)
 }
 \arguments{
 \item{y}{phenotype}
@@ -19,8 +18,6 @@ MVP.GEMMA.Vg.Ve(y, X, K, rtol = 1e-06, atol = 1e-08, ctol = 1e-08,
 \item{atol}{parameters for HE regression, no changes is recommended}
 
 \item{ctol}{parameters for HE regression, no changes is recommended}
-
-\item{root}{whether to loop iteration for the output of HE}
 }
 \value{
 vg, ve, and delta
@@ -30,14 +27,14 @@ Build date: Feb 2, 2017
 Last update: Feb 2, 2017
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype)
-vc <- MVP.GEMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K, root=FALSE)
+vc <- MVP.GEMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 print(vc)
 }
 \author{

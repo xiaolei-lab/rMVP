@@ -31,81 +31,83 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{nPC.GLM}{number of PCs added as fixed effects in GLM}
 
-\item{method.sub, }{method.sub.final: method used in substitution process}
+\item{nPC.MLM}{number of PCs added as fixed effects in MLM}
 
-\item{nPC.MLM:}{number of PCs added as fixed effects in MLM}
+\item{nPC.FarmCPU}{number of PCs added as fixed effects in FarmCPU}
 
-\item{nPC.FarmCPU:}{number of PCs added as fixed effects in FarmCPU}
+\item{perc}{percentage of total SNPs selected for PCA}
 
-\item{perc:}{percentage of total SNPs selected for PCA}
+\item{CV.GLM}{covariates added in GLM}
 
-\item{CV.GLM:}{covariates added in GLM}
+\item{CV.MLM}{covariates added in MLM}
 
-\item{CV.MLM:}{covariates added in MLM}
+\item{CV.FarmCPU}{covariates added in FarmCPU}
 
-\item{CV.FarmCPU:}{covariates added in FarmCPU}
+\item{REML}{a list contains ve and vg}
 
-\item{REML:}{a list contains ve and vg}
+\item{priority}{speed or memory}
 
-\item{priority:}{speed or memory}
+\item{ncpus}{number of cpus used for parallel}
 
-\item{ncpuc:}{number of cpus used for parallel}
+\item{vc.method}{methods for estimating variance component("EMMA" or "GEMMA")}
 
-\item{vc.method:}{methods for estimating variance component("EMMA" or "GEMMA")}
+\item{method}{the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")}
 
-\item{method:}{the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")}
+\item{maxLine}{when the priority is 'memory', users can change this parameter to limit the memory}
 
-\item{maxLine:}{when the priority is 'memory', users can change this parameter to limit the memory}
+\item{memo}{a marker added on output file name}
 
-\item{memo:}{a marker added on output file name}
+\item{P}{a start p value for each SNP}
 
-\item{P:}{a start p value for each SNP}
+\item{method.sub, }{method.sub.final method used in substitution process}
 
-\item{method.bin:}{EMMA or FaSTLMM}
+\item{method.sub.final}{method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'}
 
-\item{bin.size:}{window size in genome}
+\item{method.bin}{EMMA or FaSTLMM}
 
-\item{bin.selection:}{a vector, how many windows selected}
+\item{bin.size}{window size in genome}
 
-\item{Prior:}{four columns, SNP name, Chr, Pos, P}
+\item{bin.selection}{a vector, how many windows selected}
 
-\item{maxLoop:}{maximum number of iterations}
+\item{Prior}{four columns, SNP name, Chr, Pos, P}
 
-\item{threshold.output:}{output GWAS results only for SNPs with p value lower than the threshold.output}
+\item{maxLoop}{maximum number of iterations}
 
-\item{iteration.output:}{whether to output results for FarmCPU iterations}
+\item{threshold.output}{output GWAS results only for SNPs with p value lower than the threshold.output}
 
-\item{p.threshold:}{if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops}
+\item{iteration.output}{whether to output results for FarmCPU iterations}
 
-\item{QTN.threshold:}{Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs}
+\item{p.threshold}{if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops}
 
-\item{bound:}{maximum number of SNPs selected as pseudo QTNs for each iteration}
+\item{QTN.threshold}{Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs}
 
-\item{outward:}{the direction of circular Manhattan plot}
+\item{bound}{maximum number of SNPs selected as pseudo QTNs for each iteration}
 
-\item{permutation.threshold:}{if use a permutation cutoff or not (bonferroni cutoff)}
+\item{outward}{the direction of circular Manhattan plot}
 
-\item{permutation.rep:}{number of permutation replicates}
+\item{permutation.threshold}{if use a permutation cutoff or not (bonferroni cutoff)}
 
-\item{bar:}{if TRUE, the progress bar will be drawn on the terminal}
+\item{permutation.rep}{number of permutation replicates}
 
-\item{col:}{for color of points in each chromosome on manhattan plot}
+\item{bar}{if TRUE, the progress bar will be drawn on the terminal}
 
-\item{plot.type:}{"b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)}
+\item{col}{for color of points in each chromosome on manhattan plot}
 
-\item{file.output:}{whether to output files or not}
+\item{plot.type}{"b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)}
 
-\item{file:}{figure formats, "jpg", "tiff"}
+\item{file.output}{whether to output files or not}
 
-\item{dpi:}{resolution for output figures}
+\item{file}{figure formats, "jpg", "tiff"}
 
-\item{threshold:}{a cutoff line on manhattan plot, 0.05/marker size}
+\item{dpi}{resolution for output figures}
 
-\item{Ncluster:}{number of colors used for drawing PC 1 and PC 2}
+\item{threshold}{a cutoff line on manhattan plot, 0.05/marker size}
 
-\item{signal.cex:}{point size on output figures}
+\item{Ncluster}{number of colors used for drawing PC 1 and PC 2}
 
-\item{box:}{logical, if TRUE, the box frame will be added in output figure}
+\item{signal.cex}{point size on output figures}
+
+\item{box}{logical, if TRUE, the box frame will be added in output figure}
 }
 \value{
 a m * 2 matrix, the first column is the SNP effect, the second column is the P values
@@ -125,15 +127,16 @@ Build date: Aug 30, 2017
 Last update: Dec 14, 2018
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
-mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table("mvp.map" , head = TRUE)
-mvp <- MVP(phe=phenotype, geno=genotype, map=map, method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE)
+mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
+  method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
 }
 \author{

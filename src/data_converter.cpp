@@ -176,17 +176,17 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
             boost::split(l, buffer[i], boost::is_any_of("\t"));
             markers.clear();
             // There is only one char in REF and ALT
-            if (l[3].length() == 1 && l[4].length() == 1) {  
+            // if (l[3].length() == 1 && l[4].length() == 1) {  
                 vector<string>(l.begin() + 9, l.end()).swap(l);
                 transform(
                     l.begin(), l.end(), 
                     back_inserter(markers),
                     boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
                 );
-            } else {
-                // Delete multiple variant sites
-                fill_n(markers.begin(), NA_C, l.size() - 9); 
-            }
+            // } else {
+            //     // Delete multiple variant sites
+            //     fill_n(markers.begin(), l.size() - 9, NA_C);
+            // }
             
             for (int j = 0; j < markers.size(); j++) {
                 mat[j][m + i] = markers[j];
@@ -432,16 +432,12 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     
     // write bfile
     for (size_t i = 0; i < m; i++) {
-    #pragma omp parallel for
+        #pragma omp parallel for
         for (size_t j = 0; j < n; j++) {
             uint8_t p = 0;
             for (size_t x = 0; x < 4 && (4 * j + x) < pMat->ncol(); x++) {
                 c = mat[4 * j + x][i];
-                if (isna(c)) {
-                    p |= 1 << (x*2);
-                } else {
-                    p |= code[c] << (x*2);
-                }
+                p |= code[c] << (x*2);
             }
             geno[j] = p;
         }
@@ -483,7 +479,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     long n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
         n++; 
-    char * buffer;
+    char *buffer;
     long buffer_size;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     

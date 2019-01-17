@@ -6,11 +6,11 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Map(map_file, out = "mvp", cols = c(1, 2, 3), header = TRUE,
+MVP.Data.Map(map, out = "mvp", cols = c(1, 2, 3), header = TRUE,
   sep = "\\t")
 }
 \arguments{
-\item{map_file}{the name of map file}
+\item{map}{the name of map file or map object(data.frame or matrix)}
 
 \item{out}{the name of output file}
 
@@ -21,7 +21,8 @@ MVP.Data.Map(map_file, out = "mvp", cols = c(1, 2, 3), header = TRUE,
 \item{sep}{seperator of the file}
 }
 \value{
-NULL
+Output file:
+<out>.map
 }
 \description{
 MVP.Data.Map: To check map file
@@ -29,6 +30,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
-MVP.Data.Map(mvp.map)
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+MVP.Data.Map(mapPath)
 }

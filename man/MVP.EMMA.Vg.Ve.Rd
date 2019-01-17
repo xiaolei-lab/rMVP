@@ -33,10 +33,10 @@ Build date: August 30, 2016
 Last update: January 27, 2017
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype)

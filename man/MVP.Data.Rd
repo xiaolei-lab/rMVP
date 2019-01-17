@@ -17,6 +17,8 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
   verbose = TRUE, ...)
 }
 \arguments{
+\item{fileMVP}{Genotype in MVP format}
+
 \item{fileVCF}{Genotype in VCF format}
 
 \item{fileHMP}{Genotype in hapmap format}
@@ -29,13 +31,20 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
 
 \item{filePhe}{Phenotype, the first column is taxa name, the subsequent columns are traits}
 
+\item{fileInd}{Individual name file}
+
 \item{fileKin}{Kinship that represents relationship among individuals, n * n matrix, n is sample size}
 
 \item{filePC}{Principal components, n*npc, n is sample size, npc is number of top columns of principal components}
 
-\item{out}{A marker on output file name}
+\item{out}{prefix of output file name}
 
 \item{sep.num}{seperator for numeric file.}
+
+\item{auto_transpose}{Whether to automatically transpose numeric genotypes,
+the default is True, which will identify the most one of the rows or 
+columns as a marker, If set to False, the row represents the marker and
+the column represents the individual.}
 
 \item{sep.map}{seperator for map file.}
 
@@ -45,9 +54,11 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
 
 \item{sep.pc}{seperator for PC file.}
 
-\item{type.geno}{type parameter in bigmemory, genotype data}
+\item{type.geno}{type parameter in bigmemory, genotype data. The default is char, it is highly recommended *NOT* to modify this parameter.}
 
-\item{SNP.impute}{"Left", "Middle", "Right"}
+\item{pheno_cols}{Extract which columns of the phenotype file (including individual IDs)}
+
+\item{SNP.impute}{"Left", "Middle", "Right", or NULL for skip impute.}
 
 \item{maxLine}{number of SNPs, only used for saving memory when calculate kinship matrix}
 
@@ -57,21 +68,9 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
 
 \item{pcs.keep}{how many PCs to keep}
 
-\item{verbose}{whether to print}
+\item{verbose}{whether to print detail.}
 
-\item{sep.vcf}{seperator for vcf file.}
-
-\item{type.kin}{type parameter in bigmemory, Kinship}
-
-\item{type.pc}{type parameter in bigmemory, PC}
-
-\item{type.map}{type parameter in bigmemory, PC}
-
-\item{SNP.effect}{"Add" or "Dom"}
-
-\item{maxRecord}{maximum number for markers}
-
-\item{maxInd}{maximum number for individuals}
+\item{...}{Compatible with DEPRECATED parameters.}
 }
 \value{
 NULL
@@ -90,6 +89,6 @@ Build date: Aug 30, 2016
 Last update: Sep 12, 2018
 }
 \examples{
-bfilePath <- system.file("extdata", "mvp", package = "rMVP")
+bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 MVP.Data(fileBed=bfilePath)
 }

@@ -578,7 +578,7 @@ If you have more than one phenotype
 ```r
 for(i in 2:ncol(phenotype)){
   imMVP <- MVP(
-    phe=phenotype[, c(1, i)],
+    phe=phenotype[, c(1, i)],
     geno=genotype,
     map=map,
     #K=Kinship,
@@ -649,7 +649,7 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Flower time.jpg">
+<a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/MVP.Phe_Distribution.Flower%20time.jpg">
 <img src="results/MVP.Phe_Distribution.Flower time.jpg" height="460px" width="460px">
 </a>
 </p>
@@ -742,7 +742,7 @@ For GS/GP results:
             cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black")
         
 #Note: 
-Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
+Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
 ```
 
 <p align="center">
@@ -1010,7 +1010,9 @@ For variance components:
 ```ssh
 apt-get install libssl-dev/unstable
 ```
+
 ---
+
 :sos: **Question2:** When installing packages from Github with "devtools", an error occurred:
  
  ***Error in curl::curl_fetch_disk(url, x$path, handle = handle): Problem with the SSL CA cert (path? access rights?)***
@@ -1020,7 +1022,9 @@ apt-get install libssl-dev/unstable
 library(httr)
 set_config(config(ssl_verifypeer = 0L))
 ```
+
 ---
+
 :sos: **Question3:** When installing **MVP**:
  
 ***Error in lazyLoadDBinsertVariable(vars[i], from, datafile, ascii, compress,  : write failed

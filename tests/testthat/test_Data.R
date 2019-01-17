@@ -71,12 +71,12 @@ test_that("MVP.Data() - HMP Diploid", {
     genoInd <- read.table(paste0(out, ".geno.ind"))
     map <- read.table(paste0(out, ".map"))
     
-    # expect_known_value(geno[], "keep.geno", update = FALSE)
-    # expect_known_value(genoImp[], "keep.genoImp", update = FALSE)
-    # expect_known_value(kinship[], "keep.kinship", update = FALSE)
-    # expect_known_value(pcs[], "keep.pcs", update = FALSE)
-    # expect_known_value(genoInd, "keep.genoInd", update = FALSE)
-    # expect_known_value(map, "keep.map", update = FALSE)
+    expect_known_value(geno[], "keep.geno", update = FALSE)
+    expect_known_value(genoImp[], "keep.genoImp", update = FALSE)
+    expect_known_value(kinship[], "keep.kinship", update = FALSE)
+    expect_known_value(pcs[], "keep.pcs", update = FALSE)
+    expect_known_value(genoInd, "keep.genoInd", update = FALSE)
+    expect_known_value(map, "keep.map", update = FALSE)
 })
 
 files <- dir(pattern = "^rMVP.test")
