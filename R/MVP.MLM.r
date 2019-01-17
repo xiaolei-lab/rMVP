@@ -40,19 +40,27 @@
 #' @export
 #'
 #' @examples
-#' phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+#' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' phenotype <- read.table(phePath, header=TRUE)
+#' idx <- !is.na(phenotype[, 2])
+#' phenotype <- phenotype[idx, ]
 #' print(dim(phenotype))
-#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
+#' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' K <- MVP.K.VanRaden(genotype)
 #' mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)
 #' str(mlm)
 MVP.MLM <-
-function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=2, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
-R.ver <- Sys.info()[['sysname']]
-wind <- R.ver == 'Windows'
+function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
+    R.ver <- Sys.info()[['sysname']]
+    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    
+    if(wind) ncpus <- 1
+    if(r.open && ncpus>1 && R.ver == 'Darwin'){
+        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
+    }
 #taxa <- colnames(phe)[2]
 #r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
 math.cpu <- try(getMKLthreads(), silent=TRUE)
@@ -161,13 +169,13 @@ nf <- ncol(X0) + 1
     #Paralleled MLM
     if(cpu == 1){
         math.cpu <- try(getMKLthreads(), silent=TRUE)
-            mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-                try(setMKLthreads(mkl.cpu), silent=TRUE)
+        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
+        try(setMKLthreads(mkl.cpu), silent=TRUE)
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.mlm.parallel)
-    try(setMKLthreads(math.cpu), silent=TRUE)
+        try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
-        if(wind){
+        if(R.ver == 'Windows'){
             print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
@@ -175,21 +183,21 @@ nf <- ncol(X0) + 1
             results <- parLapply(cl, 1:m, eff.mlm.parallel)
             stopCluster(cl)
         }else{
-        tmpf.name <- tempfile()
-        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
-        writeBin(0, tmpf)
-        print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-                R.ver <- Sys.info()[['sysname']]
-                if(R.ver == 'Linux') {
-                    math.cpu <- try(getMKLthreads(), silent=TRUE)
-                    try(setMKLthreads(1), silent=TRUE)
-                }
-                results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
-                if(R.ver == 'Linux') {
-                    try(setMKLthreads(math.cpu), silent=TRUE)
+            tmpf.name <- tempfile()
+            tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
+            writeBin(0, tmpf)
+            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            R.ver <- Sys.info()[['sysname']]
+            if(R.ver == 'Linux') {
+                math.cpu <- try(getMKLthreads(), silent=TRUE)
+                try(setMKLthreads(1), silent=TRUE)
+            }
+            results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
+            if(R.ver == 'Linux') {
+                try(setMKLthreads(math.cpu), silent=TRUE)
                 #try(setMKLthreads(1), silent=TRUE)
-                }
-        close(tmpf); unlink(tmpf.name); cat('\n');
+            }
+            close(tmpf); unlink(tmpf.name); cat('\n');
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

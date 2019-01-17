@@ -20,10 +20,15 @@ MVP.Data.Kin(fileKin = TRUE, mvp_prefix = "mvp", out = NULL,
 
 \item{sep}{seperator for Kinship file.}
 }
+\value{
+Output file:
+<out>.kin.bin
+<out>.kin.desc
+}
 \description{
 Kinship
 }
 \examples{
-geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 MVP.Data.Kin(TRUE, mvp_prefix=geno, out="myKin")
 }

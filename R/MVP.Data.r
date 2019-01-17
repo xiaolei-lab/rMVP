@@ -604,11 +604,13 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' @param header whether the file contains header
 #' @param sep seperator of the file
 #' 
-#' @return NULL
+#' @return 
+#' Output file:
+#' <out>.map
 #' 
 #' @examples 
-#' mapPath <- ssystem.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' MVP.Data.Map(mvp.map)
+#' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+#' MVP.Data.Map(mapPath)
 MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t') {
     t1 <- as.numeric(Sys.time())
     if (is.character(map) && !is.data.frame(map)) {
@@ -636,9 +638,12 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
 #' @param sep seperator for PC file.
 #' 
 #' @export
-#' @return NULL
+#' @return 
+#' Output file:
+#' <out>.pc.bin
+#' <out>.pc.desc
 #' @examples
-#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+#' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
 MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
     if (is.null(out)) out <- mvp_prefix
@@ -687,9 +692,12 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
 #' @param sep seperator for Kinship file.
 #'
 #' @export
-#' @return NULL
+#' @return 
+#' Output file:
+#' <out>.kin.bin
+#' <out>.kin.desc
 #' @examples
-#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+#' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' MVP.Data.Kin(TRUE, mvp_prefix=geno, out="myKin")
 MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
     if (is.null(out)) out <- mvp_prefix
@@ -741,8 +749,8 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
 #' Output files:
 #' imputed genotype file
 #' @examples 
-#' mvpPath <- system.file("extdata", "05_mvp", "mvp.geno.desc", package = "rMVP")
-#' MVP.Data.impute(mvpPath)
+#' mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
+#' MVP.Data.impute(mvpPath, ncpus=1)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
     cat("Imputing...\n")
@@ -812,8 +820,8 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
 #' Output files:
 #' cleaned genotype file
 #' @examples 
-#' geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
-#' MVP.Data.QC(geno, out="myKin")
+#' geno <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
+#' MVP.Data.QC(geno, out="mvp", ncpus=1)
 MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
     cat("Quality control...\n")
     options(bigmemory.typecast.warning = FALSE)

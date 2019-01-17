@@ -104,6 +104,9 @@ MVP.Report(MVP, col = c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
 
 \item{memo}{Character. A text marker on output files}
 }
+\value{
+Output files
+}
 \description{
 MVP.Report
 }

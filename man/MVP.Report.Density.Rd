@@ -25,6 +25,10 @@ MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
 
 \item{file.output}{Whether to output the file}
 }
+\value{
+Output file:
+SNP_Density.<taxa>.<type>
+}
 \description{
 SNP Density
 }

@@ -58,6 +58,10 @@ QQplot.}
 
 \item{dpi}{a number, the picture element for .jpg and .tiff files. The default is 300.}
 }
+\value{
+Output file:
+<memo>.QQplot.<taxa_name>.<type>
+}
 \description{
 QQ Plot
 }

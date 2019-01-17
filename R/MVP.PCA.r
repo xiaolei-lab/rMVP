@@ -32,7 +32,7 @@
 #' @export
 #'
 #' @examples
-#' genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+#' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' pca <- MVP.PCA(M=genotype)

@@ -29,6 +29,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-mvpPath <- system.file("extdata", "05_mvp", "mvp.geno.desc", package = "rMVP")
-MVP.Data.impute(mvpPath)
+mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
+MVP.Data.impute(mvpPath, ncpus=1)
 }

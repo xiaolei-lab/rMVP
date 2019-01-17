@@ -33,6 +33,10 @@ nor NULL).}
 
 \item{box}{Logical value. If TRUE, the border line of Manhattan plot will be added}
 }
+\value{
+Output file:
+MVP.PCA_2D.<type>
+}
 \description{
 PCA Plot
 }

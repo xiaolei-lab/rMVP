@@ -20,10 +20,15 @@ MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", out = NULL,
 
 \item{sep}{seperator for PC file.}
 }
+\value{
+Output file:
+<out>.pc.bin
+<out>.pc.desc
+}
 \description{
 Principal component analysis
 }
 \examples{
-geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
+geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
 }

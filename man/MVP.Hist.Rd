@@ -27,6 +27,10 @@ device of the system.}
 \item{dpi}{The resolution of the image, specifying how many pixels 
 per inch.}
 }
+\value{
+Output file:
+MVP.Phe_Distribution.<trait>.<type>
+}
 \description{
 Phenotype distribution histogram
 }

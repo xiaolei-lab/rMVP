@@ -22,11 +22,11 @@
 #' 
 #' @param width the width of the message
 #'
-#' @return NULL
+#' @return version number.
 #' @export
 #'
 #' @examples
-#' MVP.version()
+#' MVP.Version()
 MVP.Version <- function(width=60) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"

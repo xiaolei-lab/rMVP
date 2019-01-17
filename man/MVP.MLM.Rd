@@ -5,7 +5,7 @@
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
 MVP.MLM(phe, geno, K = NULL, CV = NULL, REML = NULL,
-  priority = "speed", cpu = 2, bar = TRUE, vc.method = "EMMA",
+  priority = "speed", cpu = 1, bar = TRUE, vc.method = "EMMA",
   maxLine = 1000, file.output = TRUE, memo = "MVP")
 }
 \arguments{
@@ -41,11 +41,14 @@ Build date: Aug 30, 2016
 Last update: Aug 30, 2016
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
+idx <- !is.na(phenotype[, 2])
+phenotype <- phenotype[idx, ]
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
+genotype <- genotype[, idx]
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype)
 mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)

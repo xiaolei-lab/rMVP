@@ -61,7 +61,7 @@
 #' @param memo Character. A text marker on output files
 #'
 #' @export
-#' @return NULL
+#' @return Output files
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' #MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
@@ -1752,7 +1752,9 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 #' @param file.output Whether to output the file
 #'
 #' @export
-#' @return NULL
+#' @return 
+#' Output file:
+#' SNP_Density.<taxa>.<type>
 #'
 #' @examples
 #' data(pig60K, package = "rMVP")
@@ -1817,7 +1819,9 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #'    QQplot.
 #' @param dpi a number, the picture element for .jpg and .tiff files. The default is 300.
 #'
-#' @return NULL
+#' @return
+#' Output file:
+#' <memo>.QQplot.<taxa_name>.<type>
 #' @export
 #'
 #' @examples
@@ -1960,7 +1964,9 @@ MVP.Report.QQplot <-
 #'    per inch.
 #'
 #' @export
-#' @return NULL
+#' @return
+#' Output file:
+#' MVP.Phe_Distribution.<trait>.<type>
 #'
 #' @examples
 #' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
@@ -2062,7 +2068,9 @@ MVP.Hist <-
 #' @param box Logical value. If TRUE, the border line of Manhattan plot will be added
 #'
 #' @export
-#' @return NULL
+#' @return
+#' Output file:
+#' MVP.PCA_2D.<type>
 #'
 #' @examples
 #' PCPath <- system.file("extdata", "07_other", "mvp.imp.pc.desc", package = "rMVP")

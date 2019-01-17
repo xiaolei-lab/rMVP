@@ -66,13 +66,16 @@ Last update: May 25, 2017
 Requirement: Y, GD, and CV should have same taxa order. GD and GM should have the same order on SNPs
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
+idx <- !is.na(phenotype[, 2])
+phenotype <- phenotype[idx, ]
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
+genotype <- genotype[, idx]
 print(dim(genotype))
-mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table("mvp.map" , head = TRUE)
 farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
   ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 

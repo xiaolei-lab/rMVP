@@ -35,6 +35,6 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-geno <- file.path(system.file(), "06_mvp-impute", "mvp.imp")
-MVP.Data.QC(geno, out="myKin")
+geno <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
+MVP.Data.QC(geno, out="mvp", ncpus=1)
 }

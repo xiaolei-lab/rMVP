@@ -127,16 +127,16 @@ Build date: Aug 30, 2017
 Last update: Dec 14, 2018
 }
 \examples{
-phePath <- system.file("extdata", "mvp.phe", package = "rMVP")
+phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
-genoPath <- system.file("extdata", "mvp.geno.desc", package = "rMVP")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
-mapPath <- system.file("extdata", "mvp.map", package = "rMVP")
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table("mvp.map" , head = TRUE)
 mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
-  method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE)
+  method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
 }
 \author{

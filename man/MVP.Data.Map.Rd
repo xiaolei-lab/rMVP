@@ -20,12 +20,16 @@ MVP.Data.Map(map, out = "mvp", cols = c(1, 2, 3), header = TRUE,
 
 \item{sep}{seperator of the file}
 }
+\value{
+Output file:
+<out>.map
+}
 \description{
 MVP.Data.Map: To check map file
 Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-mapPath <- ssystem.file("extdata", "07_other", "mvp.map", package = "rMVP")
-MVP.Data.Map(mvp.map)
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+MVP.Data.Map(mapPath)
 }
