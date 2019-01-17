@@ -15,7 +15,7 @@ context("MVP.Data - vcf")
 test_that("MVP.Data() - vcf", {
     out <- "rMVP.test.1"
     expect_output(
-        MVP.Data(fileVCF = vcfPath, out = out, verbose = FALSE),
+        MVP.Data(fileVCF = vcfPath, out = out, verbose = FALSE, ncpus=1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -38,7 +38,7 @@ context("MVP.Data - bfile")
 test_that("MVP.Data() - Bfile", {
     out <- "rMVP.test.2"
     expect_output(
-        MVP.Data(fileBed = bfilePath, out = out, verbose = FALSE),
+        MVP.Data(fileBed = bfilePath, out = out, verbose = FALSE, ncpus=1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -61,7 +61,7 @@ context("MVP.Data - hapmap")
 test_that("MVP.Data() - HMP Diploid", {
     out <- "rMVP.test.3"
     expect_output(
-        MVP.Data(fileHMP = hmp2Path, out = out, verbose = FALSE),
+        MVP.Data(fileHMP = hmp2Path, out = out, verbose = FALSE, ncpus=1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))

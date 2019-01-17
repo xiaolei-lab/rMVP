@@ -48,6 +48,7 @@
 #' @param perc Percentage of markers used to calculate PCA
 #' @param pcs.keep how many PCs to keep
 #' @param verbose whether to print detail.
+#' @param ncpus The number of threads used, if NULL, (logical core number - 1) is automatically used
 #' @param ... Compatible with DEPRECATED parameters.
 #'
 #' @export
@@ -62,12 +63,12 @@
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 #' @examples 
 #' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
-#' MVP.Data(fileBed=bfilePath)
+#' MVP.Data(fileBed=bfilePath, ncpus=1)
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
                      type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
-                     perc = 1, pcs.keep = 5, verbose = TRUE, ...) {
+                     perc = 1, pcs.keep = 5, verbose = TRUE, ncpus = NULL, ...) {
     
     cat("Preparing data for MVP...\n")
     
@@ -84,6 +85,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     if ("maxInd" %in% names(params)) { message("WARNING: 'maxInd' has been DEPRECATED. Use maxLine instead.") }
     
     # Check Data Input
+    if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
+    
     geno_files <- !sapply(list(
         fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
         ), is.null)
@@ -155,8 +158,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         MVP.Data.impute(
             mvp_prefix = out, 
             out = paste0(out, '.imp'), 
-            method = SNP.impute
-            # ,ncpus = ncpus
+            method = SNP.impute,
+            ncpus = ncpus
         )
         out <- paste0(out, '.imp')
     }
