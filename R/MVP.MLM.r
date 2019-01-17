@@ -57,56 +57,55 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     R.ver <- Sys.info()[['sysname']]
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
     
-    if(wind) ncpus <- 1
-    if(r.open && ncpus>1 && R.ver == 'Darwin'){
+    if (R.ver == 'Windows') ncpus <- 1
+    if (r.open && ncpus > 1 && R.ver == 'Darwin') {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-#taxa <- colnames(phe)[2]
-#r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-math.cpu <- try(getMKLthreads(), silent=TRUE)
 
-n <- ncol(geno)
-m <- nrow(geno)
-if(priority=="speed") geno <- as.matrix(geno)
-
-ys <- as.numeric(as.matrix(phe[,2]))
-if (is.null(K)) {
-    print("Calculating Kinship...")
-    K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
-    if (file.output) {
-        filebck <- paste0("MVP.", colnames(phe)[2], memo, ".kin.bin")
-        filedes <- paste0("MVP.", colnames(phe)[2], memo, ".kin.desc")
-        if (file.exists(filebck)) file.remove(filebck)
-        if (file.exists(filedes)) file.remove(filedes)
-        Kin.backed <- big.matrix(
-            nrow = nrow(K),
-            ncol = ncol(K),
-            type = "double",
-            backingfile = filebck,
-            descriptorfile = filedes
-        )
-        Kin.backed[, ] <- K[, ]
-        flush(Kin.backed)
-        rm(list = c("Kin.backed"))
-        gc()
+    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    
+    n <- ncol(geno)
+    m <- nrow(geno)
+    if(priority=="speed") geno <- as.matrix(geno)
+    
+    ys <- as.numeric(as.matrix(phe[,2]))
+    if (is.null(K)) {
+        print("Calculating Kinship...")
+        K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
+        if (file.output) {
+            filebck <- paste0("MVP.", colnames(phe)[2], memo, ".kin.bin")
+            filedes <- paste0("MVP.", colnames(phe)[2], memo, ".kin.desc")
+            if (file.exists(filebck)) file.remove(filebck)
+            if (file.exists(filedes)) file.remove(filedes)
+            Kin.backed <- big.matrix(
+                nrow = nrow(K),
+                ncol = ncol(K),
+                type = "double",
+                backingfile = filebck,
+                descriptorfile = filedes
+            )
+            Kin.backed[, ] <- K[, ]
+            flush(Kin.backed)
+            rm(list = c("Kin.backed"))
+            gc()
+        }
+    } else {
+        # convert K to base:matrix
+        K <- K[, ]
     }
-} else {
-    # convert K to base:matrix
-    K <- K[, ]
-}
 
-if(is.null(CV)){
-    X0 <- matrix(1, n)
-}else{
-    X0 <- cbind(matrix(1, n), CV)
-}
+    if (is.null(CV)) {
+        X0 <- matrix(1, n)
+    } else {
+        X0 <- cbind(matrix(1, n), CV)
+    }
 
-#number of fixed effects
-nf <- ncol(X0) + 1
-    if(is.null(REML)){
+    # number of fixed effects
+    nf <- ncol(X0) + 1
+    if (is.null(REML)) {
 		print("Variance components...")   
-        if(vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
-        if(vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
+        if (vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
+        if (vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
 		print("Variance components is Done!")
     }
 

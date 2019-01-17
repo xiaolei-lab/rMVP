@@ -41,7 +41,8 @@ MVP.PCA_2D.<type>
 PCA Plot
 }
 \examples{
-PCPath <- system.file("extdata", "07_other", "mvp.imp.pc.desc", package = "rMVP")
-pca <- attach.big.matrix(PCPath)[, 1:3]
+geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
+MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
+pca <- attach.big.matrix("myPC.pc.desc")[, 1:3]
 MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
 }

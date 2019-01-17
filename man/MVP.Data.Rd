@@ -14,7 +14,7 @@ MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
   sep.phe = "\\t", sep.kin = "\\t", sep.pc = "\\t",
   type.geno = "char", pheno_cols = NULL, SNP.impute = "Major",
   maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5,
-  verbose = TRUE, ...)
+  verbose = TRUE, ncpus = NULL, ...)
 }
 \arguments{
 \item{fileMVP}{Genotype in MVP format}
@@ -70,6 +70,8 @@ the column represents the individual.}
 
 \item{verbose}{whether to print detail.}
 
+\item{ncpus}{The number of threads used, if NULL, (logical core number - 1) is automatically used}
+
 \item{...}{Compatible with DEPRECATED parameters.}
 }
 \value{
@@ -90,5 +92,5 @@ Last update: Sep 12, 2018
 }
 \examples{
 bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
-MVP.Data(fileBed=bfilePath)
+MVP.Data(fileBed=bfilePath, ncpus=1)
 }
