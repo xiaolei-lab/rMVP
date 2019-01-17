@@ -50,6 +50,12 @@
 #' print(vc)
 MVP.EMMA.Vg.Ve <-
 function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
+    # NA in phenotype
+    idx <- !is.na(y)
+    y <- y[idx]
+    X <- as.matrix(X[idx, ])
+    K <- K[idx, idx]
+    
     if(!is.numeric(y))	y <- as.numeric(as.character(y))
     emma.delta.REML.LL.wo.Z <- function(logdelta, lambda, etas)
     {
