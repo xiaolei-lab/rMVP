@@ -695,7 +695,7 @@ FarmCPU.Specify <-
         ID.GP=ID.GP[index,4] #must have chr and bp information, keep SNP ID only
         
         if(!is.null(inclosure.size)   ) {
-            if(!is.na(inclosure.size)){
+            if(!any(is.na(inclosure.size))){
                 avaiable=min(inclosure.size,length(ID.GP))
                 if(avaiable==0){
                     ID.GP=-1
