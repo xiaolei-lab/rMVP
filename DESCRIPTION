@@ -1,7 +1,7 @@
 Package: rMVP
 Type: Package
 Title: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
-Version: 0.99.3
+Version: 0.99.4
 Date: 2019-01-17
 Author: Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Shuhong Zhao, and Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
@@ -10,7 +10,7 @@ License: Apache License | file LICENSE
 SystemRequirements: C++11
 BugReports: https://github.com/XiaoleiLiuBio/MVP/issues
 Imports: utils, stats, methods, graphics, grDevices
-Depends: R (>= 3.5), Rcpp, RcppProgress, BH, bigmemory, biganalytics, parallel, MASS
+Depends: R (>= 3.6), Rcpp, RcppProgress, BH, bigmemory, biganalytics, parallel, MASS
 LinkingTo: Rcpp, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 biocViews: GenomeWideAssociation, Visualization, Genetics, Preprocessing, QualityControl, Software
