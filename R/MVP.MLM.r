@@ -178,7 +178,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
             print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
-            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory),library(rfunctions)))
+            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
             results <- parLapply(cl, 1:m, eff.mlm.parallel)
             stopCluster(cl)
         }else{
