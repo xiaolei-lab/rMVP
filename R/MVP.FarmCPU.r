@@ -140,8 +140,12 @@
                 break
             }#force to exit for GLM model while seqQTN=NULL and h2=0
 
-            if(!is.null(seqQTN.save)&&theLoop>1){
-                if(seqQTN.save!=0 & seqQTN.save!=-1 & !is.null(seqQTN) ) seqQTN=union(seqQTN,seqQTN.save) #Force previous QTNs in the model
+            if (!any(is.null(seqQTN.save)) && theLoop > 1) {
+                if (!(0 %in% seqQTN.save || -1 %in% seqQTN.save) && !is.null(seqQTN)) {
+                        #Force previous QTNs in the model
+                        seqQTN <- union(seqQTN,seqQTN.save)
+                    }
+                }
             }
             if(theLoop!=1){
                 seqQTN.p=myPrior[seqQTN]
