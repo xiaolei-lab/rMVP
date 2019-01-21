@@ -15,15 +15,15 @@ context("MVP.Data - vcf")
 test_that("MVP.Data() - vcf", {
     out <- "rMVP.test.1"
     expect_output(
-        MVP.Data(fileVCF = vcfPath, out = out, verbose = FALSE, ncpus=1),
+        MVP.Data(fileVCF = vcfPath, out = out, verbose = FALSE, ncpus = 1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
     kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
     pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
-    genoInd <- read.table(paste0(out, ".geno.ind"))
-    map <- read.table(paste0(out, ".map"))
+    genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
+    map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
     
     expect_known_value(geno[], "rMVP.keep.geno")
     expect_known_value(genoImp[], "rMVP.keep.genoImp")
@@ -38,15 +38,15 @@ context("MVP.Data - bfile")
 test_that("MVP.Data() - Bfile", {
     out <- "rMVP.test.2"
     expect_output(
-        MVP.Data(fileBed = bfilePath, out = out, verbose = FALSE, ncpus=1),
+        MVP.Data(fileBed = bfilePath, out = out, verbose = FALSE, ncpus = 1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
     kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
     pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
-    genoInd <- read.table(paste0(out, ".geno.ind"))
-    map <- read.table(paste0(out, ".map"))
+    genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
+    map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
 
     expect_known_value(geno[], "rMVP.keep.geno", update = FALSE)
     expect_known_value(genoImp[], "rMVP.keep.genoImp", update = FALSE)
@@ -61,15 +61,15 @@ context("MVP.Data - hapmap")
 test_that("MVP.Data() - HMP Diploid", {
     out <- "rMVP.test.3"
     expect_output(
-        MVP.Data(fileHMP = hmp2Path, out = out, verbose = FALSE, ncpus=1),
+        MVP.Data(fileHMP = hmp2Path, out = out, verbose = FALSE, ncpus = 1),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
     kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
     pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
-    genoInd <- read.table(paste0(out, ".geno.ind"))
-    map <- read.table(paste0(out, ".map"))
+    genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
+    map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
     
     expect_known_value(geno[], "rMVP.keep.geno", update = FALSE)
     expect_known_value(genoImp[], "rMVP.keep.genoImp", update = FALSE)
