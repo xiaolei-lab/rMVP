@@ -142,9 +142,8 @@
 
             if (!any(is.null(seqQTN.save)) && theLoop > 1) {
                 if (!(0 %in% seqQTN.save || -1 %in% seqQTN.save) && !is.null(seqQTN)) {
-                        #Force previous QTNs in the model
-                        seqQTN <- union(seqQTN,seqQTN.save)
-                    }
+                    #Force previous QTNs in the model
+                    seqQTN <- union(seqQTN,seqQTN.save)
                 }
             }
             if(theLoop!=1){
