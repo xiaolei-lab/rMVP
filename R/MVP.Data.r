@@ -111,7 +111,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                MVP.Data.VCF2MVP(
                    vcf_file = fileVCF, 
                    out = out,
-                   verbose = verbose
+                   verbose = verbose,
+                   threads = ncpus
                ),
            FFTFFF = 
                MVP.Data.Hapmap2MVP(
@@ -126,7 +127,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    maxLine = maxLine, 
                    priority = priority, 
                    type.geno = type.geno,
-                   verbose = verbose
+                   verbose = verbose,
+                   threads = ncpus
                ),
            FFFFTT = 
                MVP.Data.Numeric2MVP( 
