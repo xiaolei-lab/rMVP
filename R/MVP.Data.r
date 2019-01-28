@@ -800,6 +800,8 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
             dimnames = c(NULL, NULL)
         )
         outmat[, ] <- bigmat[, ]
+        file.copy(paste0(mvp_prefix, ".geno.ind"), paste0(out, ".geno.ind"))
+        file.copy(paste0(mvp_prefix, ".map"), paste0(out, ".map"))
     }
     
     # impute single marker
