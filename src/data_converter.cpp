@@ -551,6 +551,45 @@ void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=0,
     }
 }
 
+template <typename T>
+Rcpp::NumericVector count_allele(XPtr<BigMatrix> pMat, int i) {
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    
+    NumericVector counts = NumericVector::create(
+        _["0"] = 0,
+        _["1"] = 0,
+        _["2"] = 0
+    );
+    
+    auto n = pMat->ncol();
+    for (size_t j = 0; j < n; j++) {
+        switch(int(mat[j][i - 1])) {
+            case 0: counts[0]++; break;
+            case 1: counts[1]++; break;
+            case 2: counts[2]++; break;
+            default: break;
+        }
+    }
+    return counts;
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector count_allele(SEXP pBigMat, int i) {
+    XPtr<BigMatrix> xpMat(pBigMat);
+    
+    switch(xpMat->matrix_type()) {
+    case 1:
+        return count_allele<char>(xpMat, i);
+    case 2:
+        return count_allele<short>(xpMat, i);
+    case 4:
+        return count_allele<int>(xpMat, i);
+    case 8:
+        return count_allele<double>(xpMat, i);
+    default:
+        throw Rcpp::exception("unknown type detected for big.matrix object!");
+    }
+}
 
 
 /*** R

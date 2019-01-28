@@ -93,6 +93,18 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// count_allele
+Rcpp::NumericVector count_allele(SEXP pBigMat, int i);
+RcppExport SEXP _rMVP_count_allele(SEXP pBigMatSEXP, SEXP iSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_allele(pBigMat, i));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
@@ -102,6 +114,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_numeric_scan", (DL_FUNC) &_rMVP_numeric_scan, 1},
     {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
+    {"_rMVP_count_allele", (DL_FUNC) &_rMVP_count_allele, 2},
     {NULL, NULL, 0}
 };
 

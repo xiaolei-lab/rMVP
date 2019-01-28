@@ -153,6 +153,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             # , missing = missing
         )
     }
+    
     # impute
     if (!is.null(SNP.impute)) {
         MVP.Data.impute(
@@ -787,8 +788,8 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
     
     # impute single marker
     impute_marker <- function(i) {
-        # get frequency 
-        c <- table(outmat[i, ])
+        # get frequency
+        c <- count_allele(outmat@address, i)
         
         # get Minor / Major / Middle Gene
         if (method == 'Middle' | length(c) == 0) { A <- 1 }
