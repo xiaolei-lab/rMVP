@@ -142,7 +142,6 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                ),
            error_input(geno_files)
     )
-    cat("Preparation for Genotype File is done!\n")
     
     # phenotype
     if (!is.null(filePhe)) {
@@ -797,6 +796,10 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
         if (method == 'Middle' | length(c) == 0) { A <- 1 }
         else if (method == 'Major') { A <- as.numeric(names(c[c == max(c)])) }
         else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
+        else {
+            warning(paste("Unknow imputation method '", method, "', impute with 'Major' method."))
+            A <- as.numeric(names(c[c == max(c)]))
+        }
         
         # impute
         if (length(A) > 1) { A <- A[1] }
