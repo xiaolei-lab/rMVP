@@ -554,7 +554,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
     
     # read geno ind list
-    geno.id.file <- paste0(out, '.geno.id')
+    geno.id.file <- paste0(out, '.geno.ind')
     if (file.exists(geno.id.file)) {
         # read from file
         geno.id <- read.table(geno.id.file, stringsAsFactors = FALSE)
