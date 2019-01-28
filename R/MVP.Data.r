@@ -156,7 +156,10 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     }
     
     # impute
-    if (!is.null(SNP.impute)) {
+    desc <- paste0(out, ".geno.desc")
+    bigmat <- attach.big.matrix(desc)
+    
+    if (!is.null(SNP.impute) && hasNA(bigmat@address)) {
         MVP.Data.impute(
             mvp_prefix = out, 
             out = paste0(out, '.imp'), 
