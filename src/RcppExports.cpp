@@ -105,6 +105,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// hasNA
+bool hasNA(SEXP pBigMat);
+RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
@@ -115,6 +126,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
     {"_rMVP_count_allele", (DL_FUNC) &_rMVP_count_allele, 2},
+    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
     {NULL, NULL, 0}
 };
 

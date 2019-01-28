@@ -33,3 +33,7 @@ count_allele <- function(pBigMat, i) {
     .Call(`_rMVP_count_allele`, pBigMat, i)
 }
 
+hasNA <- function(pBigMat) {
+    .Call(`_rMVP_hasNA`, pBigMat)
+}
+

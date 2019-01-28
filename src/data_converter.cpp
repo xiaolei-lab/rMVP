@@ -591,7 +591,36 @@ Rcpp::NumericVector count_allele(SEXP pBigMat, int i) {
     }
 }
 
+template <typename T>
+bool hasNA(XPtr<BigMatrix> pMat, double NA_C) {
+    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    for (size_t j = 0; j < pMat->ncol(); j++) {
+        for (size_t i = 0; i < pMat->nrow(); i++) {
+            if (mat[j][i] == NA_C) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
+// [[Rcpp::export]]
+bool hasNA(SEXP pBigMat) {
+    XPtr<BigMatrix> xpMat(pBigMat);
+    
+    switch(xpMat->matrix_type()) {
+    case 1:
+        return hasNA<char>(xpMat, NA_CHAR);
+    case 2:
+        return hasNA<short>(xpMat, NA_SHORT);
+    case 4:
+        return hasNA<int>(xpMat, NA_INTEGER);
+    case 8:
+        return hasNA<double>(xpMat, NA_REAL);
+    default:
+        throw Rcpp::exception("unknown type detected for big.matrix object!");
+    }
+}
 /*** R
 # setwd("~/code/MVP/src")
 library(bigmemory)

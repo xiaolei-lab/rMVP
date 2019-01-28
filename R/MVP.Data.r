@@ -664,6 +664,10 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
         myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+        if (hasNA(geno@address)) {
+            message("NA in genotype, Calculate PCA has been skipped.")
+            return()
+        }
         myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs
     } else if (filePC == FALSE || is.null(filePC)) {
         return()
@@ -718,6 +722,10 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
         myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+        if (hasNA(geno@address)) {
+            message("NA in genotype, Calculate Kinship has been skipped.")
+            return()
+        }
         cat("Calculate KINSHIP using Vanraden method...\n")
         myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
     } else if (fileKin == FALSE || is.null(fileKin)) {
@@ -758,10 +766,17 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
 #' MVP.Data.impute(mvpPath, ncpus=1)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
-    cat("Imputing...\n")
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
     bigmat <- attach.big.matrix(desc)
+    
+    if (!hasNA(bigmat@address)) {
+        message("No NA in genotype, imputation has been skipped.")
+        return()
+    }
+    
+    cat("Imputing...\n")
+    
     options(bigmemory.typecast.warning = FALSE)
     if (is.null(ncpus)) ncpus <- detectCores()
     
@@ -797,7 +812,7 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
         else if (method == 'Major') { A <- as.numeric(names(c[c == max(c)])) }
         else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
         else {
-            warning(paste("Unknow imputation method '", method, "', impute with 'Major' method."))
+            message(paste("Unknow imputation method '", method, "', impute with 'Major' method."))
             A <- as.numeric(names(c[c == max(c)]))
         }
         
