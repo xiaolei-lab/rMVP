@@ -48,27 +48,25 @@
 
 **WE STRONGLY RECOMMEND INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
 
-**MVP** can be installed on Windows and Linux/Mac with following steps, respectively:
+**MVP** can be installed on Windows, Linux and MacOS with following steps:
 
-***Online installation(Recommended, Linux/Windows)***
+***Online installation(Recommended)***
 
 MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-> devtools::install_github("hclimente/snpStats")
-> devtools::install_github("jaredhuling/rfunctions")
-> devtools::install_github("xiaoleiLiubio/MVP")
+> devtools::install_github("xiaoleiLiubio/rMVP")
 ```
 
-***Offline installation(Linux only)***
+***Offline installation***
 
 1. Download the MVP offline installation package on the [releases page](https://github.com/XiaoleiLiuBio/MVP/releases)
 2. Unzip the installation package
 3. Run the installation script `MVPinstall.r`
 
 ```bash
-$ wget https://github.com/XiaoleiLiuBio/MVP/releases/download/1.0.1/MVP_offline_1.0.1.zip
-$ unzip MVP_offline_1.0.1.zip
+$ wget https://github.com/XiaoleiLiuBio/MVP/releases/download/0.99.9/MVP_offline_0.99.9.zip
+$ unzip MVP_offline_0.99.9.zip
 $ cd packages
 $ R
 > source("MVPinstall.r")
