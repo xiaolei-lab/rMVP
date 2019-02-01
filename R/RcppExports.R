@@ -29,3 +29,11 @@ read_bfile <- function(bed_file, pBigMat, maxLine, threads = 0L, verbose = TRUE)
     invisible(.Call(`_rMVP_read_bfile`, bed_file, pBigMat, maxLine, threads, verbose))
 }
 
+count_allele <- function(pBigMat, i) {
+    .Call(`_rMVP_count_allele`, pBigMat, i)
+}
+
+hasNA <- function(pBigMat) {
+    .Call(`_rMVP_hasNA`, pBigMat)
+}
+

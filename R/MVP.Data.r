@@ -111,7 +111,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                MVP.Data.VCF2MVP(
                    vcf_file = fileVCF, 
                    out = out,
-                   verbose = verbose
+                   verbose = verbose,
+                   threads = ncpus
                ),
            FFTFFF = 
                MVP.Data.Hapmap2MVP(
@@ -126,7 +127,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    maxLine = maxLine, 
                    priority = priority, 
                    type.geno = type.geno,
-                   verbose = verbose
+                   verbose = verbose,
+                   threads = ncpus
                ),
            FFFFTT = 
                MVP.Data.Numeric2MVP( 
@@ -140,7 +142,6 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                ),
            error_input(geno_files)
     )
-    cat("Preparation for Genotype File is done!\n")
     
     # phenotype
     if (!is.null(filePhe)) {
@@ -153,8 +154,12 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             # , missing = missing
         )
     }
+    
     # impute
-    if (!is.null(SNP.impute)) {
+    desc <- paste0(out, ".geno.desc")
+    bigmat <- attach.big.matrix(desc)
+    
+    if (!is.null(SNP.impute) && hasNA(bigmat@address)) {
         MVP.Data.impute(
             mvp_prefix = out, 
             out = paste0(out, '.imp'), 
@@ -552,7 +557,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
     
     # read geno ind list
-    geno.id.file <- paste0(out, '.geno.id')
+    geno.id.file <- paste0(out, '.geno.ind')
     if (file.exists(geno.id.file)) {
         # read from file
         geno.id <- read.table(geno.id.file, stringsAsFactors = FALSE)
@@ -662,6 +667,10 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
         myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+        if (hasNA(geno@address)) {
+            message("NA in genotype, Calculate PCA has been skipped.")
+            return()
+        }
         myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs
     } else if (filePC == FALSE || is.null(filePC)) {
         return()
@@ -716,6 +725,10 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
         myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+        if (hasNA(geno@address)) {
+            message("NA in genotype, Calculate Kinship has been skipped.")
+            return()
+        }
         cat("Calculate KINSHIP using Vanraden method...\n")
         myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
     } else if (fileKin == FALSE || is.null(fileKin)) {
@@ -756,10 +769,17 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
 #' MVP.Data.impute(mvpPath, ncpus=1)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
 MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
-    cat("Imputing...\n")
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
     bigmat <- attach.big.matrix(desc)
+    
+    if (!hasNA(bigmat@address)) {
+        message("No NA in genotype, imputation has been skipped.")
+        return()
+    }
+    
+    cat("Imputing...\n")
+    
     options(bigmemory.typecast.warning = FALSE)
     if (is.null(ncpus)) ncpus <- detectCores()
     
@@ -783,17 +803,23 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
             dimnames = c(NULL, NULL)
         )
         outmat[, ] <- bigmat[, ]
+        file.copy(paste0(mvp_prefix, ".geno.ind"), paste0(out, ".geno.ind"))
+        file.copy(paste0(mvp_prefix, ".map"), paste0(out, ".map"))
     }
     
     # impute single marker
     impute_marker <- function(i) {
-        # get frequency 
-        c <- table(outmat[i, ])
+        # get frequency
+        c <- count_allele(outmat@address, i)
         
         # get Minor / Major / Middle Gene
         if (method == 'Middle' | length(c) == 0) { A <- 1 }
         else if (method == 'Major') { A <- as.numeric(names(c[c == max(c)])) }
         else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
+        else {
+            message(paste("Unknow imputation method '", method, "', impute with 'Major' method."))
+            A <- as.numeric(names(c[c == max(c)]))
+        }
         
         # impute
         if (length(A) > 1) { A <- A[1] }
