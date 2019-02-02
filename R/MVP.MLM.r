@@ -57,8 +57,8 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     R.ver <- Sys.info()[['sysname']]
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
     
-    if (R.ver == 'Windows') ncpus <- 1
-    if (r.open && ncpus > 1 && R.ver == 'Darwin') {
+    if (R.ver == 'Windows') cpu <- 1
+    if (r.open && cpu > 1 && R.ver == 'Darwin') {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
 
