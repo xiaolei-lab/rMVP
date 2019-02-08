@@ -58,8 +58,29 @@ test_that("MVP.Data() - Bfile", {
 
 context("MVP.Data - hapmap")
 
-test_that("MVP.Data() - HMP Diploid", {
+test_that("MVP.Data() - HMP", {
     out <- "rMVP.test.3"
+    expect_output(
+        MVP.Data(fileHMP = hmp1Path, out = out, verbose = FALSE, ncpus = 1),
+        "successfully!"
+    )
+    geno <- attach.big.matrix(paste0(out, ".geno.desc"))
+    genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
+    kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
+    pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
+    genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
+    map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
+    
+    expect_known_value(geno[], "rMVP.keep.geno", update = FALSE)
+    expect_known_value(genoImp[], "rMVP.keep.genoImp", update = FALSE)
+    expect_known_value(kinship[], "rMVP.keep.kinship", update = FALSE)
+    expect_known_value(pcs[], "rMVP.keep.pcs", update = FALSE)
+    expect_known_value(genoInd, "rMVP.keep.genoInd", update = FALSE)
+    expect_known_value(map, "rMVP.keep.map", update = FALSE)
+})
+
+test_that("MVP.Data() - HMP Diploid", {
+    out <- "rMVP.test.4"
     expect_output(
         MVP.Data(fileHMP = hmp2Path, out = out, verbose = FALSE, ncpus = 1),
         "successfully!"
