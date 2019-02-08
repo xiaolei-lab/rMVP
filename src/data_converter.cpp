@@ -282,16 +282,27 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
 
 template <typename T>
 T hapmap_marker_parser(string m, char major, double NA_C) {
-    if (m.length() != 2 || 
-        (m[0] != 'A' && m[0] != 'T' && m[0] != 'G' && m[0] != 'C') ||
-        (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')
-    ) {
-        return static_cast<T>(NA_C);
-    } else {
-        return static_cast<T>(
-            ((m[0] == major)?0:1) + ((m[1] == major)?0:1)
-        );
+    if (m.length() == 1) {  // Hapmap
+        if (m[0] == '+' || m[0] == '0' || m[0] == '-' || m[0] == 'N') {
+            return static_cast<T>(NA_C);
+        } else if (m[0] == major) {
+            return 0;
+        } else if (m[0] == 'R' || m[0] == 'Y' || m[0] == 'S' || m[0] == 'W' || m[0] == 'K' || m[0] == 'M') {
+            return 1;
+        } else if (m[0] == 'A' || m[0] == 'T' || m[0] == 'G' || m[0] == 'C') {
+            return 2;
+        }
+    } else if (m.length() == 2) {   // Hapmap Diploid
+        if ((m[0] != 'A' && m[0] != 'T' && m[0] != 'G' && m[0] != 'C') ||
+            (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')) {
+            return static_cast<T>(NA_C);
+        } else {
+            return static_cast<T>(
+                ((m[0] == major)?0:1) + ((m[1] == major)?0:1)
+            );
+        }
     }
+    return static_cast<T>(NA_C);
 }
 
 template <typename T>
