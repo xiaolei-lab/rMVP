@@ -74,7 +74,7 @@ $ R
 
 After installed successfully, **MVP** can be loaded by typing
 ```r
-> library(MVP)
+> library(rMVP)
 ```
 Typing ```?MVP``` could get the details of all parameters.
 
