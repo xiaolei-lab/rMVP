@@ -65,8 +65,8 @@ MVP can be installed with following R codes:
 3. Run the installation script `MVPinstall.r`
 
 ```bash
-$ wget https://github.com/XiaoleiLiuBio/MVP/releases/download/0.99.12/MVP_offline_0.99.12.zip
-$ unzip MVP_offline_0.99.12.zip
+$ wget https://github.com/XiaoleiLiuBio/MVP/releases/download/0.99.13/MVP_offline_0.99.13.zip
+$ unzip MVP_offline_0.99.13.zip
 $ cd packages
 $ R
 > source("MVPinstall.r")
