@@ -1,7 +1,7 @@
 Package: rMVP
 Type: Package
 Title: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
-Version: 0.99.12
+Version: 0.99.13
 Date: 2019-02-12
 Author: Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Xiaohui Yuan, Shuhong Zhao, Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
