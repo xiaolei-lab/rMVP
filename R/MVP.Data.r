@@ -166,6 +166,12 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             method = SNP.impute,
             ncpus = ncpus
         )
+        # remove intermediate genotype
+        file.remove(paste0(out, ".geno.desc"))
+        file.remove(paste0(out, ".geno.bin"))
+        file.remove(paste0(out, ".geno.ind"))
+        file.remove(paste0(out, ".map"))
+        
         out <- paste0(out, '.imp')
     }
     
