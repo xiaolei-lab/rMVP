@@ -2050,6 +2050,84 @@ MVP.Hist <-
     options(warn = 0)
 }
 
+MVP.Hist.ASCII <- function(phe, taxa, break.n = 15, title = NULL, statistics.show = TRUE) {
+    # === Argument parsing & Definition =============
+    if (is.null(taxa)) { taxa <- colnames(phe) }
+    if (is.null(title)) { title <- paste("Distribution of", taxa) }
+    
+    # lower 1/8 block to full block, see https://www.unicode.org/charts/PDF/U2580.pdf
+    blocks <- c(' ', '\U2581', '\U2582', '\U2583', '\U2584', '\U2585', '\U2586', '\U2587', '\U2588')
+    
+    # boxline, see https://www.unicode.org/charts/PDF/U2500.pdf
+    LIGHT_HORIZONTAL     <- '\U2500'
+    LIGHT_VERTICAL       <- '\U2502'
+    LIGHT_DOWN_AND_RIGHT <- '\U250C'
+    LIGHT_DOWN_AND_LEFT  <- '\U2510'
+    LIGHT_UP_AND_RIGHT   <- '\U2514'
+    LIGHT_UP_AND_LEFT    <- '\U2518'
+    
+    
+    # === Data preprocessing ========================
+    phe    <- suppressWarnings(as.numeric(phe))
+    phe    <- phe[!is.na(phe)]
+    breaks <- seq(min(phe), max(phe), length = break.n + 1)
+    
+    # hist
+    xx <- hist(phe, plot = FALSE, breaks = breaks)
+    
+    # test normal distribution
+    if (statistics.show) {
+        if (length(phe) <= 5000) {
+            norm.p <- round(shapiro.test(phe)$p, 4)
+            test.method <- "Shapiro-Wilk"
+        } else {
+            norm.p <- round(ks.test(phe,"pnorm")$p, 4)
+            test.method <- "Kolmogorov-Smirnov"
+        }
+    }
+    
+    # === Drawing ===================================
+    ylim.max <- ceiling(max(xx$counts) * 1.1)
+    pdat     <- matrix(0, break.n, break.n * 3)
+    for (i in seq_len(break.n)) {
+        h <- xx$counts[i] / ylim.max * break.n
+        n <- floor(h)
+        t <- round((h - floor(h)) * 8)
+        pdat[1:n, (3 * i - 2):(3 * i)]   <- 8
+        pdat[n + 1, (3 * i - 2):(3 * i)] <- t
+    }
+    
+    yaxis.len <- 5
+    if (nchar(ylim.max) > 5) {
+        yaxis <- nchar(ylim.max)
+    }
+    
+    # Title
+    cat(paste0(strrep(" ", yaxis.len + 1 + ceiling(break.n * 1.5 - nchar(title) / 2)), 
+               title, '\n'))
+    # Top line
+    cat(paste0(strrep(" ", yaxis.len - nchar(ylim.max)),
+               ylim.max, " ",
+               LIGHT_DOWN_AND_RIGHT,
+               strrep(LIGHT_HORIZONTAL, break.n * 3),
+               LIGHT_DOWN_AND_LEFT, '\n'))
+    
+    for (i in break.n:1) {
+        cat(paste0(strrep(" ", yaxis.len + 1),
+                   LIGHT_VERTICAL,
+                   paste0(sapply(pdat[i, ], function(x){ blocks[x + 1] }), collapse = ""),
+                   LIGHT_VERTICAL, '\n'))
+    }
+    
+    # Bottom line
+    cat(paste0(strrep(" ", yaxis.len - 1),
+               0, " ",
+               LIGHT_UP_AND_RIGHT,
+               strrep(LIGHT_HORIZONTAL, break.n * 3),
+               LIGHT_UP_AND_LEFT, '\n'))
+}
+
+
 #' PCA Plot
 #'
 #' @param PCA Principal component analysis result, 2-column matrix
