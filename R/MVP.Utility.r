@@ -236,7 +236,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
         msg <- c(msg, rule_wrap(string = contact, align = "left", linechar = " ", width = width))
     }
     # bottom line
-    msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
+    msg <- c(msg, strrep(linechar, width))
     
     message(paste0(msg, collapse = "\n"))
     
@@ -251,25 +251,23 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
 #' @keywords internal
 #' @author Haohao Zhang
 make_line <- function(string, width, linechar = " ", align = "center", margin = 1) {
-    string <- paste0(paste0(rep(" ", margin), collapse = ""),
-                     string,
-                     paste0(rep(" ", margin), collapse = ""))
+    string <- paste0(strrep(" ", margin), string, strrep(" ", margin))
     
     if (align == "center") {
         if (width > nchar(string)) {
             left_width <- (width - nchar(string)) %/% 2
             right_width <- width - nchar(string) - left_width
             string <-
-                paste0(paste0(rep(linechar, left_width), collapse = ""),
+                paste0(strrep(linechar, left_width),
                        string,
-                       paste0(rep(linechar, right_width), collapse = ""))
+                       strrep(linechar, right_width))
         }
     } else if (align == "left") {
         if (width > nchar(string)) {
             string <-
                 paste0(linechar,
                        string,
-                       paste0(rep(linechar, width - nchar(string) - 1), collapse = ""))
+                       strrep(linechar, width - nchar(string) - 1))
         }
     }
     return(string)
