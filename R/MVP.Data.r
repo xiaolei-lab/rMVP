@@ -74,15 +74,22 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     
     # Parameter compatible upgrade
     params <- list(...)
-    if ("sep.vcf" %in% names(params)) { message("WARNING: 'sep.vcf' has been DEPRECATED.") }
-    if ("vcf.jump" %in% names(params)) { message("WARNING: 'vcf.jump' has been DEPRECATED.") }
-    if ("SNP.effect" %in% names(params)) { message("WARNING: 'SNP.effect' has been DEPRECATED.") }
-    if ("sep.hmp" %in% names(params)) { message("WARNING: 'sep.hmp' has been DEPRECATED.") }
-    if ("type.kin" %in% names(params)) { message("WARNING: 'type.kin' has been DEPRECATED.") }
-    if ("type.pc" %in% names(params)) { message("WARNING: 'type.pc' has been DEPRECATED.") }
-    if ("type.map" %in% names(params)) { message("WARNING: 'type.map' has been DEPRECATED.") }
-    if ("maxRecord" %in% names(params)) { message("WARNING: 'maxRecord' has been DEPRECATED. Use maxLine instead.") }
-    if ("maxInd" %in% names(params)) { message("WARNING: 'maxInd' has been DEPRECATED. Use maxLine instead.") }
+    deprecated <- c(
+        "sep.vcf",
+        "vcf.jump",
+        "SNP.effect",
+        "sep.hmp",
+        "type.kin",
+        "type.pc",
+        "type.map",
+        "maxRecord",
+        "maxInd"
+    )
+    for (x in deprecated) {
+        if (x %in% names(params)) {
+            warning(paste(x, "has been DEPRECATED."))
+        }
+    }
     
     # Check Data Input
     if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
