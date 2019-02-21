@@ -211,7 +211,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     }
     
     # align logo
-    logo_width <- max(sapply(logo, nchar))
+    logo_width <- max(vapply(logo, nchar, 60))
     for (i in 1:length(logo)) {
         l <- paste0(logo[i], paste(rep(" ", logo_width - nchar(logo[i])), collapse = ""))
         l <- make_line(l, width)

@@ -87,11 +87,23 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     # Check Data Input
     if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
     
-    geno_files <- !sapply(list(
-        fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
-        ), is.null)
+    # geno_files = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)
+    geno_files <- !vapply(
+        X = list(fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap),
+        FUN = is.null,
+        FUN.VALUE = TRUE
+    )
     
-    flag <- paste(sapply(strsplit(as.character(geno_files), ''), `[[`, 1), collapse = '')   # flag = 'TFFFFF'
+    # flag = "TFFFFF"
+    flag <- paste(
+        vapply(
+            X = strsplit(as.character(geno_files), ''), 
+            FUN = `[[`,
+            FUN.VALUE = 'T',
+            i = 1
+        ),
+        collapse = ''
+    )
     
     # convert genotype file
     error_input <- function(geno_files) {
@@ -560,7 +572,12 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     if (length(cols) < 2) {
         stop("ERROR: At least 2 columns in the phenotype file should be specified.")
     }
-    phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
+    # remove blank characters in individual names
+    phe[, cols[1]] <- vapply(
+        X = phe[, cols[1]],
+        FUN = function(x) { gsub("^\\s+|\\s+$", "", x) },
+        FUN.VALUE = "33-16"
+    ) 
     
     # read geno ind list
     geno.ind.file <- paste0(out, '.geno.ind')

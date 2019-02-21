@@ -244,9 +244,9 @@ MVP.Report <- function(
         
         #scale the space parameter between chromosomes
         if(!missing(band)){
-            band <- floor(band*(sum(sapply(pvalue.pos.list, max))/100))
+            band <- floor(band*(sum(vapply(pvalue.pos.list, max, 639975))/100))
         }else{
-            band <- floor((sum(sapply(pvalue.pos.list, max))/100))
+            band <- floor((sum(vapply(pvalue.pos.list, max, 639975))/100))
         }
         if(band==0) band=1
         
