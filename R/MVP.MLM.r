@@ -196,7 +196,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
                 try(setMKLthreads(math.cpu), silent=TRUE)
                 #try(setMKLthreads(1), silent=TRUE)
             }
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            close(tmpf); unlink(tmpf.name); message();
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

@@ -70,7 +70,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                      type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
                      perc = 1, pcs.keep = 5, verbose = TRUE, ncpus = NULL, ...) {
     
-    cat("Preparing data for MVP...\n")
+    message("Preparing data for MVP...")
     
     # Parameter compatible upgrade
     params <- list(...)
@@ -92,7 +92,9 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     }
     
     # Check Data Input
-    if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
+    if (is.null(ncpus)) { 
+        ncpus <- detectCores() - 1
+    }
     
     # geno_files = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)
     geno_files <- !vapply(
@@ -212,7 +214,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         sep = sep.kin
     )
 
-    cat("MVP data prepration accomplished successfully!\n")
+    message("MVP data prepration accomplished successfully!")
 } # end of MVP.Data function
 
 #' MVP.Data.VCF2MVP: To transform vcf data to MVP package
@@ -245,11 +247,11 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
-    cat("Reading file...\n")
+    message("Reading file...")
     scan <- vcf_parser_map(vcf_file = vcf_file, out = out)
     m <- scan$m
     n <- scan$n
-    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
+    message("inds: ", n, "\tmarkers:", m)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -263,7 +265,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     )
     vcf_parser_genotype(vcf_file = vcf_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    message("Preparation for GENOTYPE data is done within", format_time(t2 - t1))
     return(invisible(c(m, n)))
 }
 
@@ -296,7 +298,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
-    cat("Reading file...\n")
+    message("Reading file...")
     m <- MVP.Data.Map(paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
     
     # parser phenotype, ind file
@@ -304,7 +306,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     n <- nrow(fam)
     write.table(fam[, 2], paste0( out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
     
-    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
+    message("inds: ", n, "\tmarkers:", m)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -320,7 +322,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     if (priority == "speed") { maxLine <- -1 }
     read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    message("Preparation for GENOTYPE data is done within", format_time(t2 - t1))
     return(invisible(c(m, n)))
 }
 
@@ -350,11 +352,11 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # parser map
-    cat("Reading file...\n")
+    message("Reading file...")
     scan <- hapmap_parser_map(hapmap_file, out)
     m <- scan$m
     n <- scan$n
-    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
+    message("inds: ", n, "\tmarkers:", m)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -368,7 +370,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     )
     hapmap_parser_genotype(hapmap_file, bigmat@address, verbose)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    message("Preparation for GENOTYPE data is done within", format_time(t2 - t1))
     return(invisible(c(m, n)))
 }
 
@@ -403,18 +405,18 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # detecte n(ind) and m(marker)
-    cat("Reading file...\n")
+    message("Reading file...")
     scan <- numeric_scan(num_file)
     n <- scan$n
     m <- scan$m
 
     transposed <- FALSE
     if (auto_transpose & (m < n)) {
-        message("WARNING: nrow < ncol detected, has been automatically transposed.")
+        warning("WARNING: nrow < ncol detected, has been automatically transposed.")
         transposed <- TRUE
         t <- n; n <- m; m <- t;
     }
-    cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
+    message("inds: ", n, "\tmarkers:", m)
     
     # define bigmat
     bigmat <- filebacked.big.matrix(
@@ -472,7 +474,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
                 percent <- 100 * i / m
             }
 
-            cat(paste0("Written into MVP File: ", percent, "%"))
+            message("Written into MVP File: ", percent, "%")
         }
         close(con)
     }
@@ -480,7 +482,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     flush(bigmat)
     gc()
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
+    message("Preparation for GENOTYPE data is done within", format_time(t2 - t1))
     return(invisible(c(m, n)))
 }
 
@@ -542,7 +544,7 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose
     bim <- cbind(map[, 2], map[, 1], 0, map[, 3], 0, 0)
     write.table(bim, paste0(out, '.bim'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
     t2 <- as.numeric(Sys.time())
-    cat("Done within", format_time(t2 - t1), "\n")
+    message("Done within", format_time(t2 - t1))
 }
 
 #' MVP.Data.Pheno: To clean up phenotype file
@@ -593,11 +595,11 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
         geno.ind <- read.table(geno.ind.file, stringsAsFactors = FALSE)[, 1]
         overlap.ind <- intersect(geno.ind, phe[, cols[1]])
         if (length(overlap.ind) == 0) {
-            cat(paste0("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "..."), "\n")
-            cat(paste0("Genotype individuals: ", paste(geno.ind[1:5], collapse = ", "), "..."), "\n")
+            message("Phenotype individuals: ", paste(phe[, cols[1]][1:5], collapse = ", "), "...")
+            message("Genotype individuals: ", paste(geno.ind[1:5], collapse = ", "), "...")
             stop("No common individuals between phenotype and genotype!")
         } else {
-            cat(paste(length(overlap.ind), "common individuals between phenotype and genotype."), "\n")
+            message(length(overlap.ind), " common individuals between phenotype and genotype.")
         }
     } else {
         # use ind. name from phenotypefile
@@ -630,7 +632,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     # Output
     write.table(pheno, paste0(out, '.phe'), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for PHENOTYPE data is Done within", format_time(t2 - t1), "\n")
+    message("Preparation for PHENOTYPE data is Done within", format_time(t2 - t1))
 }
 
 #' MVP.Data.Map: To check map file
@@ -663,7 +665,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
     }
     write.table(map, paste0(out, ".map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
     t2 <- as.numeric(Sys.time())
-    cat("Preparation for MAP data is done within", format_time(t2 - t1), "\n")
+    message("Preparation for MAP data is done within", format_time(t2 - t1))
     return(nrow(map))
 }
 
@@ -722,7 +724,7 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
     
     PC[, ] <- myPC[, ]
     flush(PC)
-    cat("Preparation for PC matrix is done!\n")
+    message("Preparation for PC matrix is done!")
 }
 
 #' Kinship
@@ -760,7 +762,7 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
             message("NA in genotype, Calculate Kinship has been skipped.")
             return()
         }
-        cat("Calculate KINSHIP using Vanraden method...\n")
+        message("Calculate KINSHIP using Vanraden method...")
         myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
     } else if (fileKin == FALSE || is.null(fileKin)) {
         return()
@@ -781,7 +783,7 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
     
     Kinship[, ] <- myKin[, ]
     flush(Kinship)
-    cat("Preparation for Kinship matrix is done!\n")
+    message("Preparation for Kinship matrix is done!")
 }
 
 #' MVP.Data.impute: To impute the missing genotype
@@ -809,7 +811,7 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
         return()
     }
     
-    cat("Imputing...\n")
+    message("Imputing...")
     
     options(bigmemory.typecast.warning = FALSE)
     if (is.null(ncpus)) ncpus <- detectCores()
@@ -860,7 +862,7 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
     
     mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
     
-    cat("Impute Genotype File is done!\n")
+    message("Impute Genotype File is done!")
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
 }
 
@@ -883,7 +885,7 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
 #' geno <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
 #' MVP.Data.QC(geno, out="rMVP.test.qc", ncpus=1)
 MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
-    cat("Quality control...\n")
+    message("Quality control...")
     options(bigmemory.typecast.warning = FALSE)
     
     # input
@@ -911,16 +913,22 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     marker_index <- rep(TRUE, nrow(bigmat))
     if (!is.null(geno) && geno > 0) {
         marker_index <- unlist(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
-        cat(paste0(length(marker_index[marker_index == FALSE])), 
-            "markers are filtered. missing ratio > ", geno, "\n")
+        message(
+            length(marker_index[marker_index == FALSE]), 
+            " markers are filtered. missing ratio > ",
+            geno
+        )
     }
     
     # qc individual
     ind_index <- rep(TRUE, ncol(bigmat))
     if (!is.null(mind) && mind > 0) {
         ind_index <- unlist(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
-        cat(paste0(length(ind_index[ind_index == FALSE])),
-            "individuals are filtered. missing ratio > ", mind, "\n")
+        message(
+            length(ind_index[ind_index == FALSE]),
+            " individuals are filtered. missing ratio > ",
+            mind
+        )
     }
     
     # TODO: support hwe

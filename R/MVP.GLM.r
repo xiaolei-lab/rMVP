@@ -142,7 +142,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
                 try(setMKLthreads(1), silent=TRUE)
             }
             results <- mclapply(1:m, eff.glm, mc.cores=cpu)
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            close(tmpf); unlink(tmpf.name); message();
             if (R.ver == 'Linux') {
                 try(setMKLthreads(math.cpu), silent=TRUE)
             }

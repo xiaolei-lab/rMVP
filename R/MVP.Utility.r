@@ -153,7 +153,7 @@ print_bar <- function(i,
 
 
 print_accomplished <- function(width = 60) {
-    cat(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+    message(make_line("MVP ACCOMPLISHED", width = width, linechar = '='))
 }
 
 #' Print R Package information, include title, short_title, logo, version, authors, contact
@@ -238,7 +238,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # bottom line
     msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
-    cat(msg, sep = "\n")
+    message(paste0(msg, collapse = "\n"))
     
     return(version)
 }
