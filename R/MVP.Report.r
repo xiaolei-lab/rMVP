@@ -207,9 +207,10 @@ MVP.Report <- function(
         R=ncol(Pmap)-2
 
         #replace the non-euchromosome
-        options(warn = -1)
-        numeric.chr <- as.numeric(Pmap[, 1])
-        options(warn = 0)
+        suppressWarnings(
+            numeric.chr <- as.numeric(Pmap[, 1])
+        )
+
         max.chr <- max(numeric.chr, na.rm=TRUE)
         if(is.infinite(max.chr)) max.chr <- 0
         map.xy.index <- which(!numeric.chr %in% c(0:max.chr))
@@ -1554,7 +1555,9 @@ MVP.Report <- function(
 Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP Density", bin = 1e6,
                        band = 3, width = 5, legend.len = 10, legend.max = NULL, legend.pt.cex = 3,
                        legend.cex = 1, legend.x.intersp = 1, legend.y.intersp = 1, plot = TRUE) {
-    options(warn = -1)
+    opts <- options(warn = -1)
+    on.exit(options(opts))
+    
     ## Step 1: preprocess map
     # filter map
     map <- as.matrix(map)
@@ -1982,8 +1985,9 @@ MVP.Hist <-
              breakNum = 15,
              file.type = "pdf",
              dpi = 300) {
-        
-    options(warn = -1)
+    
+    opts <- options(warn = -1)
+    on.exit(options(opts))
     w <- 6
     h <- 6
     phex <- phe
@@ -2047,7 +2051,6 @@ MVP.Hist <-
         dev.off()
         phe <- phex
     }
-    options(warn = 0)
 }
 
 #' PCA Plot
