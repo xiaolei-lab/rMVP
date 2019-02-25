@@ -76,7 +76,7 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         des <- paste0("Z", memo, ".temp.desc")
         if (file.exists(bac)) file.remove(bac)
         if (file.exists(des)) file.remove(des)
-        #options(bigmemory.typecast.warning=FALSE)
+
         Z <- big.matrix(
             nrow = m,
             ncol = n,

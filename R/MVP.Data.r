@@ -431,7 +431,8 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     
     # convert to bigmat - speed
     if (priority == "speed") {
-        options(bigmemory.typecast.warning = FALSE)
+        opts <- options(bigmemory.typecast.warning = FALSE)
+        on.exit(options(opts))
         
         # detecte sep
         con <- file(num_file, open = 'r')
@@ -813,7 +814,9 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
     
     message("Imputing...")
     
-    options(bigmemory.typecast.warning = FALSE)
+    opts <- options(bigmemory.typecast.warning = FALSE)
+    on.exit(options(opts))
+    
     if (is.null(ncpus)) ncpus <- detectCores()
     
     if (is.null(out)) {
@@ -886,7 +889,9 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
 #' MVP.Data.QC(geno, out="rMVP.test.qc", ncpus=1)
 MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=NULL, ncpus=NULL) {
     message("Quality control...")
-    options(bigmemory.typecast.warning = FALSE)
+    
+    opts <- options(bigmemory.typecast.warning = FALSE)
+    on.exit(options(opts))
     
     # input
     bigmat <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))

@@ -116,7 +116,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     
     if (cpu == 1) {
         math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- min(2^(n %/% 1000), math.cpu) )
+        mkl.cpu <- min(2^(n %/% 1000), math.cpu)
         try(setMKLthreads(mkl.cpu), silent=TRUE)
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.glm)
