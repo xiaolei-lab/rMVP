@@ -306,10 +306,11 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
 }
 
 template <typename T>
-void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double NA_C, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // define
     ifstream file(hmp_file);
     
+    omp_setup(threads, verbose);
     string line;
     char major;
     vector<string> l;
@@ -337,41 +338,53 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
     
     // parser genotype
     m = 0;
-    while (getline(file, line)) {
-        boost::split(l, line, boost::is_any_of("\t"));
-        major = l[1][0];
-        if (l[1].length() > 3) {
-            major = 'N';
+    vector<string> buffer;
+    while (file) {
+        buffer.clear();
+        for (int i = 0; file && (maxLine <= 0 || i < maxLine); i++) {
+            getline(file, line);
+            if (line.length() > 1) {    // Handling the blank line at the end of the file.
+                buffer.push_back(line);
+            }
         }
-        vector<string>(l.begin() + 11, l.end()).swap(l);
-        markers.clear();
-        transform(
-            l.begin(),
-            l.end(),
-            back_inserter(markers),
-            boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
-        );
-        for (size_t i = 0; i < markers.size(); i++) {
-            mat[i][m] = markers[i];
+        #pragma omp parallel for private(l, markers)
+        for (int i = 0; i < buffer.size(); i++) {
+            boost::split(l, buffer[i], boost::is_any_of("\t"));
+            major = l[1][0];
+            if (l[1].length() > 3) {
+                major = 'N';
+            }
+            vector<string>(l.begin() + 11, l.end()).swap(l);
+            markers.clear();
+            transform(
+                l.begin(),
+                l.end(),
+                back_inserter(markers),
+                boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
+            );
+            
+            for (int j = 0; j < markers.size(); j++) {
+                mat[j][m + i] = markers[j];
+            }
+            progress.increment();
         }
-        m++;
-        progress.increment();
+        m += buffer.size();
     }
 }
 
 // [[Rcpp::export]]
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hapmap_parser_genotype<char>(hmp_file, xpMat, NA_CHAR, verbose);
+        return hapmap_parser_genotype<char>(hmp_file, xpMat, maxLine, NA_CHAR, threads, verbose);
     case 2:
-        return hapmap_parser_genotype<short>(hmp_file, xpMat, NA_SHORT, verbose);
+        return hapmap_parser_genotype<short>(hmp_file, xpMat, maxLine, NA_SHORT, threads, verbose);
     case 4:
-        return hapmap_parser_genotype<int>(hmp_file, xpMat, NA_INTEGER, verbose);
+        return hapmap_parser_genotype<int>(hmp_file, xpMat, maxLine, NA_INTEGER, threads, verbose);
     case 8:
-        return hapmap_parser_genotype<double>(hmp_file, xpMat, NA_REAL, verbose);
+        return hapmap_parser_genotype<double>(hmp_file, xpMat, maxLine, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

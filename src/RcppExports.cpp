@@ -44,14 +44,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // hapmap_parser_genotype
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose);
-RcppExport SEXP _rMVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, long maxLine, int threads, bool verbose);
+RcppExport SEXP _rMVP_hapmap_parser_genotype(SEXP hmp_fileSEXP, SEXP pBigMatSEXP, SEXP maxLineSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type hmp_file(hmp_fileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< long >::type maxLine(maxLineSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    hapmap_parser_genotype(hmp_file, pBigMat, verbose);
+    hapmap_parser_genotype(hmp_file, pBigMat, maxLine, threads, verbose);
     return R_NilValue;
 END_RCPP
 }
@@ -121,7 +123,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
     {"_rMVP_vcf_parser_genotype", (DL_FUNC) &_rMVP_vcf_parser_genotype, 5},
     {"_rMVP_hapmap_parser_map", (DL_FUNC) &_rMVP_hapmap_parser_map, 2},
-    {"_rMVP_hapmap_parser_genotype", (DL_FUNC) &_rMVP_hapmap_parser_genotype, 3},
+    {"_rMVP_hapmap_parser_genotype", (DL_FUNC) &_rMVP_hapmap_parser_genotype, 5},
     {"_rMVP_numeric_scan", (DL_FUNC) &_rMVP_numeric_scan, 1},
     {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
