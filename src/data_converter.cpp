@@ -51,7 +51,7 @@ int omp_setup(int threads=0, bool verbose=true) {
     }
 #else
     if (verbose) {
-        Rcerr << "Number of threads: 1 (No OpneMP detected)" << endl;
+        Rcerr << "Number of threads: 1 (No OpenMP detected)" << endl;
     }
 #endif
     return t;
