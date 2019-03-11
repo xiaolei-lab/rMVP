@@ -123,7 +123,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                ),
            FFTFFF = 
                MVP.Data.Hapmap2MVP(
-                   hapmap_file = fileHMP, 
+                   hmp_file = fileHMP, 
                    out = out,
                    verbose = verbose
                ),
@@ -329,7 +329,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' @examples 
 #' hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
 #' MVP.Data.Hapmap2MVP(hapmapPath, "rMVP.test.hmp")
-MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbose=TRUE) {
+MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -339,7 +339,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
     
     # parser map
     cat("Reading file...\n")
-    scan <- hapmap_parser_map(hapmap_file, out)
+    scan <- hapmap_parser_map(hmp_file, out)
     m <- scan$m
     n <- scan$n
     cat(paste0("inds: ", n, "\tmarkers:", m, '\n'))
@@ -354,7 +354,7 @@ MVP.Data.Hapmap2MVP <- function(hapmap_file, out='mvp', type.geno='char', verbos
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    hapmap_parser_genotype(hapmap_file, bigmat@address, verbose)
+    hapmap_parser_genotype(hmp_file = hmp_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n")
     return(invisible(c(m, n)))
