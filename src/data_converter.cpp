@@ -17,17 +17,23 @@
 
 #include <omp.h>
 #include <Rcpp.h>
+#include <fstream>
+#include <iostream>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <progress.hpp>
-#include <fstream>
+
 
 using namespace std;
 using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(BH, bigmemory)]]
 // [[Rcpp::plugins(openmp)]]
+// [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(bigmemory)]]
 // [[Rcpp::depends(RcppProgress)]]
 
 #include <bigmemory/isna.hpp>
@@ -57,14 +63,30 @@ int omp_setup(int threads=0, bool verbose=true) {
     return t;
 }
 
+bool end_with(string s, string suffix) {
+    return (s.length() > suffix.length() && 
+            0 == s.compare(s.length() - suffix.length(), s.length(), suffix));
+}
+
 
 // ***** VCF *****
 
 // [[Rcpp::export]]
 List vcf_parser_map(std::string vcf_file, std::string out) {
+    // open file
+    ifstream file_;
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+    if (end_with(vcf_file, ".vcf")) {
+        file_.open(vcf_file);
+    } else if (end_with(vcf_file, ".gz")) {
+        file_.open(vcf_file, std::ios_base::in | std::ios_base::binary);
+        inbuf.push(boost::iostreams::gzip_decompressor());
+    }
+    inbuf.push(file_);
+    istream file(&inbuf);
+    
     // Define
     const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
-    ifstream file(vcf_file);
     ofstream map(out + ".map");
     ofstream indfile(out + ".geno.ind");
     
@@ -116,7 +138,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
         m++;
     }
     map.close();
-    file.close();
+    file_.close();
     
     return List::create(_["n"] = n,
                         _["m"] = m);
@@ -133,9 +155,19 @@ T vcf_marker_parser(string m, double NA_C) {
 
 template <typename T>
 void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
-    // define
-    ifstream file(vcf_file);
+    // open file
+    ifstream file_;
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+    if (end_with(vcf_file, ".vcf")) {
+        file_.open(vcf_file);
+    } else if (end_with(vcf_file, ".gz")) {
+        file_.open(vcf_file, std::ios_base::in | std::ios_base::binary);
+        inbuf.push(boost::iostreams::gzip_decompressor());
+    }
+    inbuf.push(file_);
+    istream file(&inbuf);
     
+    // define
     omp_setup(threads, verbose);
     string line;
     vector<string> l;
@@ -195,6 +227,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
         m += buffer.size();
     }
+    file_.close();
 }
 
 // [[Rcpp::export]]
@@ -370,6 +403,7 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
         }
         m += buffer.size();
     }
+    file.close();
 }
 
 // [[Rcpp::export]]
