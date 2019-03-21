@@ -269,7 +269,7 @@
     d=d[d>1e-08]
     d=d^2
     U1=K.X.svd$u
-    U1=U1[,1:length(d)]
+    U1=U1[,seq_len(length(d))]
     #handler of single snp
     if(is.null(dim(U1))) U1=matrix(U1,ncol=1)
     n=nrow(U1)
@@ -291,7 +291,7 @@
         #----------------------------calculate beta-------------------------------------
         #######get beta1
         beta1=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one=matrix(U1TX[i,], nrow=1)
             beta=crossprod(one,(one/(d[i]+delta)))  #This is not real beta, confusing
             beta1= beta1+beta
@@ -299,7 +299,7 @@
         
         #######get beta2
         beta2=0
-        for(i in 1:nrow(U1)){
+        for(i in seq_len(nrow(U1))){
             one=matrix(IUX[i,], nrow=1)
             beta = crossprod(one)
             beta2= beta2+beta
@@ -308,7 +308,7 @@
         
         #######get beta3
         beta3=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one1=matrix(U1TX[i,], nrow=1)
             one2=matrix(U1TY[i,], nrow=1)
             beta=crossprod(one1,(one2/(d[i]+delta)))
@@ -317,7 +317,7 @@
         
         ###########get beta4
         beta4=0
-        for(i in 1:nrow(U1)){
+        for(i in seq_len(nrow(U1))){
             one1=matrix(IUX[i,], nrow=1)
             one2=matrix(IUY[i,], nrow=1)
             beta=crossprod(one1,one2)
@@ -339,7 +339,7 @@
         ####part 1
         part11<-n*log(2*3.14)
         part12<-0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             part12_pre=log(d[i]+delta)
             part12= part12+part12_pre
         }
@@ -351,7 +351,7 @@
         ######part221
         
         part221=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one1=U1TX[i,]
             one2=U1TY[i,]
             part221_pre=(one2-one1%*%beta)^2/(d[i]+delta)
@@ -359,7 +359,7 @@
         }
         
         part222=0
-        for(i in 1:n){
+        for(i in seq_len(n)){
             one1=XU1TX[i,]
             one2=yU1TY[i,]
             part222_pre=((one2-one1%*%beta)^2)/delta
@@ -382,13 +382,13 @@
         try(setMKLthreads(1), silent=TRUE)
     }
     
-    llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
+    llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
         try(setMKLthreads(math.cpu), silent=TRUE)
     }
     
-    for(i in 1:m){
+    for(i in seq_len(m)){
         if(i == 1){
             beta.save = llresults[[i]]$beta
             delta.save = llresults[[i]]$delta
@@ -409,7 +409,7 @@
     #--------------------calculating Va and Vem-------------------------------------
     #sigma_a1
     sigma_a1=0
-    for(i in 1:length(d)){
+    for(i in seq_len(length(d))){
         one1=matrix(U1TX[i,], ncol=1)
         one2=matrix(U1TY[i,], nrow=1)
         #sigma_a1_pre=(one2-one1%*%beta)^2/(d[i]+delta)
@@ -420,7 +420,7 @@
     ### sigma_a2
     sigma_a2=0
     
-    for(i in 1:nrow(U1)){
+    for(i in seq_len(nrow(U1))){
         one1=matrix(IUX[i,], ncol=1)
         one2=matrix(IUY[i,], nrow=1)
         #sigma_a2_pre<-(one2-one1%*%beta)^2
@@ -555,7 +555,7 @@ FarmCPU.BIN <-
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             print("Optimizing Pseudo QTNs...")
             m <- length(b)*length(s)
-            inc.index = rep(c(1:length(s)), length(b))
+            inc.index = rep(seq_len(length(s)), length(b))
             
             seqQTN.optimize.parallel <- function(ii){
                 bin.index = floor((ii-0.1)/length(s)) + 1
@@ -579,13 +579,13 @@ FarmCPU.BIN <-
                 try(setMKLthreads(1), silent=TRUE)
             }
             
-            llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
+            llresults <- mclapply(seq_len(m), seqQTN.optimize.parallel, mc.cores=ncpus)
             
             if(R.ver == 'Linux') {
                 try(setMKLthreads(math.cpu), silent=TRUE)
             }
             
-            for(i in 1:m){
+            for(i in seq_len(m)){
                 if(i == 1){
                     seqQTN.save = llresults[[i]]$seqQTN
                     myREML.save = llresults[[i]]$myREML
@@ -608,7 +608,7 @@ FarmCPU.BIN <-
             
             seqQTN.optimize.parallel <- function(ii){
                 bin = floor((ii-0.1)/length(s)) + 1
-                inc = rep(c(1:length(s)), length(b))
+                inc = rep(seq_len(length(s)), length(b))
                 GP=cbind(GM,P,NA,NA,NA)
                 mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
                 seqQTN=which(mySpecify$index==TRUE)
@@ -621,9 +621,9 @@ FarmCPU.BIN <-
                 return(list(seqQTN=seqQTN,myREML=myREML))
             }
             
-            llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
+            llresults <- mclapply(seq_len(m), seqQTN.optimize.parallel, mc.cores=ncpus)
             
-            for(i in 1:m){
+            for(i in seq_len(m)){
                 if(i == 1){
                     seqQTN.save = llresults[[i]]$seqQTN
                     myREML.save = llresults[[i]]$myREML
@@ -679,7 +679,8 @@ FarmCPU.Specify <-
         binP=binP[order(as.numeric(as.vector(binP[,1]))),]  #sort on bin
         
         #set indicator (use 2nd 3rd columns)
-        binP[2:n,2]=binP[1:(n-1),1]
+        index = c(2:n)
+        binP[index, 2] = binP[index - 1, 1]
         binP[1,2]=0 #set the first
         binP[,3]= binP[,1]-binP[,2]
         
@@ -703,7 +704,7 @@ FarmCPU.Specify <-
                 if(avaiable==0){
                     ID.GP=-1
                 }else{
-                    ID.GP=ID.GP[1:avaiable] #keep the top ones selected
+                    ID.GP=ID.GP[seq_len(avaiable)] #keep the top ones selected
                 }
             }
         }
@@ -794,7 +795,7 @@ FarmCPU.LM <-
         
         if(npc!=0){
             betapc = beta[2:(npc+1)]
-            betapred = beta[-c(1:(npc+1))]
+            betapred = beta[-seq_len(npc+1)]
         }else{
             betapc = NULL
             betapred = beta[-1]
@@ -822,10 +823,12 @@ FarmCPU.LM <-
             iXX11 <- wwi + as.numeric(invB22) * crossprod(B21)
             
             #Derive inverse of LHS with partationed matrix
-            iXX[1:q0,1:q0]=iXX11
-            iXX[q1,q1]=invB22
-            iXX[q1,1:q0]=NeginvB22B21
-            iXX[1:q0,q1]=NeginvB22B21
+            i1 = seq_len(q0)
+            i2 = q1
+            iXX[i1, i1] = iXX11
+            iXX[i2, i2] = invB22
+            iXX[i2, i1] = NeginvB22B21
+            iXX[i1, i2] = NeginvB22B21
             
             #statistics
             rhs=c(wy,xy) #the size varied automaticly by A/AD model and validated d
@@ -847,7 +850,7 @@ FarmCPU.LM <-
             return(list(B=B, P=P))
         }
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.farmcpu.parallel)
+        results <- lapply(seq_len(m), eff.farmcpu.parallel)
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
         return(list(P=results[,-1], betapred=betapred, B=results[,1]))
     } #end of FarmCPU.LM function
@@ -1024,7 +1027,7 @@ FarmCPU.Remove <-
         
         
         #index=sample(s,sampled)
-        index=1:sampled
+        index=seq_len(sampled)
         
         #This section has problem of turning big.matrix to R matrix
         #It is OK as x is small

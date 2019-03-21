@@ -163,7 +163,7 @@ MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8) {
     v_sigma2 = CalcVChe(y=y, X=X, K=K)
     
     log_sigma2 = NULL
-    for (i in 1:length(v_sigma2)) {
+    for (i in seq_len(length(v_sigma2))) {
         if (v_sigma2[i] <= 0){
             log_sigma2[i] = log(0.1)
         } else {

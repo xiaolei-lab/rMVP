@@ -518,7 +518,7 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose
     #  5. Sex code ('1' = male, '2' = female, '0' = unknown)
     #  6. Phenotype value ('1' = control, '2' = case, '-9'/'0'/non-numeric = missing data if case/control)
     if (is.null(pheno)) {
-        ind <- paste0("ind", 1:ncol(bigmat))
+        ind <- paste0("ind", seq_len(ncol(bigmat)))
         pheno <- rep(-9, ncol(bigmat))
         message("pheno is NULL, automatically named individuals.")
     } else if (ncol(pheno) == 1) {
@@ -575,7 +575,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     
     # auto select columns
     if (is.null(cols)) {
-        cols <- c(1:ncol(phe))
+        cols <- c(seq_len(ncol(phe)))
     }
     
     # check phenotype file
@@ -863,7 +863,7 @@ MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NUL
     }
     
     
-    mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
+    mclapply(seq_len(nrow(outmat)), impute_marker, mc.cores = ncpus)
     
     message("Impute Genotype File is done!")
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
@@ -917,7 +917,7 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # qc marker
     marker_index <- rep(TRUE, nrow(bigmat))
     if (!is.null(geno) && geno > 0) {
-        marker_index <- unlist(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
+        marker_index <- unlist(mclapply(seq_len(nrow(bigmat)), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
         message(
             length(marker_index[marker_index == FALSE]), 
             " markers are filtered. missing ratio > ",
@@ -928,7 +928,7 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # qc individual
     ind_index <- rep(TRUE, ncol(bigmat))
     if (!is.null(mind) && mind > 0) {
-        ind_index <- unlist(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
+        ind_index <- unlist(mclapply(seq_len(ncol(bigmat)), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
         message(
             length(ind_index[ind_index == FALSE]),
             " individuals are filtered. missing ratio > ",

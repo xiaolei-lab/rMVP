@@ -81,7 +81,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
         eig <- eigen(S %*% (K + diag(1, n)) %*% S, symmetric=TRUE)#S4 error here
 
         stopifnot(!is.complex(eig$values))
-        return(list(values=eig$values[1:(n-q)]-1, vectors=eig$vectors[, 1:(n-q)]))
+        return(list(values=eig$values[seq_len(n - q)]-1, vectors=eig$vectors[, seq_len(n - q)]))
     }
     eig.R=emma.eigen.R.wo.Z(K=K, X=X)
     n <- length(y)
@@ -110,7 +110,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
         optlogdelta <- append(optlogdelta, ulim)
         optLL <- append(optLL, emma.delta.REML.LL.wo.Z(ulim, eig.R$values, etas))
     }
-    for(i in 1:(m-1) ){
+    for(i in seq_len(m-1) ){
         if( ( dLL[i] * dLL[i + 1] < 0 ) && ( dLL[i] > 0 ) && ( dLL[i + 1] < 0 ) ) {
             emma.delta.REML.dLL.wo.Z <- function(logdelta, lambda, etas) {
                 nq <- length(etas)

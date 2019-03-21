@@ -54,7 +54,7 @@
     d=d[d>1e-08]
     d=d^2
     U1=K.X.svd$u
-    U1=U1[,1:length(d)]
+    U1=U1[,seq_len(length(d))]
     #handler of single snp
     if(is.null(dim(U1))) U1=matrix(U1,ncol=1)
     n=nrow(U1)
@@ -76,7 +76,7 @@
         #----------------------------calculate beta-------------------------------------
         #######get beta1
         beta1=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one=matrix(U1TX[i,], nrow=1)
             beta=crossprod(one,(one/(d[i]+delta)))  #This is not real beta, confusing
             beta1= beta1+beta
@@ -84,7 +84,7 @@
         
         #######get beta2
         beta2=0
-        for(i in 1:nrow(U1)){
+        for(i in seq_len(nrow(U1))){
             one=matrix(IUX[i,], nrow=1)
             beta = crossprod(one)
             beta2= beta2+beta
@@ -93,7 +93,7 @@
         
         #######get beta3
         beta3=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one1=matrix(U1TX[i,], nrow=1)
             one2=matrix(U1TY[i,], nrow=1)
             beta=crossprod(one1,(one2/(d[i]+delta)))
@@ -102,7 +102,7 @@
         
         ###########get beta4
         beta4=0
-        for(i in 1:nrow(U1)){
+        for(i in seq_len(nrow(U1))){
             one1=matrix(IUX[i,], nrow=1)
             one2=matrix(IUY[i,], nrow=1)
             beta=crossprod(one1,one2)
@@ -124,7 +124,7 @@
         ####part 1
         part11<-n*log(2*3.14)
         part12<-0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             part12_pre=log(d[i]+delta)
             part12= part12+part12_pre
         }
@@ -136,7 +136,7 @@
         ######part221
         
         part221=0
-        for(i in 1:length(d)){
+        for(i in seq_len(length(d))){
             one1=U1TX[i,]
             one2=U1TY[i,]
             part221_pre=(one2-one1%*%beta)^2/(d[i]+delta)
@@ -144,7 +144,7 @@
         }
         
         part222=0
-        for(i in 1:n){
+        for(i in seq_len(n)){
             one1=XU1TX[i,]
             one2=yU1TY[i,]
             part222_pre=((one2-one1%*%beta)^2)/delta
@@ -167,13 +167,13 @@
         try(setMKLthreads(1), silent=TRUE)
     }
     
-    llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
+    llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
         try(setMKLthreads(math.cpu), silent=TRUE)
     }
     
-    for(i in 1:m){
+    for(i in seq_len(m)){
         if(i == 1){
             beta.save = llresults[[i]]$beta
             delta.save = llresults[[i]]$delta
@@ -194,7 +194,7 @@
     #--------------------calculating Va and Vem-------------------------------------
     #sigma_a1
     sigma_a1=0
-    for(i in 1:length(d)){
+    for(i in seq_len(length(d))){
         one1=matrix(U1TX[i,], ncol=1)
         one2=matrix(U1TY[i,], nrow=1)
         #sigma_a1_pre=(one2-one1%*%beta)^2/(d[i]+delta)
@@ -205,7 +205,7 @@
     ### sigma_a2
     sigma_a2=0
     
-    for(i in 1:nrow(U1)){
+    for(i in seq_len(nrow(U1))){
         one1=matrix(IUX[i,], ncol=1)
         one2=matrix(IUY[i,], nrow=1)
         #sigma_a2_pre<-(one2-one1%*%beta)^2

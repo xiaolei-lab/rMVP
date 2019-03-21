@@ -69,13 +69,13 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
     if (perc < 1) {
         # set.seed(123456)
         m <- nrow(M)
-        big.geno <- t(M[sample(1:m, round(m * perc)), ])
+        big.geno <- t(M[sample(seq_len(m), round(m * perc)), ])
     }else{
         big.geno <- t(as.matrix(M))
     }
     #Calculate PCs by using bigPCA package
 
-    PCs <- prcomp(big.geno)$x[, 1:pcs.keep]
+    PCs <- prcomp(big.geno)$x[, seq_len(pcs.keep)]
 
     return(list(PCs=PCs))
 } # end of MVP.PCA function

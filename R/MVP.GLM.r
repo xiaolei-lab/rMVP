@@ -100,18 +100,21 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
         iXX11 <- X0X0i + as.numeric(invB22) * B21B21
         
         #Derive inverse of LHS with partationed matrix
-        iXX[1:q0,1:q0] <- iXX11
-        iXX[(q0+1),(q0+1)] <- invB22
-        iXX[(q0+1),1:q0] <- NeginvB22B21
-        iXX[1:q0,(q0+1)] <- NeginvB22B21
-        df <- n-q0-1
+        i1 = seq_len(q0)
+        i2 = q0 + 1
+        iXX[i1, i1] = iXX11
+        iXX[i2, i2] = invB22
+        iXX[i2, i1] = NeginvB22B21
+        iXX[i1, i2] = NeginvB22B21
+        
+        df  <- n - i2
         rhs <- c(X0Y,sy)
         effect <- crossprod(iXX,rhs)
-        ve <- (YY-crossprod(effect,rhs))/df
-        effect <- effect[q0+1]
-        t.value <- effect/sqrt(iXX[q0+1, q0+1] * ve)
-        p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
-        return(list(effect=effect, p=p))
+        ve <- (YY - crossprod(effect, rhs)) / df
+        effect <- effect[i2]
+        t.value <- effect/sqrt(invB22 * ve)
+        p <- 2 * pt(abs(t.value), df, lower.tail = FALSE)
+        return(list(effect = effect, p = p))
     }
     
     if (cpu == 1) {
@@ -119,7 +122,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
         mkl.cpu <- min(2^(n %/% 1000), math.cpu)
         try(setMKLthreads(mkl.cpu), silent=TRUE)
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.glm)
+        results <- lapply(seq_len(m), eff.glm)
         try(setMKLthreads(math.cpu), silent=TRUE)
     } else {
         if (wind) {
@@ -129,7 +132,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.glm)
+            results <- parLapply(cl, seq_len(m), eff.glm)
             stopCluster(cl)
         } else {
             tmpf.name <- tempfile()
@@ -141,7 +144,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
                 math.cpu <- try(getMKLthreads(), silent=TRUE)
                 try(setMKLthreads(1), silent=TRUE)
             }
-            results <- mclapply(1:m, eff.glm, mc.cores=cpu)
+            results <- mclapply(seq_len(m), eff.glm, mc.cores=cpu)
             close(tmpf); unlink(tmpf.name); message();
             if (R.ver == 'Linux') {
                 try(setMKLthreads(math.cpu), silent=TRUE)

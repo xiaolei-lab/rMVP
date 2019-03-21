@@ -92,7 +92,7 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
             if(length(dimz) == 1) { dimz[2] <- 1 }
             if(length(dimz)>1 & length(dimz)<11 & is.numeric(dimz)) {
                 total.size <- as.double(1)
-                for(cc in 1:length(dimz)) { total.size <- as.double(total.size * as.double(dimz[cc])) }
+                for(cc in seq_len(length(dimz))) { total.size <- as.double(total.size * as.double(dimz[cc])) }
                 memory.estimate <- as.double(as.double(total.size)/cells.per.gb)
                 memory.estimate <- memory.estimate
                 if(integer) { memory.estimate <- memory.estimate/2 } else { if(raw) { memory.estimate <- memory.estimate/8 } }
@@ -118,18 +118,18 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         if(max(loop.index) < m) loop.index <- c(loop.index, m)
         loop.len <- length(loop.index)
         print("Z assignment...")
-        for(cc in 1:loop.len){
+        for(cc in seq_len(loop.len)){
             if(loop.len == 1){
                 c1 <- 1
             }else{
                 c1 <- ifelse(cc == loop.len, (loop.index[cc-1]) + 1, loop.index[cc]-maxLine + 1)
             }
             c2 <- loop.index[cc]
-            means <-rowMeans(M[c1:c2, 1:n])
-            if(!is.null(weight)){
-                Z[c1:c2, 1:n] <- (M[c1:c2, 1:n]-means) * sqrt(weight[c1:c2])
+            means <- rowMeans(M[c1:c2, seq_len(n)])
+            if (!is.null(weight)) {
+                Z[c1:c2, seq_len(n)] <- (M[c1:c2, seq_len(n)] - means) * sqrt(weight[c1:c2])
             }else{
-                Z[c1:c2, 1:n] <- M[c1:c2, 1:n]-means
+                Z[c1:c2, seq_len(n)] <- M[c1:c2, seq_len(n)] - means
             }
             Pi <- c(Pi, 0.5 * means);gc()
         }

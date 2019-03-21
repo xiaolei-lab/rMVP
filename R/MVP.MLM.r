@@ -129,7 +129,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     X0Y <- crossprod(X0t,yt)
     iX0X0 <- solve(X0X0)
     
-    Xt[1:n,1:q0] <- X0t
+    Xt[seq_len(n), seq_len(q0)] <- X0t
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
@@ -141,7 +141,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
 
         SNP <- geno[i, ]
         xst <- crossprod(U, SNP)
-        Xt[1:n,q0+1] <- xst
+        Xt[seq_len(n), q0 + 1] <- xst
         X0Xst <- crossprod(X0t,xst)
         XstX0 <- t(X0Xst)
         xstxst <- crossprod(xst)
@@ -149,19 +149,22 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
         XY <- c(X0Y,xsY)
         #B22 <- xstxst - XstX0%*%iX0X0%*%X0Xst
         B22 <- xstxst - crossprod(X0Xst, iX0X0) %*% X0Xst
-        invB22 <- 1/B22
+        invB22 <- 1 / B22
         B21 <- tcrossprod(XstX0, iX0X0)
         NeginvB22B21 <- crossprod(-invB22,B21)
         B11 <- iX0X0 + as.numeric(invB22)*crossprod(B21,B21)
-            
-        iXX[1:q0,1:q0]=B11
-        iXX[(q0+1),(q0+1)]=1/B22
-        iXX[(q0+1),1:q0]=NeginvB22B21
-        iXX[1:q0,(q0+1)]=NeginvB22B21
+        
+        i1 = seq_len(q0)
+        i2 = q0 + 1
+        iXX[i1, i1] = B11
+        iXX[i2, i2] = 1 / B22
+        iXX[i2, i1] = NeginvB22B21
+        iXX[i1, i2] = NeginvB22B21
+        
         beta <- crossprod(iXX,XY)
-        stats <- beta[(q0+1)]/sqrt((iXX[(q0+1), (q0+1)]) * vgs)
-        p <- 2 * pt(abs(stats), n-(q0+1), lower.tail=FALSE)
-        effect<- beta[(q0+1)]
+        stats <- beta[i2] / sqrt(invB22 * vgs)
+        p <- 2 * pt(abs(stats), n - i2, lower.tail = FALSE)
+        effect <- beta[i2]
         return(list(effect = effect, p = p))
     }
     
@@ -171,7 +174,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
         try(setMKLthreads(mkl.cpu), silent=TRUE)
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.mlm.parallel)
+        results <- lapply(seq_len(m), eff.mlm.parallel)
         try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
         if(R.ver == 'Windows'){
@@ -179,7 +182,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.mlm.parallel)
+            results <- parLapply(cl, seq_len(m), eff.mlm.parallel)
             stopCluster(cl)
         }else{
             tmpf.name <- tempfile()
@@ -191,7 +194,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
                 math.cpu <- try(getMKLthreads(), silent=TRUE)
                 try(setMKLthreads(1), silent=TRUE)
             }
-            results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
+            results <- mclapply(seq_len(m), eff.mlm.parallel, mc.cores=cpu)
             if(R.ver == 'Linux') {
                 try(setMKLthreads(math.cpu), silent=TRUE)
                 #try(setMKLthreads(1), silent=TRUE)

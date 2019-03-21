@@ -133,7 +133,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
-    if(length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
+    if(length(na.index) != 0) seqTaxa <- intersect(seqTaxa, seq_len(nrow(phe))[-na.index])
     #file.exsits()
     if(length(seqTaxa) != length(phe[,2])){
         try(unlink(c("geno.temp.bin","geno.temp.desc")), silent=TRUE)
@@ -197,10 +197,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         if(glm.run){
             if(!is.null(CV.GLM)){
                 if(!is.null(nPC.GLM)){
-                    CV.GLM <- cbind(ipca[,1:nPC.GLM], CV.GLM)
+                    CV.GLM <- cbind(ipca[,seq_len(nPC.GLM)], CV.GLM)
                 }
             }else{
-                CV.GLM <- ipca[,1:nPC.GLM]
+                CV.GLM <- ipca[,seq_len(nPC.GLM)]
             }
         }
         
@@ -208,10 +208,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         if(mlm.run){
             if(!is.null(CV.MLM)){
                 if(!is.null(nPC.MLM)){
-                    CV.MLM <- cbind(ipca[,1:nPC.MLM], CV.MLM)
+                    CV.MLM <- cbind(ipca[,seq_len(nPC.MLM)], CV.MLM)
                 }
             }else{
-                CV.MLM <- ipca[,1:nPC.MLM]
+                CV.MLM <- ipca[,seq_len(nPC.MLM)]
             }
         }
         
@@ -219,10 +219,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         if(farmcpu.run){
             if(!is.null(CV.FarmCPU)){
                 if(!is.null(nPC.FarmCPU)){
-                    CV.FarmCPU <- cbind(ipca[,1:nPC.FarmCPU], CV.FarmCPU)
+                    CV.FarmCPU <- cbind(ipca[,seq_len(nPC.FarmCPU)], CV.FarmCPU)
                 }
             }else{
-                CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
+                CV.FarmCPU <- ipca[,seq_len(nPC.FarmCPU)]
             }
         }
         
@@ -257,8 +257,8 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(permutation.threshold){
         # set.seed(12345)
         i=1
-            for(i in 1:permutation.rep){
-            index = 1:nrow(phe)
+            for(i in seq_len(permutation.rep)){
+            index = seq_len(nrow(phe))
             index.shuffle = sample(index,length(index),replace=FALSE)
             myY.shuffle = phe
             myY.shuffle[,2] = myY.shuffle[index.shuffle,2]

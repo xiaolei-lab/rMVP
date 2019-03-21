@@ -216,7 +216,7 @@ MVP.Report <- function(
         map.xy.index <- which(!numeric.chr %in% c(0:max.chr))
         if(length(map.xy.index) != 0){
             chr.xy <- unique(Pmap[map.xy.index, 1])
-            for(i in 1:length(chr.xy)){
+            for(i in seq_len(length(chr.xy))){
                 Pmap[Pmap[, 1] == chr.xy[i], 1] <- max.chr + i
             }
         }
@@ -230,7 +230,7 @@ MVP.Report <- function(
         chr <- unique(Pmap[,1])
         chr.ori <- chr
         if(length(map.xy.index) != 0){
-            for(i in 1:length(chr.xy)){
+            for(i in seq_len(length(chr.xy))){
                 chr.ori[chr.ori == max.chr + i] <- chr.xy[i]
             }
         }
@@ -239,7 +239,7 @@ MVP.Report <- function(
         pvalue.pos <- Pmap[, 2]
         p0.index <- Pmap[, 1] == 0
         if(sum(p0.index) != 0){
-            pvalue.pos[p0.index] <- 1:sum(p0.index)
+            pvalue.pos[p0.index] <- seq_len(sum(p0.index))
         }
         pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
         
@@ -273,7 +273,7 @@ MVP.Report <- function(
         N <- NULL
 
         #set the colors for each traits
-        for(i in 1:R){
+        for(i in seq_len(R)){
             colx <- col[i,]
             colx <- colx[!is.na(colx)]
             N[i] <- ceiling(Nchr/length(colx))
@@ -289,7 +289,6 @@ MVP.Report <- function(
                 pvalue.posN <- pvalue.pos.list[[i+1]] + band
                 ticks[i+1] <- max(pvalue.posN)-floor(max(pvalue.pos.list[[i+1]])/2)
             }else{
-                #pvalue <- append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
                 pvalue.posN <- c(pvalue.posN, max(pvalue.posN) + band + pvalue.pos.list[[i+1]])
                 ticks[i+1] <- max(pvalue.posN)-floor(max(pvalue.pos.list[[i+1]])/2)
             }
@@ -306,7 +305,7 @@ MVP.Report <- function(
         }
 
         add <- list()
-        for(i in 1:R){
+        for(i in seq_len(R)){
             colx <- col[i,]
             colx <- colx[!is.na(colx)]
             add[[i]] <- c(Num,rep(0,N[i]*length(colx)-Nchr))
@@ -326,7 +325,7 @@ MVP.Report <- function(
         signal.line.index <- NULL
         if(!is.null(threshold)){
             if(!is.null(signal.line)){
-                for(l in 1:R){
+                for(l in seq_len(R)){
                     if(LOG10){
                         signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)))
                     }else{
@@ -367,7 +366,7 @@ MVP.Report <- function(
                 segments(X1chr,Y1chr,X2chr,Y2chr,lty=2,lwd=signal.line,col="grey")
             }
         }
-        for(i in 1:R){
+        for(i in seq_len(R)){
         
             #get the colors for each trait
             colx <- col[i,]
@@ -396,7 +395,7 @@ MVP.Report <- function(
                     
                     #plot the boundary which represents the chromosomes
                     polygon.num <- 1000
-                    for(k in 1:length(chr)){
+                    for(k in seq_len(length(chr))){
                         if(k==1){
                             polygon.index <- seq(round(band/2)+1,-round(band/2)+max(pvalue.posN.list[[1]]), length=polygon.num)
                             #change the axis from right angle into circle format
@@ -452,8 +451,6 @@ MVP.Report <- function(
                         
                     }
                     
-                    # XLine=(RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
-                    # YLine=(RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
                     # lines(XLine,YLine,lwd=1.5)
                     if(cir.density){
                         circle.plot(myr=RR+cir.chr.h,lwd=1.5,add=TRUE,col='grey')
@@ -495,7 +492,7 @@ MVP.Report <- function(
                 
                 if(!is.null(threshold)){
                     if(sum(threshold!=0)==length(threshold)){
-                        for(thr in 1:length(threshold)){
+                        for(thr in seq_len(length(threshold))){
                             significantline1=ifelse(LOG10, H*(-log10(threshold[thr]))/Max, H*(threshold[thr])/Max)
                             #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
                             #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
@@ -527,7 +524,7 @@ MVP.Report <- function(
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
                             
-                                for(ll in 1:length(threshold)){
+                                for(ll in seq_len(length(threshold))){
                                     if(ll == 1){
                                         if(LOG10){
                                             significantline1=H*(-log10(threshold[ll]))/Max
@@ -563,12 +560,12 @@ MVP.Report <- function(
                     ticks1=1.07*(RR+cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=1.07*(RR+cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
                         }
@@ -577,12 +574,12 @@ MVP.Report <- function(
                     ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                         angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                         text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
                         }
@@ -596,7 +593,7 @@ MVP.Report <- function(
                     # lines(XLine,YLine,lwd=1.5)
 
                     polygon.num <- 1000
-                    for(k in 1:length(chr)){
+                    for(k in seq_len(length(chr))){
                         if(k==1){
                             polygon.index <- seq(round(band/2)+1,-round(band/2)+max(pvalue.posN.list[[1]]), length=polygon.num)
                             X1chr=(2*cir.band+RR)*sin(2*pi*(polygon.index)/TotalN)
@@ -692,7 +689,7 @@ MVP.Report <- function(
                 if(!is.null(threshold)){
                     if(sum(threshold!=0)==length(threshold)){
                     
-                        for(thr in 1:length(threshold)){
+                        for(thr in seq_len(length(threshold))){
                             significantline1=ifelse(LOG10, H*(-log10(threshold[thr]))/Max, H*(threshold[thr])/Max)
                             #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
                             #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
@@ -718,7 +715,7 @@ MVP.Report <- function(
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
                             
-                                for(ll in 1:length(threshold)){
+                                for(ll in seq_len(length(threshold))){
                                     if(ll == 1){
                                         if(LOG10){
                                             significantline1=H*(-log10(threshold[ll]))/Max
@@ -756,12 +753,12 @@ MVP.Report <- function(
                     ticks1=1.1*(2*cir.band+RR)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=1.1*(2*cir.band+RR)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                           angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                           text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
                         }
@@ -770,14 +767,14 @@ MVP.Report <- function(
                     ticks1=1.0*(RR+cir.band)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=1.0*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                         
                             #adjust the angle of labels of circle plot
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
-                        for(i in 1:length(ticks)){
+                        for(i in seq_len(length(ticks))){
                             angle=360*(1-(ticks-round(band/2))[i]/TotalN)
                             text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
                         }
@@ -792,7 +789,7 @@ MVP.Report <- function(
     if ("m" %in% plot.type) {
         if (multracks==FALSE) {
             #print("Starting Rectangular-Manhattan plot!",quote=FALSE)
-            for(i in 1:R){
+            for(i in seq_len(R)){
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
                 print(paste("Rectangular_Manhattan Plotting ",taxa[i],"...",sep=""))
@@ -895,7 +892,7 @@ MVP.Report <- function(
                     }
                     if(!is.null(threshold)){
                         if(sum(threshold!=0)==length(threshold)){
-                            for(thr in 1:length(threshold)){
+                            for(thr in seq_len(length(threshold))){
                                 h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
                                 # print(h)
                                 # print(threshold.col[thr])
@@ -919,7 +916,7 @@ MVP.Report <- function(
                                 #cover the points that exceed the threshold with the color "white"
                                 points(HX1,HY1,pch=pch,cex=cex[2],col="white")
                                 
-                                for(ll in 1:length(threshold)){
+                                for(ll in seq_len(length(threshold))){
                                     if(ll == 1){
                                         if(LOG10){
                                             sgline1=-log10(threshold[ll])
@@ -953,7 +950,7 @@ MVP.Report <- function(
                         }
                     }
                     if(cir.density){
-                        for(yll in 1:length(pvalue.posN.list)){
+                        for(yll in seq_len(length(pvalue.posN.list))){
                             polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
                                 c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
                                 -1.5*Max/den.fold, -0.5*Max/den.fold), 
@@ -996,7 +993,7 @@ MVP.Report <- function(
                 if(is.null(dev.list())) dev.new(width = 15, height = 6)
                 par(xpd=TRUE)
             }
-            for(i in 1:R){
+            for(i in seq_len(R)){
                 print(paste("Multracks_Rectangular Plotting ",taxa[i],"...",sep=""))
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
@@ -1079,7 +1076,7 @@ MVP.Report <- function(
                 }
                 if(!is.null(threshold)){
                     if(sum(threshold!=0)==length(threshold)){
-                        for(thr in 1:length(threshold)){
+                        for(thr in seq_len(length(threshold))){
                             h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
                             par(xpd=FALSE); abline(h=h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr]); par(xpd=TRUE)
                         }
@@ -1098,7 +1095,7 @@ MVP.Report <- function(
                                 #cover the points that exceed the threshold with the color "white"
                                 points(HX1,HY1,pch=pch,cex=cex[2]*xn,col="white")
                                 
-                                for(ll in 1:length(threshold)){
+                                for(ll in seq_len(length(threshold))){
                                     if(ll == 1){
                                         if(LOG10){
                                             sgline1=-log10(threshold[ll])
@@ -1212,7 +1209,7 @@ MVP.Report <- function(
                         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
                 }
             }
-            legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
+            legend("topleft",taxa,col=t(col)[seq_len(R)],pch=19,text.font=6,box.col=NA)
             if(is.null(chr.labels)){
                 axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
             }else{
@@ -1238,13 +1235,13 @@ MVP.Report <- function(
             }
             do <- TRUE
             sam.index <- list()
-            for(l in 1:R){
-                sam.index[[l]] <- 1:nrow(Pmap)
+            for(l in seq_len(R)){
+                sam.index[[l]] <- seq_len(nrow(Pmap))
             }
             sam.num <- 1000
             print("Multraits_Rectangular Plotting...")
             while(do){
-                for(i in 1:R){
+                for(i in seq_len(R)){
                     if(length(sam.index[[i]]) < sam.num){
                         plot.index <- sam.index[[i]]
                     }else{
@@ -1258,21 +1255,21 @@ MVP.Report <- function(
                 if(length(sam.index[[i]]) == 0) do <- FALSE
             }
             
-            # for(i in 1:R){
+            # for(i in seq_len(R)){
                 # logpvalue=logpvalueT[,i]
                 # points(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=t(col)[i])
             # }
             
             if(!is.null(threshold)){
                 if(sum(threshold!=0)==length(threshold)){
-                    for(thr in 1:length(threshold)){
+                    for(thr in seq_len(length(threshold))){
                         h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
                         par(xpd=FALSE); abline(h=h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr]); par(xpd=TRUE)
                     }
                 }
             }
             if(cir.density){
-                        for(yll in 1:length(pvalue.posN.list)){
+                        for(yll in seq_len(length(pvalue.posN.list))){
                             polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
                                 c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
                                 -1.5*Max/den.fold, -0.5*Max/den.fold), 
@@ -1314,7 +1311,7 @@ MVP.Report <- function(
                 if(is.null(dev.list())) dev.new(width = 2.5*R, height = 5.5)
                 par(xpd=TRUE)
             }
-            for(i in 1:R){
+            for(i in seq_len(R)){
                 print(paste("Multracks_QQ Plotting ",taxa[i],"...",sep=""))
                 P.values=as.numeric(Pmap[,i+2])
                 P.values=P.values[!is.na(P.values)]
@@ -1327,7 +1324,7 @@ MVP.Report <- function(
                     N=length(P.values)
                     P.values=P.values[order(P.values,decreasing=TRUE)]
                 }
-                p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+                p_value_quantiles=(seq_len(length(P.values)))/(length(P.values)+1)
                 log.Quantiles <- -log10(p_value_quantiles)
                 if(LOG10){
                     log.P.values <- -log10(P.values)
@@ -1340,7 +1337,7 @@ MVP.Report <- function(
                     N1=length(log.Quantiles)
                     c95 <- rep(NA,N1)
                     c05 <- rep(NA,N1)
-                    for(j in 1:N1){
+                    for(j in seq_len(N1)){
                         xi=ceiling((10^-log.Quantiles[j])*N)
                         if(xi==0)xi=1
                         c95[j] <- qbeta(0.95,xi,N-xi+1)
@@ -1394,7 +1391,7 @@ MVP.Report <- function(
                     dev.new(width = 5.5, height = 5.5)
                     par(xpd=TRUE)
                 }
-                p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
+                p_value_quantiles=(seq_len(nrow(Pmap)))/(nrow(Pmap)+1)
                 log.Quantiles <- -log10(p_value_quantiles)
                                             
                 # calculate the confidence interval of QQ-plot
@@ -1402,7 +1399,7 @@ MVP.Report <- function(
                     N1=length(log.Quantiles)
                     c95 <- rep(NA,N1)
                     c05 <- rep(NA,N1)
-                    for(j in 1:N1){
+                    for(j in seq_len(N1)){
                         xi=ceiling((10^-log.Quantiles[j])*N)
                         if(xi==0)xi=1
                         c95[j] <- qbeta(0.95,xi,N-xi+1)
@@ -1416,14 +1413,14 @@ MVP.Report <- function(
                 Pmap.min <- Pmap[,3:(R+2)]
                 YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), -log10(min(Pmap.min[Pmap.min > 0])))
                 plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
-                legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
+                legend("topleft",taxa,col=t(col)[seq_len(R)],pch=19,text.font=6,box.col=NA)
                 axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
                 axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
                 
                 # plot the confidence interval of QQ-plot
                 if(conf.int) polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
                 
-                for(i in 1:R){
+                for(i in seq_len(R)){
                     print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
                     P.values=as.numeric(Pmap[,i+2])
                     P.values=P.values[!is.na(P.values)]
@@ -1469,7 +1466,7 @@ MVP.Report <- function(
                 if(file.output) dev.off()
             }
         }else{
-            for(i in 1:R){
+            for(i in seq_len(R)){
                 print(paste("Q_Q Plotting ",taxa[i],"...",sep=""))
                 if(file.output){
                     if(file=="jpg") jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
@@ -1491,7 +1488,7 @@ MVP.Report <- function(
                     N=length(P.values)
                     P.values=P.values[order(P.values,decreasing=TRUE)]
                 }
-                p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+                p_value_quantiles=(seq_len(length(P.values)))/(length(P.values)+1)
                 log.Quantiles <- -log10(p_value_quantiles)
                 if(LOG10){
                     log.P.values <- -log10(P.values)
@@ -1504,7 +1501,7 @@ MVP.Report <- function(
                     N1=length(log.Quantiles)
                     c95 <- rep(NA,N1)
                     c05 <- rep(NA,N1)
-                    for(j in 1:N1){
+                    for(j in seq_len(N1)){
                         xi=ceiling((10^-log.Quantiles[j])*N)
                         if(xi==0)xi=1
                         c95[j] <- qbeta(0.95,xi,N-xi+1)
@@ -1573,7 +1570,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0:max.chr))
     if (length(map.xy.index) != 0) {
         chr.xy <- unique(map[map.xy.index, 2])
-        for (i in 1:length(chr.xy)) {
+        for (i in seq_len(length(chr.xy))) {
             map[map[, 2] == chr.xy[i], 2] <- max.chr + i
         }
     }
@@ -1589,7 +1586,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     pos.x      <- list()
     col.index  <- list()
     maxbin.num <- NULL
-    for (i in 1:length(chr.num)) {
+    for (i in seq_len(length(chr.num))) {
         pos.x[[i]] <- pos[which(chr == chr.num[i])]
         cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
         if (cut.len <= 1) {
@@ -1608,7 +1605,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     }
     col = colorRampPalette(col)(maxbin.num)
     col.seg = NULL
-    for (i in 1:length(chr.num)) {
+    for (i in seq_len(length(chr.num))) {
         if (!is.null(legend.max)) {
             if (legend.max < Maxbin.num) {
                 col.index[[i]][col.index[[i]] > legend.max] <- legend.max
@@ -1617,7 +1614,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
         col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
     }
     if (length(map.xy.index) != 0) {
-        for (i in 1:length(chr.xy)) {
+        for (i in seq_len(length(chr.xy))) {
             chr.num[chr.num == max.chr + i] <- chr.xy[i]
         }
     }
@@ -1673,7 +1670,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
         )
         
         # draw each Chr
-        for (i in 1:length(chr.num)) {
+        for (i in seq_len(length(chr.num))) {
             # draw bg
             polygon(
                 x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
@@ -1875,7 +1872,7 @@ MVP.Report.QQplot <-
     P.values <- -log10(P.values[order(P.values)])
     
     N <- length(P.values)
-    quantiles <- -log10((1:N) / (N + 1))
+    quantiles <- -log10((seq_len(N)) / (N + 1))
     
     # filter
     is_visable <- filter.points(quantiles, P.values, w, h, dpi)
@@ -1887,7 +1884,7 @@ MVP.Report.QQplot <-
         vi <- which(is_visable)
         c95 <- rep(NA, length(vi))
         c05 <- rep(NA, length(vi))
-        for (i in 1:length(vi)) {
+        for (i in seq_len(length(vi))) {
             xi <- ceiling((10 ^ -quantiles[vi[i]]) * N)
             if (xi == 0) { xi <- 1 }
             c95[i] <- qbeta(0.95, xi, N - xi + 1)
@@ -2101,7 +2098,7 @@ MVP.PCAplot <- function(PCA,
     if(!is.null(pch)){
         pch <- rep(pch, Ncluster)
     }else{
-        pch=1:Ncluster
+        pch=seq_len(Ncluster)
     } 
     print("PCA plot2d...")
     if(file=="jpg") jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
@@ -2115,7 +2112,7 @@ MVP.PCAplot <- function(PCA,
     plot(PCA[,1],PCA[,2],pch=pch[kc$cluster],col=col[kc$cluster],font=2,font.lab=2,xlab="PC1",ylab="PC2",axes=FALSE)
     axis(1, font.axis=2)
     if(!is.null(class)){
-        legend(legend.pos,levels(as.factor(class)),col=col[1:Ncluster],pch=pch[1:Ncluster],text.font=6,box.col=NA)
+        legend(legend.pos,levels(as.factor(class)),col=col[seq_len(Ncluster)],pch=pch[seq_len(Ncluster)],text.font=6,box.col=NA)
     }
     axis(2, font.axis=2)
     if(box) box()
