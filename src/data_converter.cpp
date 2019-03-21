@@ -493,15 +493,15 @@ void write_bfile(SEXP pBigMat, std::string bed_file, int threads=0, bool verbose
 template <typename T>
 void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // check input
-    string ending = ".bed";
-    if (bed_file.length() <= ending.length() ||
-        0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
-        bed_file += ending;
+    if (!end_with(bed_file, ".bed")) {
+        bed_file += ".bed";
+    }
     
     // define
     omp_setup(threads, verbose);
-    long n = pMat->ncol() / 4;  // 4 individual = 1 bit
-    if (pMat->ncol() % 4 != 0) 
+    long ind = pMat->ncol();
+    long n = ind / 4;  // 4 individual = 1 bit
+    if (ind % 4 != 0) 
         n++; 
     char *buffer;
     long buffer_size;
@@ -534,20 +534,21 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     fread(buffer, 1, 3, fin);
     
     // loop file
-    #pragma omp parallel for
+    size_t r, c, cond;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fread(buffer, 1, buffer_size, fin);
         
-        size_t r, c;
         // i: current block start, j: current bit.
-        for (size_t j = 0; j < buffer_size && i * buffer_size + j < length - 3; j++) {
+        cond = min(buffer_size, length - 3 - i * buffer_size);
+        #pragma omp parallel for schedule(static)
+        for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
             r = (i * buffer_size + j) / n;
             c = (i * buffer_size + j) % n * 4;
             uint8_t p = buffer[j];
             
-            for (size_t x = 0; x < 4 && (c + x) < pMat->ncol(); x++) {
+            for (size_t x = 0; x < 4 && (c + x) < ind; x++) {
                 mat[c + x][r] = code[(p >> (2*x)) & 0x03];
             }
         }
