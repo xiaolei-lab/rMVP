@@ -204,7 +204,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
             welcome <- paste0("Welcome to ", getPackageName())
         }
     }
-    msg <- c(msg, make_line(welcome, line = linechar, width = width))
+    msg <- c(msg, make_line(welcome, linechar = linechar, width = width))
     # title
     if (!is.null(title)) {
         msg <- c(msg, rule_wrap(string = title, width = width, align = "center"))
