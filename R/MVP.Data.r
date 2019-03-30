@@ -442,7 +442,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
         
         # load geno
         suppressWarnings(
-            geno <- read.big.matrix(num_file, head = FALSE, sep = sep)
+            geno <- read.big.matrix(num_file, header = FALSE, sep = sep)
         )
         if (transposed) {
             bigmat[, ] <- t(geno[, ])
@@ -698,7 +698,7 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
     
     # get pc
     if (is.character(filePC)) {
-        myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
+        myPC <- read.big.matrix(filePC, header = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
         if (hasNA(geno@address)) {
@@ -756,7 +756,7 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
     
     # get kin
     if (is.character(fileKin)) {
-        myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
+        myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
         if (hasNA(geno@address)) {
