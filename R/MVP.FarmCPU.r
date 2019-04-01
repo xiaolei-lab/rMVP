@@ -94,7 +94,7 @@
     isDone=FALSE
     name.of.trait2=name.of.trait
     
-    while(!isDone) {
+    while (!isDone) {
         theLoop=theLoop+1
         print(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""))
             
@@ -110,11 +110,24 @@
         myPrior=FarmCPU.Prior(GM=map,P=P,Prior=Prior)
 
         #Step 2b: Set bins
-        if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus)
-        }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus)
+        if (theLoop <= 2) {
+            bin.CV = CV
+        } else {
+            bin.CV = theCV
         }
+        myBin <- FarmCPU.BIN(
+            Y = phe[, c(1, 2)],
+            GDP = geno,
+            GM = map,
+            CV = CV,
+            P = myPrior,
+            method = method.bin,
+            b = bin.size,
+            s = bin.selection,
+            theLoop = theLoop,
+            bound = bound,
+            ncpus = ncpus
+        )
         
         #Step 2c: Remove bin dependency
         #Remove QTNs in LD
@@ -289,60 +302,53 @@
     delta.range <- seq(deltaExpStart,deltaExpEnd,by=0.1)
     m <- length(delta.range)
     #for (m in seq(deltaExpStart,deltaExpEnd,by=0.1)){
-    beta.optimize.parallel <- function(ii){
+    beta.optimize.parallel <- function(ii) {
         #p=p+1
         delta <- exp(delta.range[ii])
+        sum.list <- function(x) {
+            r <- 0
+            for (i in seq_len(length(x)))
+                r <- r + x[[i]]
+            return(r)
+        }
         #----------------------------calculate beta-------------------------------------
         #######get beta1
-        beta1=0
-        for(i in seq_len(length(d))){
-            one=matrix(U1TX[i,], nrow=1)
-            beta=crossprod(one,(one/(d[i]+delta)))  #This is not real beta, confusing
-            beta1= beta1+beta
-        }
-        
+        beta1 <- sum.list(lapply(
+            seq_len(length(d)), 
+            function(i) { tcrossprod(U1TX[i,], (U1TX[i,]/(d[i] + delta))) }
+        ))
+
         #######get beta2
-        beta2=0
-        for(i in seq_len(nrow(U1))){
-            one=matrix(IUX[i,], nrow=1)
-            beta = crossprod(one)
-            beta2= beta2+beta
-        }
-        beta2<-beta2/delta
-        
+        beta2 <- sum.list(lapply(
+            seq_len(nrow(U1)), 
+            function(i) { tcrossprod(IUX[i,]) }
+        ))
+        beta2 <- beta2 / delta
+
         #######get beta3
-        beta3=0
-        for(i in seq_len(length(d))){
-            one1=matrix(U1TX[i,], nrow=1)
-            one2=matrix(U1TY[i,], nrow=1)
-            beta=crossprod(one1,(one2/(d[i]+delta)))
-            beta3= beta3+beta
-        }
-        
+        beta3 <- sum.list(lapply(
+            seq_len(length(d)),
+            function(i) {
+                tcrossprod(U1TX[i, ], (U1TY[i, ] / (d[i] + delta)))
+            }
+        ))
+
         ###########get beta4
-        beta4=0
-        for(i in seq_len(nrow(U1))){
-            one1=matrix(IUX[i,], nrow=1)
-            one2=matrix(IUY[i,], nrow=1)
-            beta=crossprod(one1,one2)
-            beta4= beta4+beta
-        }
-        beta4<-beta4/delta
-        
+        beta4 <- sum.list(lapply(
+            seq_len(nrow(U1)),
+            function(i) { tcrossprod(IUX[i, ], IUY[i, ]) }
+        ))
+        beta4 <- beta4 / delta
+
         #######get final beta
-        zw1 <- ginv(beta1+beta2)
-        #zw1 <- try(solve(beta1+beta2))
-        #if(inherits(zw1, "try-error")){
-        #zw1 <- ginv(beta1+beta2)
-        #}
-        
-        zw2=(beta3+beta4)
-        beta=crossprod(zw1,zw2)
+        zw1 <- ginv(beta1 + beta2)
+        zw2 <- beta3 + beta4
+        beta <- crossprod(zw1,zw2)
         
         #----------------------------calculate LL---------------------------------------
         ####part 1
-        part11<-n*log(2*3.14)
-        part12<-0
+        part11 <- n * log(2 * base::pi)
+        part12 <- 0
         for(i in seq_len(length(d))){
             part12_pre=log(d[i]+delta)
             part12= part12+part12_pre
