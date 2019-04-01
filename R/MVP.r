@@ -54,7 +54,6 @@
 #' @param Prior four columns, SNP name, Chr, Pos, P
 #' @param maxLoop maximum number of iterations
 #' @param threshold.output output GWAS results only for SNPs with p value lower than the threshold.output
-#' @param iteration.output whether to output results for FarmCPU iterations
 #' @param p.threshold if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
 #' @param bound maximum number of SNPs selected as pseudo QTNs for each iteration
@@ -92,7 +91,7 @@
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, p.threshold=NA, QTN.threshold=0.01, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 ) {
     R.ver <- Sys.info()[['sysname']]
@@ -247,7 +246,28 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     
     if(farmcpu.run){
         print("FarmCPU Start ...")
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, priority=priority, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", P=P, method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, Prior=Prior, maxLoop=maxLoop, threshold.output=threshold.output, iteration.output=iteration.output, p.threshold=p.threshold, QTN.threshold=QTN.threshold, bound=NULL)
+        farmcpu.results <-
+            MVP.FarmCPU(
+                phe = phe,
+                geno = geno,
+                map = map,
+                priority = priority,
+                CV = CV.FarmCPU,
+                ncpus = ncpus,
+                bar = bar,
+                memo = "MVP.FarmCPU",
+                P = P,
+                method.sub = method.sub,
+                method.sub.final = method.sub.final,
+                method.bin = method.bin,
+                bin.size = bin.size,
+                bin.selection = bin.selection,
+                Prior = Prior,
+                maxLoop = maxLoop,
+                threshold.output = threshold.output,
+                p.threshold = p.threshold,
+                QTN.threshold = QTN.threshold
+            )
         colnames(farmcpu.results) <- c("effect", paste(colnames(phe)[2],"FarmCPU",sep="."))
         if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
     }

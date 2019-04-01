@@ -217,5 +217,5 @@
     sigma_a<- 1/n*(sigma_a1+sigma_a2)
     sigma_e<-delta*sigma_a
     
-    return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a, ve=sigma_e))
+    return(list(beta=beta, delta=delta, REML=LL, vg=sigma_a, ve=sigma_e))
 }
