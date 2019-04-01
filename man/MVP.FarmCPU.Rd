@@ -10,7 +10,7 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, priority = "speed", P = NULL,
   bin.selection = seq(10, 100, 10), memo = "MVP.FarmCPU",
   Prior = NULL, ncpus = 2, bar = TRUE, maxLoop = 10,
   threshold.output = 0.01, converge = 1, iteration.output = FALSE,
-  p.threshold = NA, QTN.threshold = NULL, bound = NULL)
+  p.threshold = NA, QTN.threshold = 0.01, bound = NULL)
 }
 \arguments{
 \item{phe}{phenotype, n by t matrix, n is sample size, t is number of phenotypes}
@@ -76,7 +76,7 @@ genotype <- attach.big.matrix(genoPath)
 genotype <- genotype[, idx]
 print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-map <- read.table("mvp.map" , head = TRUE)
+map <- read.table(mapPath, head = TRUE)
 farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
   ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
   method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
