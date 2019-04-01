@@ -87,7 +87,7 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' map <- read.table("mvp.map" , head = TRUE)
+#' map <- read.table(mapPath , head = TRUE)
 #' mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
@@ -257,7 +257,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     if(permutation.threshold){
         # set.seed(12345)
         i=1
-            for(i in seq_len(permutation.rep)){
+        for(i in seq_len(permutation.rep)){
             index = seq_len(nrow(phe))
             index.shuffle = sample(index,length(index),replace=FALSE)
             myY.shuffle = phe

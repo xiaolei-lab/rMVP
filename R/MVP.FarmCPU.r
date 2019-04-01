@@ -60,13 +60,18 @@
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' map <- read.table("mvp.map" , head = TRUE)
+#' map <- read.table(mapPath, head = TRUE)
 #' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
 #'   ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
 #'   method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
 #'   Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
 #' str(farmcpu)
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL){
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed",
+                          P=NULL, method.sub="reward", method.sub.final="reward", 
+                          method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
+                          memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, 
+                          threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, 
+                          QTN.threshold=0.01, bound=NULL){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
     
     echo=TRUE
@@ -78,7 +83,6 @@
         npc=0
     }
     
-    if(is.null(QTN.threshold)){QTN.threshold = 0.01}
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
     name.of.trait=colnames(phe)[2]
@@ -170,7 +174,7 @@
                 }
             }
 
-            myRemove=FarmCPU.Remove(GD=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
+            myRemove=FarmCPU.Remove(GDP=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
             
             #Recoding QTNs history
             seqQTN=myRemove$seqQTN
@@ -600,7 +604,7 @@ FarmCPU.BIN <-
         
         #Method of optimum: GEMMA
         #can not be used to provide REML
-        #============================Optimize by EMMA============================================
+        #============================Optimize by GEMMA============================================
         if(method=="GEMMA"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             print("Optimizing Pseudo QTNs...")
