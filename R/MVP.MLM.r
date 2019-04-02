@@ -98,12 +98,12 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     # number of fixed effects
     nf <- ncol(X0) + 1
     if (is.null(REML)) {
-		print("Variance components...")   
+        print("Variance components...")   
         if (vc.method == "EMMA")
             REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "GEMMA")
             REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
-		print("Variance components is Done!")
+        print("Variance components is Done!")
     }
 
     q0 <- ncol(X0)
