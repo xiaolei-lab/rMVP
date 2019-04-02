@@ -267,37 +267,38 @@
 #' @export
 `FarmCPU.FaSTLMM.LL` <- function(y, snp.pool, X0=NULL, ncpus=2){
     p <- 0
-    deltaExpStart  <-  -5
-    deltaExpEnd  <-  5
+    deltaExpStart <- -5
+    deltaExpEnd <- 5
     snp.pool <- as.matrix(snp.pool)
     if (!is.null(snp.pool) && var(snp.pool) == 0) {
-        deltaExpStart = 100
-        deltaExpEnd = deltaExpStart
+        deltaExpStart <- 100
+        deltaExpEnd <- deltaExpStart
     }
     if (is.null(X0)) {
-        X0 = matrix(1, nrow(snp.pool), 1)
+        X0 <- matrix(1, nrow(snp.pool), 1)
     }
-    X=X0
+    X <- X0
     #########SVD of X
     K.X.svd <- svd(snp.pool)
-    d=K.X.svd$d
-    d=d[d>1e-08]
-    d=d^2
-    U1=K.X.svd$u
-    U1=U1[,seq_len(length(d))]
+    d <- K.X.svd$d
+    d <- d[d > 1e-08]
+    d <- d^2
+    U1 <- K.X.svd$u
+    U1 <- U1[,seq_len(length(d))]
     #handler of single snp
-    if(is.null(dim(U1))) U1=matrix(U1,ncol=1)
-    n=nrow(U1)
-    U1TX=crossprod(U1,X)
-    U1TY=crossprod(U1,y)
-    yU1TY <- y-U1%*%U1TY
-    XU1TX<- X-U1%*%U1TX
-    IU = -tcrossprod(U1)
-    diag(IU) = rep(1,n) + diag(IU)
-    IUX=crossprod(IU,X)
-    IUY=crossprod(IU,y)
+    if (is.null(dim(U1)))
+        U1 <- matrix(U1,ncol=1)
+    n <- nrow(U1)
+    U1TX <- crossprod(U1,X)
+    U1TY <- crossprod(U1,y)
+    yU1TY <- y - U1 %*% U1TY
+    XU1TX <- X - U1 %*% U1TX
+    IU <- -tcrossprod(U1)
+    diag(IU) <- rep(1,n) + diag(IU)
+    IUX <- crossprod(IU,X)
+    IUY <- crossprod(IU,y)
     #Iteration on the range of delta (-5 to 5 in glog scale)
-    delta.range <- seq(deltaExpStart,deltaExpEnd,by=0.1)
+    delta.range <- seq(deltaExpStart, deltaExpEnd, by = 0.1)
     m <- length(delta.range)
     #for (m in seq(deltaExpStart,deltaExpEnd,by=0.1)){
     beta.optimize.parallel <- function(ii) {
@@ -347,54 +348,47 @@
         ####part 1
         part11 <- n * log(2 * base::pi)
         part12 <- 0
-        for(i in seq_len(length(d))){
-            part12_pre=log(d[i]+delta)
-            part12= part12+part12_pre
+        for (i in seq_len(length(d))) {
+            part12_pre <- log(d[i] + delta)
+            part12 <- part12 + part12_pre
         }
-        part13<- (nrow(U1)-length(d))*log(delta)
-        part1<- -1/2*(part11+part12+part13)
+        part13 <- (nrow(U1) - length(d)) * log(delta)
+        part1 <- -1 / 2 * (part11 + part12 + part13)
         
         ######  part2
-        part21<-nrow(U1)
+        part21 <- nrow(U1)
         ######part221
         
-        part221=0
-        for(i in seq_len(length(d))){
-            one1=U1TX[i,]
-            one2=U1TY[i,]
-            part221_pre=(one2-one1%*%beta)^2/(d[i]+delta)
-            part221 = part221+part221_pre
+        part221 = 0
+        for (i in seq_len(length(d))) {
+            one1 = U1TX[i,]
+            one2 = U1TY[i,]
+            part221_pre = (one2 - one1 %*% beta) ^ 2 / (d[i] + delta)
+            part221 = part221 + part221_pre
         }
         
-        part222=0
-        for(i in seq_len(n)){
-            one1=XU1TX[i,]
-            one2=yU1TY[i,]
-            part222_pre=((one2-one1%*%beta)^2)/delta
-            part222= part222+part222_pre
+        part222 = 0
+        for (i in seq_len(n)) {
+            one1 = XU1TX[i, ]
+            one2 = yU1TY[i, ]
+            part222_pre = ((one2 - one1 %*% beta) ^ 2) / delta
+            part222 = part222 + part222_pre
         }
-        part22<-n*log((1/n)*(part221+part222))
-        part2<- -1/2*(part21+part22)
+        part22 <- n * log((1 / n) * (part221 + part222))
+        part2 <- -1 / 2 * (part21 + part22)
         
         ################# likihood
-        LL<-part1+part2
-        part1<-0
-        part2<-0
+        LL <- part1 + part2
+        part1 <- 0
+        part2 <- 0
         
-        return(list(beta=beta,delta=delta,LL=LL))
+        return(list(beta = beta, delta = delta, LL = LL))
     }
     #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
-    R.ver <- Sys.info()[['sysname']]
-    if(R.ver == 'Linux') {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        try(setMKLthreads(1), silent=TRUE)
-    }
-    
-    llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
-    
-    if(R.ver == 'Linux') {
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }
+
+    mkl_env({
+        llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
+    })
     
     for(i in seq_len(m)){
         if(i == 1){
@@ -470,7 +464,8 @@
 #'
 #' @keywords internal
 FarmCPU.BIN <-
-    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
+    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", 
+             b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
         #print("FarmCPU.BIN Started")
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -559,17 +554,17 @@ FarmCPU.BIN <-
         
         #Method of optimum: EMMA
         #============================Optimize by EMMA============================================
-        if(method=="EMMA"&optimumable){
+        if(method == "EMMA" & optimumable) {
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             print("Optimizing Pseudo QTNs...")
-            m <- length(b)*length(s)
+            m <- length(b) * length(s)
             inc.index = rep(seq_len(length(s)), length(b))
             
-            seqQTN.optimize.parallel <- function(ii){
+            seqQTN.optimize.parallel <- function(ii) {
                 bin.index <- floor((ii - 0.1) / length(s)) + 1
                 bin <- b[bin.index]
                 inc <- s[inc.index[ii]]
-                GP  <- cbind(GM,P,NA,NA,NA)
+                GP  <- cbind(GM, P, NA, NA, NA)
                 
                 mySpecify <- FarmCPU.Specify(
                     GI = GM,
@@ -592,18 +587,9 @@ FarmCPU.BIN <-
                 return(list(seqQTN = seqQTN, myREML = myREML))
             }
             
-            R.ver <- Sys.info()[['sysname']]
-            if (R.ver == 'Linux') {
-                math.cpu <- try(getMKLthreads(), silent = TRUE)
-                try(setMKLthreads(1), silent = TRUE)
-            }
-            
-            # llresults <- mclapply(seq_len(m), seqQTN.optimize.parallel, mc.cores=2)
-            llresults <- lapply(seq_len(m), seqQTN.optimize.parallel)
-            
-            if (R.ver == 'Linux') {
-                try(setMKLthreads(math.cpu), silent=TRUE)
-            }
+            mkl_env({
+                llresults <- mclapply(seq_len(m), seqQTN.optimize.parallel, mc.cores = ncpus)
+            })
             
             for(i in seq_len(m)){
                 if(i == 1){

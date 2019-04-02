@@ -51,7 +51,6 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -118,16 +117,19 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     }
     
     if (cpu == 1) {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- min(2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(seq_len(m), eff.glm)
+        print.f <- function(i) {
+            print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+        }
+        mkl_threads <- try(getMKLthreads(), silent=TRUE)
+        mkl_env({
+            results <- lapply(seq_len(m), eff.glm)
+        }, threads = min(2^(n %/% 1000), mkl_threads))
+        
         try(setMKLthreads(math.cpu), silent=TRUE)
     } else {
         if (wind) {
             print.f <- function(i) {
-                print_bar(i=i, n=m, type="type1", fixed.points=TRUE)
+                print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
@@ -139,16 +141,12 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
             tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
             writeBin(0, tmpf)
             print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            R.ver <- Sys.info()[['sysname']]
-            if (R.ver == 'Linux') {
-                math.cpu <- try(getMKLthreads(), silent=TRUE)
-                try(setMKLthreads(1), silent=TRUE)
-            }
-            results <- mclapply(seq_len(m), eff.glm, mc.cores=cpu)
-            close(tmpf); unlink(tmpf.name); message();
-            if (R.ver == 'Linux') {
-                try(setMKLthreads(math.cpu), silent=TRUE)
-            }
+            mkl_env({
+                results <- mclapply(seq_len(m), eff.glm, mc.cores = cpu)
+            })
+            close(tmpf)
+            unlink(tmpf.name)
+            message()
         }
     }
     if (is.list(results)) {

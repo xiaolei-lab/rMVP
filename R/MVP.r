@@ -101,12 +101,6 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
     
     if(wind) ncpus <- 1
-    if(r.open && ncpus>1 && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    #if(r.open && ncpus>1 && !mac){
-    #setMKLthreads(1)
-    #}
     
     MVP.Version(width = 60)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")

@@ -49,7 +49,6 @@ MVP.GEMMA.Vg.Ve <- function(y, X, K, rtol=1e-6, atol=1e-8, ctol=1e-8) {
     X <- as.matrix(X[idx, ])
     K <- K[idx, idx]
     
-    #try(setMKLthreads(1),silent = TRUE)
     K = K[]
     n = nrow(K)
 

@@ -161,17 +161,10 @@
         return(list(beta=beta,delta=delta,LL=LL))
     }
     #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
-    R.ver <- Sys.info()[['sysname']]
-    if(R.ver == 'Linux') {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        try(setMKLthreads(1), silent=TRUE)
-    }
-    
-    llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
-    
-    if(R.ver == 'Linux') {
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }
+
+    mkl_env({
+        llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
+    })
     
     for(i in seq_len(m)){
         if(i == 1){
