@@ -47,10 +47,7 @@
 #' str(glm)
 MVP.GLM <-
 function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -127,7 +124,7 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
         
         try(setMKLthreads(math.cpu), silent=TRUE)
     } else {
-        if (wind) {
+        if (Sys.info()[['sysname']] == 'Windows') {
             print.f <- function(i) {
                 print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }

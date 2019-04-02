@@ -37,16 +37,6 @@
 #' K <- MVP.K.VanRaden(genotype)
 MVP.K.VanRaden <-
 function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, maxLine=1000){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-
-    if(r.open && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    
     if(!is.null(weight)){
         if(sum(is.na(weight)) != 0) stop("'NA' is not allowed in weight")
     }

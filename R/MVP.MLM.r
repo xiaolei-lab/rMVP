@@ -54,10 +54,7 @@
 #' str(mlm)
 MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
-    R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    
-    if (R.ver == 'Windows')
+    if (Sys.info()[['sysname']] == 'Windows')
         cpu <- 1
     math.cpu <- try(getMKLthreads(), silent=TRUE)
     
@@ -173,7 +170,7 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
             results <- lapply(seq_len(m), eff.mlm.parallel)
         }, threads = min(2^(n %/% 1000), math.cpu))
     } else {
-        if (R.ver == 'Windows'){
+        if (Sys.info()[['sysname']] == 'Windows'){
             print.f <- function(i) {
                 print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }
