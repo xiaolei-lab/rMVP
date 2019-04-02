@@ -336,3 +336,25 @@ format_time <- function(x) {
     char <- c("h", "m", "s")[index]
     return(paste0(num, char, collapse = ""))
 }
+
+
+load_if_installed <- function(package) {
+    if (!identical(system.file(package = package), "")) {
+        do.call('library', list(package))
+        return(TRUE)
+    } else {
+        return(FALSE) 
+    }
+}
+
+mkl_env <- function(exprs, threads = 1) {
+    if (load_if_installed("RevoUtilsMath")) {
+        math.cores <- RevoUtilsMath::getMKLthreads()
+        RevoUtilsMath::setMKLthreads(threads)
+    }
+    result <- exprs
+    if (load_if_installed("RevoUtilsMath")) {
+        RevoUtilsMath::setMKLthreads(math.cores)
+    }
+    return(result)
+}

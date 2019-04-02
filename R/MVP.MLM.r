@@ -54,14 +54,8 @@
 #' str(mlm)
 MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
-    R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    
-    if (R.ver == 'Windows') cpu <- 1
-    if (r.open && cpu > 1 && R.ver == 'Darwin') {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-
+    if (Sys.info()[['sysname']] == 'Windows')
+        cpu <- 1
     math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
@@ -166,16 +160,18 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     }
     
     #Paralleled MLM
-    if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.mlm.parallel)
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-        if(R.ver == 'Windows'){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+    if (cpu == 1) {
+        print.f <- function(i) {
+            print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+        }
+        mkl_env({
+            results <- lapply(seq_len(m), eff.mlm.parallel)
+        }, threads = min(2^(n %/% 1000), math.cpu))
+    } else {
+        if (Sys.info()[['sysname']] == 'Windows'){
+            print.f <- function(i) {
+                print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+            }
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))

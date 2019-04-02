@@ -47,11 +47,7 @@
 #' str(glm)
 MVP.GLM <-
 function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -125,29 +121,10 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.glm)
         try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-            if(wind){
-                print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-                cl <- makeCluster(getOption("cl.cores", cpu))
-                clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
-                Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-                results <- parLapply(cl, 1:m, eff.glm)
-                stopCluster(cl)
-            }else{
-        tmpf.name <- tempfile()
-        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
-        writeBin(0, tmpf)
-        print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-                R.ver <- Sys.info()[['sysname']]
-                if(R.ver == 'Linux') {
-                    math.cpu <- try(getMKLthreads(), silent=TRUE)
-                    try(setMKLthreads(1), silent=TRUE)
-                }
-                results <- mclapply(1:m, eff.glm, mc.cores=cpu)
-        close(tmpf); unlink(tmpf.name); cat('\n');
-                if(R.ver == 'Linux') {
-                    try(setMKLthreads(math.cpu), silent=TRUE)
-                }
+    } else {
+        if (Sys.info()[['sysname']] == 'Windows') {
+            print.f <- function(i) {
+                print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

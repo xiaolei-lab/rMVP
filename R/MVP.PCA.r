@@ -39,15 +39,6 @@
 #' str(pca)
 MVP.PCA <-
 function(M, perc=1, pcs.keep=5, memo=NULL){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent = TRUE),"try-error")
-
-    if (r.open && mac) {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
     #Data Check
     if (is.null(M)) {
         stop("There is no genotype data!")

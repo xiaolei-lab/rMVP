@@ -95,19 +95,8 @@ MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 ) {
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    
-    if(wind) ncpus <- 1
-    if(r.open && ncpus>1 && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    #if(r.open && ncpus>1 && !mac){
-    #setMKLthreads(1)
-    #}
+    if (Sys.info()[['sysname']] == 'Windows')
+        ncpus <- 1
     
     MVP.Version(width = 60)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
