@@ -218,22 +218,60 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
   
     #GWAS
     print("GWAS Start...")
-    
-    if(glm.run){
+    # ------------------------- GLM -------------------------
+    if (glm.run) {
         print("General Linear Model (GLM) Start ...")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar);gc()
-        colnames(glm.results) <- c("effect", paste(colnames(phe)[2],"GLM",sep="."))
-        if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
-    }
-
-    if(mlm.run){
-        print("Mixed Linear Model (MLM) Start ...")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM");gc()
-        colnames(mlm.results) <- c("effect", paste(colnames(phe)[2],"MLM",sep="."))
-        if(file.output) write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
+        glm.results <-
+            MVP.GLM(
+                phe = phe,
+                geno = geno,
+                priority = priority,
+                CV = CV.GLM,
+                cpu = ncpus,
+                memo = "MVP.GLM",
+                bar = bar
+            )
+        gc()
+        colnames(glm.results) <-
+            c("effect", paste(colnames(phe)[2], "GLM", sep = "."))
+        if (file.output)
+            write.csv(
+                cbind(map, glm.results),
+                paste("MVP.", colnames(phe)[2], ".GLM", ".csv", sep = ""),
+                row.names = FALSE
+            )
     }
     
-    if(farmcpu.run){
+    # ------------------------- MLM -------------------------
+    if (mlm.run) {
+        print("Mixed Linear Model (MLM) Start ...")
+        mlm.results <-
+            MVP.MLM(
+                phe = phe,
+                geno = geno,
+                K = K,
+                priority = priority,
+                CV = CV.MLM,
+                cpu = ncpus,
+                bar = bar,
+                maxLine = maxLine,
+                vc.method = vc.method,
+                file.output = file.output,
+                memo = "MVP.MLM"
+            )
+        gc()
+        colnames(mlm.results) <-
+            c("effect", paste(colnames(phe)[2], "MLM", sep = "."))
+        if (file.output)
+            write.csv(
+                cbind(map, mlm.results),
+                paste("MVP.", colnames(phe)[2], ".MLM", ".csv", sep = ""),
+                row.names = FALSE
+            )
+    }
+    
+    # ----------------------- FarmCPU -----------------------
+    if (farmcpu.run) {
         print("FarmCPU Start ...")
         farmcpu.results <-
             MVP.FarmCPU(
@@ -257,32 +295,43 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
                 p.threshold = p.threshold,
                 QTN.threshold = QTN.threshold
             )
-        colnames(farmcpu.results) <- c("effect", paste(colnames(phe)[2],"FarmCPU",sep="."))
-        if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
+        colnames(farmcpu.results) <-
+            c("effect", paste(colnames(phe)[2], "FarmCPU", sep = "."))
+        if (file.output)
+            write.csv(
+                cbind(map, farmcpu.results),
+                paste("MVP.", colnames(phe)[2], ".FarmCPU", ".csv", sep = ""),
+                row.names = FALSE
+            )
     }
     
-    MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
+    MVP.return <-
+        list(
+            map = map,
+            glm.results = glm.results,
+            mlm.results = mlm.results,
+            farmcpu.results = farmcpu.results
+        )
     
-    if(permutation.threshold){
-        # set.seed(12345)
-        i=1
-        for(i in seq_len(permutation.rep)){
-            index = seq_len(nrow(phe))
-            index.shuffle = sample(index,length(index),replace=FALSE)
-            myY.shuffle = phe
-            myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
+    if (permutation.threshold) {
+        pvalue.final <- c()
+        for (i in seq_len(permutation.rep)) {
+            index         <- seq_len(nrow(phe))
+            index.shuffle <- sample(index, length(index), replace = FALSE)
+            myY.shuffle   <- phe
+            myY.shuffle[, 2] <- myY.shuffle[index.shuffle, 2]
+            
             #GWAS using t.test...
-            myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, cpu=ncpus)
-            pvalue = min(myPermutation[,2],na.rm=TRUE)
-            if(i==1){
-                    pvalue.final=pvalue
-               }else{
-                    pvalue.final=c(pvalue.final,pvalue)
-            }
+            myPermutation <-
+                MVP.GLM(phe = myY.shuffle[, c(1, 2)], geno = geno, cpu = ncpus)
+            
+            pvalue       <- min(myPermutation[, 2], na.rm = TRUE)
+            pvalue.final <- c(pvalue.final,pvalue)
         }#end of permutation.rep
-        permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
-        threshold = permutation.cutoff * m
+        permutation.cutoff <- sort(pvalue.final)[ceiling(permutation.rep*0.05)]
+        threshold <- permutation.cutoff * m
     }
+    
     print(paste("Significance Level: ", threshold/m, sep=""))
     if(file.output){
         print("Visualization Start...")

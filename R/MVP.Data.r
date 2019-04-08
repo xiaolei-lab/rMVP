@@ -243,8 +243,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_if_exist(backingfile, descriptorfile)
     
     # parser map
     message("Reading file...")
@@ -294,8 +293,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_if_exist(backingfile, descriptorfile)
     
     # parser map
     message("Reading file...")
@@ -319,7 +317,9 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         dimnames = c(NULL, NULL)
     )
     
-    if (priority == "speed") { maxLine <- -1 }
+    if (priority == "speed") {
+        maxLine <- -1
+    }
     read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     message("Preparation for GENOTYPE data is done within", format_time(t2 - t1))
@@ -348,8 +348,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_if_exist(backingfile, descriptorfile)
     
     # parser map
     message("Reading file...")
@@ -401,8 +400,7 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_if_exist(backingfile, descriptorfile)
     
     # detecte n(ind) and m(marker)
     message("Reading file...")
@@ -456,7 +454,9 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
     if (priority == "memory") {
         i <- 0
         con <- file(num_file, open = 'r')
-        if (col_names) { readLines(con, n = 1) }
+        if (col_names) {
+            readLines(con, n = 1)
+        }
         while (TRUE) {
             line = readLines(con, n = maxLine)
 
@@ -568,7 +568,9 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\t', missing=c(NA, 'NA', '-9', 9999)) {
     t1 <- as.numeric(Sys.time())
     # read data
-    if (!is.vector(pheno_file)) { pheno_file <- c(pheno_file) }
+    if (!is.vector(pheno_file)) {
+        pheno_file <- c(pheno_file)
+    }
 
     # phenotype files
     phe <- read.delim(pheno_file, sep = sep, header = header)
@@ -693,8 +695,7 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
     # check old file
     backingfile <- paste0(basename(out), ".pc.bin")
     descriptorfile <- paste0(basename(out), ".pc.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_if_exist(backingfile, descriptorfile)
     
     # get pc
     if (is.character(filePC)) {
@@ -964,3 +965,11 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # output new ind
     write.table(ind[ind_index, ], paste0(out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
  }
+
+remove_if_exist <- function(...) {
+    files <- match.call(expand.dots = FALSE)$...
+    for (f in files) {
+        if (file.exists(f))
+            file.remove(f)
+    }
+}

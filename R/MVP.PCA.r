@@ -58,7 +58,6 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
     }
     print("Principal Component Analysis Start...")
     if (perc < 1) {
-        # set.seed(123456)
         m <- nrow(M)
         big.geno <- t(M[sample(seq_len(m), round(m * perc)), ])
     }else{

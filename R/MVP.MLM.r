@@ -56,7 +56,7 @@ MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
     if (Sys.info()[['sysname']] == 'Windows')
         cpu <- 1
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    math.cpu <- try(RevoUtilsMath::getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -66,12 +66,13 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     ys <- as.numeric(as.matrix(phe[,2]))
     if (is.null(K)) {
         print("Calculating Kinship...")
-        K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
+        K <- MVP.K.VanRaden(M = geno, priority = priority, maxLine = maxLine)
+        gc()
+        
         if (file.output) {
             filebck <- paste0("MVP.", colnames(phe)[2], memo, ".kin.bin")
             filedes <- paste0("MVP.", colnames(phe)[2], memo, ".kin.desc")
-            if (file.exists(filebck)) file.remove(filebck)
-            if (file.exists(filedes)) file.remove(filedes)
+            remove_if_exist(filebck, filedes)
             Kin.backed <- big.matrix(
                 nrow = nrow(K),
                 ncol = ncol(K),
@@ -190,7 +191,8 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
             close(tmpf); unlink(tmpf.name); message();
         }
     }
-    if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
+    if (is.list(results))
+        results <- matrix(unlist(results), m, byrow = TRUE)
     #print("****************MLM ACCOMPLISHED****************")
     return(results)
 }#end of MVP.MLM function

@@ -187,7 +187,9 @@ print_accomplished <- function(width = 60) {
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
     msg <- c()
     # width
-    if (is.null(width)) { width <- getOption('width') }
+    if (is.null(width))
+        width <- getOption('width')
+    
     # version
     if (is.null(version)) {
         if (getPackageName() == ".GlobalEnv") {
@@ -196,6 +198,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
             version <- as.character(packageVersion(getPackageName()))
         }
     }
+    
     # welcome
     if (is.null(welcome)) { 
         if (getPackageName() == ".GlobalEnv") {

@@ -52,19 +52,20 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     n <- ncol(geno)
     m <- nrow(geno)
     
-    if(priority=="speed") geno <- as.matrix(geno)
+    if (priority == "speed")
+        geno <- as.matrix(geno)
     
     ys <- as.numeric(as.matrix(phe[,2]))
     
-    if(is.null(CV)){
+    if (is.null(CV)) {
         X0 <- matrix(1, n)
-    }else{
+    } else {
         X0 <- cbind(matrix(1, n), CV)
     }
     
     q0 <- ncol(X0)
-    iXX <- matrix(NA,q0+1,q0+1)
-    Xt <- matrix(NA,n, q0+1)
+    iXX <- matrix(NA, q0 + 1, q0 + 1)
+    Xt <- matrix(NA, n, q0 + 1)
 
     y <- matrix(ys)
     X0X0 <- crossprod(X0)
@@ -117,19 +118,19 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
         print.f <- function(i) {
             print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
         }
-        mkl_threads <- try(getMKLthreads(), silent=TRUE)
+
+        math.cpu <- try(RevoUtilsMath::getMKLthreads(), silent = TRUE)
         mkl_env({
             results <- lapply(seq_len(m), eff.glm)
-        }, threads = min(2^(n %/% 1000), mkl_threads))
+        }, threads = min(2^(n %/% 1000), math.cpu))
         
-        try(setMKLthreads(math.cpu), silent=TRUE)
     } else {
         if (Sys.info()[['sysname']] == 'Windows') {
             print.f <- function(i) {
                 print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }
             cl <- makeCluster(getOption("cl.cores", cpu))
-            clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
+            clusterExport(cl, varlist = c("geno", "ys", "X0"), envir = environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
             results <- parLapply(cl, seq_len(m), eff.glm)
             stopCluster(cl)
