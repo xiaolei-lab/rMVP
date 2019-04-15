@@ -6,17 +6,17 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Hapmap2MVP(hapmap_file, out = "mvp", type.geno = "char",
-  verbose = TRUE)
+MVP.Data.Hapmap2MVP(hmp_file, out = "mvp", maxLine = 10000,
+  type.geno = "char", threads = 1, verbose = TRUE)
 }
 \arguments{
-\item{hapmap_file}{Genotype in Hapmap format}
-
 \item{out}{the name of output file}
 
 \item{type.geno}{the type of genotype elements}
 
 \item{verbose}{whether to print the reminder}
+
+\item{hapmap_file}{Genotype in Hapmap format}
 }
 \value{
 number of individuals and markers.

@@ -55,7 +55,7 @@
 MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-> devtools::install_github("xiaoleiLiubio/rMVP")
+> devtools::install_github("xiaoleiLiubio/rMVP@0.99.13")
 ```
 
 ***Offline installation***

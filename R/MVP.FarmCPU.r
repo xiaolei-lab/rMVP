@@ -41,7 +41,6 @@
 #' @param maxLoop maximum number of iterations
 #' @param threshold.output only the GWAS results with p-values lower than threshold.output will be output
 #' @param converge a number, 0 to 1, if selected pseudo QTNs in the last and the second last iterations have a certain probality (the probability is converge) of overlap, the loop will stop
-#' @param iteration.output whether to output results of all iterations
 #' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
 #' @param bound maximum number of SNPs selected as pseudo QTNs in each iteration
@@ -60,171 +59,188 @@
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' map <- read.table("mvp.map" , head = TRUE)
+#' map <- read.table(mapPath, head = TRUE)
 #' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
 #'   ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
 #'   method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
 #'   Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
 #' str(farmcpu)
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed", P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL){
-    #print("--------------------- Welcome to FarmCPU ----------------------------")
-    
-    echo=TRUE
-    nm=nrow(map)
-    if(!is.null(CV)){
-        CV=as.matrix(CV)
-        npc=ncol(CV)
-    }else{
-        npc=0
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, priority="speed",
+                          P=NULL, method.sub="reward", method.sub.final="reward", 
+                          method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
+                          memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, 
+                          threshold.output=1, converge=1, p.threshold=NA, 
+                          QTN.threshold=0.01, bound=NULL){
+    #print("--------------- Welcome to FarmCPU ----------------------")
+    npc <- 0
+    if (!is.null(CV)) {
+        CV  <- as.matrix(CV)
+        npc <- ncol(CV)
     }
     
-    if(is.null(QTN.threshold)){QTN.threshold = 0.01}
-    if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
+    if (!is.na(p.threshold)) 
+        QTN.threshold <- max(p.threshold, QTN.threshold)
     
-    name.of.trait=colnames(phe)[2]
-    if(!is.null(memo)) name.of.trait=paste(memo,".",name.of.trait,sep="")
-    theLoop=0
-    theConverge=0
-    seqQTN.save=c(0)
-    seqQTN.pre=c(-1)
-    isDone=FALSE
-    name.of.trait2=name.of.trait
+    name.of.trait <- colnames(phe)[2]
     
-    while(!isDone) {
-        theLoop=theLoop+1
-        print(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""))
-            
-        spacer="0"
-        if(theLoop>9){
-            spacer=""
-        }
-        if(iteration.output){
-            name.of.trait2=paste("Iteration_",spacer,theLoop,".",name.of.trait,sep="")
-        }
+    if (!is.null(memo))
+        name.of.trait <- paste(memo, name.of.trait, sep = ".")
+    
+    theLoop     <- 0
+    theConverge <- 0
+    seqQTN.save <- c(0)
+    seqQTN.pre  <- c(-1)
+    isDone      <- FALSE
+
+    
+    while (!isDone) {
+        theLoop <- theLoop + 1
+        print(paste("Current loop:", theLoop, "out of maximum of", maxLoop))
             
         #Step 2a: Set prior
-        myPrior=FarmCPU.Prior(GM=map,P=P,Prior=Prior)
+        myPrior <- FarmCPU.Prior(GM = map, P = P,Prior = Prior)
 
         #Step 2b: Set bins
-        if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus)
-        }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus)
+        if (theLoop <= 2) {
+            bin.CV <- CV
+        } else {
+            bin.CV <- theCV
         }
+        
+        myBin <- FarmCPU.BIN(
+            Y = phe[, c(1, 2)],
+            GDP = geno,
+            GM = map,
+            CV = CV,
+            P = myPrior,
+            method = method.bin,
+            b = bin.size,
+            s = bin.selection,
+            theLoop = theLoop,
+            bound = bound,
+            ncpus = ncpus
+        )
         
         #Step 2c: Remove bin dependency
         #Remove QTNs in LD
-        seqQTN=myBin$seqQTN
+        seqQTN <- myBin$seqQTN
 
-        if(theLoop==2){
-            if(!is.na(p.threshold)){
-                if(min(myPrior,na.rm=TRUE)>p.threshold){
-                    seqQTN=NULL
-                    print("Top snps have little effect, set seqQTN to NULL!")
-                    }
-                }else{
-                    if(min(myPrior,na.rm=TRUE)>0.01/nm){
-                        seqQTN=NULL
-                        print("Top snps have little effect, set seqQTN to NULL!")
-                    }
-                }
-            }
-            
-            #when FarmCPU can not work, make a new QQ plot and manhatthan plot
-            if(theLoop==2&&is.null(seqQTN)){
-                #Report
-                P=myGLM$P[,ncol(myGLM$P)]
-                P[P==0] <- min(P[P!=0],na.rm=TRUE)*0.01
-                results = cbind(myGLM$B, P)
-                colnames(results) = c("effect","p")
+        if (theLoop == 2) {
+            minPrior <- min(myPrior, na.rm = TRUE)
+            if (minPrior > min(p.threshold, 0.01 / nrow(map), na.rm = TRUE)) {
+                seqQTN <- NULL
+                print("Top snps have little effect, set seqQTN to NULL!")
+                
+                # FarmCPU can not work, make a new QQ plot and manhatthan plot
+                P <- myGLM$P[, ncol(myGLM$P)]
+                P[P == 0] <- min(P[P != 0], na.rm = TRUE) * 0.01
+                results <- cbind(myGLM$B, P)
+                colnames(results) <- c("effect", "p")
                 break
-            }#force to exit for GLM model while seqQTN=NULL and h2=0
+                # force to exit for GLM model while seqQTN=NULL and h2=0
+            }
+        }   
 
-            if (!any(is.null(seqQTN.save)) && theLoop > 1) {
-                if (!(0 %in% seqQTN.save || -1 %in% seqQTN.save) && !is.null(seqQTN)) {
-                    #Force previous QTNs in the model
-                    seqQTN <- union(seqQTN,seqQTN.save)
-                }
+        if (!any(is.null(seqQTN.save)) && theLoop > 1) {
+            if (!(0 %in% seqQTN.save || -1 %in% seqQTN.save) && !is.null(seqQTN)) {
+                # Force previous QTNs in the model
+                seqQTN <- union(seqQTN, seqQTN.save)
             }
-            if(theLoop!=1){
-                seqQTN.p=myPrior[seqQTN]
-                if(theLoop==2){
-                    index.p=seqQTN.p<QTN.threshold
-                    #if(!is.na(p.threshold)){
-                    #index.p=seqQTN.p<p.threshold
-                    #}
-                    seqQTN.p=seqQTN.p[index.p]
-                    seqQTN=seqQTN[index.p]
-                    seqQTN.p=seqQTN.p[!is.na(seqQTN)]
-                    seqQTN=seqQTN[!is.na(seqQTN)]
-                }else{
-                    index.p=seqQTN.p<QTN.threshold
-                    #if(!is.na(p.threshold)){
-                    #index.p=seqQTN.p<p.threshold
-                    #}
-                    index.p[seqQTN%in%seqQTN.save]=TRUE
-                    seqQTN.p=seqQTN.p[index.p]
-                    seqQTN=seqQTN[index.p]
-                    seqQTN.p=seqQTN.p[!is.na(seqQTN)]
-                    seqQTN=seqQTN[!is.na(seqQTN)]
-                }
+        }
+        
+        if (theLoop > 1) {
+            seqQTN.p <- myPrior[seqQTN]
+            index.p  <- seqQTN.p < QTN.threshold
+            if (theLoop > 2) {
+                index.p[seqQTN %in% seqQTN.save] = TRUE
             }
+            seqQTN.p <- seqQTN.p[index.p]
+            seqQTN   <- seqQTN[index.p]
+            seqQTN.p <- seqQTN.p[!is.na(seqQTN)]
+            seqQTN   <- seqQTN[!is.na(seqQTN)]
+        }
 
-            myRemove=FarmCPU.Remove(GD=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
-            
-            #Recoding QTNs history
-            seqQTN=myRemove$seqQTN
-            theConverge=length(intersect(seqQTN,seqQTN.save))/length(union(seqQTN,seqQTN.save))
-            circle=(length(union(seqQTN,seqQTN.pre))==length(intersect(seqQTN,seqQTN.pre)))
-            
-            #handler of initial status
-            if(is.null(seqQTN.pre)){circle=FALSE
-            }else{
-                if(seqQTN.pre[1]==0) circle=FALSE
-                if(seqQTN.pre[1]==-1) circle=FALSE
-            }
+        myRemove <- FarmCPU.Remove(
+            GDP = geno,
+            GM = map,
+            seqQTN = seqQTN,
+            seqQTN.p = seqQTN.p,
+            threshold = .7
+        )
+        
+        #Recoding QTNs history
+        n_intersect <- function(...) { length(intersect(...)) }
+        n_union <- function(...) { length(union(...)) }
+        
+        seqQTN <- myRemove$seqQTN
+        
+        theConverge <- 
+            n_intersect(seqQTN, seqQTN.save) / n_union(seqQTN, seqQTN.save)
+        
+        circle <- 
+            n_union(seqQTN, seqQTN.pre) == n_intersect(seqQTN, seqQTN.pre)
+        
+        #handler of initial status
+        if (is.null(seqQTN.pre) || seqQTN.pre[1] %in% c(0, -1)) {
+            circle <- FALSE
+        }
 
-            print("seqQTN")
-            print(seqQTN)
-            print("scanning...")
-            if(theLoop==maxLoop){
-                print(paste("Total number of possible QTNs in the model is: ", length(seqQTN),sep=""))
+        print("seqQTN")
+        print(seqQTN)
+        print("scanning...")
+        if (theLoop == maxLoop) {
+            print(paste(
+                "Total number of possible QTNs in the model is:",
+                length(seqQTN)
+            ))
+        }
+        
+        isDone <- ((theLoop >= maxLoop) | (theConverge >= converge) | circle )
+        
+        seqQTN.pre  <- seqQTN.save
+        seqQTN.save <- seqQTN
+        
+        #Step 3: Screen with bins
+        rm(myBin)
+        gc()
+        
+        theCV <- CV
+        if (!is.null(myRemove$bin)) {
+            if (length(myRemove$seqQTN) == 1) {
+                #myRemove$bin = as.matrix(myRemove$bin)
+                myRemove$bin <- t(myRemove$bin)
             }
-            
-            isDone=((theLoop>=maxLoop) | (theConverge>=converge) | circle )
-            
-            seqQTN.pre=seqQTN.save
-            seqQTN.save=seqQTN
-            
-            #Step 3: Screen with bins
-            rm(myBin)
-            gc()
-            
-            theCV=CV
-            
-            if(!is.null(myRemove$bin)){
-                if(length(myRemove$seqQTN) == 1){
-                    #myRemove$bin = as.matrix(myRemove$bin)
-                    myRemove$bin = t(myRemove$bin)
-                }
-                theCV=cbind(CV,myRemove$bin)
-            }
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc,bar=bar)
-            
-            #Step 4: Background unit substitution
-            if(!isDone){
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,],method=method.sub)
-            }else{
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,],method=method.sub.final)
-            }
-            P=myGLM$P[,ncol(myGLM$P)]
-            P[P==0] <- min(P[P!=0],na.rm=TRUE)*0.01
-            results = cbind(myGLM$B, P)
-            colnames(results) = c("effect","p")
-        } #end of while loop
-        #print("****************FarmCPU ACCOMPLISHED****************")
-        return(results)
-}#The MVP.FarmCPU function ends here
+            theCV <- cbind(CV, myRemove$bin)
+        }
+        myGLM <-
+            FarmCPU.LM(
+                y = phe[, 2],
+                GDP = geno,
+                w = theCV,
+                ncpus = ncpus,
+                npc = npc,
+                bar = bar
+            )
+        
+        #Step 4: Background unit substitution
+        theMethod <- ifelse(isDone, method.sub.final, method.sub)
+        mySUB <-
+            FarmCPU.SUB(
+                GM = map,
+                GLM = myGLM,
+                QTN = map[myRemove$seqQTN, ],
+                method = theMethod
+            )
+
+        P <- mySUB$P[, ncol(mySUB$P)]
+        P[P == 0] <- min(P[P != 0], na.rm = TRUE) * 0.01
+        
+        results <- cbind(myGLM$B, P)
+        colnames(results) <- c("effect","p")
+    } #end of while loop
+    #print("****************FarmCPU ACCOMPLISHED****************")
+    return(results)
+}# The MVP.FarmCPU function ends here
 
 
 #' FarmCPU.FaSTLMM.LL
@@ -236,7 +252,7 @@
 #'  
 #' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
 #' 
-#' @param pheno a two-column phenotype matrix
+#' @param pheno a one-column phenotype matrix
 #' @param snp.pool matrix for pseudo QTNs
 #' @param X0 covariates matrix
 #' @param ncpus number of threads used for parallel computation
@@ -249,146 +265,132 @@
 #' Output: ve - residual variance
 #' 
 #' @export
-`FarmCPU.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
-    y=pheno
-    p=0
-    deltaExpStart = -5
-    deltaExpEnd = 5
-    snp.pool=snp.pool[,]
-    if(!is.null(snp.pool)&&var(snp.pool)==0){
-        deltaExpStart = 100
-        deltaExpEnd = deltaExpStart
+`FarmCPU.FaSTLMM.LL` <- function(y, snp.pool, X0=NULL, ncpus=2){
+    p <- 0
+    deltaExpStart <- -5
+    deltaExpEnd <- 5
+    snp.pool <- as.matrix(snp.pool)
+    if (!is.null(snp.pool) && var(snp.pool) == 0) {
+        deltaExpStart <- 100
+        deltaExpEnd <- deltaExpStart
     }
-    if(is.null(X0)) {
-        X0 = matrix(1, nrow(snp.pool), 1)
+    if (is.null(X0)) {
+        X0 <- matrix(1, nrow(snp.pool), 1)
     }
-    X=X0
+    X <- X0
     #########SVD of X
     K.X.svd <- svd(snp.pool)
-    d=K.X.svd$d
-    d=d[d>1e-08]
-    d=d^2
-    U1=K.X.svd$u
-    U1=U1[,1:length(d)]
+    d <- K.X.svd$d
+    d <- d[d > 1e-08]
+    d <- d^2
+    U1 <- K.X.svd$u
+    U1 <- U1[,seq_len(length(d))]
     #handler of single snp
-    if(is.null(dim(U1))) U1=matrix(U1,ncol=1)
-    n=nrow(U1)
-    U1TX=crossprod(U1,X)
-    U1TY=crossprod(U1,y)
-    yU1TY <- y-U1%*%U1TY
-    XU1TX<- X-U1%*%U1TX
-    IU = -tcrossprod(U1)
-    diag(IU) = rep(1,n) + diag(IU)
-    IUX=crossprod(IU,X)
-    IUY=crossprod(IU,y)
+    if (is.null(dim(U1)))
+        U1 <- matrix(U1,ncol=1)
+    n <- nrow(U1)
+    U1TX <- crossprod(U1,X)
+    U1TY <- crossprod(U1,y)
+    yU1TY <- y - U1 %*% U1TY
+    XU1TX <- X - U1 %*% U1TX
+    IU <- -tcrossprod(U1)
+    diag(IU) <- rep(1,n) + diag(IU)
+    IUX <- crossprod(IU,X)
+    IUY <- crossprod(IU,y)
     #Iteration on the range of delta (-5 to 5 in glog scale)
-    delta.range <- seq(deltaExpStart,deltaExpEnd,by=0.1)
+    delta.range <- seq(deltaExpStart, deltaExpEnd, by = 0.1)
     m <- length(delta.range)
     #for (m in seq(deltaExpStart,deltaExpEnd,by=0.1)){
-    beta.optimize.parallel <- function(ii){
+    beta.optimize.parallel <- function(ii) {
         #p=p+1
         delta <- exp(delta.range[ii])
+        sum.list <- function(x) {
+            r <- 0
+            for (i in seq_len(length(x)))
+                r <- r + x[[i]]
+            return(r)
+        }
         #----------------------------calculate beta-------------------------------------
         #######get beta1
-        beta1=0
-        for(i in 1:length(d)){
-            one=matrix(U1TX[i,], nrow=1)
-            beta=crossprod(one,(one/(d[i]+delta)))  #This is not real beta, confusing
-            beta1= beta1+beta
-        }
-        
+        beta1 <- sum.list(lapply(
+            seq_len(length(d)), 
+            function(i) { tcrossprod(U1TX[i,], (U1TX[i,]/(d[i] + delta))) }
+        ))
+
         #######get beta2
-        beta2=0
-        for(i in 1:nrow(U1)){
-            one=matrix(IUX[i,], nrow=1)
-            beta = crossprod(one)
-            beta2= beta2+beta
-        }
-        beta2<-beta2/delta
-        
+        beta2 <- sum.list(lapply(
+            seq_len(nrow(U1)), 
+            function(i) { tcrossprod(IUX[i,]) }
+        ))
+        beta2 <- beta2 / delta
+
         #######get beta3
-        beta3=0
-        for(i in 1:length(d)){
-            one1=matrix(U1TX[i,], nrow=1)
-            one2=matrix(U1TY[i,], nrow=1)
-            beta=crossprod(one1,(one2/(d[i]+delta)))
-            beta3= beta3+beta
-        }
-        
+        beta3 <- sum.list(lapply(
+            seq_len(length(d)),
+            function(i) {
+                tcrossprod(U1TX[i, ], (U1TY[i, ] / (d[i] + delta)))
+            }
+        ))
+
         ###########get beta4
-        beta4=0
-        for(i in 1:nrow(U1)){
-            one1=matrix(IUX[i,], nrow=1)
-            one2=matrix(IUY[i,], nrow=1)
-            beta=crossprod(one1,one2)
-            beta4= beta4+beta
-        }
-        beta4<-beta4/delta
-        
+        beta4 <- sum.list(lapply(
+            seq_len(nrow(U1)),
+            function(i) { tcrossprod(IUX[i, ], IUY[i, ]) }
+        ))
+        beta4 <- beta4 / delta
+
         #######get final beta
-        zw1 <- ginv(beta1+beta2)
-        #zw1 <- try(solve(beta1+beta2))
-        #if(inherits(zw1, "try-error")){
-        #zw1 <- ginv(beta1+beta2)
-        #}
-        
-        zw2=(beta3+beta4)
-        beta=crossprod(zw1,zw2)
+        zw1 <- ginv(beta1 + beta2)
+        zw2 <- beta3 + beta4
+        beta <- crossprod(zw1,zw2)
         
         #----------------------------calculate LL---------------------------------------
         ####part 1
-        part11<-n*log(2*3.14)
-        part12<-0
-        for(i in 1:length(d)){
-            part12_pre=log(d[i]+delta)
-            part12= part12+part12_pre
+        part11 <- n * log(2 * base::pi)
+        part12 <- 0
+        for (i in seq_len(length(d))) {
+            part12_pre <- log(d[i] + delta)
+            part12 <- part12 + part12_pre
         }
-        part13<- (nrow(U1)-length(d))*log(delta)
-        part1<- -1/2*(part11+part12+part13)
+        part13 <- (nrow(U1) - length(d)) * log(delta)
+        part1 <- -1 / 2 * (part11 + part12 + part13)
         
         ######  part2
-        part21<-nrow(U1)
+        part21 <- nrow(U1)
         ######part221
         
-        part221=0
-        for(i in 1:length(d)){
-            one1=U1TX[i,]
-            one2=U1TY[i,]
-            part221_pre=(one2-one1%*%beta)^2/(d[i]+delta)
-            part221 = part221+part221_pre
+        part221 = 0
+        for (i in seq_len(length(d))) {
+            one1 = U1TX[i,]
+            one2 = U1TY[i,]
+            part221_pre = (one2 - one1 %*% beta) ^ 2 / (d[i] + delta)
+            part221 = part221 + part221_pre
         }
         
-        part222=0
-        for(i in 1:n){
-            one1=XU1TX[i,]
-            one2=yU1TY[i,]
-            part222_pre=((one2-one1%*%beta)^2)/delta
-            part222= part222+part222_pre
+        part222 = 0
+        for (i in seq_len(n)) {
+            one1 = XU1TX[i, ]
+            one2 = yU1TY[i, ]
+            part222_pre = ((one2 - one1 %*% beta) ^ 2) / delta
+            part222 = part222 + part222_pre
         }
-        part22<-n*log((1/n)*(part221+part222))
-        part2<- -1/2*(part21+part22)
+        part22 <- n * log((1 / n) * (part221 + part222))
+        part2 <- -1 / 2 * (part21 + part22)
         
         ################# likihood
-        LL<-part1+part2
-        part1<-0
-        part2<-0
+        LL <- part1 + part2
+        part1 <- 0
+        part2 <- 0
         
-        return(list(beta=beta,delta=delta,LL=LL))
+        return(list(beta = beta, delta = delta, LL = LL))
     }
     #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
-    R.ver <- Sys.info()[['sysname']]
-    if(R.ver == 'Linux') {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        try(setMKLthreads(1), silent=TRUE)
-    }
+
+    mkl_env({
+        llresults <- mclapply(seq_len(m), beta.optimize.parallel, mc.cores=ncpus)
+    })
     
-    llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
-    
-    if(R.ver == 'Linux') {
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }
-    
-    for(i in 1:m){
+    for(i in seq_len(m)){
         if(i == 1){
             beta.save = llresults[[i]]$beta
             delta.save = llresults[[i]]$delta
@@ -409,7 +411,7 @@
     #--------------------calculating Va and Vem-------------------------------------
     #sigma_a1
     sigma_a1=0
-    for(i in 1:length(d)){
+    for(i in seq_len(length(d))){
         one1=matrix(U1TX[i,], ncol=1)
         one2=matrix(U1TY[i,], nrow=1)
         #sigma_a1_pre=(one2-one1%*%beta)^2/(d[i]+delta)
@@ -420,7 +422,7 @@
     ### sigma_a2
     sigma_a2=0
     
-    for(i in 1:nrow(U1)){
+    for(i in seq_len(nrow(U1))){
         one1=matrix(IUX[i,], ncol=1)
         one2=matrix(IUY[i,], nrow=1)
         #sigma_a2_pre<-(one2-one1%*%beta)^2
@@ -462,7 +464,8 @@
 #'
 #' @keywords internal
 FarmCPU.BIN <-
-    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
+    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", 
+             b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
         #print("FarmCPU.BIN Started")
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -521,7 +524,7 @@ FarmCPU.BIN <-
                     mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                     seqQTN=which(mySpecify$index==TRUE)
                     GK=t(GDP[seqQTN,])
-                    myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
+                    myBurger=FarmCPU.Burger(Y=Y, CV=CV, GK=GK, ncpus=ncpus, method=method)
                     myREML=myBurger$REMLs
                     myVG=myBurger$vg #it is unused
                     myVE=myBurger$ve #it is unused
@@ -551,45 +554,50 @@ FarmCPU.BIN <-
         
         #Method of optimum: EMMA
         #============================Optimize by EMMA============================================
-        if(method=="EMMA"&optimumable){
+        if(method == "EMMA" & optimumable) {
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             print("Optimizing Pseudo QTNs...")
-            m <- length(b)*length(s)
-            inc.index = rep(c(1:length(s)), length(b))
+            m <- length(b) * length(s)
+            inc.index = rep(seq_len(length(s)), length(b))
             
-            seqQTN.optimize.parallel <- function(ii){
-                bin.index = floor((ii-0.1)/length(s)) + 1
-                bin = b[bin.index]
-                inc = s[inc.index[ii]]
-                GP=cbind(GM,P,NA,NA,NA)
-                mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
-                seqQTN=which(mySpecify$index==TRUE)
-                GK=t(GDP[seqQTN,])
-                myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
-                myREML=myBurger$REMLs
-                myVG=myBurger$vg #it is unused
-                myVE=myBurger$ve #it is unused
-                print(c(bin,inc,myREML,myVG,myVE))
-                return(list(seqQTN=seqQTN,myREML=myREML))
+            seqQTN.optimize.parallel <- function(ii) {
+                bin.index <- floor((ii - 0.1) / length(s)) + 1
+                bin <- b[bin.index]
+                inc <- s[inc.index[ii]]
+                GP  <- cbind(GM, P, NA, NA, NA)
+                
+                mySpecify <- FarmCPU.Specify(
+                    GI = GM,
+                    GP = GP,
+                    bin.size = bin,
+                    inclosure.size = inc
+                )
+                
+                GK <- t(GDP[mySpecify$index, ])
+                myBurger <- FarmCPU.Burger(
+                    Y = Y,
+                    CV = CV,
+                    GK = GK,
+                    ncpus = ncpus,
+                    method = method
+                )
+                
+                seqQTN <- which(mySpecify$index == TRUE)
+                myREML <- myBurger$REMLs
+                return(list(seqQTN = seqQTN, myREML = myREML))
             }
             
-            R.ver <- Sys.info()[['sysname']]
-            if(R.ver == 'Linux') {
-                math.cpu <- try(getMKLthreads(), silent=TRUE)
-                try(setMKLthreads(1), silent=TRUE)
-            }
+            mkl_env({
+                llresults <- mclapply(seq_len(m), seqQTN.optimize.parallel, mc.cores = ncpus)
+            })
             
-            llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
-            
-            if(R.ver == 'Linux') {
-                try(setMKLthreads(math.cpu), silent=TRUE)
-            }
-            
-            for(i in 1:m){
+            for(i in seq_len(m)){
                 if(i == 1){
                     seqQTN.save = llresults[[i]]$seqQTN
                     myREML.save = llresults[[i]]$myREML
                 }else{
+                    print("myREML.save")
+                    print(length(myREML.save))
                     if(llresults[[i]]$myREML < myREML.save){
                         seqQTN.save = llresults[[i]]$seqQTN
                         myREML.save = llresults[[i]]$myREML
@@ -597,45 +605,6 @@ FarmCPU.BIN <-
                 }
             }
         }
-        
-        #Method of optimum: GEMMA
-        #can not be used to provide REML
-        #============================Optimize by EMMA============================================
-        if(method=="GEMMA"&optimumable){
-            #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            print("Optimizing Pseudo QTNs...")
-            m <- length(b)*length(s)
-            
-            seqQTN.optimize.parallel <- function(ii){
-                bin = floor((ii-0.1)/length(s)) + 1
-                inc = rep(c(1:length(s)), length(b))
-                GP=cbind(GM,P,NA,NA,NA)
-                mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
-                seqQTN=which(mySpecify$index==TRUE)
-                GK=t(GDP[seqQTN,])
-                myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
-                myREML=myBurger$REMLs
-                myVG=myBurger$vg #it is unused
-                myVE=myBurger$ve #it is unused
-                print(c(bin,inc,myREML,myVG,myVE))
-                return(list(seqQTN=seqQTN,myREML=myREML))
-            }
-            
-            llresults <- mclapply(1:m, seqQTN.optimize.parallel, mc.cores=ncpus)
-            
-            for(i in 1:m){
-                if(i == 1){
-                    seqQTN.save = llresults[[i]]$seqQTN
-                    myREML.save = llresults[[i]]$myREML
-                }else{
-                    if(llresults[[i]]$myREML < myREML.save){
-                        seqQTN.save = llresults[[i]]$seqQTN
-                        myREML.save = llresults[[i]]$myREML
-                    }
-                }
-            }
-        }
-        
         return(list(seqQTN=seqQTN.save))
     }#The function FarmCPU.BIN ends here
 
@@ -659,57 +628,64 @@ FarmCPU.BIN <-
 #'
 #' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not
 FarmCPU.Specify <-
-    function(GI=NULL, GP=NULL, bin.size=10000000, inclosure.size=NULL, MaxBP=1e10){
-        #print("Specification in process...")
-        if(is.null(GP))return (list(index=NULL,BP=NULL))
+    function(GI=NULL, GP=NULL, bin.size=1e7, inclosure.size=NULL, MaxBP=1e10){
+        if (is.null(GP))
+            return(list(index = NULL, BP = NULL))
         
-        #set inclosure bin in GP
-        #Create SNP ID: position+CHR*MaxBP
-        ID.GP=as.numeric(as.vector(GP[,3]))+as.numeric(as.vector(GP[,2]))*MaxBP
+        chr  <- as.numeric(as.vector(GP[, 2]))
+        pos  <- as.numeric(as.vector(GP[, 3]))
+        pval <- as.numeric(as.vector(GP[, 4]))
         
-        #Creat bin ID
-        bin.GP=floor(ID.GP/bin.size )
+        # set inclosure bin in GP
+        # Create SNP ID: position+CHR*MaxBP
+        ID.GP <- pos + chr * MaxBP
         
-        #Create a table with bin ID, SNP ID and p value (set 2nd and 3rd NA temporately)
-        binP=as.matrix(cbind(bin.GP,NA,NA,ID.GP,as.numeric(as.vector(GP[,4])))  )
-        n=nrow(binP)
+        # Creat bin ID
+        bin.GP <- floor(ID.GP/bin.size)
         
-        #Sort the table by p value and then bin ID (e.g. sort p within bin ID)
-        binP=binP[order(as.numeric(as.vector(binP[,5]))),]  #sort on P alue
-        binP=binP[order(as.numeric(as.vector(binP[,1]))),]  #sort on bin
+        # Create a table with bin ID, SNP ID and p value 
+        # set 2nd and 3rd NA temporately
+        binP <- as.matrix(cbind(bin.GP, NA, NA, ID.GP, pval))
+        n <- nrow(binP)
         
-        #set indicator (use 2nd 3rd columns)
-        binP[2:n,2]=binP[1:(n-1),1]
-        binP[1,2]=0 #set the first
-        binP[,3]= binP[,1]-binP[,2]
+        # Sort the table by p value and then bin ID (e.g. sort p within bin ID)
+        binP <- binP[order(as.numeric(as.vector(binP[,5]))),]  #sort on P alue
+        binP <- binP[order(as.numeric(as.vector(binP[,1]))),]  #sort on bin
         
-        #Se representives of bins
-        ID.GP=binP[binP[,3]>0,]
+        # set indicator (use 2nd 3rd columns)
+        index <- c(2:n)
+        binP[index, 2] <- binP[index - 1, 1]
+        binP[1, 2] <- 0 # set the first
+        binP[, 3]  <- binP[,1] - binP[,2]
         
-        #Choose the most influencial bins as estimated QTNs
-        #Handler of single row
-        if(is.null(dim(ID.GP))) ID.GP=matrix(ID.GP,1,length(ID.GP))
-        ID.GP=ID.GP[order(as.numeric(as.vector(ID.GP[,5]))),]  #sort on P alue
+        # Set representives of bins
+        # column: SNP name, chr, pos, P, MAF, N, effect
+        ID.GP <- binP[binP[, 3] > 0,]
         
-        #Handler of single row (again after reshape)
-        if(is.null(dim(ID.GP))) ID.GP=matrix(ID.GP,1,length(ID.GP))
+        # Choose the most influencial bins as estimated QTNs
+        # Handler of single row
+        if (is.null(dim(ID.GP)))
+            ID.GP <- matrix(ID.GP,1,length(ID.GP))
+        ID.GP <- ID.GP[order(as.numeric(as.vector(ID.GP[,5]))),]  #sort on P alue
         
-        index=!is.na(ID.GP[,4])
-        ID.GP=ID.GP[index,4] #must have chr and bp information, keep SNP ID only
+        # Handler of single row (again after reshape)
+        if (is.null(dim(ID.GP)))
+            ID.GP <- matrix(ID.GP, nrow = 1)
         
-        if(!is.null(inclosure.size)   ) {
-            if(!any(is.na(inclosure.size))){
-                avaiable=min(inclosure.size,length(ID.GP))
-                if(avaiable==0){
-                    ID.GP=-1
-                }else{
-                    ID.GP=ID.GP[1:avaiable] #keep the top ones selected
-                }
+        index <- !is.na(ID.GP[, 4])
+        ID.GP <- ID.GP[index, 4] # must have chr and bp information, keep SNP ID only
+        
+        if (!is.null(inclosure.size) && !any(is.na(inclosure.size))) {
+            avaiable <- min(inclosure.size, length(ID.GP))
+            if (avaiable == 0) {
+                ID.GP = -1
+            } else {
+                ID.GP = ID.GP[seq_len(avaiable)] #keep the top ones selected
             }
         }
         
         #create index in GI
-        theIndex=NULL
+        theIndex <- NULL
         if(!is.null(GI)){
             ID.GI=as.numeric(as.vector(GI[,3]))+as.numeric(as.vector(GI[,2]))*MaxBP
             theIndex=ID.GI %in% ID.GP
@@ -794,7 +770,7 @@ FarmCPU.LM <-
         
         if(npc!=0){
             betapc = beta[2:(npc+1)]
-            betapred = beta[-c(1:(npc+1))]
+            betapred = beta[-seq_len(npc+1)]
         }else{
             betapc = NULL
             betapred = beta[-1]
@@ -822,10 +798,12 @@ FarmCPU.LM <-
             iXX11 <- wwi + as.numeric(invB22) * crossprod(B21)
             
             #Derive inverse of LHS with partationed matrix
-            iXX[1:q0,1:q0]=iXX11
-            iXX[q1,q1]=invB22
-            iXX[q1,1:q0]=NeginvB22B21
-            iXX[1:q0,q1]=NeginvB22B21
+            i1 = seq_len(q0)
+            i2 = q1
+            iXX[i1, i1] = iXX11
+            iXX[i2, i2] = invB22
+            iXX[i2, i1] = NeginvB22B21
+            iXX[i1, i2] = NeginvB22B21
             
             #statistics
             rhs=c(wy,xy) #the size varied automaticly by A/AD model and validated d
@@ -838,17 +816,19 @@ FarmCPU.LM <-
             tvalue=beta/se
             pvalue <- 2 * pt(abs(tvalue), df,lower.tail = FALSE)
             
-            #Handler of dependency between  marker are covariate
+            # Handler of dependency between marker are covariate
             if(!is.na(abs(B22[1,1]))){
-                if(abs(B22[1,1])<10e-8)pvalue[]=NA
+                if(abs(B22[1,1])<10e-8)
+                    pvalue[]=NA
             }
             B = beta[length(beta)]
             P = pvalue[-1]
             return(list(B=B, P=P))
         }
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.farmcpu.parallel)
-        if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
+        results <- lapply(seq_len(m), eff.farmcpu.parallel)
+        if(is.list(results))
+            results <- matrix(unlist(results), m, byrow=TRUE)
         return(list(P=results[,-1], betapred=betapred, B=results[,1]))
     } #end of FarmCPU.LM function
 
@@ -874,57 +854,62 @@ FarmCPU.LM <-
 #' 
 #' @keywords internal
 FarmCPU.Burger <-
-    function(Y=NULL,CV=NULL,GK=NULL,ncpus=2, method="FaST-LMM"){
-        if(!is.null(CV)){
-            CV=as.matrix(CV)#change CV to a matrix when it is a vector
-            theCV=as.matrix(cbind(matrix(1,nrow(CV),1),CV))
-        }else{
-            theCV=matrix(1,nrow(Y),1)
+    function(Y = NULL, CV = NULL, GK = NULL, ncpus = 2, method="FaST-LMM"){
+        theCV <- matrix(1, nrow(Y))
+        if (!is.null(CV)) {
+            theCV <- as.matrix(cbind(theCV, as.matrix(CV)))
         }
         
-        #handler of single column GK
-        n=nrow(GK)
-        m=ncol(GK)
-        if(m>2){
-            theGK=as.matrix(GK)#GK is pure genotype matrix
-        }else{
-            theGK=matrix(GK,n,1)
+        # handler of single column GK
+        n <- nrow(GK)
+        m <- ncol(GK)
+        if (m > 2) {
+            theGK <- as.matrix(GK) # GK is pure genotype matrix
+        } else {
+            theGK <- matrix(GK, ncol = 1)
         }
         
-        if(method=="FaST-LMM"){
-            myFaSTREML=FarmCPU.FaSTLMM.LL(pheno=matrix(Y[,-1],nrow(Y),1), snp.pool=theGK, X0=theCV, ncpus=ncpus)
-            REMLs=-2*myFaSTREML$LL
-            delta=myFaSTREML$delta
-            vg=myFaSTREML$vg
-            ve=myFaSTREML$ve
-        }
+        pheno <- matrix(Y[, 2], ncol = 1)
+        switch(method,
+               "FaST-LMM" = {
+                   myREML <- FarmCPU.FaSTLMM.LL(
+                       y = pheno,
+                       snp.pool = theGK,
+                       X0 = theCV,
+                       ncpus = ncpus
+                   )
+               },
+               "EMMA" = {
+                   K <- MVP.K.VanRaden(M = t(theGK), priority = "speed")
+                   myREML <- MVP.EMMA.Vg.Ve(y = pheno, X = theCV, K = K)
+               })
         
-        if(method=="EMMA"){
-            theGK <- t(theGK)
-            K <- MVP.K.VanRaden(M=theGK, priority="speed")
-            myEMMAREML <- MVP.EMMA.Vg.Ve(y=matrix(Y[,-1],nrow(Y),1), X=theCV, K=K)
-            REMLs=-2*myEMMAREML$REML
-            delta=myEMMAREML$delta
-            vg=myEMMAREML$vg
-            ve=myEMMAREML$ve
-        }
+        REMLs <- -2 * myREML$REML
+        delta <- myREML$delta
+        vg <- myREML$vg
+        ve <- myREML$ve
         
         #print("FarmCPU.Burger succeed!")
-        return (list(REMLs=REMLs, vg=vg, ve=ve, delta=delta))
+        return(list(REMLs = REMLs, vg = vg, ve = ve, delta = delta))
     } #end of FarmCPU.Burger
 
 
 #' FarmCPU.SUB
 #'
 #' Last update: Febuary 26, 2013
-#' Requirement: P has row name of SNP. s<=t. covariates of QTNs are next to SNP
+#' Requirement: 
+#'   P has row name of SNP. 
+#'   s<=t. 
+#'   covariates of QTNs are next to SNP
 #'
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
-#' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
+#' @param GM SNP map information, m by 3 matrix, m is marker size, 
+#'   the three columns are SNP_ID, Chr, and Pos
 #' @param GLM FarmCPU.GLM object
 #' @param QTN s by 3  matrix for SNP name, chromosome and BP
-#' @param method options are "penalty", "reward","mean","median",and "onsite"
+#' @param method options are "penalty", "reward", "mean", "median",
+#'   and "onsite"
 #'
 #' @return 
 #' Output: GLM$P - Updated p-values by substitution process
@@ -1024,7 +1009,7 @@ FarmCPU.Remove <-
         
         
         #index=sample(s,sampled)
-        index=1:sampled
+        index=seq_len(sampled)
         
         #This section has problem of turning big.matrix to R matrix
         #It is OK as x is small
@@ -1053,7 +1038,7 @@ FarmCPU.Remove <-
         
         #This section has problem of turning big.matrix to R matrix
         if(is.big.matrix(GDP)){
-            bin=t(as.matrix(deepcopy(GDP,rows=seqQTN,) ))
+            bin=t(as.matrix(deepcopy(GDP,rows=seqQTN)))
         }else{
             bin=t(GDP[seqQTN,] )
         }

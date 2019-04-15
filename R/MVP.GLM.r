@@ -45,26 +45,23 @@
 #' str(glm)
 MVP.GLM <-
 function(phe, geno, CV=NULL, cpu=2, bar=TRUE){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
+
     taxa <- colnames(phe)[2]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
     
     ys <- as.numeric(as.matrix(phe[,2]))
     
-    if(is.null(CV)){
+    if (is.null(CV)) {
         X0 <- matrix(1, n)
-    }else{
+    } else {
         X0 <- cbind(matrix(1, n), CV)
     }
     
     q0 <- ncol(X0)
-    iXX <- matrix(NA,q0+1,q0+1)
-    Xt <- matrix(NA,n, q0+1)
+    iXX <- matrix(NA, q0 + 1, q0 + 1)
+    Xt <- matrix(NA, n, q0 + 1)
 
     y <- matrix(ys)
     X0X0 <- crossprod(X0)
@@ -77,76 +74,77 @@ function(phe, geno, CV=NULL, cpu=2, bar=TRUE){
 
     #parallel function for GLM model
     eff.glm <- function(i){
-        if(bar) print.f(i)
-        # if(i%%1000==0){
-            # print(paste("****************", i, "****************",sep=""))
-        # }
-        #if(cpu>1 & r.open){
-        #setMKLthreads(math.cpu)
-        #}
+        if (bar) {
+            print.f(i)
+        }
 
         SNP <- geno[i, ]
         #Process the edge (marker effects)
-            sy <- crossprod(SNP,y)
-            ss <- crossprod(SNP)
-            xs <- crossprod(X0,SNP)
-            
-            B21 <- crossprod(xs, X0X0i)
-            t2 <- B21 %*% xs
-            B22 <- ss - t2
-            invB22 <- 1/B22
-            NeginvB22B21 <- crossprod(-invB22,B21)
-            B21B21 <- crossprod(B21)
-            iXX11 <- X0X0i + as.numeric(invB22) * B21B21
-            
-            #Derive inverse of LHS with partationed matrix
-            iXX[1:q0,1:q0] <- iXX11
-            iXX[(q0+1),(q0+1)] <- invB22
-            iXX[(q0+1),1:q0] <- NeginvB22B21
-            iXX[1:q0,(q0+1)] <- NeginvB22B21
-            df <- n-q0-1
-            rhs <- c(X0Y,sy)
-            effect <- crossprod(iXX,rhs)
-            ve <- (YY-crossprod(effect,rhs))/df
-            effect <- effect[q0+1]
-            t.value <- effect/sqrt(iXX[q0+1, q0+1] * ve)
-            p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
-        return(list(effect=effect, p=p))
+        sy <- crossprod(SNP,y)
+        ss <- crossprod(SNP)
+        xs <- crossprod(X0,SNP)
+        
+        B21 <- crossprod(xs, X0X0i)
+        t2 <- B21 %*% xs
+        B22 <- ss - t2
+        invB22 <- 1/B22
+        NeginvB22B21 <- crossprod(-invB22,B21)
+        B21B21 <- crossprod(B21)
+        iXX11 <- X0X0i + as.numeric(invB22) * B21B21
+        
+        #Derive inverse of LHS with partationed matrix
+        i1 = seq_len(q0)
+        i2 = q0 + 1
+        iXX[i1, i1] = iXX11
+        iXX[i2, i2] = invB22
+        iXX[i2, i1] = NeginvB22B21
+        iXX[i1, i2] = NeginvB22B21
+        
+        df  <- n - i2
+        rhs <- c(X0Y,sy)
+        effect <- crossprod(iXX,rhs)
+        ve <- (YY - crossprod(effect, rhs)) / df
+        effect <- effect[i2]
+        t.value <- effect/sqrt(invB22 * ve)
+        p <- 2 * pt(abs(t.value), df, lower.tail = FALSE)
+        return(list(effect = effect, p = p))
     }
     
-    if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.glm)
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-        if(wind){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+    if (cpu == 1) {
+        print.f <- function(i) {
+            print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+        }
+
+        math.cpu <- try(RevoUtilsMath::getMKLthreads(), silent = TRUE)
+        mkl_env({
+            results <- lapply(seq_len(m), eff.glm)
+        }, threads = min(2^(n %/% 1000), math.cpu))
+        
+    } else {
+        if (Sys.info()[['sysname']] == 'Windows') {
+            print.f <- function(i) {
+                print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+            }
             cl <- makeCluster(getOption("cl.cores", cpu))
-            clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
+            clusterExport(cl, varlist = c("geno", "ys", "X0"), envir = environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.glm)
+            results <- parLapply(cl, seq_len(m), eff.glm)
             stopCluster(cl)
-        }else{
+        } else {
             tmpf.name <- tempfile()
             tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
             writeBin(0, tmpf)
             print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            R.ver <- Sys.info()[['sysname']]
-            if(R.ver == 'Linux') {
-                math.cpu <- try(getMKLthreads(), silent=TRUE)
-                try(setMKLthreads(1), silent=TRUE)
-            }
-            results <- mclapply(1:m, eff.glm, mc.cores=cpu)
-            close(tmpf); unlink(tmpf.name); cat('\n');
-            if(R.ver == 'Linux') {
-                try(setMKLthreads(math.cpu), silent=TRUE)
-            }
+            mkl_env({
+                results <- mclapply(seq_len(m), eff.glm, mc.cores = cpu)
+            })
+            close(tmpf)
+            unlink(tmpf.name)
+            message()
         }
     }
-    if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-    #print("****************GLM ACCOMPLISHED****************")
+    if (is.list(results)) {
+        results <- matrix(unlist(results), m, byrow = TRUE)
+    }
     return(results)
 }#end of MVP.GLM function

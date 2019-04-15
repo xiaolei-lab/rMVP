@@ -15,23 +15,25 @@
 // limitations under the License.
 
 
+// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::plugins(openmp)]]
+// [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(bigmemory)]]
+// [[Rcpp::depends(RcppProgress)]]
+
 #include <omp.h>
+// #include <zlib.h>
 #include <Rcpp.h>
+#include <fstream>
+#include <iostream>
+#include <progress.hpp>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
-#include <progress.hpp>
-#include <fstream>
+#include <bigmemory/isna.hpp>
+#include <bigmemory/MatrixAccessor.hpp>
 
 using namespace std;
 using namespace Rcpp;
-
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(BH, bigmemory)]]
-// [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppProgress)]]
-
-#include <bigmemory/isna.hpp>
-#include <bigmemory/MatrixAccessor.hpp>
 
 
 // *** Utility ***
@@ -51,10 +53,15 @@ int omp_setup(int threads=0, bool verbose=true) {
     }
 #else
     if (verbose) {
-        Rcerr << "Number of threads: 1 (No OpneMP detected)" << endl;
+        Rcerr << "Number of threads: 1 (No OpenMP detected)" << endl;
     }
 #endif
     return t;
+}
+
+bool end_with(string s, string suffix) {
+    return (s.length() > suffix.length() && 
+            0 == s.compare(s.length() - suffix.length(), s.length(), suffix));
 }
 
 
@@ -62,9 +69,21 @@ int omp_setup(int threads=0, bool verbose=true) {
 
 // [[Rcpp::export]]
 List vcf_parser_map(std::string vcf_file, std::string out) {
+    // open file
+    ifstream file(vcf_file);
+    // TODO: GZVCF
+    // boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+    // if (end_with(vcf_file, ".vcf")) {
+    //     file_.open(vcf_file);
+    // } else if (end_with(vcf_file, ".gz")) {
+    //     file_.open(vcf_file, std::ios_base::in | std::ios_base::binary);
+    //     inbuf.push(boost::iostreams::gzip_decompressor());
+    // }
+    // inbuf.push(file_);
+    // istream file(&inbuf);
+    
     // Define
     const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
-    ifstream file(vcf_file);
     ofstream map(out + ".map");
     ofstream indfile(out + ".geno.ind");
     
@@ -133,9 +152,20 @@ T vcf_marker_parser(string m, double NA_C) {
 
 template <typename T>
 void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
-    // define
+    // open file
     ifstream file(vcf_file);
+    // TODO: GZVCF
+    // boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+    // if (end_with(vcf_file, ".vcf")) {
+    //     file_.open(vcf_file);
+    // } else if (end_with(vcf_file, ".gz")) {
+    //     file_.open(vcf_file, std::ios_base::in | std::ios_base::binary);
+    //     inbuf.push(boost::iostreams::gzip_decompressor());
+    // }
+    // inbuf.push(file_);
+    // istream file(&inbuf);
     
+    // define
     omp_setup(threads, verbose);
     string line;
     vector<string> l;
@@ -195,6 +225,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
         m += buffer.size();
     }
+    file.close();
 }
 
 // [[Rcpp::export]]
@@ -306,10 +337,11 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
 }
 
 template <typename T>
-void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double NA_C, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // define
     ifstream file(hmp_file);
     
+    omp_setup(threads, verbose);
     string line;
     char major;
     vector<string> l;
@@ -337,41 +369,54 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, double N
     
     // parser genotype
     m = 0;
-    while (getline(file, line)) {
-        boost::split(l, line, boost::is_any_of("\t"));
-        major = l[1][0];
-        if (l[1].length() > 3) {
-            major = 'N';
+    vector<string> buffer;
+    while (file) {
+        buffer.clear();
+        for (int i = 0; file && (maxLine <= 0 || i < maxLine); i++) {
+            getline(file, line);
+            if (line.length() > 1) {    // Handling the blank line at the end of the file.
+                buffer.push_back(line);
+            }
         }
-        vector<string>(l.begin() + 11, l.end()).swap(l);
-        markers.clear();
-        transform(
-            l.begin(),
-            l.end(),
-            back_inserter(markers),
-            boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
-        );
-        for (size_t i = 0; i < markers.size(); i++) {
-            mat[i][m] = markers[i];
+        #pragma omp parallel for private(l, markers)
+        for (int i = 0; i < buffer.size(); i++) {
+            boost::split(l, buffer[i], boost::is_any_of("\t"));
+            major = l[1][0];
+            if (l[1].length() > 3) {
+                major = 'N';
+            }
+            vector<string>(l.begin() + 11, l.end()).swap(l);
+            markers.clear();
+            transform(
+                l.begin(),
+                l.end(),
+                back_inserter(markers),
+                boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
+            );
+            
+            for (int j = 0; j < markers.size(); j++) {
+                mat[j][m + i] = markers[j];
+            }
+            progress.increment();
         }
-        m++;
-        progress.increment();
+        m += buffer.size();
     }
+    file.close();
 }
 
 // [[Rcpp::export]]
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hapmap_parser_genotype<char>(hmp_file, xpMat, NA_CHAR, verbose);
+        return hapmap_parser_genotype<char>(hmp_file, xpMat, maxLine, NA_CHAR, threads, verbose);
     case 2:
-        return hapmap_parser_genotype<short>(hmp_file, xpMat, NA_SHORT, verbose);
+        return hapmap_parser_genotype<short>(hmp_file, xpMat, maxLine, NA_SHORT, threads, verbose);
     case 4:
-        return hapmap_parser_genotype<int>(hmp_file, xpMat, NA_INTEGER, verbose);
+        return hapmap_parser_genotype<int>(hmp_file, xpMat, maxLine, NA_INTEGER, threads, verbose);
     case 8:
-        return hapmap_parser_genotype<double>(hmp_file, xpMat, NA_REAL, verbose);
+        return hapmap_parser_genotype<double>(hmp_file, xpMat, maxLine, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -480,15 +525,15 @@ void write_bfile(SEXP pBigMat, std::string bed_file, int threads=0, bool verbose
 template <typename T>
 void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // check input
-    string ending = ".bed";
-    if (bed_file.length() <= ending.length() ||
-        0 != bed_file.compare(bed_file.length() - ending.length(), ending.length(), ending))
-        bed_file += ending;
+    if (!end_with(bed_file, ".bed")) {
+        bed_file += ".bed";
+    }
     
     // define
     omp_setup(threads, verbose);
-    long n = pMat->ncol() / 4;  // 4 individual = 1 bit
-    if (pMat->ncol() % 4 != 0) 
+    long ind = pMat->ncol();
+    long n = ind / 4;  // 4 individual = 1 bit
+    if (ind % 4 != 0) 
         n++; 
     char *buffer;
     long buffer_size;
@@ -521,20 +566,21 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     fread(buffer, 1, 3, fin);
     
     // loop file
-    #pragma omp parallel for
+    size_t r, c, cond;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fread(buffer, 1, buffer_size, fin);
         
-        size_t r, c;
         // i: current block start, j: current bit.
-        for (size_t j = 0; j < buffer_size && i * buffer_size + j < length - 3; j++) {
+        cond = min(buffer_size, length - 3 - i * buffer_size);
+        #pragma omp parallel for schedule(static)
+        for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
             r = (i * buffer_size + j) / n;
             c = (i * buffer_size + j) % n * 4;
             uint8_t p = buffer[j];
             
-            for (size_t x = 0; x < 4 && (c + x) < pMat->ncol(); x++) {
+            for (size_t x = 0; x < 4 && (c + x) < ind; x++) {
                 mat[c + x][r] = code[(p >> (2*x)) & 0x03];
             }
         }

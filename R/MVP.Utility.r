@@ -153,7 +153,7 @@ print_bar <- function(i,
 
 
 print_accomplished <- function(width = 60) {
-    cat(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+    message(make_line("MVP ACCOMPLISHED", width = width, linechar = '='))
 }
 
 #' Print R Package information, include title, short_title, logo, version, authors, contact
@@ -187,7 +187,9 @@ print_accomplished <- function(width = 60) {
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
     msg <- c()
     # width
-    if (is.null(width)) { width <- getOption('width') }
+    if (is.null(width))
+        width <- getOption('width')
+    
     # version
     if (is.null(version)) {
         if (getPackageName() == ".GlobalEnv") {
@@ -196,6 +198,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
             version <- as.character(packageVersion(getPackageName()))
         }
     }
+    
     # welcome
     if (is.null(welcome)) { 
         if (getPackageName() == ".GlobalEnv") {
@@ -204,15 +207,15 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
             welcome <- paste0("Welcome to ", getPackageName())
         }
     }
-    msg <- c(msg, make_line(welcome, line = linechar, width = width))
+    msg <- c(msg, make_line(welcome, linechar = linechar, width = width))
     # title
     if (!is.null(title)) {
         msg <- c(msg, rule_wrap(string = title, width = width, align = "center"))
     }
     
     # align logo
-    logo_width <- max(sapply(logo, nchar))
-    for (i in 1:length(logo)) {
+    logo_width <- max(vapply(logo, nchar, 60))
+    for (i in seq_len(length(logo))) {
         l <- paste0(logo[i], paste(rep(" ", logo_width - nchar(logo[i])), collapse = ""))
         l <- make_line(l, width)
         msg <- c(msg, l)
@@ -236,9 +239,9 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
         msg <- c(msg, rule_wrap(string = contact, align = "left", linechar = " ", width = width))
     }
     # bottom line
-    msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
+    msg <- c(msg, strrep(linechar, width))
     
-    cat(msg, sep = "\n")
+    message(paste0(msg, collapse = "\n"))
     
     return(version)
 }
@@ -251,25 +254,23 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
 #' @keywords internal
 #' @author Haohao Zhang
 make_line <- function(string, width, linechar = " ", align = "center", margin = 1) {
-    string <- paste0(paste0(rep(" ", margin), collapse = ""),
-                     string,
-                     paste0(rep(" ", margin), collapse = ""))
+    string <- paste0(strrep(" ", margin), string, strrep(" ", margin))
     
     if (align == "center") {
         if (width > nchar(string)) {
             left_width <- (width - nchar(string)) %/% 2
             right_width <- width - nchar(string) - left_width
             string <-
-                paste0(paste0(rep(linechar, left_width), collapse = ""),
+                paste0(strrep(linechar, left_width),
                        string,
-                       paste0(rep(linechar, right_width), collapse = ""))
+                       strrep(linechar, right_width))
         }
     } else if (align == "left") {
         if (width > nchar(string)) {
             string <-
                 paste0(linechar,
                        string,
-                       paste0(rep(linechar, width - nchar(string) - 1), collapse = ""))
+                       strrep(linechar, width - nchar(string) - 1))
         }
     }
     return(string)
@@ -289,7 +290,7 @@ rule_wrap <- function(string, width, align = "center", linechar = " ") {
     lines <- strwrap(string, width = width - 4)
 
     # wrap
-    for (i in 1:length(lines)) {
+    for (i in seq_len(length(lines))) {
         l <- make_line(lines[i], width = width, linechar = linechar, align = align)
         msg <- c(msg, l)
     }
@@ -335,4 +336,26 @@ format_time <- function(x) {
     num <- round(num, 0)
     char <- c("h", "m", "s")[index]
     return(paste0(num, char, collapse = ""))
+}
+
+
+load_if_installed <- function(package) {
+    if (!identical(system.file(package = package), "")) {
+        do.call('library', list(package))
+        return(TRUE)
+    } else {
+        return(FALSE) 
+    }
+}
+
+mkl_env <- function(exprs, threads = 1) {
+    if (load_if_installed("RevoUtilsMath")) {
+        math.cores <- RevoUtilsMath::getMKLthreads()
+        RevoUtilsMath::setMKLthreads(threads)
+    }
+    result <- exprs
+    if (load_if_installed("RevoUtilsMath")) {
+        RevoUtilsMath::setMKLthreads(math.cores)
+    }
+    return(result)
 }

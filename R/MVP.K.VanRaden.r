@@ -37,16 +37,6 @@
 #' K <- MVP.K.VanRaden(genotype)
 MVP.K.VanRaden <-
 function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, maxLine=1000){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-
-    if(r.open && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    
     if(!is.null(weight)){
         if(sum(is.na(weight)) != 0) stop("'NA' is not allowed in weight")
     }
@@ -74,9 +64,8 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         m <- nrow(M)
         bac <- paste0("Z", memo, ".temp.bin")
         des <- paste0("Z", memo, ".temp.desc")
-        if (file.exists(bac)) file.remove(bac)
-        if (file.exists(des)) file.remove(des)
-        #options(bigmemory.typecast.warning=FALSE)
+        remove_if_exist(bac, des)
+
         Z <- big.matrix(
             nrow = m,
             ncol = n,
@@ -89,13 +78,18 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         estimate.memory <- function(dat, integer=FALSE, raw=FALSE){
             cells.per.gb <- 2^27  # size of double() resulting in ~1GB of memory use by R 2.15
             dimz <- dat
-            if(length(dimz) == 1) { dimz[2] <- 1 }
-            if(length(dimz)>1 & length(dimz)<11 & is.numeric(dimz)) {
+            if(length(dimz) == 1) {
+                dimz[2] <- 1
+            } else if(length(dimz)>1 & length(dimz)<11 & is.numeric(dimz)) {
                 total.size <- as.double(1)
-                for(cc in 1:length(dimz)) { total.size <- as.double(total.size * as.double(dimz[cc])) }
+                for(cc in seq_len(length(dimz))) { total.size <- as.double(total.size * as.double(dimz[cc])) }
                 memory.estimate <- as.double(as.double(total.size)/cells.per.gb)
                 memory.estimate <- memory.estimate
-                if(integer) { memory.estimate <- memory.estimate/2 } else { if(raw) { memory.estimate <- memory.estimate/8 } }
+                if (integer) {
+                    memory.estimate <- memory.estimate / 2 
+                } else if (raw) { 
+                    memory.estimate <- memory.estimate / 8 
+                }
                 return(memory.estimate)
             } else {
                 # guessing this is a vector
@@ -107,31 +101,36 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
                 }
             }
         }
-        if((Sys.info()[['sysname']]) == 'Windows'){
+        if ((Sys.info()[['sysname']]) == 'Windows') {
             max.gb <- memory.limit()/1000
         }else{
             max.gb <- Inf
         }
         maxLines.gb <- estimate.memory(c(maxLine, n))
-        if(maxLines.gb > max.gb) stop("Memory limited! Please reset the 'maxLine'")
+        if (maxLines.gb > max.gb)
+            stop("Memory limited! Please reset the 'maxLine'")
         loop.index <- seq(0, m, maxLine)[-1]
-        if(max(loop.index) < m) loop.index <- c(loop.index, m)
+        if (max(loop.index) < m)
+            loop.index <- c(loop.index, m)
         loop.len <- length(loop.index)
         print("Z assignment...")
-        for(cc in 1:loop.len){
-            if(loop.len == 1){
+        for (cc in seq_len(loop.len)) {
+            if (loop.len == 1) {
                 c1 <- 1
-            }else{
-                c1 <- ifelse(cc == loop.len, (loop.index[cc-1]) + 1, loop.index[cc]-maxLine + 1)
+            } else {
+                c1 <- ifelse(cc == loop.len, (loop.index[cc - 1]) + 1, loop.index[cc] - maxLine + 1)
             }
             c2 <- loop.index[cc]
-            means <-rowMeans(M[c1:c2, 1:n])
-            if(!is.null(weight)){
-                Z[c1:c2, 1:n] <- (M[c1:c2, 1:n]-means) * sqrt(weight[c1:c2])
-            }else{
-                Z[c1:c2, 1:n] <- M[c1:c2, 1:n]-means
+            means <- rowMeans(M[c1:c2, seq_len(n)])
+            
+            Z[c1:c2, seq_len(n)] <- M[c1:c2, seq_len(n)] - means
+            
+            if (!is.null(weight)) {
+                Z[c1:c2, seq_len(n)] <- Z[c1:c2, seq_len(n)] * sqrt(weight[c1:c2])
             }
-            Pi <- c(Pi, 0.5 * means);gc()
+            
+            Pi <- c(Pi, 0.5 * means)
+            gc()
         }
         print("Assignment done!")
         if(is.null(SUM)){

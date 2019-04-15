@@ -54,15 +54,9 @@
 #' str(mlm)
 MVP.MLM <-
 function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRUE,vc.method="EMMA",maxLine=1000, file.output=TRUE, memo="MVP"){
-    R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    
-    if (R.ver == 'Windows') cpu <- 1
-    if (r.open && cpu > 1 && R.ver == 'Darwin') {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    if (Sys.info()[['sysname']] == 'Windows')
+        cpu <- 1
+    math.cpu <- try(RevoUtilsMath::getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -70,12 +64,13 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     ys <- as.numeric(as.matrix(phe[,2]))
     if (is.null(K)) {
         print("Calculating Kinship...")
-        K <- MVP.K.VanRaden(M=geno, priority=priority, maxLine=maxLine);gc()
+        K <- MVP.K.VanRaden(M = geno, priority = priority, maxLine = maxLine)
+        gc()
+        
         if (file.output) {
             filebck <- paste0("MVP.", colnames(phe)[2], memo, ".kin.bin")
             filedes <- paste0("MVP.", colnames(phe)[2], memo, ".kin.desc")
-            if (file.exists(filebck)) file.remove(filebck)
-            if (file.exists(filedes)) file.remove(filedes)
+            remove_if_exist(filebck, filedes)
             Kin.backed <- big.matrix(
                 nrow = nrow(K),
                 ncol = ncol(K),
@@ -102,10 +97,12 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     # number of fixed effects
     nf <- ncol(X0) + 1
     if (is.null(REML)) {
-		print("Variance components...")   
-        if (vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
-        if (vc.method == "GEMMA") REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
-		print("Variance components is Done!")
+        print("Variance components...")   
+        if (vc.method == "EMMA")
+            REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
+        if (vc.method == "GEMMA")
+            REML <- MVP.GEMMA.Vg.Ve(y=ys, X=X0, K=K)
+        print("Variance components is Done!")
     }
 
     q0 <- ncol(X0)
@@ -128,19 +125,15 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     X0Y <- crossprod(X0t,yt)
     iX0X0 <- solve(X0X0)
     
-    Xt[1:n,1:q0] <- X0t
+    Xt[seq_len(n), seq_len(q0)] <- X0t
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
-        if(bar) print.f(i)
-        # if(i%%1000==0){
-            # print(paste("****************", i, "****************",sep=""))
-        # }
-        #if(cpu>1 & r.open) setMKLthreads(math.cpu)
-
+        if(bar)
+            print.f(i)
         SNP <- geno[i, ]
         xst <- crossprod(U, SNP)
-        Xt[1:n,q0+1] <- xst
+        Xt[seq_len(n), q0 + 1] <- xst
         X0Xst <- crossprod(X0t,xst)
         XstX0 <- t(X0Xst)
         xstxst <- crossprod(xst)
@@ -148,57 +141,56 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
         XY <- c(X0Y,xsY)
         #B22 <- xstxst - XstX0%*%iX0X0%*%X0Xst
         B22 <- xstxst - crossprod(X0Xst, iX0X0) %*% X0Xst
-        invB22 <- 1/B22
+        invB22 <- 1 / B22
         B21 <- tcrossprod(XstX0, iX0X0)
         NeginvB22B21 <- crossprod(-invB22,B21)
         B11 <- iX0X0 + as.numeric(invB22)*crossprod(B21,B21)
-            
-        iXX[1:q0,1:q0]=B11
-        iXX[(q0+1),(q0+1)]=1/B22
-        iXX[(q0+1),1:q0]=NeginvB22B21
-        iXX[1:q0,(q0+1)]=NeginvB22B21
+        
+        i1 = seq_len(q0)
+        i2 = q0 + 1
+        iXX[i1, i1] = B11
+        iXX[i2, i2] = 1 / B22
+        iXX[i2, i1] = NeginvB22B21
+        iXX[i1, i2] = NeginvB22B21
+        
         beta <- crossprod(iXX,XY)
-        stats <- beta[(q0+1)]/sqrt((iXX[(q0+1), (q0+1)]) * vgs)
-        p <- 2 * pt(abs(stats), n-(q0+1), lower.tail=FALSE)
-        effect<- beta[(q0+1)]
+        stats <- beta[i2] / sqrt(invB22 * vgs)
+        p <- 2 * pt(abs(stats), n - i2, lower.tail = FALSE)
+        effect <- beta[i2]
         return(list(effect = effect, p = p))
     }
     
     #Paralleled MLM
-    if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.mlm.parallel)
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-        if(R.ver == 'Windows'){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+    if (cpu == 1) {
+        print.f <- function(i) {
+            print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+        }
+        mkl_env({
+            results <- lapply(seq_len(m), eff.mlm.parallel)
+        }, threads = min(2^(n %/% 1000), math.cpu))
+    } else {
+        if (Sys.info()[['sysname']] == 'Windows'){
+            print.f <- function(i) {
+                print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
+            }
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.mlm.parallel)
+            results <- parLapply(cl, seq_len(m), eff.mlm.parallel)
             stopCluster(cl)
         }else{
             tmpf.name <- tempfile()
             tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
             writeBin(0, tmpf)
             print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            R.ver <- Sys.info()[['sysname']]
-            if(R.ver == 'Linux') {
-                math.cpu <- try(getMKLthreads(), silent=TRUE)
-                try(setMKLthreads(1), silent=TRUE)
-            }
-            results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
-            if(R.ver == 'Linux') {
-                try(setMKLthreads(math.cpu), silent=TRUE)
-                #try(setMKLthreads(1), silent=TRUE)
-            }
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            mkl_env({
+                results <- mclapply(seq_len(m), eff.mlm.parallel, mc.cores=cpu)
+            })
+            close(tmpf); unlink(tmpf.name); message();
         }
     }
-    if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
+    if (is.list(results))
+        results <- matrix(unlist(results), m, byrow = TRUE)
     #print("****************MLM ACCOMPLISHED****************")
     return(results)
 }#end of MVP.MLM function

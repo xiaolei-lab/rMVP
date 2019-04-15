@@ -134,7 +134,7 @@ genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-map <- read.table("mvp.map" , head = TRUE)
+map <- read.table(mapPath , head = TRUE)
 mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
