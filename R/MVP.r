@@ -233,7 +233,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     
     if(glm.run){
         print("General Linear Model (GLM) Start ...")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar);gc()
         colnames(glm.results) <- c("effect", paste(colnames(phe)[2],"GLM",sep="."))
         if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
     }

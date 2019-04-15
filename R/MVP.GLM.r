@@ -26,8 +26,6 @@
 #' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
 #' @param cpu number of cpus used for parallel computation
-#' @param priority 'memory' or 'speed'
-#' @param memo a marker on output file name
 #' @param bar whether to show the progress bar
 #'
 #' @return m * 2 matrix, the first column is the SNP effect, the second column is the P values
@@ -46,7 +44,7 @@
 #' glm <- MVP.GLM(phe=phenotype, geno=genotype)
 #' str(glm)
 MVP.GLM <-
-function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
+function(phe, geno, CV=NULL, cpu=2, bar=TRUE){
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
@@ -55,8 +53,6 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     
     n <- ncol(geno)
     m <- nrow(geno)
-    
-    if(priority=="speed") geno <- as.matrix(geno)
     
     ys <- as.numeric(as.matrix(phe[,2]))
     
@@ -119,36 +115,36 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
     }
     
     if(cpu == 1){
-            math.cpu <- try(getMKLthreads(), silent=TRUE)
-            mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-                try(setMKLthreads(mkl.cpu), silent=TRUE)
+        math.cpu <- try(getMKLthreads(), silent=TRUE)
+        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
+        try(setMKLthreads(mkl.cpu), silent=TRUE)
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.glm)
-    try(setMKLthreads(math.cpu), silent=TRUE)
+        try(setMKLthreads(math.cpu), silent=TRUE)
     }else{
-            if(wind){
-                print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-                cl <- makeCluster(getOption("cl.cores", cpu))
-                clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
-                Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-                results <- parLapply(cl, 1:m, eff.glm)
-                stopCluster(cl)
-            }else{
-        tmpf.name <- tempfile()
-        tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
-        writeBin(0, tmpf)
-        print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-                R.ver <- Sys.info()[['sysname']]
-                if(R.ver == 'Linux') {
-                    math.cpu <- try(getMKLthreads(), silent=TRUE)
-                    try(setMKLthreads(1), silent=TRUE)
-                }
-                results <- mclapply(1:m, eff.glm, mc.cores=cpu)
-        close(tmpf); unlink(tmpf.name); cat('\n');
-                if(R.ver == 'Linux') {
-                    try(setMKLthreads(math.cpu), silent=TRUE)
-                }
+        if(wind){
+            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            cl <- makeCluster(getOption("cl.cores", cpu))
+            clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
+            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
+            results <- parLapply(cl, 1:m, eff.glm)
+            stopCluster(cl)
+        }else{
+            tmpf.name <- tempfile()
+            tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
+            writeBin(0, tmpf)
+            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            R.ver <- Sys.info()[['sysname']]
+            if(R.ver == 'Linux') {
+                math.cpu <- try(getMKLthreads(), silent=TRUE)
+                try(setMKLthreads(1), silent=TRUE)
             }
+            results <- mclapply(1:m, eff.glm, mc.cores=cpu)
+            close(tmpf); unlink(tmpf.name); cat('\n');
+            if(R.ver == 'Linux') {
+                try(setMKLthreads(math.cpu), silent=TRUE)
+            }
+        }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
     #print("****************GLM ACCOMPLISHED****************")

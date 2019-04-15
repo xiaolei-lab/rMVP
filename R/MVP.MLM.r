@@ -66,7 +66,6 @@ function(phe, geno, K=NULL, CV=NULL, REML=NULL, priority="speed", cpu=1, bar=TRU
     
     n <- ncol(geno)
     m <- nrow(geno)
-    if(priority=="speed") geno <- as.matrix(geno)
     
     ys <- as.numeric(as.matrix(phe[,2]))
     if (is.null(K)) {

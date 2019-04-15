@@ -141,7 +141,7 @@ function(M, weight=NULL, priority=c("speed", "memory"), memo=NULL, SUM=NULL, max
         if(!fl.suc){ stop("flush failed\n") } 
         RR <- describe(Z); rm(list=c("Z", "Pi", "means")); gc()
         Z <- attach.big.matrix(RR)
-        K <- 0.5 * crossprod(Z[])/SUM
+        K <- 0.5 * big.crossprod(Z)/SUM
         rm(Z)
         gc()
         unlink(c(paste0("Z", memo, ".temp.bin"), paste0("Z", memo, ".temp.desc")), recursive = TRUE)
