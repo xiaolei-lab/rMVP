@@ -64,9 +64,8 @@ function(M, perc=1, pcs.keep=5, memo=NULL){
     }else{
         big.geno <- t(as.matrix(M))
     }
-    #Calculate PCs by using bigPCA package
 
-    PCs <- prcomp(big.geno)$x[, 1:pcs.keep]
+    PCs <- irlba::prcomp_irlba(big.geno, n = pcs.keep)
 
     return(list(PCs=PCs))
 }#end of MVP.PCA function

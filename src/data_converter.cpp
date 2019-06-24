@@ -534,18 +534,19 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     fread(buffer, 1, 3, fin);
     
     // loop file
-    size_t r, c, cond;
+    size_t r, c, cond, block_start;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fread(buffer, 1, buffer_size, fin);
         
-        // i: current block start, j: current bit.
-        cond = min(buffer_size, length - 3 - i * buffer_size);
+        // i: current block, j: current bit.
+        block_start = i * buffer_size;
+        cond = min(buffer_size, length - 3 - block_start);
         #pragma omp parallel for schedule(static)
         for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
-            r = (i * buffer_size + j) / n;
-            c = (i * buffer_size + j) % n * 4;
+            r = (block_start + j) / n;
+            c = (block_start + j) % n * 4;
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < ind; x++) {
