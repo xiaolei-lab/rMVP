@@ -126,6 +126,23 @@ function(phe, geno, CV=NULL, cpu=2, priority="speed", memo="MVP.GLM", bar=TRUE){
             print.f <- function(i) {
                 print_bar(i = i, n = m, type = "type1", fixed.points = TRUE)
             }
+            cl <- makeCluster(getOption("cl.cores", cpu))
+            clusterExport(cl, varlist = c("geno", "ys", "X0"), envir = environment())
+            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
+            results <- parLapply(cl, seq_len(m), eff.glm)
+            stopCluster(cl)
+        } else {
+            tmpf.name <- tempfile()
+            tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
+            writeBin(0, tmpf)
+            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            mkl_env({
+                results <- mclapply(seq_len(m), eff.glm, mc.cores = cpu)
+            })
+            close(tmpf)
+            unlink(tmpf.name)
+            message()
+        }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
     #print("****************GLM ACCOMPLISHED****************")
