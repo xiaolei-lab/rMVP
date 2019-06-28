@@ -19,9 +19,9 @@ test_that("MVP.Data() - vcf", {
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
-    genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
-    kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
-    pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
+    genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
+    kinship <- attach.big.matrix(paste0(out, ".kin.desc"))
+    pcs <- attach.big.matrix(paste0(out, ".pc.desc"))
     genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
     map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
     
@@ -42,9 +42,9 @@ test_that("MVP.Data() - Bfile", {
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
-    genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
-    kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
-    pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
+    genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
+    kinship <- attach.big.matrix(paste0(out, ".kin.desc"))
+    pcs <- attach.big.matrix(paste0(out, ".pc.desc"))
     genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
     map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
 
@@ -65,9 +65,9 @@ test_that("MVP.Data() - HMP", {
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
-    genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
-    kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
-    pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
+    genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
+    kinship <- attach.big.matrix(paste0(out, ".kin.desc"))
+    pcs <- attach.big.matrix(paste0(out, ".pc.desc"))
     genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
     map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
     
@@ -86,9 +86,9 @@ test_that("MVP.Data() - HMP Diploid", {
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
-    genoImp <- attach.big.matrix(paste0(out, ".imp.geno.desc"))
-    kinship <- attach.big.matrix(paste0(out, ".imp.kin.desc"))
-    pcs <- attach.big.matrix(paste0(out, ".imp.pc.desc"))
+    genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
+    kinship <- attach.big.matrix(paste0(out, ".kin.desc"))
+    pcs <- attach.big.matrix(paste0(out, ".pc.desc"))
     genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
     map <- read.table(paste0(out, ".map"), header = TRUE, stringsAsFactors = FALSE)
     

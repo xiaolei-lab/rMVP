@@ -169,17 +169,17 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     if (!is.null(SNP.impute) && hasNA(bigmat@address)) {
         MVP.Data.impute(
             mvp_prefix = out, 
-            out = paste0(out, '.imp'), 
+            # out = paste0(out, '.imp'), 
             method = SNP.impute,
             ncpus = ncpus
         )
-        # remove intermediate genotype
-        file.remove(paste0(out, ".geno.desc"))
-        file.remove(paste0(out, ".geno.bin"))
-        file.remove(paste0(out, ".geno.ind"))
-        file.remove(paste0(out, ".map"))
+        # # remove intermediate genotype
+        # file.remove(paste0(out, ".geno.desc"))
+        # file.remove(paste0(out, ".geno.bin"))
+        # file.remove(paste0(out, ".geno.ind"))
+        # file.remove(paste0(out, ".map"))
         
-        out <- paste0(out, '.imp')
+        # out <- paste0(out, '.imp')
     }
     
     # get pc
@@ -783,7 +783,7 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
 #' mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
 #' MVP.Data.impute(mvpPath, ncpus=1)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
-MVP.Data.impute <- function(mvp_prefix, out='mvp.imp', method='Major', ncpus=NULL) {
+MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
     bigmat <- attach.big.matrix(desc)
