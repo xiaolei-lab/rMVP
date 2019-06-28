@@ -686,7 +686,7 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
             message("NA in genotype, Calculate PCA has been skipped.")
             return()
         }
-        myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs
+        myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs$x
     } else if (filePC == FALSE || is.null(filePC)) {
         return()
     } else {
