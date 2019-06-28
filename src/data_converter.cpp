@@ -493,7 +493,7 @@ void write_bfile(SEXP pBigMat, std::string bed_file, int threads=0, bool verbose
 template <typename T>
 void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // check input
-    if (!end_with(bed_file, ".bed")) {
+    if (!boost::ends_with(bed_file, ".bed")) {
         bed_file += ".bed";
     }
     
@@ -534,7 +534,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     fread(buffer, 1, 3, fin);
     
     // loop file
-    size_t r, c, cond, block_start;
+    size_t cond;
+    long block_start;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
         fread(buffer, 1, buffer_size, fin);
@@ -545,8 +546,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         #pragma omp parallel for schedule(static)
         for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
-            r = (block_start + j) / n;
-            c = (block_start + j) % n * 4;
+            size_t r = (block_start + j) / n;
+            size_t c = (block_start + j) % n * 4;
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < ind; x++) {
