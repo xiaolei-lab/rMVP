@@ -182,23 +182,26 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         # out <- paste0(out, '.imp')
     }
     
+    # get kin
+    K <- MVP.Data.Kin(
+        fileKin = fileKin, 
+        mvp_prefix = out, 
+        priority = priority, 
+        sep = sep.kin,
+        cpus=cpus
+    )
+    
     # get pc
     MVP.Data.PC(
         filePC = filePC, 
         mvp_prefix = out, 
-        perc = perc, 
-        pcs.keep = pcs.keep, 
-        sep = sep.pc
-    )
-    
-    # get kin
-    MVP.Data.Kin(
-        fileKin = fileKin, 
-        mvp_prefix = out, 
-        maxLine = maxLine, 
+        K = K[,],
+        pcs.keep = pcs.keep,
         priority = priority, 
-        sep = sep.kin
+        sep = sep.pc,
+        cpus=cpus
     )
+
 
     cat("MVP data prepration accomplished successfully!\n")
 } # end of MVP.Data function
@@ -651,14 +654,15 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
     return(nrow(map))
 }
 
+
 #' Principal component analysis
 #'
 #' @param filePC Principal components, n*npc, n is sample size, npc is number of top columns of principal components
 #' @param mvp_prefix Prefix for mvp format files
 #' @param out prefix of output file name
-#' @param perc Percentage of markers used to calculate PCA
 #' @param pcs.keep how many PCs to keep
 #' @param sep seperator for PC file.
+#' @param cpus
 #' 
 #' @export
 #' @return 
@@ -668,7 +672,16 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' MVP.Data.PC(TRUE, mvp_prefix=geno, out="rMVP.test.pc")
-MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.keep=5, sep='\t') {
+MVP.Data.PC <- function(
+    filePC=TRUE, 
+    mvp_prefix='mvp', 
+    K=NULL, 
+    out=NULL,  
+    pcs.keep=5,
+    priority='speed',
+    sep='\t',
+    cpus=1,
+){
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
@@ -679,14 +692,18 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
     
     # get pc
     if (is.character(filePC)) {
-        myPC <- read.big.matrix(filePC, header = FALSE, type = 'double', sep = sep)
+        myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
-        geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-        if (hasNA(geno@address)) {
-            message("NA in genotype, Calculate PCA has been skipped.")
-            return()
+        if(is.null(K)){
+            geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
+            if (hasNA(geno@address)) {
+                message("NA in genotype, Calculate PCA has been skipped.")
+                return()
+            }
+            myPC <- MVP.PCA(M=geno, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
+        }else{
+            myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
         }
-        myPC <- MVP.PCA(geno, perc = perc, pcs.keep = pcs.keep)$PCs$x
     } else if (filePC == FALSE || is.null(filePC)) {
         return()
     } else {
@@ -706,7 +723,7 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
     
     PC[, ] <- myPC[, ]
     flush(PC)
-    cat("Preparation for PC matrix is done!\n")
+    cat("Preparation for PC matrix is done!", "\n")
 }
 
 #' Kinship
@@ -714,9 +731,9 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
 #' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
 #' @param mvp_prefix Prefix for mvp format files
 #' @param out prefix of output file name
-#' @param maxLine number of SNPs, only used for saving memory when calculate kinship matrix
 #' @param priority "speed" or "memory"
 #' @param sep seperator for Kinship file.
+#' @param cpus
 #'
 #' @export
 #' @return 
@@ -726,7 +743,14 @@ MVP.Data.PC <- function(filePC=TRUE, mvp_prefix='mvp', out=NULL, perc=1, pcs.kee
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' MVP.Data.Kin(TRUE, mvp_prefix=geno, out="rMVP.test.kin")
-MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, priority='speed', sep='\t') {
+MVP.Data.Kin <- function(
+    fileKin=TRUE, 
+    mvp_prefix='mvp', 
+    out=NULL, 
+    priority='speed', 
+    sep='\t',
+    cpus=1
+){
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
@@ -737,17 +761,17 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
     
     # get kin
     if (is.character(fileKin)) {
-        myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
+        myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
         if (hasNA(geno@address)) {
             message("NA in genotype, Calculate Kinship has been skipped.")
             return()
         }
-        cat("Calculate KINSHIP using Vanraden method...\n")
-        myKin <- MVP.K.VanRaden(geno, priority = priority, maxLine = maxLine)
+        cat("Calculate KINSHIP using Vanraden method...", "\n")
+        myKin <- MVP.K.VanRaden(geno, priority = priority, cpu=cpus)
     } else if (fileKin == FALSE || is.null(fileKin)) {
-        return()
+        return(NULL)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
@@ -765,8 +789,10 @@ MVP.Data.Kin <- function(fileKin=TRUE, mvp_prefix='mvp', out=NULL, maxLine=1e4, 
     
     Kinship[, ] <- myKin[, ]
     flush(Kinship)
-    cat("Preparation for Kinship matrix is done!\n")
+    cat("Preparation for Kinship matrix is done!", "\n")
+    return(Kinship)
 }
+
 
 #' MVP.Data.impute: To impute the missing genotype
 #' Author: Haohao Zhang
