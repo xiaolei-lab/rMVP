@@ -48,9 +48,6 @@ function(
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
     
-    if(!is.null(weight)){
-        if(sum(is.na(weight)) != 0) stop("'NA' is not allowed in weight")
-    }
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
         match.arg(priority),
