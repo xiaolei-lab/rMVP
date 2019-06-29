@@ -142,6 +142,5 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     maxLL <- max(optLL)
     maxva <- sum(etas * etas/(eig.R$values + maxdelta))/(n-q)    
     maxve <- maxva * maxdelta
-    print("Variance Components Estimation is Done!")
     return (list(REML=maxLL, delta=maxdelta, ve=maxve, vg=maxva))
 }# end of MVP.EMMA.Vg.Ve function
