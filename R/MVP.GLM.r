@@ -106,9 +106,10 @@ function(
         effect <- crossprod(iXX,rhs)
         ve <- (YY-crossprod(effect,rhs))/df
         effect <- effect[q0+1]
-        t.value <- effect/sqrt(iXX[q0+1, q0+1] * ve)
+        se <- sqrt(iXX[q0+1, q0+1] * ve)
+        t.value <- effect/se
         p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
-        return(list(effect=effect, p=p))
+        return(list(effect=effect, se=se, p=p))
     }
     
     if(cpu == 1){
