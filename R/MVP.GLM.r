@@ -132,9 +132,8 @@ function(
             writeBin(0, tmpf)
             print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
             mkl_env({
-                results <- mclapply(seq_len(m), eff.glm, mc.cores = cpu)
+                results <- mclapply(1:m, eff.glm, mc.cores = cpu)
             })
-            results <- mclapply(1:m, eff.glm, mc.cores=cpu)
             close(tmpf); unlink(tmpf.name); cat('\n');
         }
     }
