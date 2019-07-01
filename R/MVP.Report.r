@@ -141,8 +141,8 @@ MVP.Report <- function(
     if (is(MVP, "list")) {
         MVP.res <- cbind(MVP$glm.results, MVP$mlm.results, MVP$farmcpu.results)
         Cnames <- colnames(MVP.res)
-        Cnames <- Cnames[seq(2, ncol(MVP.res), 2)]
-        MVP.res <- MVP.res[, seq(2, ncol(MVP.res), 2)]
+        Cnames <- Cnames[seq(3, ncol(MVP.res), 3)]
+        MVP.res <- MVP.res[, seq(3, ncol(MVP.res), 3)]
         MVP.res[is.na(MVP.res)] <- 1
         MVP.res <- cbind(MVP$map, MVP.res)
         Pmap <- MVP.res
