@@ -85,9 +85,9 @@ function(
         # convert K to base:matrix
         K <- K[, ]
         if(is.null(eigenK)){
-            print("Eigen Decomposition of Kinship...")
+            cat("Eigen Decomposition of Kinship...", "\n")
             eigenK <- eigen(K, symmetric=TRUE)
-            print("Eigen-Decomposition is Done!")
+            cat("Eigen-Decomposition is Done!", "\n")
         }
     }
 
@@ -100,13 +100,13 @@ function(
     # number of fixed effects
     nf <- ncol(X0) + 1
     if(is.null(REML)) {
-		print(paste("Variance components using: ", vc.method), sep="")   
+		cat(paste("Variance components using: ", vc.method, sep=""), "\n")   
         if (vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "HE") REML <- MVP.HE.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "BRENT") REML <- MVP.BRENT.Vg.Ve(y=ys, X=X0, eigenK=eigenK)
-		print(paste("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""))
+		cat(paste("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
     }else{
-        print(paste("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""))
+        cat(paste("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
     }
     if(!is.null(K)){rm(K); gc()}
 
