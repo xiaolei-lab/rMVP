@@ -147,7 +147,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #Data information
     m=nrow(geno)
     n=ncol(geno)
-    print(paste("Input data has", n, "individuals,", m, "markers", sep=" "))
+    cat(paste("Input data has", n, "individuals,", m, "markers", sep=" "), "\n")
     
     #initial results
     glm.results <- NULL
@@ -172,11 +172,11 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         if(is.null(K)){
             K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus)
         }
-        print("Eigen Decomposition...")
+        cat("Eigen Decomposition...", "\n")
         eigenK <- eigen(K, symmetric=TRUE)
         if(!is.null(nPC)){
             ipca <- eigenK$vectors[, 1:nPC]
-            print("Deriving PCs successfully!")
+            cat("Deriving PCs successfully!", "\n")
         }
         if(("MLM" %in% method) & vc.method == "BRENT"){K <- NULL; gc()}
         if(!"MLM" %in% method){rm(eigenK); rm(K); gc()}
@@ -219,24 +219,24 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     }
   
     #GWAS
-    print("GWAS Start...")
+    cat("GWAS Start...", "\n")
     
     if(glm.run){
-        print("General Linear Model (GLM) Start...")
+        cat("General Linear Model (GLM) Start...", "\n")
         glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
         if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
     }
 
     if(mlm.run){
-        print("Mixed Linear Model (MLM) Start...")
+        cat("Mixed Linear Model (MLM) Start...", "\n")
         mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
         if(file.output) write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
     }
     
     if(farmcpu.run){
-        print("FarmCPU Start...")
+        cat("FarmCPU Start...", "\n")
         farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
         if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
@@ -264,10 +264,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
         threshold = permutation.cutoff * m
     }
-    print(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""))
+    cat(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n")
     if(file.output){
-        print("Visualization Start...")
-        print("Phenotype distribution Plotting...")
+        cat("Visualization Start...", "\n")
+        cat("Phenotype distribution Plotting...", "\n")
         MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
