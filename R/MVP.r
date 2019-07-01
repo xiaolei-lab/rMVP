@@ -34,14 +34,13 @@
 #' @param nPC.GLM number of PCs added as fixed effects in GLM
 #' @param nPC.MLM number of PCs added as fixed effects in MLM
 #' @param nPC.FarmCPU number of PCs added as fixed effects in FarmCPU
-#' @param perc percentage of total SNPs selected for PCA
 #' @param CV.GLM covariates added in GLM
 #' @param CV.MLM covariates added in MLM
 #' @param CV.FarmCPU covariates added in FarmCPU
 #' @param REML a list contains ve and vg
 #' @param priority speed or memory
 #' @param ncpus number of cpus used for parallel
-#' @param vc.method methods for estimating variance component("EMMA" or "GEMMA")
+#' @param vc.method methods for estimating variance component("EMMA" or "HE" or "BRENT")
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
 #' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
 #' @param memo a marker added on output file name
@@ -58,20 +57,15 @@
 #' @param p.threshold if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
 #' @param bound maximum number of SNPs selected as pseudo QTNs for each iteration
-#' @param outward the direction of circular Manhattan plot
 #' @param permutation.threshold if use a permutation cutoff or not (bonferroni cutoff)
 #' @param permutation.rep number of permutation replicates
 #' @param bar if TRUE, the progress bar will be drawn on the terminal
 #' @param col for color of points in each chromosome on manhattan plot
-#' @param plot.type "b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)
 #' @param file.output whether to output files or not
 #' @param file figure formats, "jpg", "tiff"
 #' @param dpi resolution for output figures
 #' @param threshold a cutoff line on manhattan plot, 0.05/marker size
-#' @param Ncluster number of colors used for drawing PC 1 and PC 2
-#' @param signal.cex point size on output figures
-#' @param box logical, if TRUE, the box frame will be added in output figure
-#'
+
 #' @export
 #' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
@@ -92,30 +86,25 @@
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, perc=1, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
-permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), method="MLM", memo=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), maxLoop=10,
+permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), file.output=TRUE, file="jpg", dpi=300, threshold=0.05
 ) {
-    if (rMVP.OutputLog2File == TRUE) {
-        now <- Sys.time()
-        
-        # get logfile name
-        logfile <- paste("MVP", format(now, "%Y%m%d"), sep = ".")
-        count <- 1
-        while (file.exists(paste0(logfile, ".log"))) {
-            logfile <- paste("MVP", format(now, "%Y%m%d"), count, sep = ".")
-            count <- count + 1
-        }
-        logfile <- paste0(logfile, ".log")
-        
-        sink(logfile)
-        cat(now)
+    R.ver <- Sys.info()[['sysname']]
+    wind <- R.ver == 'Windows'
+    linux <- R.ver == 'Linux'
+    mac <- (!linux) & (!wind)
+    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    
+    if(wind) ncpus <- 1
+    if(r.open && ncpus>1 && mac){
+        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-    
-    
-    if (Sys.info()[['sysname']] == 'Windows')
-        ncpus <- 1
+    #if(r.open && ncpus>1 && !mac){
+    #setMKLthreads(1)
+    #}
     
     MVP.Version(width = 60)
+    vc.method <- match.arg(vc.method)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map)
@@ -179,26 +168,22 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         nPC <- NULL
     }
     
-    if (!is.null(nPC)) {
-        ipca <- MVP.PCA(M = geno, perc = perc, pcs.keep = nPC)$PCs
-        if (file.output) {
-            filebck <- paste0("MVP.", colnames(phe)[2], memo, ".pc.bin")
-            filedes <- paste0("MVP.", colnames(phe)[2], memo, ".pc.desc")
-            
-            if (file.exists(filebck)) file.remove(filebck)
-            if (file.exists(filedes)) file.remove(filedes)
-            PC.backed <- big.matrix(
-                nrow = nrow(ipca), 
-                ncol = ncol(ipca), 
-                type = "double", 
-                backingfile = filebck,
-                descriptorfile = filedes
-            )
-            
-            PC.backed[, ] <- ipca[, ]
-            flush(PC.backed)
-            rm(list = c("PC.backed"))
+    if(!is.null(nPC) | "MLM" %in% method){
+        if(is.null(K)){
+            K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus)
         }
+        print("Eigen Decomposition...")
+        eigenK <- eigen(K, symmetric=TRUE)
+        if(!is.null(nPC)){
+            ipca <- eigenK$vectors[, 1:nPC]
+            print("Deriving PCs successfully!")
+        }
+        if(("MLM" %in% method) & vc.method == "BRENT"){K <- NULL; gc()}
+        if(!"MLM" %in% method){rm(eigenK); rm(K); gc()}
+    }
+
+    if (!is.null(nPC)) {
+
         #CV for GLM
         if(glm.run){
             if(!is.null(CV.GLM)){
@@ -230,31 +215,30 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
             }else{
                 CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
             }
-        }
-        
+        }  
     }
   
     #GWAS
     print("GWAS Start...")
     
     if(glm.run){
-        print("General Linear Model (GLM) Start ...")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, priority=priority, CV=CV.GLM, cpu=ncpus, memo="MVP.GLM", bar=bar);gc()
-        colnames(glm.results) <- c("effect", paste(colnames(phe)[2],"GLM",sep="."))
+        print("General Linear Model (GLM) Start...")
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar);gc()
+        colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
         if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
     }
 
     if(mlm.run){
-        print("Mixed Linear Model (MLM) Start ...")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, priority=priority, CV=CV.MLM, cpu=ncpus, bar=bar, maxLine=maxLine, vc.method=vc.method, file.output=file.output, memo="MVP.MLM");gc()
-        colnames(mlm.results) <- c("effect", paste(colnames(phe)[2],"MLM",sep="."))
+        print("Mixed Linear Model (MLM) Start...")
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method);gc()
+        colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
         if(file.output) write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
     }
     
     if(farmcpu.run){
-        print("FarmCPU Start ...")
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, priority=priority, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", P=P, method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, Prior=Prior, maxLoop=maxLoop, threshold.output=threshold.output, iteration.output=iteration.output, p.threshold=p.threshold, QTN.threshold=QTN.threshold, bound=NULL)
-        colnames(farmcpu.results) <- c("effect", paste(colnames(phe)[2],"FarmCPU",sep="."))
+        print("FarmCPU Start...")
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop)
+        colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
         if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
     }
     
@@ -280,7 +264,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
         threshold = permutation.cutoff * m
     }
-    print(paste("Significance Level: ", threshold/m, sep=""))
+    print(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""))
     if(file.output){
         print("Visualization Start...")
         print("Phenotype distribution Plotting...")
@@ -292,47 +276,34 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
                 ipca[,1:3],
                 col=col,
                 plot3D=plot3D,
-                Ncluster=Ncluster,
                 file=file,
                 dpi=dpi,
-                box=box
             )
         }
         
         MVP.Report(
             MVP.return,
             col=col,
-            box=box,
             plot.type=c("c","m","q","d"),
             file.output=TRUE,
             file=file,
             dpi=dpi,
             threshold=threshold/m,
-            signal.cex=signal.cex,
-            outward=outward
         )
-        
+
         if(sum(c(is.null(glm.results), is.null(mlm.results), is.null(farmcpu.results))) < 2) {
             MVP.Report(
                 MVP.return,
                 col=col,
                 plot.type=c("m","q"),
                 multracks=TRUE,
-                outward=outward,
                 file.output=TRUE,
                 file=file,
                 dpi=dpi,
-                box=box,
-                threshold=threshold/m,
-                signal.cex=signal.cex
+                threshold=threshold/m
             )
         }
     }
     print_accomplished(width = 60)
-    
-    if (rMVP.OutputLog2File == TRUE) {
-        sink()
-    }
-    
     return(MVP.return)
 }#end of MVP function
