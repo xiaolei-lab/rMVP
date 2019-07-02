@@ -110,7 +110,7 @@ arma::mat kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
 	double p12 = 0.0;
 	MinimalProgressBar pb;
 
-	arma::vec Mean = BigRowMean(pMat, threads = threads);
+	arma::vec Mean = BigRowMean(pMat, threads);
 	double SUM = arma::dot((0.5 * Mean), (1 - 0.5 * Mean));
 
 	arma::mat kin(n, n);
