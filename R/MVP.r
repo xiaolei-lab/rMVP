@@ -86,14 +86,24 @@
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), method="MLM", memo=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), maxLoop=10,
-permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), file.output=TRUE, file="jpg", dpi=300, threshold=0.05
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
+permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 ) {
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    if (options("rMVP.OutputLog2File") == TRUE) {
+        now <- Sys.time()
+        
+        # get logfile name
+        logfile <- paste("MVP", format(now, "%Y%m%d"), sep = ".")
+        count <- 1
+        while (file.exists(paste0(logfile, ".log"))) {
+            logfile <- paste("MVP", format(now, "%Y%m%d"), count, sep = ".")
+            count <- count + 1
+        }
+        logfile <- paste0(logfile, ".log")
+        sink(logfile, split=TRUE)
+        cat(paste("Start:", as.character(now), "\n",
+                  "The log has been output to the file:", logfile, "\n"))
+    }
     
     if(wind) ncpus <- 1
     if(r.open && ncpus>1 && mac){
@@ -305,5 +315,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         }
     }
     print_accomplished(width = 60)
+    
+    if (options("rMVP.OutputLog2File") == TRUE) {
+        sink()
+    }
+    
     return(MVP.return)
 }#end of MVP function

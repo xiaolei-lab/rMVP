@@ -680,7 +680,7 @@ MVP.Data.PC <- function(
     pcs.keep=5,
     priority='speed',
     sep='\t',
-    cpus=1,
+    cpus=1
 ){
     if (is.null(out)) out <- mvp_prefix
     
