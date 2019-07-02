@@ -10,8 +10,8 @@ License: Apache License | file LICENSE
 SystemRequirements: C++11
 BugReports: https://github.com/XiaoleiLiuBio/MVP/issues
 Imports: utils, stats, methods, graphics, grDevices
-Depends: R (>= 3.4), Rcpp, RcppProgress, BH, bigmemory, biganalytics, parallel, MASS, irlba
-LinkingTo: Rcpp, RcppProgress, BH, bigmemory
+Depends: R (>= 3.4), Rcpp, RcppProgress, RcppArmadillo, BH, bigmemory, biganalytics, parallel, MASS, irlba
+LinkingTo: Rcpp, RcppProgress, RcppArmadillo, BH, bigmemory
 NeedsCompilation: yes
 biocViews: GenomeWideAssociation, Visualization, Genetics, Preprocessing, QualityControl, Software
 Suggests: 

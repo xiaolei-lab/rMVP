@@ -37,3 +37,11 @@ hasNA <- function(pBigMat) {
     .Call(`_rMVP_hasNA`, pBigMat)
 }
 
+BigRowMean <- function(pBigMat, threads = 0L) {
+    .Call(`_rMVP_BigRowMean`, pBigMat, threads)
+}
+
+kin_cal <- function(pBigMat, threads = 0L) {
+    .Call(`_rMVP_kin_cal`, pBigMat, threads)
+}
+
