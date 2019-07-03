@@ -281,7 +281,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     }
     cat(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n")
     if(file.output){
-        cat("Visualization Start", "\n")
+        cat("|--------------------Visualization Start-------------------|", "\n")
         cat("Phenotype distribution Plotting", "\n")
         MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
