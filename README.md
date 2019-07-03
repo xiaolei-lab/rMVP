@@ -540,7 +540,7 @@ imMVP <- MVP(
     nPC.FarmCPU=3,
     priority="speed",
     #ncpus=10,
-    vc.method="EMMA",
+    vc.method="BRENT",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
     #permutation.threshold=TRUE,
@@ -567,7 +567,7 @@ for(i in 2:ncol(phenotype)){
     nPC.FarmCPU=3,
     priority="speed",
     #ncpus=10,
-    vc.method="EMMA",
+    vc.method="BRENT",
     maxLoop=10,
     method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
     #permutation.threshold=TRUE,
