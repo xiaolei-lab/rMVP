@@ -89,9 +89,8 @@ MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 ) {
+    now <- Sys.time()
     if (options("rMVP.OutputLog2File") == TRUE) {
-        now <- Sys.time()
-        
         # get logfile name
         logfile <- paste("MVP", format(now, "%Y%m%d"), sep = ".")
         count <- 1
@@ -101,8 +100,6 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         }
         logfile <- paste0(logfile, ".log")
         sink(logfile, split=TRUE)
-        cat(paste("Start:", as.character(now), "\n",
-                  "The log has been output to the file:", logfile, "\n"))
     }
     
     R.ver <- Sys.info()[['sysname']]
@@ -120,6 +117,10 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     #}
     
     MVP.Version(width = 60)
+    cat("Start:", as.character(now), "\n")
+    if (options("rMVP.OutputLog2File") == TRUE) {
+        cat("The log has been output to the file:", logfile, "\n")
+    }
     vc.method <- match.arg(vc.method)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
@@ -319,6 +320,8 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
             )
         }
     }
+    now <- Sys.time()
+    cat("End:", as.character(now), "\n")
     print_accomplished(width = 60)
     
     if (options("rMVP.OutputLog2File") == TRUE) {
