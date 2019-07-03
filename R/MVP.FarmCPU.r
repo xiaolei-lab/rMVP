@@ -219,8 +219,8 @@
             }
             P=myGLM$P[,ncol(myGLM$P)]
             P[P==0] <- min(P[P!=0],na.rm=TRUE)*0.01
-            results = cbind(myGLM$B, P)
-            colnames(results) = c("effect","p")
+            results = cbind(myGLM$B, myGLM$S, P)
+            colnames(results) = c("effect","se", "p")
         } #end of while loop
         #print("****************FarmCPU ACCOMPLISHED****************")
         return(results)
@@ -837,13 +837,14 @@ FarmCPU.LM <-
                 if(abs(B22[1,1])<10e-8)pvalue[]=NA
             }
             B = beta[length(beta)]
+            S = se[length(se)]
             P = pvalue[-1]
-            return(list(B=B, P=P))
+            return(list(B=B, S=S, P=P))
         }
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.farmcpu.parallel)
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-        return(list(P=results[,-1], betapred=betapred, B=results[,1]))
+        return(list(P=results[,3], betapred=betapred, B=results[,1], S=results[,2]))
     } #end of FarmCPU.LM function
 
 
