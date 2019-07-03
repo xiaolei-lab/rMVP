@@ -59,7 +59,7 @@ function(
             cat("Scale the genotype matrix", "\n")
             M <- M - 2 * Pi
             SUM <- sum(Pi * (1 - Pi))
-            cat("Computing Z'Z...", "\n")
+            cat("Computing Z'Z", "\n")
             if(r.open)  try(setMKLthreads(cpu), silent=TRUE)
             K <- 0.5 * crossprod(M)/SUM
         },
@@ -145,7 +145,7 @@ function(
         }
     )
     #print("K Preparation is Done!")
-    cat("Deriving relationship matrix successfully!", "\n"); gc()
+    cat("Deriving relationship matrix successfully", "\n"); gc()
     return(K)
 }#end of MVP.k.VanRaden function
 
