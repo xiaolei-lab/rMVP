@@ -65,7 +65,7 @@ function(
         },
         "memory" = {
             if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
-            K <- kin_cal(M, threads=cpu)
+            K <- kin_cal(M@address, threads=cpu)
             # n <- ncol(M)
             # m <- nrow(M)
             # bac <- paste0("Z", memo, ".temp.bin")
