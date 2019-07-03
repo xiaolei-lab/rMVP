@@ -235,8 +235,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     }
   
     #GWAS
-    cat("|***********************GWAS Start***********************|", "\n")
-    
+    cat("|------------------------GWAS Start------------------------|", "\n")
     if(glm.run){
         cat("General Linear Model (GLM) Start...", "\n")
         glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar);gc()
