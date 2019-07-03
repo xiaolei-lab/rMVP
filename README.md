@@ -4,13 +4,14 @@
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
-<img src="results/mvp_logo.png" height="250px" width="450px">
+<img src="results/mvp_logo.png" height="180px" width="400px">
 </a>
 </p>
 
 ### Authors:
 
-> Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Xiaohui Yuan, Shuhong Zhao, ***Xiaolei Liu***
+[Lilin Yin](https://github.com/YinLiLin)#, [Haohao Zhang](https://github.com/hyacz)#, and [**Xiaolei Liu**](https://github.com/XiaoleiLiuBio).</br>
+Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu@mail.hzau.edu.cn](mailto:xiaoleiliu@mail.hzau.edu.cn)
 
 ### Contact:
 > [xiaoleiliu@mail.hzau.edu.cn](Xiaolei Liu)
@@ -50,26 +51,10 @@
 
 **MVP** can be installed on Windows, Linux and MacOS with following steps:
 
-***Online installation(Recommended)***
-
 MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 > devtools::install_github("xiaoleiLiubio/rMVP@0.99.13")
-```
-
-***Offline installation***
-
-1. Download the MVP offline installation package on the [releases page](https://github.com/XiaoleiLiuBio/MVP/releases)
-2. Unzip the installation package
-3. Run the installation script `MVPinstall.r`
-
-```bash
-$ wget https://github.com/XiaoleiLiuBio/MVP/releases/download/0.99.13/MVP_offline_0.99.13.zip
-$ unzip MVP_offline_0.99.13.zip
-$ cd packages
-$ R
-> source("MVPinstall.r")
 ```
 
 After installed successfully, **MVP** can be loaded by typing
@@ -83,6 +68,7 @@ Typing ```?MVP``` could get the details of all parameters.
 # Data Preparation
 ## Phenotype
 **[back to top](#contents)**  
+We suggest to provide the phenotype file, user needn' to manually pre-treat the order of phenotype and genotype individuals, MVP could automatically adjust the order of genotype file to be consistent with phenotype file.
 
 | Taxa | trait1 | trait2 | trait3 |
 | :---: | :---: |:---: |:---: |
@@ -535,8 +521,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **nPC.MLM**, number of first columns of Principal Components added in MLM  
 **please attention that if nPC.FarmCPU > 0, no PCs should be added in CV.FarmCPU**  
 **nPC.FarmCPU**, number of first columns of Principal Components added in FarmCPU  
-**perc**, percentage of random selected SNPs used for calculating Principal Components  
-**priority**, **"speed"** or **"memory"**  
+**priority**, **"speed"** or **"memory" when calculating the genomic relationship matrix**  
 **ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default.
 **vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" (Kang, 2008, Genetics) and "GEMMA" (HE Regression, Xiang Zhou, 2016, doi: https://doi.org/10.1101/042846)  
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
@@ -558,7 +543,6 @@ imMVP <- MVP(
     nPC.GLM=5,
     nPC.MLM=3,
     nPC.FarmCPU=3,
-    perc=1,
     priority="speed",
     #ncpus=10,
     vc.method="EMMA",
@@ -586,7 +570,6 @@ for(i in 2:ncol(phenotype)){
     nPC.GLM=5,
     nPC.MLM=3,
     nPC.FarmCPU=3,
-    perc=1,
     priority="speed",
     #ncpus=10,
     vc.method="EMMA",
