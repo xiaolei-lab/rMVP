@@ -9,8 +9,8 @@ Description: a Memory efficient, Visualization enhanced, and Parallel accelerate
 License: Apache License | file LICENSE
 SystemRequirements: C++11
 BugReports: https://github.com/XiaoleiLiuBio/MVP/issues
-Imports: utils, stats, methods, graphics, grDevices, Rcpp, RcppEigen, RcppProgress, RcppArmadillo, BH, bigmemory, parallel, MASS
-Depends: R (>= 3.4)
+Imports: utils, stats, methods, graphics, grDevices, Rcpp, RcppEigen, RcppProgress, RcppArmadillo, BH, parallel, MASS
+Depends: R (>= 3.4), bigmemory
 LinkingTo: Rcpp, RcppEigen, RcppProgress, RcppArmadillo, BH, bigmemory
 NeedsCompilation: yes
 biocViews: GenomeWideAssociation, Visualization, Genetics, Preprocessing, QualityControl, Software
