@@ -111,7 +111,7 @@ function(
         p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
         return(list(effect=effect, se=se, p=p))
     }
-    
+    cat("scanning...\n")
     if(cpu == 1){
         math.cpu <- try(getMKLthreads(), silent=TRUE)
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
