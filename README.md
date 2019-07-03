@@ -63,7 +63,7 @@ Typing ```?MVP``` could get the details of all parameters.
 # Data Preparation
 ## Phenotype
 **[back to top](#contents)**  
-We suggest to provide the phenotype file, user needn' to manually pre-treat the order of phenotype and genotype individuals, MVP could automatically adjust the order of genotype file to be consistent with phenotype file.
+We suggest to provide the phenotype file, users needn't to manually pre-treat the order of phenotype and genotype individuals, MVP could automatically adjust the order of genotype file to be consistent with phenotype file.
 
 | Taxa | trait1 | trait2 | trait3 |
 | :---: | :---: |:---: |:---: |
