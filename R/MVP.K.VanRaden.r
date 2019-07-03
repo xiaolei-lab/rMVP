@@ -61,7 +61,11 @@ function(
             SUM <- sum(Pi * (1 - Pi))
             cat("Computing Z'Z", "\n")
             if(r.open)  try(setMKLthreads(cpu), silent=TRUE)
-            K <- 0.5 * crossprod(M)/SUM
+            K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
+            if(inherits(K,"try-error")){
+                cat("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n")
+                stop(K[[1]])
+            }
         },
         "memory" = {
             if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
