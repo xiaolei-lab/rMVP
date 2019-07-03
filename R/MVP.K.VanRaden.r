@@ -47,7 +47,7 @@ function(
     if(r.open && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-    
+    cat("Relationship matrix mode in", priority[1], "\n")
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
         match.arg(priority),
