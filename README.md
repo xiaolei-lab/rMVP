@@ -47,8 +47,6 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 **WE STRONGLY RECOMMEND INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
 
 **MVP** can be installed on Windows, Linux and MacOS with following steps:
-
-MVP can be installed with following R codes:  
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 > devtools::install_github("xiaoleiLiubio/rMVP@0.99.13")
