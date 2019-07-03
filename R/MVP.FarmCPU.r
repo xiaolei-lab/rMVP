@@ -184,8 +184,12 @@
             }
 
             cat("seqQTN:", "\n")
-            if(is.null(seqQTN)) seqQTN="NULL"
-            cat(seqQTN, "\n")
+            if(is.null(seqQTN)){
+                cat("NULL", "\n")
+            }else{
+                cat(seqQTN, "\n")
+            }
+            
             cat("scanning...", "\n")
             if(theLoop==maxLoop){
                 cat(paste("Total number of possible QTNs in the model is: ", length(seqQTN),sep=""), "\n")
