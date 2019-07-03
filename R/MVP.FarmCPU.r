@@ -183,7 +183,8 @@
                 if(seqQTN.pre[1]==-1) circle=FALSE
             }
 
-            cat("seqQTN", "\n")
+            cat("seqQTN:", "\n")
+            if(is.null(seqQTN)) seqQTN="NULL"
             cat(seqQTN, "\n")
             cat("scanning...", "\n")
             if(theLoop==maxLoop){
