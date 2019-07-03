@@ -2,6 +2,7 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -119,6 +120,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fit_diago_brent
+List fit_diago_brent(NumericVector Y, NumericMatrix X, IntegerVector p_, NumericVector Sigma, NumericMatrix U, double min_h2, double max_h2, double tol, double verbose);
+RcppExport SEXP _rMVP_fit_diago_brent(SEXP YSEXP, SEXP XSEXP, SEXP p_SEXP, SEXP SigmaSEXP, SEXP USEXP, SEXP min_h2SEXP, SEXP max_h2SEXP, SEXP tolSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p_(p_SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type U(USEXP);
+    Rcpp::traits::input_parameter< double >::type min_h2(min_h2SEXP);
+    Rcpp::traits::input_parameter< double >::type max_h2(max_h2SEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< double >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(fit_diago_brent(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // BigRowMean
 arma::vec BigRowMean(SEXP pBigMat, int threads);
 RcppExport SEXP _rMVP_BigRowMean(SEXP pBigMatSEXP, SEXP threadsSEXP) {
@@ -154,6 +174,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
     {"_rMVP_count_allele", (DL_FUNC) &_rMVP_count_allele, 2},
     {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
+    {"_rMVP_fit_diago_brent", (DL_FUNC) &_rMVP_fit_diago_brent, 9},
     {"_rMVP_BigRowMean", (DL_FUNC) &_rMVP_BigRowMean, 2},
     {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 2},
     {NULL, NULL, 0}
