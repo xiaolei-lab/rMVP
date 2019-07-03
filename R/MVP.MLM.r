@@ -155,7 +155,7 @@ function(
         effect<- beta[(q0+1)]
         return(list(effect = effect, se = se, p = p))
     }
-    
+    cat("scanning...\n")
     #Paralleled MLM
     if(cpu == 1){
         math.cpu <- try(getMKLthreads(), silent=TRUE)
