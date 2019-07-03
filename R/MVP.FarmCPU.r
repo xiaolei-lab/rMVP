@@ -841,7 +841,7 @@ FarmCPU.LM <-
                 if(abs(B22[1,1])<10e-8)pvalue[]=NA
             }
             B = beta[length(beta)]
-            #S = se[length(se)]
+            S = se[length(se)]
             P = pvalue[-1]
             return(list(B=B, S=S, P=P))
         }
