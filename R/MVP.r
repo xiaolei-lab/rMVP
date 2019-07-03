@@ -86,7 +86,7 @@
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method="EMMA", method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
 permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
 ) {
     if (options("rMVP.OutputLog2File") == TRUE) {
@@ -188,11 +188,11 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         if(is.null(K)){
             K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus)
         }
-        cat("Eigen Decomposition...", "\n")
+        cat("Eigen Decomposition", "\n")
         eigenK <- eigen(K, symmetric=TRUE)
         if(!is.null(nPC)){
             ipca <- eigenK$vectors[, 1:nPC]
-            cat("Deriving PCs successfully!", "\n")
+            cat("Deriving PCs successfully", "\n")
         }
         if(("MLM" %in% method) & vc.method == "BRENT"){K <- NULL; gc()}
         if(!"MLM" %in% method){rm(eigenK); rm(K); gc()}
@@ -235,7 +235,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     }
   
     #GWAS
-    cat("GWAS Start...", "\n")
+    cat("|***********************GWAS Start***********************|", "\n")
     
     if(glm.run){
         cat("General Linear Model (GLM) Start...", "\n")
@@ -282,8 +282,8 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
     }
     cat(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n")
     if(file.output){
-        cat("Visualization Start...", "\n")
-        cat("Phenotype distribution Plotting...", "\n")
+        cat("Visualization Start", "\n")
+        cat("Phenotype distribution Plotting", "\n")
         MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
