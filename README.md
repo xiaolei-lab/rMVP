@@ -51,6 +51,12 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
 > devtools::install_github("xiaoleiLiubio/rMVP@0.99.13")
 ```
+If you get trouble in installing "devtools", please download [rMVP_0.99.14.tar.gz]() and try following steps:
+```r
+pkg <- setdiff(c("RcppEigen", "RcppProgress", "RcppArmadillo"), installed.packages()[,c("Package")])
+install.packages(pkg)
+install.packages("rMVP_0.99.14.tar.gz", repos=NULL)
+```
 
 After installed successfully, **MVP** can be loaded by typing
 ```r
