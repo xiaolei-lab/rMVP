@@ -53,7 +53,7 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 ```
 If you get trouble in installing "devtools", please download [rMVP_0.99.14.tar.gz]() and try following steps:
 ```r
-pkg <- setdiff(c("RcppEigen", "RcppProgress", "RcppArmadillo"), installed.packages()[,c("Package")])
+pkg <- setdiff(c("RcppEigen", "RcppProgress", "RcppArmadillo", "bigmemory"), installed.packages()[,c("Package")])
 install.packages(pkg)
 install.packages("rMVP_0.99.14.tar.gz", repos=NULL)
 ```
