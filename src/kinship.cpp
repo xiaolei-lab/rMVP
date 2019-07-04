@@ -10,6 +10,7 @@
 #include <R_ext/Print.h>
 #include <progress.hpp>
 #include "progress_bar.hpp"
+#include <RcppProgress/progress_bar.hpp>
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppArmadillo)]]
