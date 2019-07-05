@@ -321,6 +321,7 @@ permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4",
         }
     }
     now <- Sys.time()
+    cat("Results are stored at Working Directory:", getwd(), "\n")
     cat("End:", as.character(now), "\n")
     print_accomplished(width = 60)
     
