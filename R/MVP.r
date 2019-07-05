@@ -42,21 +42,12 @@
 #' @param ncpus number of cpus used for parallel
 #' @param vc.method methods for estimating variance component("EMMA" or "HE" or "BRENT")
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
-#' @param maxLine when the priority is 'memory', users can change this parameter to limit the memory
-#' @param memo a marker added on output file name
-#' @param P a start p value for each SNP
 #' @param method.sub, method.sub.final method used in substitution process
 #' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
 #' @param method.bin EMMA or FaSTLMM
 #' @param bin.size window size in genome
 #' @param bin.selection a vector, how many windows selected
-#' @param Prior four columns, SNP name, Chr, Pos, P
 #' @param maxLoop maximum number of iterations
-#' @param threshold.output output GWAS results only for SNPs with p value lower than the threshold.output
-#' @param iteration.output whether to output results for FarmCPU iterations
-#' @param p.threshold if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops
-#' @param QTN.threshold Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs
-#' @param bound maximum number of SNPs selected as pseudo QTNs for each iteration
 #' @param permutation.threshold if use a permutation cutoff or not (bonferroni cutoff)
 #' @param permutation.rep number of permutation replicates
 #' @param bar if TRUE, the progress bar will be drawn on the terminal
@@ -86,8 +77,15 @@
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 MVP <-
-function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL, CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), method="MLM", maxLine=1000, memo=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), Prior=NULL, maxLoop=10, threshold.output=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL, outward=FALSE,
-permutation.threshold=FALSE, permutation.rep=100, bar=TRUE, col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), plot.type="b", file.output=TRUE, file="jpg", dpi=300, threshold=0.05, Ncluster=1, signal.cex=0.8, box=FALSE
+function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
+         CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
+         ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), 
+         method=c("GLM", "MLM", "FarmCPU"), method.sub="reward", 
+         method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), 
+         bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
+         permutation.rep=100, bar=TRUE, 
+         col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
+         file.output=TRUE, file="jpg", dpi=300, threshold=0.05
 ) {
     now <- Sys.time()
     if (options("rMVP.OutputLog2File") == TRUE) {
