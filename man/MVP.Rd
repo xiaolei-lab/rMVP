@@ -4,21 +4,15 @@
 \alias{MVP}
 \title{MVP, Memory-efficient, Visualization-enhanced, Parallel-accelerated}
 \usage{
-MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
-  nPC.FarmCPU = NULL, perc = 1, CV.GLM = NULL, CV.MLM = NULL,
-  CV.FarmCPU = NULL, REML = NULL, priority = "speed",
-  ncpus = detectCores(logical = FALSE), vc.method = "EMMA",
-  method = "MLM", maxLine = 1000, memo = NULL, P = NULL,
-  method.sub = "reward", method.sub.final = "reward",
-  method.bin = "static", bin.size = c(5e+05, 5e+06, 5e+07),
-  bin.selection = seq(10, 100, 10), Prior = NULL, maxLoop = 10,
-  threshold.output = 1, iteration.output = FALSE, p.threshold = NA,
-  QTN.threshold = NULL, bound = NULL, outward = FALSE,
-  permutation.threshold = FALSE, permutation.rep = 100, bar = TRUE,
-  col = c("dodgerblue4", "olivedrab4", "violetred", "darkgoldenrod1",
-  "purple4"), plot.type = "b", file.output = TRUE, file = "jpg",
-  dpi = 300, threshold = 0.05, Ncluster = 1, signal.cex = 0.8,
-  box = FALSE)
+MVP(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
+         CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
+         ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), 
+         method=c("GLM", "MLM", "FarmCPU"), method.sub="reward", 
+         method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), 
+         bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
+         permutation.rep=100, bar=TRUE, 
+         col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
+         file.output=TRUE, file="jpg", dpi=300, threshold=0.05)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix, n is sample size}
@@ -34,8 +28,6 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 \item{nPC.MLM}{number of PCs added as fixed effects in MLM}
 
 \item{nPC.FarmCPU}{number of PCs added as fixed effects in FarmCPU}
-
-\item{perc}{percentage of total SNPs selected for PCA}
 
 \item{CV.GLM}{covariates added in GLM}
 
@@ -53,13 +45,7 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{method}{the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")}
 
-\item{maxLine}{when the priority is 'memory', users can change this parameter to limit the memory}
-
-\item{memo}{a marker added on output file name}
-
-\item{P}{a start p value for each SNP}
-
-\item{method.sub, }{method.sub.final method used in substitution process}
+\item{method.sub}{method.sub.final method used in substitution process}
 
 \item{method.sub.final}{method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'}
 
@@ -69,21 +55,7 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{bin.selection}{a vector, how many windows selected}
 
-\item{Prior}{four columns, SNP name, Chr, Pos, P}
-
 \item{maxLoop}{maximum number of iterations}
-
-\item{threshold.output}{output GWAS results only for SNPs with p value lower than the threshold.output}
-
-\item{iteration.output}{whether to output results for FarmCPU iterations}
-
-\item{p.threshold}{if all p values in the 1st iteration are bigger than p.threshold, FarmCPU stops}
-
-\item{QTN.threshold}{Only SNPs have a more significant p value than QTN.threshold have chance to be selected as pseudo QTNs}
-
-\item{bound}{maximum number of SNPs selected as pseudo QTNs for each iteration}
-
-\item{outward}{the direction of circular Manhattan plot}
 
 \item{permutation.threshold}{if use a permutation cutoff or not (bonferroni cutoff)}
 
@@ -93,8 +65,6 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{col}{for color of points in each chromosome on manhattan plot}
 
-\item{plot.type}{"b" (both Manhattan plot and qq plot will be draw) or "q" (qq plot only)}
-
 \item{file.output}{whether to output files or not}
 
 \item{file}{figure formats, "jpg", "tiff"}
@@ -103,11 +73,6 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{threshold}{a cutoff line on manhattan plot, 0.05/marker size}
 
-\item{Ncluster}{number of colors used for drawing PC 1 and PC 2}
-
-\item{signal.cex}{point size on output figures}
-
-\item{box}{logical, if TRUE, the box frame will be added in output figure}
 }
 \value{
 a m * 2 matrix, the first column is the SNP effect, the second column is the P values
