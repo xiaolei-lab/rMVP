@@ -93,8 +93,9 @@ arma::vec BigRowMean(SEXP pBigMat, int threads = 0){
 	}
 }
 
+
 template <typename T>
-arma::mat kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
+SEXP kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
 
     if (threads == 0) {
         omp_set_num_threads(omp_get_num_procs());
@@ -144,11 +145,12 @@ arma::mat kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
 		// }
 	// }
 	
-	return kin;
+	return Rcpp::wrap(kin);
 }
 
+
 // [[Rcpp::export]]
-arma::mat kin_cal(SEXP pBigMat, int threads = 0){
+SEXP kin_cal(SEXP pBigMat, int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
