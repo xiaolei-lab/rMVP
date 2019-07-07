@@ -139,7 +139,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                ),
            FFFFTT = 
                MVP.Data.Numeric2MVP( 
-                   num_file = fileNum, 
+                   num_file = fileNum,
+                   map_file = fileMap,
                    out = out, 
                    maxLine = maxLine, 
                    priority = priority, 
@@ -385,7 +386,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
 #' @examples 
 #' numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 #' MVP.Data.Numeric2MVP(numericPath, "rMVP.test.num")
-MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
+MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
@@ -468,6 +469,8 @@ MVP.Data.Numeric2MVP <- function(num_file, out='mvp', maxLine=1e4, priority='spe
         }
         close(con)
     }
+    
+    file.copy(map_file, paste0(out, ".geno.map"))
     
     flush(bigmat)
     gc()
