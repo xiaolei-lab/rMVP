@@ -65,7 +65,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     // Define
     const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
     ifstream file(vcf_file);
-    ofstream map(out + ".map");
+    ofstream map(out + ".geno.map");
     ofstream indfile(out + ".geno.ind");
     
     string line;
@@ -222,7 +222,7 @@ void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, long maxLine, int t
 List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     // Define
     const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
-    ofstream map(out + ".map");
+    ofstream map(out + ".geno.map");
     ofstream indfile(out + ".geno.ind");
     
     string line;

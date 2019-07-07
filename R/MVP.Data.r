@@ -648,7 +648,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t')
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
     }
-    write.table(map, paste0(out, ".map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
+    write.table(map, paste0(out, ".geno.map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
     t2 <- as.numeric(Sys.time())
     cat("Preparation for MAP data is done within", format_time(t2 - t1), "\n")
     return(nrow(map))
@@ -847,7 +847,7 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
         )
         outmat[, ] <- bigmat[, ]
         file.copy(paste0(mvp_prefix, ".geno.ind"), paste0(out, ".geno.ind"))
-        file.copy(paste0(mvp_prefix, ".map"), paste0(out, ".map"))
+        file.copy(paste0(mvp_prefix, ".geno.map"), paste0(out, ".geno.map"))
     }
     
     # impute single marker
@@ -902,7 +902,7 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
 
     # input
     bigmat <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-    map <- read.table(paste0(mvp_prefix, ".map"), header = TRUE)
+    map <- read.table(paste0(mvp_prefix, ".geno.map"), header = TRUE)
     ind <- read.table(paste0(mvp_prefix, ".geno.ind"))
     if (is.null(out)) { out <- paste0(basename(mvp_prefix), ".qc")}
     if (is.null(ncpus)) { ncpus <- detectCores() - 1 }
