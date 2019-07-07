@@ -139,20 +139,8 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// BigRowMean
-arma::vec BigRowMean(SEXP pBigMat, int threads);
-RcppExport SEXP _rMVP_BigRowMean(SEXP pBigMatSEXP, SEXP threadsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(BigRowMean(pBigMat, threads));
-    return rcpp_result_gen;
-END_RCPP
-}
 // kin_cal
-arma::mat kin_cal(SEXP pBigMat, int threads);
+SEXP kin_cal(SEXP pBigMat, int threads);
 RcppExport SEXP _rMVP_kin_cal(SEXP pBigMatSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -175,7 +163,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_count_allele", (DL_FUNC) &_rMVP_count_allele, 2},
     {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
     {"_rMVP_fit_diago_brent", (DL_FUNC) &_rMVP_fit_diago_brent, 9},
-    {"_rMVP_BigRowMean", (DL_FUNC) &_rMVP_BigRowMean, 2},
     {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 2},
     {NULL, NULL, 0}
 };

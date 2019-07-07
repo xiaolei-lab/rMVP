@@ -74,7 +74,7 @@ arma::vec BigRowMean(XPtr<BigMatrix> pMat, int threads = 0){
 	return mean;
 }
 
-// [[Rcpp::export]]
+
 arma::vec BigRowMean(SEXP pBigMat, int threads = 0){
 	
 	XPtr<BigMatrix> xpMat(pBigMat);

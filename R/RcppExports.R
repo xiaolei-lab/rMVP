@@ -41,10 +41,6 @@ fit_diago_brent <- function(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose) {
     .Call(`_rMVP_fit_diago_brent`, Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose)
 }
 
-BigRowMean <- function(pBigMat, threads = 0L) {
-    .Call(`_rMVP_BigRowMean`, pBigMat, threads)
-}
-
 kin_cal <- function(pBigMat, threads = 0L) {
     .Call(`_rMVP_kin_cal`, pBigMat, threads)
 }
