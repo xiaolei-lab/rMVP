@@ -65,7 +65,7 @@
 #' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 #' MVP.Data(fileBed=bfilePath, out="rMVP.test.data", ncpus=1)
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
-                     filePhe = NULL, fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp", sep.num = "\t",
+                     filePhe = NULL, fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
                      type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
                      pcs.keep = 5, verbose = TRUE, ncpus = NULL, ...) {
@@ -694,6 +694,10 @@ MVP.Data.PC <- function(
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # get pc
+    if (is.null(filePC) || filePC == FALSE) {
+        return()
+    }
+    
     if (is.character(filePC)) {
         myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
@@ -707,8 +711,6 @@ MVP.Data.PC <- function(
         }else{
             myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
         }
-    } else if (filePC == FALSE || is.null(filePC)) {
-        return()
     } else {
         stop("ERROR: The value of filePC is invalid.")
     }
@@ -763,8 +765,12 @@ MVP.Data.Kin <- function(
     if (file.exists(descriptorfile)) file.remove(descriptorfile)
     
     # get kin
+    if (is.null(fileKin) || fileKin == FALSE) {
+        return()
+    }
+    
     if (is.character(fileKin)) {
-        myKin <- read.big.matrix(fileKin, head = FALSE, type = 'double', sep = sep)
+        myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
         if (hasNA(geno@address)) {
@@ -773,8 +779,6 @@ MVP.Data.Kin <- function(
         }
         cat("Calculate KINSHIP using Vanraden method...", "\n")
         myKin <- MVP.K.VanRaden(geno, priority = priority, cpu=cpus)
-    } else if (fileKin == FALSE || is.null(fileKin)) {
-        return(NULL)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
