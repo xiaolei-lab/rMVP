@@ -182,7 +182,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }else{
         nPC <- NULL
     }
-    if(!is.null(K))){K <- as.matrix(K)}
+    if(!is.null(K)){K <- as.matrix(K)}
     if(!is.null(nPC) | "MLM" %in% method){
         if(is.null(K)){
             K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus)
