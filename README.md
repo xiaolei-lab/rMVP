@@ -2,12 +2,14 @@
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
+
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
 <img src="results/mvp_logo.png" height="180px" width="370px">
 </a>
 </p>
-------------------------------------***MVP is back, and better than ever!***------------------------------------
+
+### ***MVP is back, and better than ever!***
 
 ### Authors:
 
