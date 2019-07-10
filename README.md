@@ -526,7 +526,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **please attention that if nPC.FarmCPU > 0, no PCs should be added in CV.FarmCPU**  
 **nPC.FarmCPU**, number of first columns of Principal Components added in FarmCPU  
 **priority**, **"speed"** or **"memory" when calculating the genomic relationship matrix**  
-**ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default.
+**ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default  
 **vc.method**, method of variance components analysis, two methods are avaiblable, "EMMA" (Kang, 2008, Genetics) and "GEMMA" (HE Regression, Xiang Zhou, 2016, doi: https://doi.org/10.1101/042846)  
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
 **method.bin**, a parameter for FarmCPU only, three options are available: "FaST-LMM","EMMA", and "static"  
