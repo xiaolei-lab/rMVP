@@ -876,8 +876,13 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
         outmat[i, is.na(outmat[i, ])] <- A
     }
     
-    
-    mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
+    if(Sys.info()[['sysname']] != 'Windows'){
+        mkl_env({
+            mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
+        })
+    }else{
+        lapply(1:nrow(outmat), impute_marker)
+    }
     
     cat("Impute Genotype File is done!\n")
     # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
@@ -931,7 +936,14 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # qc marker
     marker_index <- rep(TRUE, nrow(bigmat))
     if (!is.null(geno) && geno > 0) {
-        marker_index <- unlist(mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno))
+        if(Sys.info()[['sysname']] != 'Windows'){
+            mkl_env({
+                marker_index <- mclapply(1:nrow(bigmat), is.valid, mc.cores = ncpus, margin = "r", cutoff = geno)
+            })
+        }else{
+            marker_index <- lapply(1:nrow(bigmat), is.valid, margin = "r", cutoff = geno)
+        }
+        marker_index <- unlist(marker_index)
         cat(paste0(length(marker_index[marker_index == FALSE])), 
             "markers are filtered. missing ratio > ", geno, "\n")
     }
@@ -939,7 +951,14 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # qc individual
     ind_index <- rep(TRUE, ncol(bigmat))
     if (!is.null(mind) && mind > 0) {
-        ind_index <- unlist(mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = mind))
+        if(Sys.info()[['sysname']] != 'Windows'){
+            mkl_env({
+                marker_index <- mclapply(1:ncol(bigmat), is.valid, mc.cores = ncpus, margin = "c", cutoff = geno)
+            })
+        }else{
+            marker_index <- lapply(1:ncol(bigmat), is.valid, margin = "c", cutoff = geno)
+        }
+        marker_index <- unlist(marker_index)
         cat(paste0(length(ind_index[ind_index == FALSE])),
             "individuals are filtered. missing ratio > ", mind, "\n")
     }
