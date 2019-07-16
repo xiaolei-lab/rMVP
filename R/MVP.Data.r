@@ -568,7 +568,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     
     # check phenotype file
     if (length(cols) < 2) {
-        stop("ERROR: At least 2 columns in the phenotype file should be specified.")
+        stop("ERROR: At least 2 columns in the phenotype file should be specified, please check the parameter 'sep.phe'. ")
     }
     phe[, cols[1]] <- sapply(phe[, cols[1]], function(x){gsub("^\\s+|\\s+$", "", x)}) 
     
