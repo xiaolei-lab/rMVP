@@ -52,13 +52,13 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 **MVP** can be installed on Windows, Linux and MacOS with following steps:
 ```r
 #if "devtools" isn't installed, please "install.packages('devtools')" first.
-> devtools::install_github("xiaoleiLiubio/rMVP@0.99.14")
+> devtools::install_github("xiaoleiLiubio/rMVP@0.99.14.1")
 ```
-If you get trouble in installing "devtools", please download [rMVP_0.99.14.tar.gz](https://github.com/XiaoleiLiuBio/rMVP/releases/download/0.99.14/rMVP_0.99.14.tar.gz) and try following steps:
+If you get trouble in installing "devtools", please download [rMVP_0.99.14.tar.gz](https://github.com/XiaoleiLiuBio/rMVP/releases/download/0.99.14.1/rMVP_0.99.14.1.tar.gz) and try following steps:
 ```r
 pkg <- setdiff(c("RcppEigen", "RcppProgress", "RcppArmadillo", "bigmemory"), installed.packages()[,c("Package")])
 install.packages(pkg)
-install.packages("rMVP_0.99.14.tar.gz", repos=NULL)
+install.packages("rMVP_0.99.14.1.tar.gz", repos=NULL)
 ```
 
 After installed successfully, **MVP** can be loaded by typing
