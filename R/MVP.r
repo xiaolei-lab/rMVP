@@ -42,8 +42,8 @@
 #' @param ncpus number of cpus used for parallel
 #' @param vc.method methods for estimating variance component("EMMA" or "HE" or "BRENT")
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
-#' @param method.sub, method.sub.final method used in substitution process
-#' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
+#' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
+#' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
 #' @param method.bin EMMA or FaSTLMM
 #' @param bin.size window size in genome
 #' @param bin.selection a vector, how many windows selected
@@ -80,8 +80,8 @@ MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
          ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), 
-         method=c("GLM", "MLM", "FarmCPU"), method.sub="reward", 
-         method.sub.final="reward", method.bin="static", bin.size=c(5e5,5e6,5e7), 
+         method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
+         QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
          permutation.rep=100, bar=TRUE, 
          col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
@@ -258,7 +258,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     
     if(farmcpu.run){
         cat("FarmCPU Start...", "\n")
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", method.sub=method.sub, method.sub.final=method.sub.final, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
         if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
     }
