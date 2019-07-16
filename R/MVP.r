@@ -146,8 +146,15 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if(length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
     #file.exsits()
     if(length(seqTaxa) != length(phe[,2])){
-        try(unlink(c("geno.temp.bin","geno.temp.desc")), silent=TRUE)
-        geno = deepcopy(geno, cols=seqTaxa, backingfile="geno.temp.bin", descriptorfile="geno.temp.desc")
+        try(unlink(c("temp.geno.bin","temp.geno.desc")), silent=TRUE)
+        remove_bigmatrix("temp")
+        geno = deepcopy(
+          x = geno,
+          cols = seqTaxa,
+          backingpath = getwd(),
+          backingfile = "temp.geno.bin",
+          descriptorfile = "temp.geno.desc"
+        )
         phe = phe[seqTaxa,]
         if(!is.null(K)){K = K[seqTaxa, seqTaxa]}
         if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
@@ -155,9 +162,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
         rm(geno)
             gc()
-            genoName <- "geno.temp.desc"
+            genoName <- "temp.geno.desc"
         geno <- attach.big.matrix(genoName)
-        unlink(c("geno.temp.desc", "geno.temp.bin"))
+        unlink(c("temp.geno.desc", "temp.geno.bin"))
     }
     #Data information
     m=nrow(geno)
