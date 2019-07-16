@@ -365,8 +365,8 @@ remove_bigmatrix <- function(x, desc_suffix=".geno.desc", bin_suffix=".geno.bin"
     name <- basename(x)
     path <- dirname(x)
     
-    descfile <- file.path(x, desc_suffix)
-    binfile  <- file.path(x, bin_suffix)
+    descfile <- paste0(x, desc_suffix)
+    binfile  <- paste0(x, bin_suffix)
     
     # Delete objects that occupy binfile in the global environment
     if (Sys.info()[['sysname']] == "Windows") {
