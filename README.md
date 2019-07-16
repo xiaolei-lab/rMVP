@@ -491,7 +491,7 @@ At least you should prepare three datasets: genotype, phenotype, and map
 ```r
 genotype <- attach.big.matrix("mvp.geno.desc")
 phenotype <- read.table("mvp.phe",head=TRUE)
-map <- read.table("mvp.map" , head = TRUE)
+map <- read.table("mvp.geno.map" , head = TRUE)
 ```
 
 ## Advanced
