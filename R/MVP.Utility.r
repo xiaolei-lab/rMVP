@@ -372,7 +372,7 @@ remove_bigmatrix <- function(x, desc_suffix=".geno.desc", bin_suffix=".geno.bin"
     if (Sys.info()[['sysname']] == "Windows") {
         for (v in ls(envir = globalenv())) {
             if (class(get(v, envir = globalenv())) == "big.matrix") {
-                desc <- describe(v)@description
+                desc <- describe(get(v, envir = globalenv()))@description
                 if (desc$dirname == path && desc$filename == binfile) {
                     rm(list = v, envir = globalenv())
                     gc()
