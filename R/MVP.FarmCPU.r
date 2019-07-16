@@ -65,7 +65,7 @@
 #'   method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
 #'   Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
 #' str(farmcpu)
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=NULL, bound=NULL){
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=0.01, bound=NULL){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
     
     echo=TRUE
@@ -77,7 +77,6 @@
         npc=0
     }
     
-    if(is.null(QTN.threshold)){QTN.threshold = 0.01}
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
     name.of.trait=colnames(phe)[2]
