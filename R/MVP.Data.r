@@ -164,44 +164,37 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     }
     
     # impute
-    desc <- paste0(out, ".geno.desc")
-    bigmat <- attach.big.matrix(desc)
-    
-    if (!is.null(SNP.impute) && hasNA(bigmat@address)) {
+    if (!is.null(SNP.impute)) {
         MVP.Data.impute(
-            mvp_prefix = out, 
-            # out = paste0(out, '.imp'), 
+            mvp_prefix = out,
             method = SNP.impute,
             ncpus = ncpus
         )
-        # # remove intermediate genotype
-        # file.remove(paste0(out, ".geno.desc"))
-        # file.remove(paste0(out, ".geno.bin"))
-        # file.remove(paste0(out, ".geno.ind"))
-        # file.remove(paste0(out, ".map"))
-        
-        # out <- paste0(out, '.imp')
     }
     
     # get kin
-    K <- MVP.Data.Kin(
-        fileKin = fileKin, 
-        mvp_prefix = out, 
-        priority = priority, 
-        sep = sep.kin,
-        cpus=cpus
-    )
+    if (!is.null(fileKin) && fileKin != FALSE) {
+        K <- MVP.Data.Kin(
+            fileKin = fileKin, 
+            mvp_prefix = out, 
+            priority = priority, 
+            sep = sep.kin,
+            cpus=cpus
+        )
+    }
     
     # get pc
-    MVP.Data.PC(
-        filePC = filePC, 
-        mvp_prefix = out, 
-        K = K[,],
-        pcs.keep = pcs.keep,
-        priority = priority, 
-        sep = sep.pc,
-        cpus=cpus
-    )
+    if (!is.null(filePC) && filePC != FALSE) {
+        MVP.Data.PC(
+            filePC = filePC, 
+            mvp_prefix = out, 
+            K = K[,],
+            pcs.keep = pcs.keep,
+            priority = priority, 
+            sep = sep.pc,
+            cpus=cpus
+        )
+    }
 
 
     cat("MVP data prepration accomplished successfully!\n")
@@ -686,12 +679,7 @@ MVP.Data.PC <- function(
     # check old file
     backingfile <- paste0(basename(out), ".pc.bin")
     descriptorfile <- paste0(basename(out), ".pc.desc")
-    remove_bigmatrix(out)
-    
-    # get pc
-    if (is.null(filePC) || filePC == FALSE) {
-        return()
-    }
+    remove_bigmatrix(out, desc_suffix = ".pc.desc", bin_suffix = ".pc.bin")
     
     if (is.character(filePC)) {
         myPC <- read.big.matrix(filePC, header = FALSE, type = 'double', sep = sep)
@@ -750,18 +738,13 @@ MVP.Data.Kin <- function(
     priority='speed', 
     sep='\t',
     cpus=1
-){
+) {
     if (is.null(out)) out <- mvp_prefix
     
     # check old file
     backingfile <- paste0(basename(out), ".kin.bin")
     descriptorfile <- paste0(basename(out), ".kin.desc")
-    remove_bigmatrix(out)
-    
-    # get kin
-    if (is.null(fileKin) || fileKin == FALSE) {
-        return()
-    }
+    remove_bigmatrix(out, desc_suffix = ".kin.desc", bin_suffix = ".kin.bin")
     
     if (is.character(fileKin)) {
         myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
