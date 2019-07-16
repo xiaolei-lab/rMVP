@@ -133,8 +133,8 @@
                 #Report
                 P=myGLM$P[,ncol(myGLM$P)]
                 P[P==0] <- min(P[P!=0],na.rm=TRUE)*0.01
-                results = cbind(myGLM$B, P)
-                colnames(results) = c("effect","p")
+                results = cbind(myGLM$B, myGLM$S, P)
+                colnames(results) = c("effect", "se", "p")
                 break
             }#force to exit for GLM model while seqQTN=NULL and h2=0
 
