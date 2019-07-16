@@ -347,6 +347,7 @@ load_if_installed <- function(package) {
     }
 }
 
+
 mkl_env <- function(exprs, threads = 1) {
     if (load_if_installed("RevoUtilsMath")) {
         math.cores <- RevoUtilsMath::getMKLthreads()
@@ -357,4 +358,33 @@ mkl_env <- function(exprs, threads = 1) {
         RevoUtilsMath::setMKLthreads(math.cores)
     }
     return(result)
+}
+
+
+remove_bigmatrix <- function(x, desc_suffix=".geno.desc", bin_suffix=".geno.bin") {
+    name <- basename(x)
+    path <- dirname(x)
+    
+    descfile <- file.path(x, desc_suffix)
+    binfile  <- file.path(x, bin_suffix)
+    
+    # Delete objects that occupy binfile in the global environment
+    if (Sys.info()[['sysname']] == "Windows") {
+        for (v in ls(envir = globalenv())) {
+            if (class(get(v, envir = globalenv())) == "big.matrix") {
+                desc <- describe(v)@description
+                if (desc$dirname == path && desc$filename == binfile) {
+                    rm(list = v, envir = globalenv())
+                    gc()
+                }
+            }
+        }
+    }
+    
+    if (file.exists(descfile)) {
+        file.remove(descfile)
+    }
+    if (file.exists(binfile)) {
+        file.remove(binfile)
+    }
 }

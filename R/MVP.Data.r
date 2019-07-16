@@ -233,8 +233,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # parser map
     cat("Reading file...\n")
@@ -284,8 +283,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # parser map
     cat("Reading file...\n")
@@ -338,8 +336,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # parser map
     cat("Reading file...\n")
@@ -391,8 +388,7 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # detecte n(ind) and m(marker)
     cat("Reading file...\n")
@@ -690,8 +686,7 @@ MVP.Data.PC <- function(
     # check old file
     backingfile <- paste0(basename(out), ".pc.bin")
     descriptorfile <- paste0(basename(out), ".pc.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # get pc
     if (is.null(filePC) || filePC == FALSE) {
@@ -699,7 +694,7 @@ MVP.Data.PC <- function(
     }
     
     if (is.character(filePC)) {
-        myPC <- read.big.matrix(filePC, head = FALSE, type = 'double', sep = sep)
+        myPC <- read.big.matrix(filePC, header = FALSE, type = 'double', sep = sep)
     } else if (filePC == TRUE) {
         if(is.null(K)){
             geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
@@ -761,8 +756,7 @@ MVP.Data.Kin <- function(
     # check old file
     backingfile <- paste0(basename(out), ".kin.bin")
     descriptorfile <- paste0(basename(out), ".kin.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     # get kin
     if (is.null(fileKin) || fileKin == FALSE) {
@@ -840,8 +834,7 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
         # output to new genotype file.
         backingfile <- paste0(basename(out), ".geno.bin")
         descriptorfile <- paste0(basename(out), ".geno.desc")
-        if (file.exists(backingfile)) file.remove(backingfile)
-        if (file.exists(descriptorfile)) file.remove(descriptorfile)
+        remove_bigmatrix(out)
         
         outmat <- filebacked.big.matrix(
             nrow = nrow(bigmat),
@@ -971,8 +964,7 @@ MVP.Data.QC <- function(mvp_prefix, out=NULL, geno=0.1, mind=0.1, maf=0.05, hwe=
     # output to new genotype file.
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
-    if (file.exists(backingfile)) file.remove(backingfile)
-    if (file.exists(descriptorfile)) file.remove(descriptorfile)
+    remove_bigmatrix(out)
     
     outmat <- filebacked.big.matrix(
         nrow = nrow(bigmat),
