@@ -67,6 +67,8 @@ After installed successfully, **MVP** can be loaded by typing
 ```
 Typing ```?MVP``` could get the details of all parameters.
 
+**For more help on Windows installation, see the [wiki page](https://github.com/XiaoleiLiuBio/rMVP/wiki/R-%E8%AF%AD%E8%A8%80%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97%EF%BC%88Windows%EF%BC%89) (Chinese)**
+
 ---
 
 # Data Preparation
