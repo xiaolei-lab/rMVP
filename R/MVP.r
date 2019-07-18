@@ -183,9 +183,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     
     if(!is.null(nPC.GLM)|!is.null(nPC.MLM)|!is.null(nPC.FarmCPU)){
         nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU)
-        #if(nPC < 3){
-        #nPC <- 3
-        #}
+        if(nPC < 3){
+        	nPC <- 3
+        }
     }else{
         nPC <- NULL
     }
