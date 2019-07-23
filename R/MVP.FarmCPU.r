@@ -783,7 +783,7 @@ FarmCPU.LM <-
         wy = crossprod(w,y)
         # yy=crossprodcpp(y)
         yy = crossprod(y)
-        wwi = solve(ww)
+        wwi = ginv(ww)
         
         #Statistics on the reduced model without marker
         rhs=wy
