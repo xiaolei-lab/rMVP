@@ -94,6 +94,8 @@ function(
     if (is.null(CV)) {
         X0 <- matrix(1, n)
     } else {
+	CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
+	CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
     }
 
