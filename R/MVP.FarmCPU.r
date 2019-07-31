@@ -72,6 +72,8 @@
     nm=nrow(map)
     if(!is.null(CV)){
         CV=as.matrix(CV)
+        CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
+	    CV <- CV[, CV.index, drop=FALSE]
         npc=ncol(CV)
     }else{
         npc=0
