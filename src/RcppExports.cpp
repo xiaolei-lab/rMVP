@@ -97,29 +97,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// count_allele
-Rcpp::NumericVector count_allele(SEXP pBigMat, int i);
-RcppExport SEXP _rMVP_count_allele(SEXP pBigMatSEXP, SEXP iSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    Rcpp::traits::input_parameter< int >::type i(iSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_allele(pBigMat, i));
-    return rcpp_result_gen;
-END_RCPP
-}
-// hasNA
-bool hasNA(SEXP pBigMat);
-RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat));
-    return rcpp_result_gen;
-END_RCPP
-}
 // fit_diago_brent
 List fit_diago_brent(NumericVector Y, NumericMatrix X, IntegerVector p_, NumericVector Sigma, NumericMatrix U, double min_h2, double max_h2, double tol, double verbose);
 RcppExport SEXP _rMVP_fit_diago_brent(SEXP YSEXP, SEXP XSEXP, SEXP p_SEXP, SEXP SigmaSEXP, SEXP USEXP, SEXP min_h2SEXP, SEXP max_h2SEXP, SEXP tolSEXP, SEXP verboseSEXP) {
@@ -136,6 +113,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< double >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(fit_diago_brent(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// impute_marker
+void impute_marker(SEXP pBigMat, int threads, bool verbose);
+RcppExport SEXP _rMVP_impute_marker(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    impute_marker(pBigMat, threads, verbose);
+    return R_NilValue;
+END_RCPP
+}
+// hasNA
+bool hasNA(SEXP pBigMat);
+RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -160,9 +160,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_numeric_scan", (DL_FUNC) &_rMVP_numeric_scan, 1},
     {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
-    {"_rMVP_count_allele", (DL_FUNC) &_rMVP_count_allele, 2},
-    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
     {"_rMVP_fit_diago_brent", (DL_FUNC) &_rMVP_fit_diago_brent, 9},
+    {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 3},
+    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
     {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 2},
     {NULL, NULL, 0}
 };

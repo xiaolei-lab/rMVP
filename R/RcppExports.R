@@ -29,16 +29,16 @@ read_bfile <- function(bed_file, pBigMat, maxLine, threads = 0L, verbose = TRUE)
     invisible(.Call(`_rMVP_read_bfile`, bed_file, pBigMat, maxLine, threads, verbose))
 }
 
-count_allele <- function(pBigMat, i) {
-    .Call(`_rMVP_count_allele`, pBigMat, i)
+fit_diago_brent <- function(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose) {
+    .Call(`_rMVP_fit_diago_brent`, Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose)
+}
+
+impute_marker <- function(pBigMat, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_rMVP_impute_marker`, pBigMat, threads, verbose))
 }
 
 hasNA <- function(pBigMat) {
     .Call(`_rMVP_hasNA`, pBigMat)
-}
-
-fit_diago_brent <- function(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose) {
-    .Call(`_rMVP_fit_diago_brent`, Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose)
 }
 
 kin_cal <- function(pBigMat, threads = 0L) {

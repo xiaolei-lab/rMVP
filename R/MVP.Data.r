@@ -168,7 +168,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         MVP.Data.impute(
             mvp_prefix = out,
             method = SNP.impute,
-            ncpus = ncpus
+            ncpus = ncpus,
+            verbose = verbose
         )
     }
     
@@ -179,7 +180,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             mvp_prefix = out, 
             priority = priority, 
             sep = sep.kin,
-            cpus=cpus
+            cpus = cpus
         )
     }
     
@@ -192,7 +193,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             pcs.keep = pcs.keep,
             priority = priority, 
             sep = sep.pc,
-            cpus=cpus
+            cpus = cpus
         )
     }
 
@@ -755,7 +756,7 @@ MVP.Data.Kin <- function(
             return()
         }
         cat("Calculate KINSHIP using Vanraden method...", "\n")
-        myKin <- MVP.K.VanRaden(geno, priority = priority, cpu=cpus)
+        myKin <- MVP.K.VanRaden(geno, priority = priority, cpu = cpus)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
@@ -793,7 +794,7 @@ MVP.Data.Kin <- function(
 #' mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
 #' MVP.Data.impute(mvpPath, ncpus=1)
 # TODO:A little slow (inds: 6, markers:50703 ~ 10s @haohao's mbp)
-MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
+MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL, verbose=TRUE) {
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
     bigmat <- attach.big.matrix(desc)
@@ -833,35 +834,9 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL) {
         file.copy(paste0(mvp_prefix, ".geno.map"), paste0(out, ".geno.map"))
     }
     
-    # impute single marker
-    impute_marker <- function(i) {
-        # get frequency
-        c <- count_allele(outmat@address, i)
-        
-        # get Minor / Major / Middle Gene
-        if (method == 'Middle' | length(c) == 0) { A <- 1 }
-        else if (method == 'Major') { A <- as.numeric(names(c[c == max(c)])) }
-        else if (method == 'Minor') { A <- as.numeric(names(c[c == min(c)])) }
-        else {
-            message(paste("Unknow imputation method '", method, "', impute with 'Major' method."))
-            A <- as.numeric(names(c[c == max(c)]))
-        }
-        
-        # impute
-        if (length(A) > 1) { A <- A[1] }
-        outmat[i, is.na(outmat[i, ])] <- A
-    }
-    
-    if(Sys.info()[['sysname']] != 'Windows'){
-        mkl_env({
-            mclapply(1:nrow(outmat), impute_marker, mc.cores = ncpus)
-        })
-    }else{
-        lapply(1:nrow(outmat), impute_marker)
-    }
+    impute_marker(outmat@address, threads = ncpus, verbose = verbose)
     
     cat("Impute Genotype File is done!\n")
-    # biganalytics::apply(bigmat, 1, impute.marker, MISSING = MISSING, method = method)
 }
 
 #' MVP.Data.QC: quality control of genotype

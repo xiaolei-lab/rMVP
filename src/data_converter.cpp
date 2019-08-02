@@ -15,8 +15,7 @@
 // limitations under the License.
 
 
-#include <omp.h>
-#include <Rcpp.h>
+#include "utility.h"
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <progress.hpp>
@@ -32,30 +31,6 @@ using namespace Rcpp;
 
 #include <bigmemory/isna.hpp>
 #include <bigmemory/MatrixAccessor.hpp>
-
-
-// *** Utility ***
-int omp_setup(int threads=0, bool verbose=true) {
-    int t = 1;
-#ifdef _OPENMP
-    if (threads == 0) {
-        t = omp_get_num_procs() - 1;
-        t = t > 0 ? t : 1;
-    } else if (threads > 0) {
-        t = threads;
-    }
-    omp_set_num_threads(t);
-    
-    if (verbose) {
-        Rcerr << "Number of threads: " << omp_get_max_threads() << endl;
-    }
-#else
-    if (verbose) {
-        Rcerr << "Number of threads: 1 (No OpenMP detected)" << endl;
-    }
-#endif
-    return t;
-}
 
 
 // ***** VCF *****
@@ -578,76 +553,6 @@ void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=0,
     }
 }
 
-template <typename T>
-Rcpp::NumericVector count_allele(XPtr<BigMatrix> pMat, int i) {
-    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    
-    NumericVector counts = NumericVector::create(
-        _["0"] = 0,
-        _["1"] = 0,
-        _["2"] = 0
-    );
-    
-    auto n = pMat->ncol();
-    for (size_t j = 0; j < n; j++) {
-        switch(int(mat[j][i - 1])) {
-            case 0: counts[0]++; break;
-            case 1: counts[1]++; break;
-            case 2: counts[2]++; break;
-            default: break;
-        }
-    }
-    return counts;
-}
-
-// [[Rcpp::export]]
-Rcpp::NumericVector count_allele(SEXP pBigMat, int i) {
-    XPtr<BigMatrix> xpMat(pBigMat);
-    
-    switch(xpMat->matrix_type()) {
-    case 1:
-        return count_allele<char>(xpMat, i);
-    case 2:
-        return count_allele<short>(xpMat, i);
-    case 4:
-        return count_allele<int>(xpMat, i);
-    case 8:
-        return count_allele<double>(xpMat, i);
-    default:
-        throw Rcpp::exception("unknown type detected for big.matrix object!");
-    }
-}
-
-template <typename T>
-bool hasNA(XPtr<BigMatrix> pMat, double NA_C) {
-    MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    for (size_t j = 0; j < pMat->ncol(); j++) {
-        for (size_t i = 0; i < pMat->nrow(); i++) {
-            if (mat[j][i] == NA_C) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// [[Rcpp::export]]
-bool hasNA(SEXP pBigMat) {
-    XPtr<BigMatrix> xpMat(pBigMat);
-    
-    switch(xpMat->matrix_type()) {
-    case 1:
-        return hasNA<char>(xpMat, NA_CHAR);
-    case 2:
-        return hasNA<short>(xpMat, NA_SHORT);
-    case 4:
-        return hasNA<int>(xpMat, NA_INTEGER);
-    case 8:
-        return hasNA<double>(xpMat, NA_REAL);
-    default:
-        throw Rcpp::exception("unknown type detected for big.matrix object!");
-    }
-}
 /*** R
 # setwd("~/code/MVP/src")
 library(bigmemory)
