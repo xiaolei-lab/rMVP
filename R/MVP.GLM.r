@@ -51,11 +51,7 @@ function(
     cpu=1, 
     bar=TRUE
 ){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -66,7 +62,7 @@ function(
         X0 <- matrix(1, n)
     }else{
         CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
-	CV <- CV[, CV.index, drop=FALSE]
+	    CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
     }
     
@@ -82,7 +78,6 @@ function(
 
     #parallel function for GLM model
     eff.glm <- function(i){
-        if(bar) print.f(i)
         SNP <- geno[i, ]
 
         #Process the edge (marker effects)
@@ -114,32 +109,9 @@ function(
         return(list(effect=effect, se=se, p=p))
     }
     cat("scanning...\n")
-    if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.glm)
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-        if(wind){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-            cl <- makeCluster(getOption("cl.cores", cpu))
-            clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
-            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.glm)
-            stopCluster(cl)
-        }else{
-            tmpf.name <- tempfile()
-            tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
-            writeBin(0, tmpf)
-            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            mkl_env({
-                results <- mclapply(1:m, eff.glm, mc.cores = cpu)
-            })
-            close(tmpf); unlink(tmpf.name); cat('\n');
-        }
-    }
+    
+    results <- rmvp_mclapply(1:m, eff.glm, mc.cores = cpu)
+    
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
     return(results)
 }#end of MVP.GLM function

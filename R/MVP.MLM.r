@@ -62,15 +62,6 @@ function(
     bar=TRUE,
     vc.method=c("BRENT", "EMMA", "HE")
 ){
-    R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
-    
-    if (R.ver == 'Windows') cpu <- 1
-    if (r.open && cpu > 1 && R.ver == 'Darwin') {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
     vc.method <- match.arg(vc.method)
     n <- ncol(geno)
     m <- nrow(geno)
@@ -94,8 +85,8 @@ function(
     if (is.null(CV)) {
         X0 <- matrix(1, n)
     } else {
-	CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
-	CV <- CV[, CV.index, drop=FALSE]
+    	CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
+    	CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
     }
 
@@ -132,7 +123,6 @@ function(
 
     #parallel function for MLM model
     eff.mlm.parallel <- function(i){
-        if(bar) print.f(i)
         SNP <- geno[i, ]
         xst <- crossprod(U, SNP)
         Xt[1:n,q0+1] <- xst
@@ -158,33 +148,9 @@ function(
         return(list(effect = effect, se = se, p = p))
     }
     cat("scanning...\n")
-    #Paralleled MLM
-    if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.mlm.parallel)
-        try(setMKLthreads(math.cpu), silent=TRUE)
-    }else{
-        if(R.ver == 'Windows'){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-            cl <- makeCluster(getOption("cl.cores", cpu))
-            clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
-            Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
-            results <- parLapply(cl, 1:m, eff.mlm.parallel)
-            stopCluster(cl)
-        }else{
-            tmpf.name <- tempfile()
-            tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
-            writeBin(0, tmpf)
-            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
-            mkl_env({
-                results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
-            })
-            close(tmpf); unlink(tmpf.name); cat('\n');
-        }
-    }
+    
+    results <- rmvp_mclapply(1:m, eff.mlm.parallel, mc.cores = cpu)
+    
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
     return(results)
 }#end of MVP.MLM function
