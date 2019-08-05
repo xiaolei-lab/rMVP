@@ -348,18 +348,18 @@ load_if_installed <- function(package) {
 }
 
 
-rmvp_mclapply <- function(X, FUN, pb.show = TRUE, pb.style = "ETA", threads = 0, envir = parent.frame(), ...) {
+rmvp_mclapply <- function(X, FUN, pb.show = TRUE, pb.style = "ETA", mc.cores = 0, envir = parent.frame(), ...) {
     if (Sys.info()[['sysname']] == 'Windows') {
         # Windows
         
-        if (!(threads %in% 0:1)) {
+        if (!(mc.cores %in% 0:1)) {
             warning("mc.cores > 1 is not supported on Windows due to limitation of 
-                    mc*apply() functions.\n  threads is set to 1.")
+                    mc*apply() functions.\n  mc.cores is set to 1.")
         }
-        threads <- 1
+        mc.cores <- 1
         
         if (pb.show) {
-            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = threads)
+            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = mc.cores)
         } else {
             res <- lapply(X, FUN, ...)
         }
@@ -374,16 +374,16 @@ rmvp_mclapply <- function(X, FUN, pb.show = TRUE, pb.style = "ETA", threads = 0,
         }
         
         # auto detect cores
-        if (threads < 0) {
+        if (mc.cores < 0) {
             stop("The number of threads must be >0")
-        } else if (threads == 0) {
-            threads <- parallel::detectCores() - 1
+        } else if (mc.cores == 0) {
+            mc.cores <- parallel::detectCores() - 1
         }
         
         if (pb.show) {
-            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = threads)
+            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = mc.cores)
         } else {
-            res <- mclapply(X, FUN, ..., mc.cores = threads)
+            res <- mclapply(X, FUN, ..., mc.cores = mc.cores)
         }
         
         # reset MRO MKL threads
