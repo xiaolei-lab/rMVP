@@ -9,7 +9,7 @@ Description: a Memory efficient, Visualization enhanced, and Parallel accelerate
 License: Apache License | file LICENSE
 SystemRequirements: C++11
 BugReports: https://github.com/XiaoleiLiuBio/MVP/issues
-Imports: utils, stats, methods, graphics, grDevices, Rcpp, RcppEigen, RcppProgress (>= 0.4.1), RcppArmadillo, BH, parallel, MASS
+Imports: utils, stats, methods, graphics, grDevices, Rcpp, RcppEigen, RcppProgress (>= 0.4.1), RcppArmadillo, BH, parallel, MASS, pbmcapply
 Depends: MASS, parallel, bigmemory
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes

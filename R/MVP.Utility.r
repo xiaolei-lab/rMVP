@@ -348,16 +348,51 @@ load_if_installed <- function(package) {
 }
 
 
-mkl_env <- function(exprs, threads = 1) {
-    if (load_if_installed("RevoUtilsMath")) {
-        math.cores <- RevoUtilsMath::getMKLthreads()
-        RevoUtilsMath::setMKLthreads(threads)
+rmvp_mclapply <- function(X, FUN, pb.show = TRUE, pb.style = "ETA", threads = 0, envir = parent.frame(), ...) {
+    if (Sys.info()[['sysname']] == 'Windows') {
+        # Windows
+        
+        if (!(threads %in% 0:1)) {
+            warning("mc.cores > 1 is not supported on Windows due to limitation of 
+                    mc*apply() functions.\n  threads is set to 1.")
+        }
+        threads <- 1
+        
+        if (pb.show) {
+            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = threads)
+        } else {
+            res <- lapply(X, FUN, ...)
+        }
+        
+    } else {
+        # Linux & macOS
+        
+        # set MRO MKL threads to 1
+        if (load_if_installed("RevoUtilsMath")) {
+            MKLthreads <- RevoUtilsMath::getMKLthreads()
+            RevoUtilsMath::setMKLthreads(1)
+        }
+        
+        # auto detect cores
+        if (threads < 0) {
+            stop("The number of threads must be >0")
+        } else if (threads == 0) {
+            threads <- parallel::detectCores() - 1
+        }
+        
+        if (pb.show) {
+            res <- pbmcapply::pbmclapply(X, FUN, ..., mc.style = pb.style, mc.cores = threads)
+        } else {
+            res <- mclapply(X, FUN, ..., mc.cores = threads)
+        }
+        
+        # reset MRO MKL threads
+        if (load_if_installed("RevoUtilsMath")) {
+            RevoUtilsMath::setMKLthreads(MKLthreads)
+        }
     }
-    result <- exprs
-    if (load_if_installed("RevoUtilsMath")) {
-        RevoUtilsMath::setMKLthreads(math.cores)
-    }
-    return(result)
+    
+    return(res)
 }
 
 
