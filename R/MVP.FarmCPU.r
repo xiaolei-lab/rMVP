@@ -67,7 +67,7 @@
 #' str(farmcpu)
 `MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", method.bin="EMMA", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, QTN.threshold=0.01, bound=NULL){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
-    
+
     echo=TRUE
     nm=nrow(map)
     if(!is.null(CV)){
@@ -78,7 +78,21 @@
     }else{
         npc=0
     }
-    
+
+	map <- as.matrix(map)
+	options(warn = -1)
+	max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE)
+	if(is.infinite(max.chr))	max.chr <- 0
+	map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
+	if(length(map.xy.index) != 0){
+		chr.xy <- unique(map[map.xy.index, 2])
+		for(i in 1:length(chr.xy)){
+			map[map[, 2] == chr.xy[i], 2] <- max.chr + i
+		}
+	}
+	map <- matrix(as.numeric(map), nrow(map))
+	options(warn = 0)
+	
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
     name.of.trait=colnames(phe)[2]
@@ -89,7 +103,7 @@
     seqQTN.pre=c(-1)
     isDone=FALSE
     name.of.trait2=name.of.trait
-    
+
     while(!isDone) {
         theLoop=theLoop+1
         cat(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""), "\n")
@@ -260,6 +274,7 @@
     deltaExpStart = -5
     deltaExpEnd = 5
     snp.pool=snp.pool[,]
+
     if(!is.null(snp.pool)&&var(snp.pool)==0){
         deltaExpStart = 100
         deltaExpEnd = deltaExpStart
@@ -380,13 +395,7 @@
         
         return(list(beta=beta,delta=delta,LL=LL))
     }
-    if(Sys.info()[['sysname']] != 'Windows'){
-        mkl_env({
-            llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
-        })
-    }else{
-        llresults <- lapply(1:m, beta.optimize.parallel)
-    }
+    llresults <- lapply(1:m, beta.optimize.parallel)
     for(i in 1:m){
         if(i == 1){
             beta.save = llresults[[i]]$beta
@@ -846,8 +855,19 @@ FarmCPU.LM <-
             P = pvalue[-1]
             return(list(B=B, S=S, P=P))
         }
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
-        results <- lapply(1:m, eff.farmcpu.parallel)
+		if(Sys.info()[['sysname']] != 'Windows'){
+			tmpf.name <- tempfile()
+			tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
+			writeBin(0, tmpf)
+			print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            mkl_env({
+                results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
+            })
+			close(tmpf); unlink(tmpf.name); cat('\n');
+        }else{
+			print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            results <- lapply(1:m, eff.farmcpu.parallel)
+        }
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
         return(list(P=results[,-c(1,2)], betapred=betapred, B=results[,1], S=results[,2]))
     } #end of FarmCPU.LM function
@@ -885,12 +905,19 @@ FarmCPU.Burger <-
         #handler of single column GK
         n=nrow(GK)
         m=ncol(GK)
-        if(m>2){
-            theGK=as.matrix(GK)#GK is pure genotype matrix
-        }else{
-            theGK=matrix(GK,n,1)
-        }
-        
+		if(!is.null(GK)){
+			n=nrow(GK)
+			m=ncol(GK)
+			if(m > 2){
+				theGK = as.matrix(GK)#GK is pure genotype matrix
+			}else if(m==0){
+				theGK = NULL
+			}else{
+				theGK = matrix(GK,n,1)
+			}
+		}else{
+			theGK=GK
+		}
         if(method=="FaST-LMM"){
             myFaSTREML=FarmCPU.FaSTLMM.LL(pheno=matrix(Y[,-1],nrow(Y),1), snp.pool=theGK, X0=theCV, ncpus=ncpus)
             REMLs=-2*myFaSTREML$LL
