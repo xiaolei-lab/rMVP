@@ -60,7 +60,11 @@ function(
             M <- M - 2 * Pi
             SUM <- sum(Pi * (1 - Pi))
             cat("Computing Z'Z", "\n")
-            K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
+            if(r.open){
+                K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
+            }else{
+                K <- try(0.5 * crossprodcpp(M)/SUM, silent=TRUE)
+            }
             if(inherits(K,"try-error")){
                 cat("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n")
                 stop(K[[1]])
