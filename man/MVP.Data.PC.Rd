@@ -4,21 +4,26 @@
 \alias{MVP.Data.PC}
 \title{Principal component analysis}
 \usage{
-MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", out = NULL,
-  perc = 1, pcs.keep = 5, sep = "\\t")
+MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", K = NULL,
+  out = NULL, pcs.keep = 5, priority = "speed", sep = "\\t",
+  cpus = 1)
 }
 \arguments{
 \item{filePC}{Principal components, n*npc, n is sample size, npc is number of top columns of principal components}
 
 \item{mvp_prefix}{Prefix for mvp format files}
 
-\item{out}{prefix of output file name}
+\item{K}{Kinship matrix}
 
-\item{perc}{Percentage of markers used to calculate PCA}
+\item{out}{prefix of output file name}
 
 \item{pcs.keep}{how many PCs to keep}
 
+\item{priority}{speed or memory}
+
 \item{sep}{seperator for PC file.}
+
+\item{cpus}{the number of cpu}
 }
 \value{
 Output file:

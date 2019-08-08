@@ -4,9 +4,8 @@
 \alias{MVP.MLM}
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
-MVP.MLM(phe, geno, K = NULL, CV = NULL, REML = NULL,
-  priority = "speed", cpu = 1, bar = TRUE, vc.method = "EMMA",
-  maxLine = 1000, file.output = TRUE, memo = "MVP")
+MVP.MLM(phe, geno, K = NULL, eigenK = NULL, CV = NULL, REML = NULL,
+  cpu = 1, bar = TRUE, vc.method = c("BRENT", "EMMA", "HE"))
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
@@ -15,23 +14,17 @@ MVP.MLM(phe, geno, K = NULL, CV = NULL, REML = NULL,
 
 \item{K}{Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite}
 
+\item{eigenK}{list of eigen Kinship}
+
 \item{CV}{covariates}
 
 \item{REML}{a list that contains ve and vg}
-
-\item{priority}{speed or memory}
 
 \item{cpu}{number of cpus used for parallel computation}
 
 \item{bar}{whether to show the progress bar}
 
-\item{vc.method}{the methods for estimating variance component("emma" or "gemma")}
-
-\item{maxLine}{when the priority is 'memory', users can change this parameter to limit the memory}
-
-\item{file.output}{whether to output files or not}
-
-\item{memo}{a marker on output file name}
+\item{vc.method}{the methods for estimating variance component("emma" or "he" or "brent")}
 }
 \value{
 results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
