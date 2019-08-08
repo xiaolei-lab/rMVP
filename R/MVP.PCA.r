@@ -23,10 +23,10 @@
 #' 
 #' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param K kinship matrix
-#' @param priority
+#' @param priority speed or memory
 #' @param pcs.keep maximum number of PCs for output
-#' @param cpu
-
+#' @param cpu the number of cpu
+#' 
 #' @return
 #' Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep 
 #' 
