@@ -1,16 +1,16 @@
 Package: rMVP
 Type: Package
-Title: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS
-Version: 0.99.14.1
-Date: 2019-07-07
+Title: A Memory-Efficient, Visualization-Enhanced, and Parallel-Accelerated Tool for GWAS
+Version: 0.99.15
+Date: 2019-08-09
 Author: Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Xiaohui Yuan, Shuhong Zhao, Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
-Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS
+Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS.
 License: Apache License | file LICENSE
 SystemRequirements: C++11
-BugReports: https://github.com/XiaoleiLiuBio/MVP/issues
-Imports: utils, stats, methods, graphics, grDevices, Rcpp, RcppEigen, RcppProgress (>= 0.4.1), RcppArmadillo, BH, parallel, MASS
-Depends: MASS, parallel, bigmemory
+BugReports: https://github.com/XiaoleiLiuBio/rMVP/issues
+Imports: utils, stats, methods, graphics, grDevices, Rcpp
+Depends: R (>= 3.3), MASS, parallel, bigmemory
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: 
