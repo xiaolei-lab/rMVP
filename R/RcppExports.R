@@ -33,6 +33,14 @@ fit_diago_brent <- function(Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose) {
     .Call(`_rMVP_fit_diago_brent`, Y, X, p_, Sigma, U, min_h2, max_h2, tol, verbose)
 }
 
+crossprodcpp <- function(X) {
+    .Call(`_rMVP_crossprodcpp`, X)
+}
+
+geninv <- function(GG) {
+    .Call(`_rMVP_geninv`, GG)
+}
+
 impute_marker <- function(pBigMat, threads = 0L, verbose = TRUE) {
     invisible(.Call(`_rMVP_impute_marker`, pBigMat, threads, verbose))
 }
