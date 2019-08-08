@@ -59,11 +59,8 @@
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' map <- read.table("mvp.map" , head = TRUE)
-#' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
-#'   ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
-#'   method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
-#'   Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
+#' map <- read.table(mapPath , head = TRUE)
+#' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map)
 #' str(farmcpu)
 `MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
                           method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
