@@ -416,7 +416,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     fout = fopen(bed_file.c_str(), "wb");
     
     // progress bar
-    Progress progress(n, verbose);
+    Progress progress(m, verbose);
     
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
