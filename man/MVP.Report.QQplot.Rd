@@ -67,5 +67,7 @@ QQ Plot
 }
 \examples{
 data(pig60K, package = "rMVP")
+\dontrun{
 MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+}
 }

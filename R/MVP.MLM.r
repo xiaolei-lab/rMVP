@@ -47,8 +47,10 @@
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' K <- MVP.K.VanRaden(genotype)
+#' \dontrun{
 #' mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)
 #' str(mlm)
+#' }
 
 MVP.MLM <-
 function(

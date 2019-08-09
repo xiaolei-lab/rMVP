@@ -41,8 +41,10 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
+#' \dontrun{
 #' glm <- MVP.GLM(phe=phenotype, geno=genotype)
 #' str(glm)
+#' }
 MVP.GLM <-
 function(
     phe, 

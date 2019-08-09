@@ -39,9 +39,11 @@ print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
+\dontrun{
 K <- MVP.K.VanRaden(genotype)
 vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 print(vc)
+}
 }
 \author{
 EMMA (Kang et. al. Genetics, 2008), Modified only for speed up by Xiaolei Liu and Lilin Yin

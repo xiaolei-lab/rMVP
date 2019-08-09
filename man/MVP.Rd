@@ -101,9 +101,12 @@ genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
+
+\dontrun{
 mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
+}
 }
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu

@@ -60,8 +60,10 @@
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 #' map <- read.table(mapPath , head = TRUE)
+#' \dontrun{
 #' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map)
 #' str(farmcpu)
+#' }
 `MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
                           method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
                           memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, 

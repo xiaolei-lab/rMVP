@@ -64,8 +64,10 @@
 #' @return Output files
 #' @examples
 #' data(pig60K, package = "rMVP")
-#' #MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
-#' #MVP.Report(pig60K, plot.type="c", threshold=0.05/nrow(pig60K))
+#' \dontrun{
+#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
+#' MVP.Report(pig60K, plot.type="c", threshold=0.05/nrow(pig60K))
+#' }
 MVP.Report <- function(
     MVP,
     col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
@@ -1829,7 +1831,9 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #'
 #' @examples
 #' data(pig60K, package = "rMVP")
+#' \dontrun{
 #' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+#' }
 MVP.Report.QQplot <-
     function(P.values,
              taxa_name,

@@ -62,7 +62,9 @@
 #' Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 #' @examples 
 #' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
+#' \dontrun{
 #' MVP.Data(fileBed=bfilePath, out="rMVP.test.data", ncpus=1)
+#' }
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",

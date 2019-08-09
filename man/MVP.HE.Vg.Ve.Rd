@@ -27,9 +27,11 @@ print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
+\dontrun{
 K <- MVP.K.VanRaden(genotype)
 vc <- MVP.HE.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 print(vc)
+}
 }
 \author{
 Translated from C++(GEMMA, Xiang Zhou) to R by: Haohao Zhang

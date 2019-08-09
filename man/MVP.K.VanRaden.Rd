@@ -24,5 +24,7 @@ Last update: Dec 12, 2019
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
+\dontrun{
 K <- MVP.K.VanRaden(genotype)
+}
 }
