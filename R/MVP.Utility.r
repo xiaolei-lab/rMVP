@@ -30,14 +30,15 @@
 MVP.Version <- function(width=60) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
-    authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
+    authors <- c("Designed and Maintained by Lilin Yin, Haohao Zhang, and Xiaolei Liu", 
+                 "Contributors: Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li")
     contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
     logo_s  <- c(" __  __  __   __  ___",
                  "|  \\/  | \\ \\ / / | _ \\",
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
-    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = 60)
+    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
     return(invisible(version))
 }
 

@@ -3,7 +3,7 @@ Type: Package
 Title: A Memory-Efficient, Visualization-Enhanced, and Parallel-Accelerated Tool for GWAS
 Version: 0.99.15
 Date: 2019-08-09
-Author: Lilin Yin, Haohao Zhang, Zhiwu Zhang, Xinyun Li, Xiaohui Yuan, Shuhong Zhao, Xiaolei Liu
+Author: Lilin Yin, Haohao Zhang, Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li, and Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
 Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS.
 License: Apache License | file LICENSE
