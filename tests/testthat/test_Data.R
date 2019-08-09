@@ -13,9 +13,11 @@ mapPath     <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 context("MVP.Data - vcf")
 
 test_that("MVP.Data() - vcf", {
+    skip_on_cran()
+    
     out <- "rMVP.test.1"
     expect_output(
-        MVP.Data(fileVCF = vcfPath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 10),
+        MVP.Data(fileVCF = vcfPath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -36,9 +38,11 @@ test_that("MVP.Data() - vcf", {
 context("MVP.Data - bfile")
 
 test_that("MVP.Data() - Bfile", {
+    skip_on_cran()
+    
     out <- "rMVP.test.2"
     expect_output(
-        MVP.Data(fileBed = bfilePath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 10),
+        MVP.Data(fileBed = bfilePath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -59,9 +63,11 @@ test_that("MVP.Data() - Bfile", {
 context("MVP.Data - hapmap")
 
 test_that("MVP.Data() - HMP", {
+    skip_on_cran()
+    
     out <- "rMVP.test.3"
     expect_output(
-        MVP.Data(fileHMP = hmp1Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 10),
+        MVP.Data(fileHMP = hmp1Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -80,9 +86,11 @@ test_that("MVP.Data() - HMP", {
 })
 
 test_that("MVP.Data() - HMP Diploid", {
+    skip_on_cran()
+    
     out <- "rMVP.test.4"
     expect_output(
-        MVP.Data(fileHMP = hmp2Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 10),
+        MVP.Data(fileHMP = hmp2Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
         "successfully!"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
