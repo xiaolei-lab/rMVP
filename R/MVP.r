@@ -287,6 +287,20 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }
     cat(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n")
     if(file.output){
+        if(glm.run){
+            index <- which(glm.results[, ncol(glm.results)] < threshold/m)
+            if(length(index) != 0)  write.csv(cbind(map,glm.results)[index, ], paste("MVP.",colnames(phe)[2],".GLM_signal", ".csv", sep=""), row.names=FALSE)
+        }
+        if(mlm.run){
+            index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
+            if(length(index) != 0)  write.csv(cbind(map,mlm.results)[index, ], paste("MVP.",colnames(phe)[2],".MLM_signal", ".csv", sep=""), row.names=FALSE)
+        }
+        if(farmcpu.run){
+            index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
+            if(length(index) != 0)  write.csv(cbind(map,farmcpu.results)[index, ], paste("MVP.",colnames(phe)[2],".FarmCPU_signal", ".csv", sep=""), row.names=FALSE)
+        }
+    }
+    if(file.output){
         cat("|--------------------Visualization Start-------------------|", "\n")
         cat("Phenotype distribution Plotting", "\n")
         MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
