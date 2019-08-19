@@ -181,7 +181,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             mvp_prefix = out, 
             priority = priority, 
             sep = sep.kin,
-            cpus = cpus
+            cpus = ncpus
         )
     }
     
