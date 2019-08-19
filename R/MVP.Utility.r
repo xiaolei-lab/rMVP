@@ -369,18 +369,21 @@ remove_bigmatrix <- function(x, desc_suffix=".geno.desc", bin_suffix=".geno.bin"
     descfile <- paste0(x, desc_suffix)
     binfile  <- paste0(x, bin_suffix)
     
-    # Delete objects that occupy binfile in the global environment
-    if (Sys.info()[['sysname']] == "Windows") {
-        for (v in ls(envir = globalenv())) {
-            if (class(get(v, envir = globalenv())) == "big.matrix") {
-                desc <- describe(get(v, envir = globalenv()))@description
-                if (desc$dirname == path && desc$filename == binfile) {
-                    rm(list = v, envir = globalenv())
+    remove_var <- function(binfile, envir) {
+        for (v in ls(envir = envir)) {
+            if (class(get(v, envir = envir)) == "big.matrix") {
+                desc <- describe(get(v, envir = envir))@description
+                if (desc$filename == binfile) { # TODO: Risky deletion
+                    rm(list = v, envir = envir)
                     gc()
                 }
             }
         }
     }
+    
+    # Delete objects that occupy binfile in the global environment
+    remove_var(binfile, globalenv())
+    remove_var(binfile, as.environment(-1L))
     
     if (file.exists(descfile)) {
         file.remove(descfile)
