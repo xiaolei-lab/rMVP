@@ -46,7 +46,7 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent = TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
     if (r.open && mac) {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
@@ -71,7 +71,7 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
     }
 
     cat("Eigen Decomposition", "\n")
-    if(r.open)  try(setMKLthreads(cpu), silent=TRUE)
+    if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
     cat("Deriving PCs successfully", "\n")
 

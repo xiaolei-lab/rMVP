@@ -352,11 +352,11 @@ load_if_installed <- function(package) {
 mkl_env <- function(exprs, threads = 1) {
     if (load_if_installed("RevoUtilsMath")) {
         math.cores <- getMKLthreads()
-        setMKLthreads(threads)
+        eval(parse(text = "setMKLthreads(threads)"))
     }
     result <- exprs
     if (load_if_installed("RevoUtilsMath")) {
-        setMKLthreads(math.cores)
+        eval(parse(text = "setMKLthreads(math.cores)"))
     }
     return(result)
 }

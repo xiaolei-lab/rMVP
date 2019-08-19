@@ -164,13 +164,13 @@
     R.ver <- Sys.info()[['sysname']]
     if(R.ver == 'Linux') {
         math.cpu <- try(getMKLthreads(), silent=TRUE)
-        try(setMKLthreads(1), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(1), silent=TRUE)"))
     }
     
     llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
-        try(setMKLthreads(math.cpu), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(math.cpu), silent=TRUE)"))
     }
     
     for(i in 1:m){

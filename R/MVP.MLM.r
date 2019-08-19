@@ -65,7 +65,7 @@ function(
     vc.method=c("BRENT", "EMMA", "HE")
 ){
     R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
     
     if (R.ver == 'Windows') cpu <- 1
     if (r.open && cpu > 1 && R.ver == 'Darwin') {
@@ -164,10 +164,10 @@ function(
     if(cpu == 1){
         math.cpu <- try(getMKLthreads(), silent=TRUE)
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(mkl.cpu), silent=TRUE)"))
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
         results <- lapply(1:m, eff.mlm.parallel)
-        try(setMKLthreads(math.cpu), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(math.cpu), silent=TRUE)"))
     }else{
         if(R.ver == 'Windows'){
             print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}

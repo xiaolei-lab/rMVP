@@ -44,7 +44,7 @@ function(
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
     if(r.open && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")

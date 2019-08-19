@@ -107,15 +107,13 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+    
     
     if(wind) ncpus <- 1
     if(r.open && ncpus>1 && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-    #if(r.open && ncpus>1 && !mac){
-    #setMKLthreads(1)
-    #}
     
     MVP.Version(width = 60)
     cat("Start:", as.character(now), "\n")

@@ -48,7 +48,6 @@ MVP.HE.Vg.Ve <- function(y, X, K) {
     X <- as.matrix(X[idx, ])
     K <- K[idx, idx]
     
-    #try(setMKLthreads(1),silent = TRUE)
     K = K[]
     n = nrow(K)
 
