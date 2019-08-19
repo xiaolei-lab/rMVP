@@ -17,5 +17,4 @@ Suggests:
     knitr,
     testthat,
     rmarkdown
-VignetteBuilder: knitr
 RoxygenNote: 6.1.1
