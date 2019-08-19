@@ -5,7 +5,7 @@ Version: 0.99.15
 Date: 2019-08-09
 Author: Lilin Yin, Haohao Zhang, Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li, and Xiaolei Liu
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
-Description: a Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS.
+Description: A Memory efficient, Visualization enhanced, and Parallel accelerated Tool For GWAS.
 License: Apache License | file LICENSE
 SystemRequirements: C++11
 BugReports: https://github.com/XiaoleiLiuBio/rMVP/issues
