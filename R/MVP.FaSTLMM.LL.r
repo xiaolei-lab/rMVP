@@ -163,7 +163,7 @@
     #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
     R.ver <- Sys.info()[['sysname']]
     if(R.ver == 'Linux') {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
+        math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         eval(parse(text = "try(setMKLthreads(1), silent=TRUE)"))
     }
     

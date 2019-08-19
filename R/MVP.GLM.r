@@ -57,7 +57,7 @@ function(
     wind <- R.ver == 'Windows'
     taxa <- colnames(phe)[2]
     r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
     
     n <- ncol(geno)
     m <- nrow(geno)
@@ -117,7 +117,7 @@ function(
     }
     cat("scanning...\n")
     if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
+        math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
         eval(parse(text="try(setMKLthreads(mkl.cpu), silent=TRUE)"))
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}

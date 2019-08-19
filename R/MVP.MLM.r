@@ -72,7 +72,7 @@ function(
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
 
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
     vc.method <- match.arg(vc.method)
     n <- ncol(geno)
     m <- nrow(geno)
@@ -162,7 +162,7 @@ function(
     cat("scanning...\n")
     #Paralleled MLM
     if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
+        math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
         eval(parse(text = "try(setMKLthreads(mkl.cpu), silent=TRUE)"))
         print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
