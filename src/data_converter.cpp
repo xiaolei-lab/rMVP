@@ -505,15 +505,16 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     Progress progress(n_block, verbose);
     
     // magic number of bfile
+    size_t n_bytes_read = 0;
     buffer = new char [3];
-    fread(buffer, 1, 3, fin);
+    n_bytes_read = fread(buffer, 1, 3, fin);
     
     // loop file
     size_t cond;
     long block_start;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
-        fread(buffer, 1, buffer_size, fin);
+        n_bytes_read = fread(buffer, 1, buffer_size, fin);
         
         // i: current block, j: current bit.
         block_start = i * buffer_size;
