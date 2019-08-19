@@ -124,9 +124,9 @@
 
         #Step 2b: Set bins
         if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus)
         }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GD=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus)
         }
         
         #Step 2c: Remove bin dependency
@@ -187,7 +187,7 @@
                 }
             }
 
-            myRemove=FarmCPU.Remove(GD=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
+            myRemove=FarmCPU.Remove(GDP=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
             
             #Recoding QTNs history
             seqQTN=myRemove$seqQTN
