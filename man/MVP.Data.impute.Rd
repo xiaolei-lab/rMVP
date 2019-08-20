@@ -32,5 +32,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
+\dontrun{
 MVP.Data.impute(mvpPath, ncpus=1)
+}
 }

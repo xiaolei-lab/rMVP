@@ -39,5 +39,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
+\dontrun{
 MVP.Data.Bfile2MVP(bfilePath, "rMVP.test.bfile")
+}
 }

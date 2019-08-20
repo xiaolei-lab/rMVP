@@ -31,5 +31,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+\dontrun{
 MVP.Data.Map(mapPath)
+}
 }

@@ -45,5 +45,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
+\dontrun{
 MVP.Data.Numeric2MVP(numericPath, "rMVP.test.num")
+}
 }

@@ -33,5 +33,7 @@ Build date: Sep 12, 2018
 \examples{
 bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
+\dontrun{
 MVP.Data.MVP2Bfile(bigmat, map, out="rMVP.test.mvp2bfile")
+}
 }

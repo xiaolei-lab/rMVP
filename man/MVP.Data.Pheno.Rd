@@ -34,5 +34,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
+\dontrun{
 MVP.Data.Pheno(phePath)
+}
 }

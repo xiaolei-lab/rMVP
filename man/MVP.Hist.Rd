@@ -37,5 +37,7 @@ Phenotype distribution histogram
 \examples{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phe <- read.table(phePath, header=TRUE)
+\dontrun{
 MVP.Hist(phe)
+}
 }

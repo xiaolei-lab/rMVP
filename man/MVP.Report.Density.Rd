@@ -34,5 +34,7 @@ SNP Density
 }
 \examples{
 data(pig60K, package = "rMVP")
+\dontrun{
 MVP.Report.Density(pig60K, "mvp")
+}
 }
