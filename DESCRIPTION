@@ -1,6 +1,6 @@
 Package: rMVP
 Type: Package
-Title: Memory-efficient, Visualize-enhanced, Parallel-accelerated tool
+Title: Memory-Efficient, Visualize-Enhanced, Parallel-Accelerated Tool
 Version: 0.99.15
 Date: 2019-08-09
 Authors@R: c( person("Lilin", "Yin", role = "aut"), 
