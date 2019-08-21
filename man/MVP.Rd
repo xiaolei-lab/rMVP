@@ -102,11 +102,11 @@ print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
 
-\dontrun{
-mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
+mvp <- MVP(phe=phenotype, geno=genotype, map=map, maxLoop=3,
   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
-}
+
+file.remove(dir(pattern = "*.log"))
 }
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu

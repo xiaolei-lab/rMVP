@@ -75,10 +75,10 @@ genotype <- genotype[, idx]
 print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
-\dontrun{
-farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map)
+
+farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, maxLoop=2)
 str(farmcpu)
-}
+
 }
 \author{
 Xiaolei Liu and Zhiwu Zhang

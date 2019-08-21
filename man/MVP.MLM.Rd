@@ -44,10 +44,10 @@ genotype <- attach.big.matrix(genoPath)
 genotype <- genotype[, idx]
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype)
-\dontrun{
+
 mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)
 str(mlm)
-}
+
 }
 \author{
 Lilin Yin and Xiaolei Liu

@@ -64,10 +64,10 @@
 #' @return Output files
 #' @examples
 #' data(pig60K, package = "rMVP")
-#' \dontrun{
+#' 
 #' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
-#' MVP.Report(pig60K, plot.type="c", threshold=0.05/nrow(pig60K))
-#' }
+#' 
+#' file.remove("Rectangular-Manhattan.trait2.jpg")
 MVP.Report <- function(
     MVP,
     col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
@@ -1763,7 +1763,10 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 #'
 #' @examples
 #' data(pig60K, package = "rMVP")
+#' 
 #' MVP.Report.Density(pig60K, "mvp")
+#' 
+#' file.remove("SNP_Density.mvp.jpg")
 MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE) {
     cat("SNP_Density Plotting", "\n")
@@ -1831,9 +1834,10 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #'
 #' @examples
 #' data(pig60K, package = "rMVP")
-#' \dontrun{
+#' 
 #' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
-#' }
+#' 
+#' file.remove(c("QQplot.trait1.jpg", "QQplot.trait2.jpg", "QQplot.trait3.jpg"))
 MVP.Report.QQplot <-
     function(P.values,
              taxa_name,
@@ -1978,7 +1982,10 @@ MVP.Report.QQplot <-
 #' @examples
 #' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' phe <- read.table(phePath, header=TRUE)
+#' 
 #' MVP.Hist(phe)
+#' 
+#' file.remove("MVP.Phe_Distribution.V6.pdf")
 MVP.Hist <-
     function(phe,
              col = c("dodgerblue4",
@@ -2081,9 +2088,12 @@ MVP.Hist <-
 #'
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
+#' 
 #' MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
 #' pca <- attach.big.matrix("myPC.pc.desc")[, 1:3]
 #' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
+#' 
+#' file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 MVP.PCAplot <- function(PCA,
                         col = NULL,
                         pch = NULL,

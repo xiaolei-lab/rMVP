@@ -16,11 +16,11 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
-#' \dontrun{
+#' 
 #' eigenK <- eigen(MVP.K.VanRaden(genotype))
 #' vc <- MVP.BRENT.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), eigenK=eigenK)
 #' print(vc)
-#' }
+#' 
 MVP.BRENT.Vg.Ve <- function(y, X, eigenK) {
     p = 0
     Sigma <- eigenK$values

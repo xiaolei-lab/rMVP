@@ -35,7 +35,8 @@ Principal component analysis
 }
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
-\dontrun{
-MVP.Data.PC(TRUE, mvp_prefix=geno, out="rMVP.test.pc")
-}
+
+MVP.Data.PC(TRUE, mvp_prefix=geno, out="rMVP.test")
+
+file.remove(dir(pattern = "rMVP.test.*"))
 }

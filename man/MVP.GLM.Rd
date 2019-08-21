@@ -34,10 +34,9 @@ genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package
 genotype <- attach.big.matrix(genoPath)
 genotype <- genotype[, idx]
 print(dim(genotype))
-\dontrun{
+
 glm <- MVP.GLM(phe=phenotype, geno=genotype)
 str(glm)
-}
 }
 \author{
 Lilin Yin and Xiaolei Liu

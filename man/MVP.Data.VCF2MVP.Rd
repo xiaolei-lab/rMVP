@@ -35,7 +35,7 @@ Accept the | or / separated markers, any variant sites that are not 0 or 1 will 
 \examples{
 vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 
-\dontrun{
-MVP.Data.VCF2MVP(vcfPath, "rMVP.test.vcf")
-}
+MVP.Data.VCF2MVP(vcfPath, "rMVP.test")
+
+file.remove(dir(pattern = "rMVP.test.*"))
 }

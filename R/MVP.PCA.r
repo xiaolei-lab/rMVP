@@ -36,10 +36,10 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
-#' \dontrun{
+#' 
 #' pca <- MVP.PCA(M=genotype)
 #' str(pca)
-#' }
+#' 
 MVP.PCA <-
 function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
     R.ver <- Sys.info()[['sysname']]

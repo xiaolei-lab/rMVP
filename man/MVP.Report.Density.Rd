@@ -34,7 +34,8 @@ SNP Density
 }
 \examples{
 data(pig60K, package = "rMVP")
-\dontrun{
+
 MVP.Report.Density(pig60K, "mvp")
-}
+
+file.remove("SNP_Density.mvp.jpg")
 }

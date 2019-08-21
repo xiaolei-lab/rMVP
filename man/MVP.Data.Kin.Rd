@@ -30,7 +30,8 @@ Kinship
 }
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
-\dontrun{
-MVP.Data.Kin(TRUE, mvp_prefix=geno, out="rMVP.test.kin")
-}
+
+MVP.Data.Kin(TRUE, mvp_prefix=geno, out="rMVP.test")
+
+file.remove(dir(pattern = "rMVP.test.*"))
 }

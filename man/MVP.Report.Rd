@@ -112,8 +112,8 @@ MVP.Report
 }
 \examples{
 data(pig60K, package = "rMVP")
-\dontrun{
+
 MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
-MVP.Report(pig60K, plot.type="c", threshold=0.05/nrow(pig60K))
-}
+
+file.remove("Rectangular-Manhattan.trait2.jpg")
 }

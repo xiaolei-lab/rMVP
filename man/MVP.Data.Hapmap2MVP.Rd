@@ -36,7 +36,8 @@ Build date: Sep 12, 2018
 }
 \examples{
 hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
-\dontrun{
-MVP.Data.Hapmap2MVP(hapmapPath, "rMVP.test.hmp")
-}
+
+MVP.Data.Hapmap2MVP(hapmapPath, "rMVP.test")
+
+file.remove(dir(pattern = "rMVP.test.*"))
 }

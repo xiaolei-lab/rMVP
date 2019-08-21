@@ -42,9 +42,10 @@ PCA Plot
 }
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
-\dontrun{
+
 MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
 pca <- attach.big.matrix("myPC.pc.desc")[, 1:3]
 MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
-}
+
+file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 }

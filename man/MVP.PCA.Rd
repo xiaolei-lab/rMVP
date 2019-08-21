@@ -29,10 +29,10 @@ Last update: Oct 29, 2018
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
-\dontrun{
+
 pca <- MVP.PCA(M=genotype)
 str(pca)
-}
+
 }
 \author{
 Xiaolei Liu, Lilin Yin and Haohao Zhang
