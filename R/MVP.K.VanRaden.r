@@ -49,7 +49,7 @@ function(
     if(r.open && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-    cat("Relationship matrix mode in", priority[1], "\n")
+    message("Relationship matrix mode in", priority[1])
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
         match.arg(priority),
@@ -58,17 +58,17 @@ function(
             n <- ncol(M)
             m <- nrow(M)
             Pi <- 0.5 * rowMeans(M)
-            cat("Scale the genotype matrix", "\n")
+            message("Scale the genotype matrix")
             M <- M - 2 * Pi
             SUM <- sum(Pi * (1 - Pi))
-            cat("Computing Z'Z", "\n")
+            message("Computing Z'Z")
             if(r.open){
                 K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
             }else{
                 K <- try(0.5 * crossprodcpp(M)/SUM, silent=TRUE)
             }
             if(inherits(K,"try-error")){
-                cat("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n")
+                message("   Out of memory, please set parameter (..., priority='memory') and try again.")
                 stop(K[[1]])
             }
         },
@@ -143,7 +143,7 @@ function(
             #     SUM <- sum(Pi * (1-Pi))
             # }
             # fl.suc <- flush(Z)
-            # if(!fl.suc){ stop("flush failed\n") } 
+            # if(!fl.suc){ stop("flush failed") } 
             # RR <- describe(Z); rm(list=c("Z", "Pi", "means")); gc()
             # Z <- attach.big.matrix(RR)
             # print("Computing Z'Z in big.matrix...")
@@ -154,7 +154,7 @@ function(
         }
     )
     #print("K Preparation is Done!")
-    cat("Deriving relationship matrix successfully", "\n"); gc()
+    message("Deriving relationship matrix successfully"); gc()
     return(K)
 }#end of MVP.k.VanRaden function
 

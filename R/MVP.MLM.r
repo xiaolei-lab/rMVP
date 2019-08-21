@@ -87,9 +87,9 @@ function(
         # convert K to base:matrix
         K <- K[, ]
         if(is.null(eigenK)){
-            cat("Eigen Decomposition of Kinship...", "\n")
+            message("Eigen Decomposition of Kinship...")
             eigenK <- eigen(K, symmetric=TRUE)
-            cat("Eigen-Decomposition is Done!", "\n")
+            message("Eigen-Decomposition is Done!")
         }
     }
 
@@ -104,13 +104,13 @@ function(
     # number of fixed effects
     nf <- ncol(X0) + 1
     if(is.null(REML)) {
-		cat(paste("Variance components using: ", vc.method, sep=""), "\n")   
+		message("Variance components using: ", vc.method)
         if (vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "HE") REML <- MVP.HE.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "BRENT") REML <- MVP.BRENT.Vg.Ve(y=ys, X=X0, eigenK=eigenK)
-		cat(paste("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
+		message("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve))
     }else{
-        cat(paste("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
+        message("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve))
     }
     if(!is.null(K)){rm(K); gc()}
 
@@ -159,7 +159,7 @@ function(
         effect<- beta[(q0+1)]
         return(list(effect = effect, se = se, p = p))
     }
-    cat("scanning...\n")
+    message("scanning...")
     #Paralleled MLM
     if(cpu == 1){
         math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
@@ -184,7 +184,7 @@ function(
             mkl_env({
                 results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
             })
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            close(tmpf); unlink(tmpf.name); message('\n');
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

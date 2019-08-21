@@ -378,7 +378,7 @@ MVP.Report <- function(
             #debug
             #print(colx)
             
-            cat(paste("Circular_Manhattan Plotting ",taxa[i],sep=""), "\n")
+            message("Circular_Manhattan Plotting ",taxa[i])
             pvalue <- pvalueT[,i]
             logpvalue <- logpvalueT[,i]
             if(is.null(ylim)){
@@ -797,7 +797,7 @@ MVP.Report <- function(
             for(i in 1:R){
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
-                cat(paste("Rectangular_Manhattan Plotting ",taxa[i],sep=""), "\n")
+                message("Rectangular_Manhattan Plotting ",taxa[i],sep="")
                     if(file.output){
                         if(file=="jpg") jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
                         if(file=="pdf") pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
@@ -999,7 +999,7 @@ MVP.Report <- function(
                 par(xpd=TRUE)
             }
             for(i in 1:R){
-                cat(paste("Multracks_Rectangular Plotting ",taxa[i],sep=""), "\n")
+                message("Multracks_Rectangular Plotting ",taxa[i])
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
                 pvalue=pvalueT[,i]
@@ -1244,7 +1244,7 @@ MVP.Report <- function(
                 sam.index[[l]] <- 1:nrow(Pmap)
             }
             sam.num <- 1000
-            cat("Multraits_Rectangular Plotting", "\n")
+            message("Multraits_Rectangular Plotting")
             while(do){
                 for(i in 1:R){
                     if(length(sam.index[[i]]) < sam.num){
@@ -1317,7 +1317,7 @@ MVP.Report <- function(
                 par(xpd=TRUE)
             }
             for(i in 1:R){
-                cat(paste("Multracks_QQ Plotting ",taxa[i],sep=""), "\n")
+                message("Multracks_QQ Plotting ",taxa[i])
                 P.values=as.numeric(Pmap[,i+2])
                 P.values=P.values[!is.na(P.values)]
                 if(LOG10){
@@ -1426,7 +1426,7 @@ MVP.Report <- function(
                 if(conf.int) polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
                 
                 for(i in 1:R){
-                    cat(paste("Multraits_QQ Plotting ",taxa[i],sep=""), "\n")
+                    message("Multraits_QQ Plotting ",taxa[i])
                     P.values=as.numeric(Pmap[,i+2])
                     P.values=P.values[!is.na(P.values)]
                     if(LOG10){
@@ -1472,7 +1472,7 @@ MVP.Report <- function(
             }
         }else{
             for(i in 1:R){
-                cat(paste("Q_Q Plotting ",taxa[i],sep=""), "\n")
+                message("Q_Q Plotting ",taxa[i])
                 if(file.output){
                     if(file=="jpg") jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
                     if(file=="pdf") pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
@@ -1769,7 +1769,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 #' file.remove("SNP_Density.mvp.jpg")
 MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE) {
-    cat("SNP_Density Plotting", "\n")
+    message("SNP_Density Plotting")
     w <- 9
     h <- 7
     if (file.output) {
@@ -1857,7 +1857,7 @@ MVP.Report.QQplot <-
              box=TRUE,
              dpi=300
 ) {
-    cat(paste0("Q_Q Plotting ", taxa_name), "\n")
+    message("Q_Q Plotting ", taxa_name)
     w <- 5.5
     h <- 5.5
     
@@ -2117,7 +2117,7 @@ MVP.PCAplot <- function(PCA,
     }else{
         pch=1:Ncluster
     } 
-    cat("PCA plot2d", "\n")
+    message("PCA plot2d")
     if(file=="jpg") jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
     if(file=="pdf") pdf("MVP.PCA_2D.pdf", width = 6,height=6)
     if(file=="tiff") tiff("MVP.PCA_2D.tiff", width = 6*dpi,height=6*dpi,res=dpi)
@@ -2135,7 +2135,7 @@ MVP.PCAplot <- function(PCA,
     if(box) box()
     dev.off()
     if(plot3D){
-        cat("The 3D PCA map has been temporarily disabled, and we will improve this feature in subsequent versions.", "\n")
+        message("The 3D PCA map has been temporarily disabled, and we will improve this feature in subsequent versions.")
         # print("PCA plot3d")
         # par3d(cex=0.8,windowRect=c(100,100,600,600),font=4,userMatrix=matrix(c(0.88,0.47,-0.07,0,-0.14,0.40,0.90,0,0.45,-0.78,0.42,0,0,0,0,1),4,byrow=TRUE))
         # if(is.null(class)) kc <- kmeans(PCA, Ncluster)
