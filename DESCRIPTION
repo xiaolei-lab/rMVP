@@ -1,13 +1,23 @@
 Package: rMVP
 Type: Package
-Title: A Memory-Efficient, Visualization-Enhanced, and Parallel-Accelerated Tool for Genome-Wide Association Study
+Title: Memory-Efficient, Visualize-Enhanced, Parallel-Accelerated tool
 Version: 0.99.15
 Date: 2019-08-09
-Author: Lilin Yin, Haohao Zhang, Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li, and Xiaolei Liu
-Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
-Description: A Memory efficient, Visualization enhanced, and Parallel accelerated Tool For Genome-Wide Association Study.
-License: Apache License | file LICENSE
+Authors@R: c( person("Lilin", "Yin", role = "aut"), 
+              person("Haohao", "Zhang", role = "aut"),
+              person("Zhenshuang", "Tang", role = "aut"),
+              person("Jingya", "Xu", role = "aut"),
+              person("Dong", "Yin", role = "aut"),
+              person("Zhiwu", "Zhang", role = "aut"),
+              person("Xiaohui", "Yuan", role = "aut"),
+              person("Mengjin", "Zhu", role = "aut"),
+              person("Shuhong", "Zhao", role = "aut"),
+              person("Xinyun", "Li", role = "aut"),
+              person("Xiaolei", "Liu", role = c("cre", "aut"), email = "xiaoleiliu@mail.hzau.edu.cn"))
+Description: rMVP can: (1) effectively process large GWAS data, (2) rapidly evaluate population structure, (3) efficiently estimate variance components by EMMAX, FaST-LMM, and HE regression algorithms, (4) implement parallel-accelerated association tests of markers using GLM, MLM, and FarmCPU methods; methods; (5) globally efficient design on GWAS process computing; and (6) enhance visualization of GWAS related information.
+License: GPL (>= 2)
 SystemRequirements: C++11
+URL: https://github.com/XiaoleiLiuBio/rMVP
 BugReports: https://github.com/XiaoleiLiuBio/rMVP/issues
 Imports: utils, stats, methods, graphics, grDevices, Rcpp
 Depends: R (>= 3.3), MASS, parallel, bigmemory
@@ -18,3 +28,15 @@ Suggests:
     testthat,
     rmarkdown
 RoxygenNote: 6.1.1
+Author: Lilin Yin [aut] (<https://github.com/YinLiLin>),
+  HaoHao Zhang [aut] (<https://github.com/hyacz>),
+  Zhenshuang Tang [aut],
+  Jingya Xu [aut],
+  Dong Yin [aut],
+  Zhiwu Zhang [aut],
+  Xiaohui Yuan [aut],
+  Mengjin Zhu [aut],
+  Shuhong Zhao [aut],
+  Xinyun Li [aut],
+  Xiaolei Liu [cre, aut] (<https://github.com/XiaoleiLiuBio>)
+Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
