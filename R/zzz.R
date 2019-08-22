@@ -3,14 +3,18 @@
     if (Sys.info()["sysname"] == "Darwin") {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     } 
+    
+    # set option
     op <- options()
     op.rMVP <- list(
+        rMVP.Verbose = TRUE,
         rMVP.OutputLog2File = TRUE
     )
     toset <- !(names(op.rMVP) %in% names(op))
     if (any(toset)) { 
         options(op.rMVP[toset])
     }
+    
     return(invisible())
 }
 
