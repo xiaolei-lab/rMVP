@@ -13,7 +13,7 @@ Authors@R: c( person("Lilin", "Yin", role = "aut"),
               person("Mengjin", "Zhu", role = "aut"),
               person("Shuhong", "Zhao", role = "aut"),
               person("Xinyun", "Li", role = "aut"),
-              person("Xiaolei", "Liu", role = c("cre", "aut"), email = "xiaoleiliu@mail.hzau.edu.cn"))
+              person("Xiaolei", "Liu", role = c("cre", "aut", "cph"), email = "xiaoleiliu@mail.hzau.edu.cn"))
 Description: rMVP can: (1) effectively process large GWAS data, (2) rapidly evaluate population structure, 
     (3) efficiently estimate variance components by EMMAX, FaST-LMM, and HE regression algorithms, 
     (4) implement parallel-accelerated association tests of markers using GLM, MLM, and FarmCPU methods; methods; 
@@ -30,15 +30,4 @@ LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: knitr, testthat, rmarkdown
 RoxygenNote: 6.1.1
-Author: Lilin Yin [aut] (<https://github.com/YinLiLin>),
-  HaoHao Zhang [aut] (<https://github.com/hyacz>),
-  Zhenshuang Tang [aut],
-  Jingya Xu [aut],
-  Dong Yin [aut],
-  Zhiwu Zhang [aut],
-  Xiaohui Yuan [aut],
-  Mengjin Zhu [aut],
-  Shuhong Zhao [aut],
-  Xinyun Li [aut],
-  Xiaolei Liu [cre, aut] (<https://github.com/XiaoleiLiuBio>)
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
