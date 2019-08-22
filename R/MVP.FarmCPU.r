@@ -109,14 +109,14 @@
 
     while(!isDone) {
         theLoop=theLoop+1
-        message("Current loop: ",theLoop," out of maximum of ", maxLoop)
+        cat(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""), "\n")
             
         spacer="0"
         if(theLoop>9){
             spacer=""
         }
         if(iteration.output){
-            name.of.trait2=paste0("Iteration_",spacer,theLoop,".",name.of.trait)
+            name.of.trait2=paste("Iteration_",spacer,theLoop,".",name.of.trait,sep="")
         }
             
         #Step 2a: Set prior
@@ -137,12 +137,12 @@
             if(!is.na(p.threshold)){
                 if(min(myPrior,na.rm=TRUE)>p.threshold){
                     seqQTN=NULL
-                    message("Top snps have little effect, set seqQTN to NULL!")
+                    cat("Top snps have little effect, set seqQTN to NULL!", "\n")
                     }
                 }else{
                     if(min(myPrior,na.rm=TRUE)>0.01/nm){
                         seqQTN=NULL
-                        message("Top snps have little effect, set seqQTN to NULL!")
+                        cat("Top snps have little effect, set seqQTN to NULL!", "\n")
                     }
                 }
             }
@@ -201,16 +201,16 @@
                 if(seqQTN.pre[1]==-1) circle=FALSE
             }
 
-            message("seqQTN:")
+            cat("seqQTN:", "\n")
             if(is.null(seqQTN)){
-                message("NULL")
+                cat("NULL", "\n")
             }else{
-                message(seqQTN)
+                cat(seqQTN, "\n")
             }
             
-            message("scanning...")
+            cat("scanning...", "\n")
             if(theLoop==maxLoop){
-                message("Total number of possible QTNs in the model is: ", length(seqQTN))
+                cat(paste("Total number of possible QTNs in the model is: ", length(seqQTN),sep=""), "\n")
             }
             
             isDone=((theLoop>=maxLoop) | (theConverge>=converge) | circle )
@@ -513,7 +513,7 @@ FarmCPU.BIN <-
             }
             s=bound
             s[s>bound]=bound
-            message("Optimizing Pseudo QTNs...")
+            cat("Optimizing Pseudo QTNs...", "\n")
             GP=cbind(GM,P,NA,NA,NA)
             mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=b,inclosure.size=s)
             seqQTN.save=which(mySpecify$index==TRUE)
@@ -523,7 +523,7 @@ FarmCPU.BIN <-
         #============================Optimize by FaST-LMM============================================
         if(method=="FaST-LMM"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            message("Optimizing Pseudo QTNs...")
+            cat("Optimizing Pseudo QTNs...", "\n")
             count=0
             for (bin in b){
                 for (inc in s){
@@ -536,7 +536,7 @@ FarmCPU.BIN <-
                     myREML=myBurger$REMLs
                     myVG=myBurger$vg #it is unused
                     myVE=myBurger$ve #it is unused
-                    message(c(bin,inc,myREML,myVG,myVE))
+                    cat(c(bin,inc,myREML,myVG,myVE), "\n")
                     #Recoding the optimum GK
                     if(count==1){
                         seqQTN.save=seqQTN
@@ -564,7 +564,7 @@ FarmCPU.BIN <-
         #============================Optimize by EMMA============================================
         if(method=="EMMA"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            message("Optimizing Pseudo QTNs...")
+            cat("Optimizing Pseudo QTNs...", "\n")
             m <- length(b)*length(s)
             inc.index = rep(c(1:length(s)), length(b))
             
@@ -580,7 +580,7 @@ FarmCPU.BIN <-
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
-                message(c(bin,inc,myREML,myVG,myVE))
+                cat(c(bin,inc,myREML,myVG,myVE), "\n")
                 return(list(seqQTN=seqQTN,myREML=myREML))
             }
             if(Sys.info()[['sysname']] != 'Windows'){
@@ -609,7 +609,7 @@ FarmCPU.BIN <-
         #============================Optimize by EMMA============================================
         if(method=="GEMMA"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            message("Optimizing Pseudo QTNs...")
+            cat("Optimizing Pseudo QTNs...\n")
             m <- length(b)*length(s)
             
             seqQTN.optimize.parallel <- function(ii){
@@ -623,7 +623,7 @@ FarmCPU.BIN <-
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
-                message(paste(bin,inc,myREML,myVG,myVE))
+                cat(c(bin,inc,myREML,myVG,myVE), "\n")
                 return(list(seqQTN=seqQTN,myREML=myREML))
             }
             if(Sys.info()[['sysname']] != 'Windows'){
@@ -778,8 +778,8 @@ FarmCPU.LM <-
             q0=1
         }
         
-        message("number of covariates in current loop is:")
-        message(nf)
+        cat("number of covariates in current loop is:", "\n")
+        cat(nf, "\n")
         
         n=N
         if(nd>n)nd=n #handler of samples less than nd
@@ -866,7 +866,7 @@ FarmCPU.LM <-
             mkl_env({
                 results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
             })
-			close(tmpf); unlink(tmpf.name); message('\n');
+			close(tmpf); unlink(tmpf.name); cat('\n');
         }else{
 			print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
             results <- lapply(1:m, eff.farmcpu.parallel)
