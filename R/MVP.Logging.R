@@ -20,7 +20,7 @@ logging.initialize <- function(module) {
         file <- paste(module, format(now, "%Y%m%d_%H%M%S"), "log", sep = ".")
     }
     
-    assign("logging.file", file, envir = globalenv())
+    assign("logging.file", file, envir = package.env)
 }
 
 
@@ -33,7 +33,7 @@ logging.log <- function(..., file = NULL, sep = " ", fill = FALSE, labels = NULL
     }
     
     if (is.null(file)) {
-        file <- get("logging.file", envir = globalenv())
+        try(file <- get("logging.file", envir = package.env), silent = TRUE)
     }
     
     if (!is.null(file)) {

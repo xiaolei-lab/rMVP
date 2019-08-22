@@ -1,3 +1,5 @@
+package.env <- NULL
+
 .onLoad <- function(libname, pkgname) {
     # Limit number of threads in veclib (MacOS MRO)
     if (Sys.info()["sysname"] == "Darwin") {
@@ -14,6 +16,9 @@
     if (any(toset)) { 
         options(op.rMVP[toset])
     }
+    
+    # package level environment
+    package.env <<- new.env()
     
     return(invisible())
 }

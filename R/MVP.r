@@ -107,7 +107,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     MVP.Version(width = 60)
     logging.log("Start:", as.character(Sys.time()), "\n")
     if (options("rMVP.OutputLog2File") == TRUE) {
-        logging.log("The log has been output to the file:", get("logging.file", envir = globalenv()), "\n")
+        logging.log("The log has been output to the file:", get("logging.file", envir = package.env), "\n")
     }
     vc.method <- match.arg(vc.method)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
