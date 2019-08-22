@@ -114,7 +114,7 @@ function(
         p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
         return(list(effect=effect, se=se, p=p))
     }
-    cat("scanning...\n")
+    logging.log("scanning...\n")
     if(cpu == 1){
         math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
@@ -138,7 +138,7 @@ function(
             mkl_env({
                 results <- mclapply(1:m, eff.glm, mc.cores = cpu)
             })
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            close(tmpf); unlink(tmpf.name); logging.log('\n');
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

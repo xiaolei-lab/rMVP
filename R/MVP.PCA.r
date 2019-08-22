@@ -70,10 +70,10 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
         K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
     }
 
-    cat("Eigen Decomposition", "\n")
+    logging.log("Eigen Decomposition", "\n")
     if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
-    cat("Deriving PCs successfully", "\n")
+    logging.log("Deriving PCs successfully", "\n")
 
     return(PCs=PCs)
 }#end of MVP.PCA function

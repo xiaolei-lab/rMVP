@@ -77,14 +77,14 @@ print_bar <- function(i,
                 if(floor(100*i/n) %in% point.index){
                     if(floor(100*i/n) != max(point.index)){
                         print.len <- floor(symbol.len*i/n)
-                        cat(paste("\r", 
+                        logging.log(paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                                   paste(rep(" ", symbol.len-print.len), collapse=""),
                                   sprintf("%.2f%%", 100*i/n), sep="")
                         )
                     }else{
                         print.len <- floor(symbol.len*i/n)
-                        cat(paste("\r", 
+                        logging.log(paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                                   sprintf("%.2f%%", 100*i/n), "\n", sep="")
                         )
@@ -93,14 +93,14 @@ print_bar <- function(i,
             }else{
                 if(i < n){
                     print.len <- floor(symbol.len*i/n)
-                    cat(paste("\r", 
+                    logging.log(paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
                               sprintf("%.2f%%", 100*i/n), sep="")
                     )
                 }else{
                     print.len <- floor(symbol.len*i/n)
-                    cat(paste("\r", 
+                    logging.log(paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               sprintf("%.2f%%", 100*i/n), "\n", sep="")
                     )
@@ -116,13 +116,13 @@ print_bar <- function(i,
         #             print.len <- round(symbol.len * progress / n)
         #             if(fixed.points){
         #                 if(progress %in% round(points * n / 100)){
-        #                     cat(paste("\r", 
+        #                     logging.log(paste("\r", 
         #                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
         #                               paste(rep(" ", symbol.len-print.len), collapse=""),
         #                               sprintf("%.2f%%", progress * 100 / n), sep=""))
         #                 }
         #             }else{
-        #                 cat(paste("\r", 
+        #                 logging.log(paste("\r", 
         #                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
         #                           paste(rep(" ", symbol.len-print.len), collapse=""),
         #                           sprintf("%.2f%%", progress * 100 / n), sep=""))
@@ -137,13 +137,13 @@ print_bar <- function(i,
             print.len <- round(symbol.len * progress / n)
             if(fixed.points){
                 if(progress %in% round(points * n / 100)){
-                    cat(paste("\r", 
+                    logging.log(paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
                               sprintf("%.2f%%", progress * 100 / n), sep=""))
                 }
             }else{
-                cat(paste("\r", 
+                logging.log(paste("\r", 
                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                           paste(rep(" ", symbol.len-print.len), collapse=""),
                           sprintf("%.2f%%", progress * 100 / n), sep=""))
@@ -154,7 +154,7 @@ print_bar <- function(i,
 
 
 print_accomplished <- function(width = 60) {
-    cat(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+    logging.log(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
 }
 
 #' Print R Package information, include title, short_title, logo, version, authors, contact
@@ -239,7 +239,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # bottom line
     msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
-    cat(msg, sep = "\n")
+    logging.log(msg, sep = "\n")
     
     return(version)
 }
