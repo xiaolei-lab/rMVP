@@ -19,7 +19,7 @@
 #'
 #' Last update: January 11, 2017
 #' 
-#' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
+#' @author Xiaolei Liu (modified)
 #' 
 #' @param pheno a two-column phenotype matrix
 #' @param snp.pool matrix for pseudo QTNs

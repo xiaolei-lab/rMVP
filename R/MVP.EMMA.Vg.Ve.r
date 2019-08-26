@@ -20,7 +20,7 @@
 #' Build date: August 30, 2016
 #' Last update: January 27, 2017
 #' 
-#' @author EMMA (Kang et. al. Genetics, 2008), Modified only for speed up by Xiaolei Liu and Lilin Yin
+#' @author Xiaolei Liu and Lilin Yin (modified)
 #' 
 #' @param y phenotype, n * 2
 #' @param X covariate matrix, the first column is 1s
