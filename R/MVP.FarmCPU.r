@@ -83,7 +83,6 @@
     }
 
 	map <- as.matrix(map)
-	options(warn = -1)
 	max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE)
 	if(is.infinite(max.chr))	max.chr <- 0
 	map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
@@ -94,7 +93,6 @@
 		}
 	}
 	map <- matrix(as.numeric(map), nrow(map))
-	options(warn = 0)
 	
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     

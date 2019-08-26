@@ -1557,8 +1557,6 @@ MVP.Report <- function(
 Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP Density", bin = 1e6,
                        band = 3, width = 5, legend.len = 10, legend.max = NULL, legend.pt.cex = 3,
                        legend.cex = 1, legend.x.intersp = 1, legend.y.intersp = 1, plot = TRUE) {
-    opts <- options(warn = -1)
-    on.exit(options(opts))
     
     ## Step 1: preprocess map
     # filter map
@@ -1997,8 +1995,6 @@ MVP.Hist <-
              file.type = "pdf",
              dpi = 300) {
     
-    opts <- options(warn = -1)
-    on.exit(options(opts))
     w <- 6
     h <- 6
     phex <- phe
