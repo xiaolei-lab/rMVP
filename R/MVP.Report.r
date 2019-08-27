@@ -66,9 +66,8 @@
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K))
+#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K), file.output=FALSE)
 #' 
-#' file.remove("Rectangular-Manhattan.trait2.jpg")
 MVP.Report <- function(
     MVP,
     col=c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
@@ -1765,9 +1764,8 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report.Density(pig60K, "mvp")
+#' MVP.Report.Density(pig60K, "mvp", file.output=FALSE)
 #' 
-#' file.remove("SNP_Density.mvp.jpg")
 MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE, verbose = TRUE) {
     logging.log("SNP_Density Plotting", "\n", verbose = verbose)
@@ -1828,6 +1826,7 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #'    QQplot.
 #' @param dpi a number, the picture element for .jpg and .tiff files. The default is 300.
 #' @param verbose whether to print detail.
+#' @param file.output Logical value. If TRUE, the figures will be generated. 
 #' 
 #' @return
 #' Output file:
@@ -1837,9 +1836,8 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+#' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300, file.output=FALSE)
 #' 
-#' file.remove(c("QQplot.trait1.jpg", "QQplot.trait2.jpg", "QQplot.trait3.jpg"))
 MVP.Report.QQplot <-
     function(P.values,
              taxa_name,
@@ -1858,6 +1856,7 @@ MVP.Report.QQplot <-
              memo="MVP",
              box=TRUE,
              dpi=300,
+             file.output=TRUE,
              verbose=TRUE
 ) {
     logging.log(paste0("Q_Q Plotting ", taxa_name), "\n", verbose = verbose)
@@ -1865,7 +1864,7 @@ MVP.Report.QQplot <-
     h <- 5.5
     
     # setup output device
-    if (!is.null(file.type)) {
+    if (file.output && !is.null(file.type)) {
         name <- paste0(memo, ".QQplot.", taxa_name)
         switch(file.type,
             jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
@@ -1958,7 +1957,7 @@ MVP.Report.QQplot <-
     points(quantiles[is_visable && is_signal], P.values[is_visable && is_signal], col = signal.col, pch = signal.pch, cex = signal.cex)
     
     if (box) { box() }
-    if (!is.null(file.type)) { dev.off() }
+    if (file.output && !is.null(file.type)) { dev.off() }
 }
 
 #' Phenotype distribution histogram
@@ -1976,7 +1975,8 @@ MVP.Report.QQplot <-
 #'    device of the system.
 #' @param dpi The resolution of the image, specifying how many pixels 
 #'    per inch.
-#'
+#' @param file.output Logical value. If TRUE, the figures will be generated. 
+#' 
 #' @export
 #' @return
 #' Output file:
@@ -1986,9 +1986,8 @@ MVP.Report.QQplot <-
 #' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' phe <- read.table(phePath, header=TRUE)
 #' 
-#' MVP.Hist(phe)
+#' MVP.Hist(phe, file.output = FALSE)
 #' 
-#' file.remove("MVP.Phe_Distribution.V6.pdf")
 MVP.Hist <-
     function(phe,
              col = c("dodgerblue4",
@@ -1998,6 +1997,7 @@ MVP.Hist <-
                      "purple4"),
              breakNum = 15,
              file.type = "pdf",
+             file.output = TRUE,
              dpi = 300) {
     
     w <- 6
@@ -2008,9 +2008,15 @@ MVP.Hist <-
         # create file
         trait <- colnames(phe)[i]
         name  <- paste0("MVP.Phe_Distribution.", paste(trait, collapse = "."))
-        if (file.type == "jpg") { jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
-        if (file.type == "pdf") { pdf(paste0(name, ".pdf"), width = w, height = h) }
-        if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
+        
+        if (file.output && !is.null(file.type)) {
+            if (file.type == "jpg") { jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }
+            if (file.type == "pdf") { pdf(paste0(name, ".pdf"), width = w, height = h) }
+            if (file.type == "tiff") { tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi) }
+        } else {
+            if (is.null(dev.list())) { dev.new(width = w, height = h) }
+        }
+        
         
         phe    <- phe[!is.na(phe[, i]), ]
         Breaks <- seq(min(phe[, i], na.rm = TRUE), max(phe[, i], na.rm = TRUE), length = breakNum)
@@ -2058,9 +2064,9 @@ MVP.Hist <-
         
         # draw text
         text(xx$breaks[1], y = maxY*0.95, labels = paste0("Mean: ", round(mean(phe[, i]), 2)), font = 2, adj = 0)
-        text(xx$breaks[1], y = maxY*0.9, labels = paste0("Sd: ", round(sd(phe[, i]), 2)), font = 2, adj = 0)
+        text(xx$breaks[1], y = maxY*0.90, labels = paste0("  Sd: ", round(sd(phe[, i]), 2)), font = 2, adj = 0)
         text(xx$breaks[1], y = maxY*0.85, labels = paste0(test.method, ": ", norm.p), font = 2, adj = 0)
-        dev.off()
+        if (file.output && !is.null(file.type)) { dev.off() }
         phe <- phex
     }
 }
@@ -2089,11 +2095,11 @@ MVP.Hist <-
 #' MVP.PCA_2D.<type>
 #'
 #' @examples
-#' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
+#' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
+#' geno <- attach.big.matrix(genoPath)
+#' pca <- MVP.PCA(M=geno)
 #' 
-#' MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
-#' pca <- attach.big.matrix("myPC.pc.desc")[, 1:3]
-#' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
+#' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
 #' 
 #' file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 MVP.PCAplot <- function(PCA,
@@ -2106,6 +2112,7 @@ MVP.PCAplot <- function(PCA,
                         file = "pdf",
                         dpi = 300,
                         box = FALSE,
+                        file.output = TRUE,
                         verbose = TRUE
 ) {
     if(!is.null(class)){if(length(class) != nrow(PCA)) stop("the length of 'class' differs from the row of 'PCA'"); Ncluster <- length(unique(class))}
@@ -2121,9 +2128,15 @@ MVP.PCAplot <- function(PCA,
         pch=1:Ncluster
     } 
     logging.log("PCA plot2d", "\n", verbose = verbose)
-    if(file=="jpg") jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
-    if(file=="pdf") pdf("MVP.PCA_2D.pdf", width = 6,height=6)
-    if(file=="tiff") tiff("MVP.PCA_2D.tiff", width = 6*dpi,height=6*dpi,res=dpi)
+    
+    if (file.output && !is.null(file.type)) {
+        if(file=="jpg") jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
+        if(file=="pdf") pdf("MVP.PCA_2D.pdf", width = 6,height=6)
+        if(file=="tiff") tiff("MVP.PCA_2D.tiff", width = 6*dpi,height=6*dpi,res=dpi)
+    } else {
+        if (is.null(dev.list())) { dev.new(width = w, height = h) }
+    }
+
     if(is.null(class)){
         kc <- kmeans(PCA[,c(1,2)], Ncluster)
     }else{
@@ -2136,7 +2149,7 @@ MVP.PCAplot <- function(PCA,
     }
     axis(2, font.axis=2)
     if(box) box()
-    dev.off()
+    if (file.output && !is.null(file.type)) { dev.off() }
     if(plot3D){
         logging.log("The 3D PCA map has been temporarily disabled, and we will improve this feature in subsequent versions.", "\n", verbose = verbose)
         # print("PCA plot3d")
