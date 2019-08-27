@@ -226,9 +226,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' @examples 
 #' vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 #' 
-#' MVP.Data.VCF2MVP(vcfPath, "rMVP.test")
+#' MVP.Data.VCF2MVP(vcfPath, file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -279,9 +278,8 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' @examples 
 #' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 #' 
-#' MVP.Data.Bfile2MVP(bfilePath, "rMVP.test")
+#' MVP.Data.Bfile2MVP(bfilePath, file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -337,9 +335,8 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' @examples 
 #' hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
 #' 
-#' MVP.Data.Hapmap2MVP(hapmapPath, "rMVP.test")
+#' MVP.Data.Hapmap2MVP(hapmapPath, file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -393,9 +390,8 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
 #' @examples 
 #' numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' MVP.Data.Numeric2MVP(numericPath, mapPath, "rMVP.test")
+#' MVP.Data.Numeric2MVP(numericPath, mapPath, file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # check old file
@@ -506,9 +502,8 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
 #' bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 #' map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
 #' 
-#' MVP.Data.MVP2Bfile(bigmat, map, out="rMVP.test")
+#' MVP.Data.MVP2Bfile(bigmat, map, out=file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
@@ -570,9 +565,8 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose
 #' @examples 
 #' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' 
-#' MVP.Data.Pheno(phePath, out="rMVP.test")
+#' MVP.Data.Pheno(phePath, out=file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\t', missing=c(NA, 'NA', '-9', 9999), verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # read data
@@ -657,9 +651,8 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' @examples 
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 #' 
-#' MVP.Data.Map(mapPath, "rMVP.test")
+#' MVP.Data.Map(mapPath, file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     if (is.character(map) && !is.data.frame(map)) {
@@ -698,9 +691,8 @@ MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t',
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.PC(TRUE, mvp_prefix=geno, out="rMVP.test")
+#' MVP.Data.PC(TRUE, mvp_prefix=geno, out=file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.PC <- function(
     filePC=TRUE, 
     mvp_prefix='mvp', 
@@ -770,9 +762,8 @@ MVP.Data.PC <- function(
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out="rMVP.test")
+#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out=file.path(tempdir(), "rMVP.test"))
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.Kin <- function(
     fileKin=TRUE, 
     mvp_prefix='mvp', 
@@ -836,9 +827,8 @@ MVP.Data.Kin <- function(
 #' @examples 
 #' mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
 #' 
-#' MVP.Data.impute(mvpPath, "rMVP.test", ncpus=1)
+#' MVP.Data.impute(mvpPath, file.path(tempdir(), "rMVP.test"), ncpus=1)
 #' 
-#' file.remove(dir(pattern = "rMVP.test.*"))
 MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL, verbose=TRUE) {
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
