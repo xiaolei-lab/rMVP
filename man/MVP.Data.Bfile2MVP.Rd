@@ -40,7 +40,6 @@ Build date: Sep 12, 2018
 \examples{
 bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 
-MVP.Data.Bfile2MVP(bfilePath, "rMVP.test")
+MVP.Data.Bfile2MVP(bfilePath, file.path(tempdir(), "rMVP.test"))
 
-file.remove(dir(pattern = "rMVP.test.*"))
 }

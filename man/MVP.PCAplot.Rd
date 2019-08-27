@@ -4,12 +4,15 @@
 \alias{MVP.PCAplot}
 \title{PCA Plot}
 \usage{
-MVP.PCAplot(PCA, col = NULL, pch = NULL, class = NULL,
-  legend.pos = "topright", Ncluster = 1, plot3D = FALSE,
-  file = "pdf", dpi = 300, box = FALSE, verbose = TRUE)
+MVP.PCAplot(PCA, memo = "MVP", col = NULL, pch = NULL,
+  class = NULL, legend.pos = "topright", Ncluster = 1,
+  plot3D = FALSE, file.type = "pdf", dpi = 300, box = FALSE,
+  file.output = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{PCA}{Principal component analysis result, 2-column matrix}
+
+\item{memo}{the prefix of the output image file.}
 
 \item{col}{colors for each cluster}
 
@@ -27,11 +30,13 @@ nor NULL).}
 
 \item{plot3D}{(DEPRECATED)if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead}
 
-\item{file}{Character. Options are jpg, pdf, and tiff}
+\item{file.type}{Character. Options are jpg, pdf, and tiff}
 
 \item{dpi}{Number. Dots per inch for .jpg and .tiff files}
 
 \item{box}{Logical value. If TRUE, the border line of Manhattan plot will be added}
+
+\item{file.output}{Logical value. If TRUE, the figures will be generated.}
 
 \item{verbose}{whether to print detail.}
 }
@@ -43,11 +48,12 @@ MVP.PCA_2D.<type>
 PCA Plot
 }
 \examples{
-geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
+geno <- attach.big.matrix(genoPath)
+pca <- MVP.PCA(M=geno)
 
-MVP.Data.PC(TRUE, mvp_prefix=geno, out="myPC")
-pca <- attach.big.matrix("myPC.pc.desc")[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", pch=19)
+MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
+    col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
 
 file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 }

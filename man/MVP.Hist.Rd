@@ -6,7 +6,7 @@
 \usage{
 MVP.Hist(phe, col = c("dodgerblue4", "olivedrab4", "violetred",
   "darkgoldenrod1", "purple4"), breakNum = 15, file.type = "pdf",
-  dpi = 300)
+  file.output = TRUE, dpi = 300)
 }
 \arguments{
 \item{phe}{phenotype data}
@@ -24,6 +24,8 @@ file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use
 in the current environment, which may be RStudioGD or the default 
 device of the system.}
 
+\item{file.output}{Logical value. If TRUE, the figures will be generated.}
+
 \item{dpi}{The resolution of the image, specifying how many pixels 
 per inch.}
 }
@@ -38,7 +40,6 @@ Phenotype distribution histogram
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phe <- read.table(phePath, header=TRUE)
 
-MVP.Hist(phe)
+MVP.Hist(phe, file.output = FALSE)
 
-file.remove("MVP.Phe_Distribution.V6.pdf")
 }

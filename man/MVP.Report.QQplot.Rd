@@ -8,7 +8,8 @@ MVP.Report.QQplot(P.values, taxa_name, col = c("blue"), cex = 0.5,
   threshold = NULL, amplify = TRUE, signal.col = "red",
   signal.pch = 19, signal.cex = 0.8, conf.int = TRUE, cex.axis = 1,
   conf.int.col = "grey", threshold.col = "red", file.type = "jpg",
-  memo = "MVP", box = TRUE, dpi = 300, verbose = TRUE)
+  memo = "MVP", box = TRUE, dpi = 300, file.output = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{P.values}{P values}
@@ -58,6 +59,8 @@ QQplot.}
 
 \item{dpi}{a number, the picture element for .jpg and .tiff files. The default is 300.}
 
+\item{file.output}{Logical value. If TRUE, the figures will be generated.}
+
 \item{verbose}{whether to print detail.}
 }
 \value{
@@ -69,8 +72,6 @@ QQ Plot
 }
 \examples{
 data(pig60K, package = "rMVP")
+MVP.Report(pig60K, plot.type="q", file.output=FALSE)
 
-MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
-
-file.remove(c("QQplot.trait1.jpg", "QQplot.trait2.jpg", "QQplot.trait3.jpg"))
 }

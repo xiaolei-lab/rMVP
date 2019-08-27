@@ -37,7 +37,6 @@ SNP Density
 \examples{
 data(pig60K, package = "rMVP")
 
-MVP.Report.Density(pig60K, "mvp")
+MVP.Report.Density(pig60K, "mvp", file.output=FALSE)
 
-file.remove("SNP_Density.mvp.jpg")
 }

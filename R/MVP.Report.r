@@ -66,7 +66,8 @@
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m", threshold=0.05/nrow(pig60K), file.output=FALSE)
+#' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m",
+#'     threshold=0.05/nrow(pig60K), file.output=FALSE)
 #' 
 MVP.Report <- function(
     MVP,
@@ -1836,7 +1837,7 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300, file.output=FALSE)
+#' MVP.Report(pig60K, plot.type="q", file.output=FALSE)
 #' 
 MVP.Report.QQplot <-
     function(P.values,
@@ -2084,9 +2085,11 @@ MVP.Hist <-
 #' @param legend.pos position of legend. default is "topright"
 #' @param Ncluster cluster number
 #' @param plot3D (DEPRECATED)if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, "rgl" package should be installed beforehead
-#' @param file Character. Options are jpg, pdf, and tiff
+#' @param file.type Character. Options are jpg, pdf, and tiff
 #' @param dpi Number. Dots per inch for .jpg and .tiff files
 #' @param box Logical value. If TRUE, the border line of Manhattan plot will be added
+#' @param memo the prefix of the output image file.
+#' @param file.output Logical value. If TRUE, the figures will be generated. 
 #' @param verbose whether to print detail.
 #' 
 #' @export
@@ -2099,22 +2102,27 @@ MVP.Hist <-
 #' geno <- attach.big.matrix(genoPath)
 #' pca <- MVP.PCA(M=geno)
 #' 
-#' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
+#' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
+#'     col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
 #' 
 #' file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 MVP.PCAplot <- function(PCA,
+                        memo = "MVP",
                         col = NULL,
                         pch = NULL,
                         class = NULL,
                         legend.pos = "topright",
                         Ncluster = 1,
                         plot3D = FALSE,
-                        file = "pdf",
+                        file.type = "pdf",
                         dpi = 300,
                         box = FALSE,
                         file.output = TRUE,
                         verbose = TRUE
 ) {
+    w <- 5.5
+    h <- 5.5
+    
     if(!is.null(class)){if(length(class) != nrow(PCA)) stop("the length of 'class' differs from the row of 'PCA'"); Ncluster <- length(unique(class))}
     if(!is.null(col)){
         col <- rep(col, Ncluster)
@@ -2130,9 +2138,12 @@ MVP.PCAplot <- function(PCA,
     logging.log("PCA plot2d", "\n", verbose = verbose)
     
     if (file.output && !is.null(file.type)) {
-        if(file=="jpg") jpeg("MVP.PCA_2D.jpg", width = 6*dpi,height=6*dpi,res=dpi,quality = 100)
-        if(file=="pdf") pdf("MVP.PCA_2D.pdf", width = 6,height=6)
-        if(file=="tiff") tiff("MVP.PCA_2D.tiff", width = 6*dpi,height=6*dpi,res=dpi)
+        name <- paste0(memo, ".PCA_2D")
+        switch(file.type,
+               jpg = jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100),
+               pdf = pdf(paste0(name, ".pdf"), width = w, height = h),
+               tiff = tiff(paste0(name, ".tiff"), width = w * dpi, height = h * dpi, res = dpi)
+        )
     } else {
         if (is.null(dev.list())) { dev.new(width = w, height = h) }
     }

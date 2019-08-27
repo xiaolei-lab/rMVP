@@ -297,13 +297,13 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
         if(!is.null(nPC)){
-            MVP.PCAplot(
-                ipca[,1:3],
-                col=col,
-                plot3D=plot3D,
-                file=file,
-                dpi=dpi,
-            )
+          MVP.PCAplot(
+            ipca[,1:3],
+            col=col,
+            plot3D=plot3D,
+            file.type=file,
+            dpi=dpi,
+          )
         }
         
         MVP.Report(

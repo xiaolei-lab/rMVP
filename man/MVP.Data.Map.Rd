@@ -34,7 +34,6 @@ Build date: Sep 12, 2018
 \examples{
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 
-MVP.Data.Map(mapPath, "rMVP.test")
+MVP.Data.Map(mapPath, file.path(tempdir(), "rMVP.test"))
 
-file.remove(dir(pattern = "rMVP.test.*"))
 }
