@@ -7,7 +7,7 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
 MVP.Data.Map(map, out = "mvp", cols = c(1, 2, 3), header = TRUE,
-  sep = "\\t")
+  sep = "\\t", verbose = TRUE)
 }
 \arguments{
 \item{map}{the name of map file or map object(data.frame or matrix)}
@@ -19,6 +19,8 @@ MVP.Data.Map(map, out = "mvp", cols = c(1, 2, 3), header = TRUE,
 \item{header}{whether the file contains header}
 
 \item{sep}{seperator of the file}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:

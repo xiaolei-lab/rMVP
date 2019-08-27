@@ -7,7 +7,7 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
 MVP.Data.Pheno(pheno_file, out = "mvp", cols = NULL, header = TRUE,
-  sep = "\\t", missing = c(NA, "NA", "-9", 9999))
+  sep = "\\t", missing = c(NA, "NA", "-9", 9999), verbose = TRUE)
 }
 \arguments{
 \item{pheno_file}{the name of phenotype file}
@@ -21,6 +21,8 @@ MVP.Data.Pheno(pheno_file, out = "mvp", cols = NULL, header = TRUE,
 \item{sep}{seperator of the file}
 
 \item{missing}{the missing value}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 NULL

@@ -6,7 +6,7 @@
 \usage{
 MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
   dpi = 300, bin.size = 1e+06, bin.max = NULL, file.type = "jpg",
-  file.output = TRUE)
+  file.output = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{Pmap}{P value Map}
@@ -24,6 +24,8 @@ MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
 \item{file.type}{format of output figure}
 
 \item{file.output}{Whether to output the file}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:

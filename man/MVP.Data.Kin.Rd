@@ -5,7 +5,7 @@
 \title{Kinship}
 \usage{
 MVP.Data.Kin(fileKin = TRUE, mvp_prefix = "mvp", out = NULL,
-  priority = "speed", sep = "\\t", cpus = 1)
+  priority = "speed", sep = "\\t", cpus = 1, verbose = TRUE)
 }
 \arguments{
 \item{fileKin}{Kinship that represents relationship among individuals, n * n matrix, n is sample size}
@@ -19,6 +19,8 @@ MVP.Data.Kin(fileKin = TRUE, mvp_prefix = "mvp", out = NULL,
 \item{sep}{seperator for Kinship file.}
 
 \item{cpus}{the number of cpu}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:

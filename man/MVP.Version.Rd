@@ -4,10 +4,12 @@
 \alias{MVP.Version}
 \title{Print MVP Banner}
 \usage{
-MVP.Version(width = 60)
+MVP.Version(width = 60, verbose = TRUE)
 }
 \arguments{
 \item{width}{the width of the message}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 version number.

@@ -5,7 +5,7 @@
 \title{Principal Component Analysis}
 \usage{
 MVP.PCA(M = NULL, K = NULL, priority = c("speed", "memory"),
-  pcs.keep = 5, cpu = 1)
+  pcs.keep = 5, cpu = 1, verbose = TRUE)
 }
 \arguments{
 \item{M}{Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size}
@@ -17,6 +17,8 @@ MVP.PCA(M = NULL, K = NULL, priority = c("speed", "memory"),
 \item{pcs.keep}{maximum number of PCs for output}
 
 \item{cpu}{the number of cpu}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep

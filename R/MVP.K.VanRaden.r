@@ -23,7 +23,8 @@
 #' @param M Genotype, m * n, m is marker size, n is population size
 #' @param priority speed or memory
 #' @param cpu the number of cpu
-
+#' @param verbose whether to print detail.
+#'
 #' @return K, n * n matrix
 #' @export
 #'
@@ -38,7 +39,8 @@ MVP.K.VanRaden <-
 function(
     M, 
     priority=c("speed", "memory"), 
-    cpu=1
+    cpu=1,
+    verbose=TRUE
 ){
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
@@ -49,7 +51,7 @@ function(
     if(r.open && mac){
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
-    logging.log("Relationship matrix mode in", priority[1], "\n")
+    logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
     if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
         match.arg(priority),
@@ -58,17 +60,17 @@ function(
             n <- ncol(M)
             m <- nrow(M)
             Pi <- 0.5 * rowMeans(M)
-            logging.log("Scale the genotype matrix", "\n")
+            logging.log("Scale the genotype matrix", "\n", verbose = verbose)
             M <- M - 2 * Pi
             SUM <- sum(Pi * (1 - Pi))
-            logging.log("Computing Z'Z", "\n")
+            logging.log("Computing Z'Z", "\n", verbose = verbose)
             if(r.open){
                 K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
             }else{
                 K <- try(0.5 * crossprodcpp(M)/SUM, silent=TRUE)
             }
             if(inherits(K,"try-error")){
-                logging.log("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n")
+                logging.log("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n", verbose = verbose)
                 stop(K[[1]])
             }
         },
@@ -154,7 +156,7 @@ function(
         }
     )
     #print("K Preparation is Done!")
-    logging.log("Deriving relationship matrix successfully", "\n"); gc()
+    logging.log("Deriving relationship matrix successfully", "\n", verbose = verbose); gc()
     return(K)
 }#end of MVP.k.VanRaden function
 

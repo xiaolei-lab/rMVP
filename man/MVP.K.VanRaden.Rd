@@ -4,7 +4,8 @@
 \alias{MVP.K.VanRaden}
 \title{Calculate Kinship matrix by VanRaden method}
 \usage{
-MVP.K.VanRaden(M, priority = c("speed", "memory"), cpu = 1)
+MVP.K.VanRaden(M, priority = c("speed", "memory"), cpu = 1,
+  verbose = TRUE)
 }
 \arguments{
 \item{M}{Genotype, m * n, m is marker size, n is population size}
@@ -12,6 +13,8 @@ MVP.K.VanRaden(M, priority = c("speed", "memory"), cpu = 1)
 \item{priority}{speed or memory}
 
 \item{cpu}{the number of cpu}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 K, n * n matrix
@@ -24,7 +27,7 @@ Last update: Dec 12, 2019
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
-\dontrun{
+
 K <- MVP.K.VanRaden(genotype)
-}
+
 }

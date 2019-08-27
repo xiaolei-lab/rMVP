@@ -5,7 +5,8 @@
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
 MVP.MLM(phe, geno, K = NULL, eigenK = NULL, CV = NULL, REML = NULL,
-  cpu = 1, bar = TRUE, vc.method = c("BRENT", "EMMA", "HE"))
+  cpu = 1, bar = TRUE, vc.method = c("BRENT", "EMMA", "HE"),
+  verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
@@ -25,6 +26,8 @@ MVP.MLM(phe, geno, K = NULL, eigenK = NULL, CV = NULL, REML = NULL,
 \item{bar}{whether to show the progress bar}
 
 \item{vc.method}{the methods for estimating variance component("emma" or "he" or "brent")}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values

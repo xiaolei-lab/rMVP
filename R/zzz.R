@@ -9,7 +9,6 @@ package.env <- NULL
     # set option
     op <- options()
     op.rMVP <- list(
-        rMVP.Verbose = TRUE,
         rMVP.OutputLog2File = TRUE
     )
     toset <- !(names(op.rMVP) %in% names(op))

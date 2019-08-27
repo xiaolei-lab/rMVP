@@ -8,7 +8,7 @@ MVP.Report.QQplot(P.values, taxa_name, col = c("blue"), cex = 0.5,
   threshold = NULL, amplify = TRUE, signal.col = "red",
   signal.pch = 19, signal.cex = 0.8, conf.int = TRUE, cex.axis = 1,
   conf.int.col = "grey", threshold.col = "red", file.type = "jpg",
-  memo = "MVP", box = TRUE, dpi = 300)
+  memo = "MVP", box = TRUE, dpi = 300, verbose = TRUE)
 }
 \arguments{
 \item{P.values}{P values}
@@ -57,6 +57,8 @@ device of the system.}
 QQplot.}
 
 \item{dpi}{a number, the picture element for .jpg and .tiff files. The default is 300.}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:

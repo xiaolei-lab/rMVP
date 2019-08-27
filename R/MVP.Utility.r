@@ -21,13 +21,14 @@
 #' @author Lilin Yin, Haohao Zhang, and Xiaolei Liu
 #' 
 #' @param width the width of the message
-#'
+#' @param verbose whether to print detail.
+#' 
 #' @return version number.
 #' @export
 #'
 #' @examples
 #' MVP.Version()
-MVP.Version <- function(width=60) {
+MVP.Version <- function(width=60, verbose=TRUE) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
     authors <- c("Designed and Maintained by Lilin Yin, Haohao Zhang, and Xiaolei Liu", 
@@ -38,7 +39,7 @@ MVP.Version <- function(width=60) {
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
-    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
+    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width, verbose = verbose)
     return(invisible(version))
 }
 
@@ -66,7 +67,8 @@ print_bar <- function(i,
                     symbol.tail = ">" ,
                     fixed.points = TRUE,
                     points = seq(0, 100, 1),
-                    symbol.len = 50
+                    symbol.len = 50,
+                    verbose = TRUE
 ) {
     switch(
         match.arg(type), 
@@ -77,32 +79,44 @@ print_bar <- function(i,
                 if(floor(100*i/n) %in% point.index){
                     if(floor(100*i/n) != max(point.index)){
                         print.len <- floor(symbol.len*i/n)
-                        logging.log(paste("\r", 
+                        logging.log(
+                            paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                                   paste(rep(" ", symbol.len-print.len), collapse=""),
-                                  sprintf("%.2f%%", 100*i/n), sep="")
+                                  sprintf("%.2f%%", 100*i/n)
+                                  , sep=""),
+                            verbose = verbose
                         )
                     }else{
                         print.len <- floor(symbol.len*i/n)
-                        logging.log(paste("\r", 
+                        logging.log(
+                            paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                                  sprintf("%.2f%%", 100*i/n), "\n", sep="")
+                                  sprintf("%.2f%%", 100*i/n), "\n"
+                                  , sep=""),
+                            verbose = verbose
                         )
                     }
                 }
             }else{
                 if(i < n){
                     print.len <- floor(symbol.len*i/n)
-                    logging.log(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
-                              sprintf("%.2f%%", 100*i/n), sep="")
+                              sprintf("%.2f%%", 100*i/n)
+                              , sep=""),
+                        verbose = verbose
                     )
                 }else{
                     print.len <- floor(symbol.len*i/n)
-                    logging.log(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                              sprintf("%.2f%%", 100*i/n), "\n", sep="")
+                              sprintf("%.2f%%", 100*i/n), "\n"
+                              , sep=""),
+                        verbose = verbose
                     )
                 }
             }
@@ -137,24 +151,32 @@ print_bar <- function(i,
             print.len <- round(symbol.len * progress / n)
             if(fixed.points){
                 if(progress %in% round(points * n / 100)){
-                    logging.log(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
-                              sprintf("%.2f%%", progress * 100 / n), sep=""))
+                              sprintf("%.2f%%", progress * 100 / n)
+                              , sep=""),
+                        verbose = verbose
+                    )
                 }
             }else{
-                logging.log(paste("\r", 
+                logging.log(
+                    paste("\r", 
                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                           paste(rep(" ", symbol.len-print.len), collapse=""),
-                          sprintf("%.2f%%", progress * 100 / n), sep=""))
+                          sprintf("%.2f%%", progress * 100 / n)
+                          , sep=""),
+                    verbose = verbose
+                )
             }
         }
     )
 }
 
 
-print_accomplished <- function(width = 60) {
-    logging.log(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+print_accomplished <- function(width = 60, verbose = TRUE) {
+    logging.log(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n", verbose = verbose)
 }
 
 #' Print R Package information, include title, short_title, logo, version, authors, contact
@@ -185,7 +207,7 @@ print_accomplished <- function(width = 60) {
 #'              "| |\/| |  \ V /  |  _/",
 #'              "|_|  |_|   \_/   |_|")
 #' print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
-print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
+print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {
     msg <- c()
     # width
     if (is.null(width)) { width <- getOption('width') }
@@ -239,7 +261,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # bottom line
     msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
-    logging.log(msg, sep = "\n")
+    logging.log(msg, sep = "\n", verbose = verbose)
     
     return(version)
 }

@@ -26,6 +26,7 @@
 #' @param priority speed or memory
 #' @param pcs.keep maximum number of PCs for output
 #' @param cpu the number of cpu
+#' @param verbose whether to print detail.
 #' 
 #' @return
 #' Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep 
@@ -41,7 +42,7 @@
 #' str(pca)
 #' 
 MVP.PCA <-
-function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
+function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbose=TRUE){
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
@@ -70,10 +71,10 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
         K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
     }
 
-    logging.log("Eigen Decomposition", "\n")
+    logging.log("Eigen Decomposition", "\n", verbose = verbose)
     if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
-    logging.log("Deriving PCs successfully", "\n")
+    logging.log("Deriving PCs successfully", "\n", verbose = verbose)
 
     return(PCs=PCs)
 }#end of MVP.PCA function

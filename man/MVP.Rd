@@ -14,7 +14,7 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
   permutation.threshold = FALSE, permutation.rep = 100, bar = TRUE,
   col = c("dodgerblue4", "olivedrab4", "violetred", "darkgoldenrod1",
   "purple4"), file.output = TRUE, file = "jpg", dpi = 300,
-  threshold = 0.05)
+  threshold = 0.05, verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix, n is sample size}
@@ -74,6 +74,8 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 \item{dpi}{resolution for output figures}
 
 \item{threshold}{a cutoff line on manhattan plot, 0.05/marker size}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 a m * 2 matrix, the first column is the SNP effect, the second column is the P values

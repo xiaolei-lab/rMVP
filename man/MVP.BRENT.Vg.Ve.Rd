@@ -5,7 +5,7 @@
 \title{MVP.BRENT.Vg.Ve
 variance component estimation using the BRENT method}
 \usage{
-MVP.BRENT.Vg.Ve(y, X, eigenK)
+MVP.BRENT.Vg.Ve(y, X, eigenK, verbose = FALSE)
 }
 \arguments{
 \item{y}{phenotype}
@@ -13,6 +13,8 @@ MVP.BRENT.Vg.Ve(y, X, eigenK)
 \item{X}{covariate matrix, the first column is 1s}
 
 \item{eigenK}{eigen of Kinship matrix}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 vg, ve, and delta

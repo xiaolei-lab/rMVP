@@ -27,6 +27,7 @@
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
 #' @param cpu number of cpus used for parallel computation
 #' @param bar whether to show the progress bar
+#' @param verbose whether to print detail.
 #'
 #' @return m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export
@@ -50,7 +51,8 @@ function(
     geno, 
     CV=NULL, 
     cpu=1, 
-    bar=TRUE
+    bar=TRUE,
+    verbose=TRUE
 ){
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
@@ -114,17 +116,17 @@ function(
         p <- 2 * pt(abs(t.value), df, lower.tail=FALSE)
         return(list(effect=effect, se=se, p=p))
     }
-    logging.log("scanning...\n")
+    logging.log("scanning...\n", verbose = verbose)
     if(cpu == 1){
         math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
         eval(parse(text="try(setMKLthreads(mkl.cpu), silent=TRUE)"))
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE, verbose = verbose)}
         results <- lapply(1:m, eff.glm)
         eval(parse(text="try(setMKLthreads(math.cpu), silent=TRUE)"))
     }else{
         if(wind){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE, verbose = verbose)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "ys", "X0"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
@@ -134,11 +136,11 @@ function(
             tmpf.name <- tempfile()
             tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
             writeBin(0, tmpf)
-            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE, verbose = verbose)}
             mkl_env({
                 results <- mclapply(1:m, eff.glm, mc.cores = cpu)
             })
-            close(tmpf); unlink(tmpf.name); logging.log('\n');
+            close(tmpf); unlink(tmpf.name); logging.log('\n', verbose = verbose);
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

@@ -44,6 +44,7 @@
 #' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
 #' @param bound maximum number of SNPs selected as pseudo QTNs in each iteration
+#' @param verbose whether to print detail.
 #'
 #' @return a m by 4 results matrix, m is marker size, the four columns are SNP_ID, Chr, Pos, and p-value
 #' @export
@@ -68,7 +69,7 @@
                           method.bin="static", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
                           memo="MVP.FarmCPU", Prior=NULL, ncpus=2, bar=TRUE, maxLoop=10, 
                           threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, 
-                          QTN.threshold=0.01, bound=NULL){
+                          QTN.threshold=0.01, bound=NULL, verbose=TRUE){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
 
     echo=TRUE
@@ -107,7 +108,7 @@
 
     while(!isDone) {
         theLoop=theLoop+1
-        logging.log(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""), "\n")
+        logging.log(paste("Current loop: ",theLoop," out of maximum of ", maxLoop, sep=""), "\n", verbose = verbose)
             
         spacer="0"
         if(theLoop>9){
@@ -122,9 +123,9 @@
 
         #Step 2b: Set bins
         if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
         }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
         }
         
         #Step 2c: Remove bin dependency
@@ -135,12 +136,12 @@
             if(!is.na(p.threshold)){
                 if(min(myPrior,na.rm=TRUE)>p.threshold){
                     seqQTN=NULL
-                    logging.log("Top snps have little effect, set seqQTN to NULL!", "\n")
+                    logging.log("Top snps have little effect, set seqQTN to NULL!", "\n", verbose = verbose)
                     }
                 }else{
                     if(min(myPrior,na.rm=TRUE)>0.01/nm){
                         seqQTN=NULL
-                        logging.log("Top snps have little effect, set seqQTN to NULL!", "\n")
+                        logging.log("Top snps have little effect, set seqQTN to NULL!", "\n", verbose = verbose)
                     }
                 }
             }
@@ -199,16 +200,16 @@
                 if(seqQTN.pre[1]==-1) circle=FALSE
             }
 
-            logging.log("seqQTN:", "\n")
+            logging.log("seqQTN:", "\n", verbose = verbose)
             if(is.null(seqQTN)){
-                logging.log("NULL", "\n")
+                logging.log("NULL", "\n", verbose = verbose)
             }else{
-                logging.log(seqQTN, "\n")
+                logging.log(seqQTN, "\n", verbose = verbose)
             }
             
-            logging.log("scanning...", "\n")
+            logging.log("scanning...", "\n", verbose = verbose)
             if(theLoop==maxLoop){
-                logging.log(paste("Total number of possible QTNs in the model is: ", length(seqQTN),sep=""), "\n")
+                logging.log(paste("Total number of possible QTNs in the model is: ", length(seqQTN),sep=""), "\n", verbose = verbose)
             }
             
             isDone=((theLoop>=maxLoop) | (theConverge>=converge) | circle )
@@ -229,7 +230,7 @@
                 }
                 theCV=cbind(CV,myRemove$bin)
             }
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc,bar=bar)
+            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc,bar=bar, verbose=verbose)
             
             #Step 4: Background unit substitution
             if(!isDone){
@@ -465,13 +466,14 @@
 #' @param theLoop iteration number
 #' @param bound maximum number of SNPs selected as pseudo QTNs in each iteration
 #' @param ncpus number of threads used for parallele computation
+#' @param verbose whether to print detail.
 #'
 #' @return
 #' Output: seqQTN - an s by 1 vecter for index of QTNs on GM file
 #'
 #' @keywords internal
 FarmCPU.BIN <-
-    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2){
+    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2, verbose=TRUE){
         #print("FarmCPU.BIN Started")
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -511,7 +513,7 @@ FarmCPU.BIN <-
             }
             s=bound
             s[s>bound]=bound
-            logging.log("Optimizing Pseudo QTNs...", "\n")
+            logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             GP=cbind(GM,P,NA,NA,NA)
             mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=b,inclosure.size=s)
             seqQTN.save=which(mySpecify$index==TRUE)
@@ -521,7 +523,7 @@ FarmCPU.BIN <-
         #============================Optimize by FaST-LMM============================================
         if(method=="FaST-LMM"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            logging.log("Optimizing Pseudo QTNs...", "\n")
+            logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             count=0
             for (bin in b){
                 for (inc in s){
@@ -534,7 +536,7 @@ FarmCPU.BIN <-
                     myREML=myBurger$REMLs
                     myVG=myBurger$vg #it is unused
                     myVE=myBurger$ve #it is unused
-                    logging.log(c(bin,inc,myREML,myVG,myVE), "\n")
+                    logging.log(c(bin,inc,myREML,myVG,myVE), "\n", verbose = verbose)
                     #Recoding the optimum GK
                     if(count==1){
                         seqQTN.save=seqQTN
@@ -562,7 +564,7 @@ FarmCPU.BIN <-
         #============================Optimize by EMMA============================================
         if(method=="EMMA"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            logging.log("Optimizing Pseudo QTNs...", "\n")
+            logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             m <- length(b)*length(s)
             inc.index = rep(c(1:length(s)), length(b))
             
@@ -578,7 +580,7 @@ FarmCPU.BIN <-
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
-                logging.log(c(bin,inc,myREML,myVG,myVE), "\n")
+                logging.log(c(bin,inc,myREML,myVG,myVE), "\n", verbose = verbose)
                 return(list(seqQTN=seqQTN,myREML=myREML))
             }
             if(Sys.info()[['sysname']] != 'Windows'){
@@ -604,10 +606,10 @@ FarmCPU.BIN <-
         
         #Method of optimum: GEMMA
         #can not be used to provide REML
-        #============================Optimize by EMMA============================================
+        #============================Optimize by GEMMA============================================
         if(method=="GEMMA"&optimumable){
             #print("c(bin.size, bin.selection, -2LL, VG, VE)")
-            logging.log("Optimizing Pseudo QTNs...\n")
+            logging.log("Optimizing Pseudo QTNs...\n", verbose = verbose)
             m <- length(b)*length(s)
             
             seqQTN.optimize.parallel <- function(ii){
@@ -621,7 +623,7 @@ FarmCPU.BIN <-
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
-                logging.log(c(bin,inc,myREML,myVG,myVE), "\n")
+                logging.log(c(bin,inc,myREML,myVG,myVE), "\n", verbose = verbose)
                 return(list(seqQTN=seqQTN,myREML=myREML))
             }
             if(Sys.info()[['sysname']] != 'Windows'){
@@ -747,6 +749,7 @@ FarmCPU.Specify <-
 #' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
 #' @param ncpus number of threads used for parallele computation
 #' @param npc number of covariates without pseudo QTNs
+#' @param verbose whether to print detail.
 #'
 #' @return
 #' Output: P - p-value of each SNP
@@ -755,7 +758,7 @@ FarmCPU.Specify <-
 #' 
 #' @keywords internal
 FarmCPU.LM <-
-    function(y, w=NULL, GDP, ncpus=2, npc=0, bar=TRUE){
+    function(y, w=NULL, GDP, ncpus=2, npc=0, bar=TRUE, verbose=TRUE){
         #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
@@ -776,8 +779,8 @@ FarmCPU.LM <-
             q0=1
         }
         
-        logging.log("number of covariates in current loop is:", "\n")
-        logging.log(nf, "\n")
+        logging.log("number of covariates in current loop is:", "\n", verbose = verbose)
+        logging.log(nf, "\n", verbose = verbose)
         
         n=N
         if(nd>n)nd=n #handler of samples less than nd
@@ -860,13 +863,13 @@ FarmCPU.LM <-
 			tmpf.name <- tempfile()
 			tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)		
 			writeBin(0, tmpf)
-			print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+			print.f <- function(i){ print_bar(i=i, n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE, verbose = verbose) }
             mkl_env({
                 results <- parallel::mclapply(1:m, eff.farmcpu.parallel, mc.cores=ncpus)
             })
-			close(tmpf); unlink(tmpf.name); logging.log('\n');
+			close(tmpf); unlink(tmpf.name); logging.log('\n', verbose = verbose)
         }else{
-			print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+			print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE, verbose = verbose)}
             results <- lapply(1:m, eff.farmcpu.parallel)
         }
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

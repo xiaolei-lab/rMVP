@@ -24,10 +24,7 @@ logging.initialize <- function(module) {
 }
 
 
-logging.log <- function(..., file = NULL, sep = " ", fill = FALSE, labels = NULL, verbose = NULL) {
-    if (is.null(verbose)) {
-        verbose <- options("rMVP.Verbose")[[1]]
-    }
+logging.log <- function(..., file = NULL, sep = " ", fill = FALSE, labels = NULL, verbose = TRUE) {
     if (verbose) {
         cat(..., sep = sep, fill = fill, labels = labels)
     }

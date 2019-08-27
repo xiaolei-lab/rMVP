@@ -6,7 +6,7 @@
 \usage{
 MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", K = NULL,
   out = NULL, pcs.keep = 5, priority = "speed", sep = "\\t",
-  cpus = 1)
+  cpus = 1, verbose = TRUE)
 }
 \arguments{
 \item{filePC}{Principal components, n*npc, n is sample size, npc is number of top columns of principal components}
@@ -24,6 +24,8 @@ MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", K = NULL,
 \item{sep}{seperator for PC file.}
 
 \item{cpus}{the number of cpu}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:

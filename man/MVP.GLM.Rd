@@ -4,7 +4,7 @@
 \alias{MVP.GLM}
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
-MVP.GLM(phe, geno, CV = NULL, cpu = 1, bar = TRUE)
+MVP.GLM(phe, geno, CV = NULL, cpu = 1, bar = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
@@ -16,6 +16,8 @@ MVP.GLM(phe, geno, CV = NULL, cpu = 1, bar = TRUE)
 \item{cpu}{number of cpus used for parallel computation}
 
 \item{bar}{whether to show the progress bar}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 m * 2 matrix, the first column is the SNP effect, the second column is the P values

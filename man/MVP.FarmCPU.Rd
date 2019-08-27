@@ -10,7 +10,8 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
   bin.selection = seq(10, 100, 10), memo = "MVP.FarmCPU",
   Prior = NULL, ncpus = 2, bar = TRUE, maxLoop = 10,
   threshold.output = 0.01, converge = 1, iteration.output = FALSE,
-  p.threshold = NA, QTN.threshold = 0.01, bound = NULL)
+  p.threshold = NA, QTN.threshold = 0.01, bound = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n by t matrix, n is sample size, t is number of phenotypes}
@@ -54,6 +55,8 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
 \item{QTN.threshold}{in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs}
 
 \item{bound}{maximum number of SNPs selected as pseudo QTNs in each iteration}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 a m by 4 results matrix, m is marker size, the four columns are SNP_ID, Chr, Pos, and p-value

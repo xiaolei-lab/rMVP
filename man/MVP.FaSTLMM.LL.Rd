@@ -26,5 +26,5 @@ Output: ve - residual variance
 Last update: January 11, 2017
 }
 \author{
-Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
+Xiaolei Liu (modified)
 }

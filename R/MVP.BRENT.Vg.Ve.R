@@ -5,7 +5,8 @@
 #' @param y phenotype
 #' @param X covariate matrix, the first column is 1s
 #' @param eigenK eigen of Kinship matrix
-#'
+#' @param verbose whether to print detail.
+#' 
 #' @return vg, ve, and delta
 #' @export
 #'
@@ -21,7 +22,7 @@
 #' vc <- MVP.BRENT.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), eigenK=eigenK)
 #' print(vc)
 #' 
-MVP.BRENT.Vg.Ve <- function(y, X, eigenK) {
+MVP.BRENT.Vg.Ve <- function(y, X, eigenK, verbose = FALSE) {
     p = 0
     Sigma <- eigenK$values
     w <- which(Sigma < 1e-6)
@@ -30,7 +31,7 @@ MVP.BRENT.Vg.Ve <- function(y, X, eigenK) {
     min_h2 = 0
     max_h2 = 1
     tol = .Machine$double.eps^0.25
-    reml <- fit_diago_brent(y, X, p, Sigma, U, min_h2, max_h2, tol, verbose = FALSE)
+    reml <- fit_diago_brent(y, X, p, Sigma, U, min_h2, max_h2, tol, verbose = verbose)
     vg <- reml[[2]]
     ve <- reml[[1]]
     delta <- ve / vg

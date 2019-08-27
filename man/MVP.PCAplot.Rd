@@ -6,7 +6,7 @@
 \usage{
 MVP.PCAplot(PCA, col = NULL, pch = NULL, class = NULL,
   legend.pos = "topright", Ncluster = 1, plot3D = FALSE,
-  file = "pdf", dpi = 300, box = FALSE)
+  file = "pdf", dpi = 300, box = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{PCA}{Principal component analysis result, 2-column matrix}
@@ -32,6 +32,8 @@ nor NULL).}
 \item{dpi}{Number. Dots per inch for .jpg and .tiff files}
 
 \item{box}{Logical value. If TRUE, the border line of Manhattan plot will be added}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:
