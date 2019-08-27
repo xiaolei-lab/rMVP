@@ -75,11 +75,13 @@
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 #' map <- read.table(mapPath , head = TRUE)
 #' 
+#' opts <- options(rMVP.OutputLog2File = FALSE)
+#' on.exit(options(opts))
+#' 
 #' mvp <- MVP(phe=phenotype, geno=genotype, map=map, maxLoop=3,
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
 #' 
-#' file.remove(dir(pattern = "*.log"))
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
