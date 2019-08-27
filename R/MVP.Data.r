@@ -63,9 +63,10 @@
 #' @examples 
 #' bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 #' opts <- options(rMVP.OutputLog2File = FALSE)
-#' on.exit(options(opts))
+#' 
 #' MVP.Data(fileBed=bfilePath, out=file.path(tempdir(), "rMVP.test"), ncpus=1)
 #' 
+#' options(opts)
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
