@@ -15,12 +15,15 @@ Authors@R: c( person("Lilin", "Yin", role = "aut"),
               person("Xinyun", "Li", role = "aut"),
               person("Xiaolei", "Liu", role = c("cre", "aut", "cph"), email = "xiaoleiliu@mail.hzau.edu.cn"))
 Description: A Memory-Efficient, Visualize-Enhanced, Parallel-Accelerated Genome-Wide Association Study Tool. it can
-    (1) effectively process large GWAS data, (2) rapidly evaluate population structure, 
-    (3) efficiently estimate variance components by EMMAX, FaST-LMM, and HE regression algorithms, 
-    (4) implement parallel-accelerated association tests of markers using GLM, MLM, and FarmCPU methods; methods; 
-    (5) globally efficient design on GWAS process computing; and (6) enhance visualization of GWAS related information. 
-    For GLM, please see Price AL and Patterson NJ (2006) <DOI:10.1038/ng1847>; For MLM, please see 
-    Yu J and Pressoir G (2006) <DOI:10.1038/ng1702>; For FarmCPU, please see Liu X and Huang M (2016) <doi:10.1371/journal.pgen.1005767>.
+    (1) effectively process large data, 
+    (2) rapidly evaluate population structure, 
+    (3) efficiently estimate variance components several algorithms, 
+    (4) implement parallel-accelerated association tests of markers three methods, 
+    (5) globally efficient design on GWAS process computing, 
+    (6) enhance visualization of related information. 
+    For Generalize Linear Model (GLM), please see Price AL and Patterson NJ (2006) <DOI:10.1038/ng1847>; 
+    For Mixed Linear Model (MLM), please see Yu J and Pressoir G (2006) <DOI:10.1038/ng1702>; 
+    For Fixed and random model Circulating Probability Unification (FarmCPU), please see Liu X and Huang M (2016) <doi:10.1371/journal.pgen.1005767>.
 License: Apache License 2.0 | file LICENSE
 SystemRequirements: C++11
 URL: https://github.com/XiaoleiLiuBio/rMVP
