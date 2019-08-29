@@ -12,9 +12,10 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
   QTN.threshold = 0.01, method.bin = "static", bin.size = c(5e+05,
   5e+06, 5e+07), bin.selection = seq(10, 100, 10), maxLoop = 10,
   permutation.threshold = FALSE, permutation.rep = 100, bar = TRUE,
-  memo = "MVP", col = c("dodgerblue4", "olivedrab4", "violetred",
-  "darkgoldenrod1", "purple4"), file.output = TRUE, file.type = "jpg",
-  dpi = 300, threshold = 0.05, verbose = TRUE)
+  memo = "MVP", outpath = getwd(), col = c("dodgerblue4",
+  "olivedrab4", "violetred", "darkgoldenrod1", "purple4"),
+  file.output = TRUE, file.type = "jpg", dpi = 300,
+  threshold = 0.05, verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix, n is sample size}
@@ -66,6 +67,8 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 \item{bar}{if TRUE, the progress bar will be drawn on the terminal}
 
 \item{memo}{Character. A text marker on output files}
+
+\item{outpath}{Effective only when file.output = TRUE, determines the path of the output file}
 
 \item{col}{for color of points in each chromosome on manhattan plot}
 

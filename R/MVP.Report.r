@@ -170,6 +170,7 @@ MVP.Report <- function(
                            bin.max = bin.max, 
                            dpi = dpi, 
                            memo = memo,
+                           outpath = outpath,
                            file.type = file.type,
                            file.output = file.output)
     }
@@ -1691,8 +1692,8 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
                 x = c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])),
                 y = c(
                     -width / 5 - band * (i - length(chr.num) - 1),
-                    width / 5 - band * (i - length(chr.num) - 1),
-                    width / 5 - band * (i - length(chr.num) - 1),
+                     width / 5 - band * (i - length(chr.num) - 1),
+                     width / 5 - band * (i - length(chr.num) - 1),
                     -width / 5 - band * (i - length(chr.num) - 1)
                 ),
                 col = "grey",
@@ -1776,7 +1777,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report.Density(pig60K, "mvp", file.output=FALSE)
+#' MVP.Report.Density(pig60K, file.output=FALSE)
 #' 
 MVP.Report.Density <- function(Pmap, col = c("darkgreen", "yellow", "red"), dpi = 300, outpath = getwd(), memo = 'MVP',
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE, verbose = TRUE) {

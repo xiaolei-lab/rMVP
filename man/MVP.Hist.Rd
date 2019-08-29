@@ -6,7 +6,8 @@
 \usage{
 MVP.Hist(phe, col = c("dodgerblue4", "olivedrab4", "violetred",
   "darkgoldenrod1", "purple4"), breakNum = 15, memo = TRUE,
-  outpath = ".", file.type = "pdf", file.output = TRUE, dpi = 300)
+  outpath = getwd(), file.type = "pdf", file.output = TRUE,
+  dpi = 300)
 }
 \arguments{
 \item{phe}{phenotype data}

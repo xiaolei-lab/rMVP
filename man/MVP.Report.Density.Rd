@@ -4,15 +4,13 @@
 \alias{MVP.Report.Density}
 \title{SNP Density}
 \usage{
-MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
-  dpi = 300, outpath = ".", memo = "MVP", bin.size = 1e+06,
+MVP.Report.Density(Pmap, col = c("darkgreen", "yellow", "red"),
+  dpi = 300, outpath = getwd(), memo = "MVP", bin.size = 1e+06,
   bin.max = NULL, file.type = "jpg", file.output = TRUE,
   verbose = TRUE)
 }
 \arguments{
 \item{Pmap}{P value Map}
-
-\item{taxa}{The identifier of the output file.}
 
 \item{col}{The color vector}
 
@@ -34,7 +32,7 @@ MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
 }
 \value{
 Output file:
-SNP_Density.<taxa>.<type>
+<memo>.SNP_Density.<type>
 }
 \description{
 SNP Density
@@ -42,6 +40,6 @@ SNP Density
 \examples{
 data(pig60K, package = "rMVP")
 
-MVP.Report.Density(pig60K, "mvp", file.output=FALSE)
+MVP.Report.Density(pig60K, file.output=FALSE)
 
 }

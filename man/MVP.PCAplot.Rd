@@ -7,7 +7,7 @@
 MVP.PCAplot(PCA, memo = "MVP", col = NULL, pch = NULL,
   class = NULL, legend.pos = "topright", Ncluster = 1,
   plot3D = FALSE, file.type = "pdf", dpi = 300, box = FALSE,
-  file.output = TRUE, outpath = ".", verbose = TRUE)
+  file.output = TRUE, outpath = getwd(), verbose = TRUE)
 }
 \arguments{
 \item{PCA}{Principal component analysis result, 2-column matrix}
