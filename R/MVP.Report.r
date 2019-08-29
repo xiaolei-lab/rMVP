@@ -110,6 +110,8 @@ MVP.Report <- function(
     memo="",
     verbose=TRUE
 ) {
+    old.par <- par()
+    on.exit(par(old.par))
     # plot a circle with a radius of r
     circle.plot <- function(myr, type="l", x=NULL, lty=1, lwd=1, col="black", add=TRUE, n.point=1000) {
         # Upper semicircle
@@ -349,7 +351,6 @@ MVP.Report <- function(
         }
         if(!file.output){
             if(!is.null(dev.list())) dev.new(width=8, height=8)
-            par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
         }
         par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
         RR <- r+H*R+cir.band*R
@@ -1766,6 +1767,9 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
 MVP.Report.Density <- function(Pmap, taxa, col = c("darkgreen", "yellow", "red"), dpi = 300, 
                                bin.size = 1e6, bin.max = NULL, file.type = "jpg", file.output = TRUE, verbose = TRUE) {
     logging.log("SNP_Density Plotting", "\n", verbose = verbose)
+    old.par <- par()
+    on.exit(par(old.par))
+    
     w <- 9
     h <- 7
     if (file.output) {
@@ -1857,6 +1861,8 @@ MVP.Report.QQplot <-
              verbose=TRUE
 ) {
     logging.log(paste0("Q_Q Plotting ", taxa_name), "\n", verbose = verbose)
+    old.par <- par()
+    on.exit(par(old.par))
     w <- 5.5
     h <- 5.5
     
