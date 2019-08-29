@@ -18,7 +18,7 @@ Authors@R: c( person("Lilin", "Yin", role = "aut"),
               person("Hyunmin", "Kang", role = "ctb"),
               person("Xiang", "Zhou", role = "ctb"),
               person("Xiaolei", "Liu", role = c("cre", "aut", "cph"), email = "xiaoleiliu@mail.hzau.edu.cn"))
-Description: A memory-efficient, visualize-enhanced, parallel-accelerated Genome-Wide Association Study (GWAS) Tool. It can
+Description: A memory-efficient, visualize-enhanced, parallel-accelerated Genome-Wide Association Study (GWAS) tool. It can
     (1) effectively process large data, 
     (2) rapidly evaluate population structure, 
     (3) efficiently estimate variance components several algorithms, 
