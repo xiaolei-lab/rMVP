@@ -17,8 +17,8 @@ MVP.Report(MVP, col = c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
   cir.chr.h = 1.3, chr.den.col = c("darkgreen", "yellow", "red"),
   cir.legend = TRUE, cir.legend.cex = 0.8, cir.legend.col = "grey45",
   LOG10 = TRUE, box = FALSE, conf.int.col = "grey",
-  file.output = TRUE, file = "jpg", dpi = 300, memo = "",
-  verbose = TRUE)
+  file.output = TRUE, outpath = ".", file.type = "jpg", dpi = 300,
+  memo = "MVP", verbose = TRUE)
 }
 \arguments{
 \item{MVP}{Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers}
@@ -99,7 +99,9 @@ MVP.Report(MVP, col = c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
 
 \item{file.output}{Logical value. If TRUE, the figures will be generated.}
 
-\item{file}{Character. Options are jpg, pdf, and tiff}
+\item{outpath}{Only when file.output = TRUE, determines the path of the output file}
+
+\item{file.type}{Character. Options are jpg, pdf, and tiff}
 
 \item{dpi}{Number. Dots per inch for .jpg and .tiff files}
 

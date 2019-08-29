@@ -91,7 +91,8 @@ Last update: Sep 12, 2018
 \examples{
 bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
 opts <- options(rMVP.OutputLog2File = FALSE)
-on.exit(options(opts))
+
 MVP.Data(fileBed=bfilePath, out=file.path(tempdir(), "rMVP.test"), ncpus=1)
 
+options(opts)
 }

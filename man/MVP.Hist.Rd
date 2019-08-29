@@ -5,8 +5,8 @@
 \title{Phenotype distribution histogram}
 \usage{
 MVP.Hist(phe, col = c("dodgerblue4", "olivedrab4", "violetred",
-  "darkgoldenrod1", "purple4"), breakNum = 15, file.type = "pdf",
-  file.output = TRUE, dpi = 300)
+  "darkgoldenrod1", "purple4"), breakNum = 15, memo = TRUE,
+  outpath = ".", file.type = "pdf", file.output = TRUE, dpi = 300)
 }
 \arguments{
 \item{phe}{phenotype data}
@@ -17,6 +17,10 @@ greater than break.n, only the previous break.n colors will be used.}
 
 \item{breakNum}{the number of cells for the histogram. The default value 
 is 15.}
+
+\item{memo}{Character. A text marker on output files}
+
+\item{outpath}{Effective only when file.output = TRUE, determines the path of the output file}
 
 \item{file.type}{A string or NULL is used to determine the type of output 
 file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use 

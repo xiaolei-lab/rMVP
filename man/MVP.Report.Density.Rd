@@ -5,8 +5,9 @@
 \title{SNP Density}
 \usage{
 MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
-  dpi = 300, bin.size = 1e+06, bin.max = NULL, file.type = "jpg",
-  file.output = TRUE, verbose = TRUE)
+  dpi = 300, outpath = ".", memo = "MVP", bin.size = 1e+06,
+  bin.max = NULL, file.type = "jpg", file.output = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{Pmap}{P value Map}
@@ -16,6 +17,10 @@ MVP.Report.Density(Pmap, taxa, col = c("darkgreen", "yellow", "red"),
 \item{col}{The color vector}
 
 \item{dpi}{Number. Dots per inch for .jpg and .tiff files}
+
+\item{outpath}{Only when file.output = TRUE, determines the path of the output file}
+
+\item{memo}{Character. A text marker on output files}
 
 \item{bin.size}{the window size for counting SNP number}
 

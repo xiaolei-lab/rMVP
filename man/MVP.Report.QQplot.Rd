@@ -7,9 +7,9 @@
 MVP.Report.QQplot(P.values, taxa_name, col = c("blue"), cex = 0.5,
   threshold = NULL, amplify = TRUE, signal.col = "red",
   signal.pch = 19, signal.cex = 0.8, conf.int = TRUE, cex.axis = 1,
-  conf.int.col = "grey", threshold.col = "red", file.type = "jpg",
-  memo = "MVP", box = TRUE, dpi = 300, file.output = TRUE,
-  verbose = TRUE)
+  conf.int.col = "grey", threshold.col = "red", outpath = ".",
+  file.type = "jpg", memo = "MVP", box = TRUE, dpi = 300,
+  file.output = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{P.values}{P values}
@@ -46,6 +46,8 @@ added.}
 
 \item{threshold.col}{Character or Vector. The colors of threshold lines}
 
+\item{outpath}{Only when file.output = TRUE, determines the path of the output file}
+
 \item{file.type}{A string or NULL is used to determine the type of output 
 file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use 
 \code{\link[grDevices:dev]{dev.new()}} to create a new graphics device 
@@ -72,6 +74,7 @@ QQ Plot
 }
 \examples{
 data(pig60K, package = "rMVP")
+
 MVP.Report(pig60K, plot.type="q", file.output=FALSE)
 
 }

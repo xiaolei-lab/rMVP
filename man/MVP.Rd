@@ -12,9 +12,9 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
   QTN.threshold = 0.01, method.bin = "static", bin.size = c(5e+05,
   5e+06, 5e+07), bin.selection = seq(10, 100, 10), maxLoop = 10,
   permutation.threshold = FALSE, permutation.rep = 100, bar = TRUE,
-  col = c("dodgerblue4", "olivedrab4", "violetred", "darkgoldenrod1",
-  "purple4"), file.output = TRUE, file = "jpg", dpi = 300,
-  threshold = 0.05, verbose = TRUE)
+  memo = "MVP", col = c("dodgerblue4", "olivedrab4", "violetred",
+  "darkgoldenrod1", "purple4"), file.output = TRUE, file.type = "jpg",
+  dpi = 300, threshold = 0.05, verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix, n is sample size}
@@ -65,11 +65,13 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{bar}{if TRUE, the progress bar will be drawn on the terminal}
 
+\item{memo}{Character. A text marker on output files}
+
 \item{col}{for color of points in each chromosome on manhattan plot}
 
 \item{file.output}{whether to output files or not}
 
-\item{file}{figure formats, "jpg", "tiff"}
+\item{file.type}{figure formats, "jpg", "tiff"}
 
 \item{dpi}{resolution for output figures}
 
@@ -105,12 +107,12 @@ mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
 
 opts <- options(rMVP.OutputLog2File = FALSE)
-on.exit(options(opts))
 
 mvp <- MVP(phe=phenotype, geno=genotype, map=map, maxLoop=3,
   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 str(mvp)
 
+options(opts)
 }
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu

@@ -7,7 +7,7 @@
 MVP.PCAplot(PCA, memo = "MVP", col = NULL, pch = NULL,
   class = NULL, legend.pos = "topright", Ncluster = 1,
   plot3D = FALSE, file.type = "pdf", dpi = 300, box = FALSE,
-  file.output = TRUE, verbose = TRUE)
+  file.output = TRUE, outpath = ".", verbose = TRUE)
 }
 \arguments{
 \item{PCA}{Principal component analysis result, 2-column matrix}
@@ -38,6 +38,8 @@ nor NULL).}
 
 \item{file.output}{Logical value. If TRUE, the figures will be generated.}
 
+\item{outpath}{Effective only when file.output = TRUE, determines the path of the output file}
+
 \item{verbose}{whether to print detail.}
 }
 \value{
@@ -55,5 +57,4 @@ pca <- MVP.PCA(M=geno)
 MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
     col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
 
-file.remove(c("MVP.PCA_2D.jpg", "myPC.pc.bin", "myPC.pc.desc"))
 }

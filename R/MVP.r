@@ -48,8 +48,9 @@
 #' @param permutation.rep number of permutation replicates
 #' @param bar if TRUE, the progress bar will be drawn on the terminal
 #' @param col for color of points in each chromosome on manhattan plot
+#' @param memo Character. A text marker on output files
 #' @param file.output whether to output files or not
-#' @param file figure formats, "jpg", "tiff"
+#' @param file.type figure formats, "jpg", "tiff"
 #' @param dpi resolution for output figures
 #' @param threshold a cutoff line on manhattan plot, 0.05/marker size
 #' @param verbose whether to print detail.
@@ -85,9 +86,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
-         permutation.rep=100, bar=TRUE, 
+         permutation.rep=100, bar=TRUE, memo="MVP",
          col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
-         file.output=TRUE, file="jpg", dpi=300, threshold=0.05, verbose=TRUE
+         file.output=TRUE, file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
 ) {
     logging.initialize("MVP")
     
@@ -222,21 +223,21 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
         glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar, verbose = verbose);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
-        if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
+        if(file.output) write.csv(cbind(map,glm.results), paste(memo,colnames(phe)[2],"GLM.csv", sep="."), row.names=FALSE)
     }
 
     if(mlm.run){
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
         mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
-        if(file.output) write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
+        if(file.output) write.csv(cbind(map,mlm.results), paste(memo,colnames(phe)[2],"MLM.csv", sep="."), row.names=FALSE)
     }
     
     if(farmcpu.run){
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
         farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
-        if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
+        if(file.output) write.csv(cbind(map,farmcpu.results), paste(memo,colnames(phe)[2],"FarmCPU.csv", sep="."), row.names=FALSE)
     }
     
     MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
@@ -265,21 +266,21 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if(file.output){
         if(glm.run){
             index <- which(glm.results[, ncol(glm.results)] < threshold/m)
-            if(length(index) != 0)  write.csv(cbind(map,glm.results)[index, ], paste("MVP.",colnames(phe)[2],".GLM_signal", ".csv", sep=""), row.names=FALSE)
+            if(length(index) != 0)  write.csv(cbind(map,glm.results)[index, ], paste(memo, colnames(phe)[2],"GLM_signal.csv", sep="."), row.names=FALSE)
         }
         if(mlm.run){
             index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
-            if(length(index) != 0)  write.csv(cbind(map,mlm.results)[index, ], paste("MVP.",colnames(phe)[2],".MLM_signal", ".csv", sep=""), row.names=FALSE)
+            if(length(index) != 0)  write.csv(cbind(map,mlm.results)[index, ], paste(memo,colnames(phe)[2],".MLM_signal.csv", sep="."), row.names=FALSE)
         }
         if(farmcpu.run){
             index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
-            if(length(index) != 0)  write.csv(cbind(map,farmcpu.results)[index, ], paste("MVP.",colnames(phe)[2],".FarmCPU_signal", ".csv", sep=""), row.names=FALSE)
+            if(length(index) != 0)  write.csv(cbind(map,farmcpu.results)[index, ], paste(memo,colnames(phe)[2],".FarmCPU_signal.csv", sep="."), row.names=FALSE)
         }
     }
     if(file.output){
         logging.log("|--------------------Visualization Start-------------------|", "\n", verbose = verbose)
         logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
-        MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
+        MVP.Hist(memo=memo, file.output=file.output, phe=phe, file.type=file.type, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
         if(!is.null(nPC)){
@@ -287,7 +288,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             ipca[,1:3],
             col=col,
             plot3D=plot3D,
-            file.type=file,
+            file.output=file.output,
+            file.type=file.type,
+            memo = memo,
             dpi=dpi,
           )
         }
@@ -296,8 +299,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             MVP.return,
             col=col,
             plot.type=c("c","m","q","d"),
-            file.output=TRUE,
-            file=file,
+            file.output=file.output,
+            file.type=file.type,
+            memo = memo,
             dpi=dpi,
             threshold=threshold/m,
         )
@@ -308,8 +312,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                 col=col,
                 plot.type=c("m","q"),
                 multracks=TRUE,
-                file.output=TRUE,
-                file=file,
+                file.output=file.output,
+                file.type=file.type,
+                memo = memo,
                 dpi=dpi,
                 threshold=threshold/m
             )
