@@ -1,5 +1,3 @@
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -21,23 +19,25 @@
 #' @author Lilin Yin, Haohao Zhang, and Xiaolei Liu
 #' 
 #' @param width the width of the message
-#'
+#' @param verbose whether to print detail.
+#' 
 #' @return version number.
 #' @export
 #'
 #' @examples
 #' MVP.Version()
-MVP.Version <- function(width=60) {
+MVP.Version <- function(width=60, verbose=TRUE) {
     welcome <- "Welcome to MVP"
     title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
-    authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
+    authors <- c("Designed and Maintained by Lilin Yin, Haohao Zhang, and Xiaolei Liu", 
+                 "Contributors: Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li")
     contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
     logo_s  <- c(" __  __  __   __  ___",
                  "|  \\/  | \\ \\ / / | _ \\",
                  "| |\\/| |  \\ V /  |  _/",
                  "|_|  |_|   \\_/   |_|")
 
-    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = 60)
+    version <- print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width, verbose = verbose)
     return(invisible(version))
 }
 
@@ -65,7 +65,8 @@ print_bar <- function(i,
                     symbol.tail = ">" ,
                     fixed.points = TRUE,
                     points = seq(0, 100, 1),
-                    symbol.len = 50
+                    symbol.len = 50,
+                    verbose = TRUE
 ) {
     switch(
         match.arg(type), 
@@ -76,32 +77,44 @@ print_bar <- function(i,
                 if(floor(100*i/n) %in% point.index){
                     if(floor(100*i/n) != max(point.index)){
                         print.len <- floor(symbol.len*i/n)
-                        cat(paste("\r", 
+                        logging.log(
+                            paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                                   paste(rep(" ", symbol.len-print.len), collapse=""),
-                                  sprintf("%.2f%%", 100*i/n), sep="")
+                                  sprintf("%.2f%%", 100*i/n)
+                                  , sep=""),
+                            verbose = verbose
                         )
                     }else{
                         print.len <- floor(symbol.len*i/n)
-                        cat(paste("\r", 
+                        logging.log(
+                            paste("\r", 
                                   paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                                  sprintf("%.2f%%", 100*i/n), "\n", sep="")
+                                  sprintf("%.2f%%", 100*i/n), "\n"
+                                  , sep=""),
+                            verbose = verbose
                         )
                     }
                 }
             }else{
                 if(i < n){
                     print.len <- floor(symbol.len*i/n)
-                    cat(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
-                              sprintf("%.2f%%", 100*i/n), sep="")
+                              sprintf("%.2f%%", 100*i/n)
+                              , sep=""),
+                        verbose = verbose
                     )
                 }else{
                     print.len <- floor(symbol.len*i/n)
-                    cat(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-                              sprintf("%.2f%%", 100*i/n), "\n", sep="")
+                              sprintf("%.2f%%", 100*i/n), "\n"
+                              , sep=""),
+                        verbose = verbose
                     )
                 }
             }
@@ -115,13 +128,13 @@ print_bar <- function(i,
         #             print.len <- round(symbol.len * progress / n)
         #             if(fixed.points){
         #                 if(progress %in% round(points * n / 100)){
-        #                     cat(paste("\r", 
+        #                     logging.log(paste("\r", 
         #                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
         #                               paste(rep(" ", symbol.len-print.len), collapse=""),
         #                               sprintf("%.2f%%", progress * 100 / n), sep=""))
         #                 }
         #             }else{
-        #                 cat(paste("\r", 
+        #                 logging.log(paste("\r", 
         #                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
         #                           paste(rep(" ", symbol.len-print.len), collapse=""),
         #                           sprintf("%.2f%%", progress * 100 / n), sep=""))
@@ -136,24 +149,32 @@ print_bar <- function(i,
             print.len <- round(symbol.len * progress / n)
             if(fixed.points){
                 if(progress %in% round(points * n / 100)){
-                    cat(paste("\r", 
+                    logging.log(
+                        paste("\r", 
                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                               paste(rep(" ", symbol.len-print.len), collapse=""),
-                              sprintf("%.2f%%", progress * 100 / n), sep=""))
+                              sprintf("%.2f%%", progress * 100 / n)
+                              , sep=""),
+                        verbose = verbose
+                    )
                 }
             }else{
-                cat(paste("\r", 
+                logging.log(
+                    paste("\r", 
                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
                           paste(rep(" ", symbol.len-print.len), collapse=""),
-                          sprintf("%.2f%%", progress * 100 / n), sep=""))
+                          sprintf("%.2f%%", progress * 100 / n)
+                          , sep=""),
+                    verbose = verbose
+                )
             }
         }
     )
 }
 
 
-print_accomplished <- function(width = 60) {
-    cat(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n")
+print_accomplished <- function(width = 60, verbose = TRUE) {
+    logging.log(make_line("MVP ACCOMPLISHED", width = width, linechar = '='), "\n", verbose = verbose)
 }
 
 #' Print R Package information, include title, short_title, logo, version, authors, contact
@@ -184,7 +205,7 @@ print_accomplished <- function(width = 60) {
 #'              "| |\/| |  \ V /  |  _/",
 #'              "|_|  |_|   \_/   |_|")
 #' print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
-print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL) {
+print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {
     msg <- c()
     # width
     if (is.null(width)) { width <- getOption('width') }
@@ -238,7 +259,7 @@ print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, ve
     # bottom line
     msg <- c(msg, paste0(rep(linechar, width), collapse = ''))
     
-    cat(msg, sep = "\n")
+    logging.log(msg, sep = "\n", verbose = verbose)
     
     return(version)
 }
@@ -350,12 +371,12 @@ load_if_installed <- function(package) {
 
 mkl_env <- function(exprs, threads = 1) {
     if (load_if_installed("RevoUtilsMath")) {
-        math.cores <- RevoUtilsMath::getMKLthreads()
-        RevoUtilsMath::setMKLthreads(threads)
+        math.cores <- eval(parse(text = "getMKLthreads()"))
+        eval(parse(text = "setMKLthreads(threads)"))
     }
     result <- exprs
     if (load_if_installed("RevoUtilsMath")) {
-        RevoUtilsMath::setMKLthreads(math.cores)
+        eval(parse(text = "setMKLthreads(math.cores)"))
     }
     return(result)
 }
@@ -368,18 +389,20 @@ remove_bigmatrix <- function(x, desc_suffix=".geno.desc", bin_suffix=".geno.bin"
     descfile <- paste0(x, desc_suffix)
     binfile  <- paste0(x, bin_suffix)
     
-    # Delete objects that occupy binfile in the global environment
-    if (Sys.info()[['sysname']] == "Windows") {
-        for (v in ls(envir = globalenv())) {
-            if (class(get(v, envir = globalenv())) == "big.matrix") {
-                desc <- describe(get(v, envir = globalenv()))@description
-                if (desc$dirname == path && desc$filename == binfile) {
-                    rm(list = v, envir = globalenv())
+    remove_var <- function(binfile, envir) {
+        for (v in ls(envir = envir)) {
+            if (class(get(v, envir = envir)) == "big.matrix") {
+                desc <- describe(get(v, envir = envir))@description
+                if (desc$filename == binfile) {
+                    rm(list = v, envir = envir)
                     gc()
                 }
             }
         }
     }
+    
+    # remove_var(binfile, globalenv())
+    remove_var(binfile, as.environment(-1L))
     
     if (file.exists(descfile)) {
         file.remove(descfile)

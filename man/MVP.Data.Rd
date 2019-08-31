@@ -9,11 +9,11 @@ Last update: Sep 12, 2018}
 \usage{
 MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
   fileBed = NULL, fileNum = NULL, fileMap = NULL, filePhe = NULL,
-  fileInd = NULL, fileKin = TRUE, filePC = TRUE, out = "mvp",
+  fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp",
   sep.num = "\\t", auto_transpose = TRUE, sep.map = "\\t",
   sep.phe = "\\t", sep.kin = "\\t", sep.pc = "\\t",
   type.geno = "char", pheno_cols = NULL, SNP.impute = "Major",
-  maxLine = 10000, priority = "speed", perc = 1, pcs.keep = 5,
+  maxLine = 10000, priority = "speed", pcs.keep = 5,
   verbose = TRUE, ncpus = NULL, ...)
 }
 \arguments{
@@ -64,8 +64,6 @@ the column represents the individual.}
 
 \item{priority}{"speed" or "memory"}
 
-\item{perc}{Percentage of markers used to calculate PCA}
-
 \item{pcs.keep}{how many PCs to keep}
 
 \item{verbose}{whether to print detail.}
@@ -92,5 +90,9 @@ Last update: Sep 12, 2018
 }
 \examples{
 bfilePath <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
-MVP.Data(fileBed=bfilePath, out="rMVP.test.data", ncpus=1)
+opts <- options(rMVP.OutputLog2File = FALSE)
+
+MVP.Data(fileBed=bfilePath, out=file.path(tempdir(), "rMVP.test"), ncpus=1)
+
+options(opts)
 }

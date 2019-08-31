@@ -6,12 +6,14 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Numeric2MVP(num_file, out = "mvp", maxLine = 10000,
+MVP.Data.Numeric2MVP(num_file, map_file, out = "mvp", maxLine = 10000,
   priority = "speed", row_names = FALSE, col_names = FALSE,
   type.geno = "char", auto_transpose = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{num_file}{Genotype in Numeric format (0,1,2)}
+
+\item{map_file}{Genotype map file, SNP_name, Chr, Pos}
 
 \item{out}{the name of output file}
 
@@ -43,5 +45,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
-MVP.Data.Numeric2MVP(numericPath, "rMVP.test.num")
+mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+MVP.Data.Numeric2MVP(numericPath, mapPath, file.path(tempdir(), "rMVP.test"))
+
 }

@@ -1,7 +1,3 @@
-# Data pre-processing module
-# 
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,10 +19,11 @@
 #' 
 #' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param K kinship matrix
-#' @param priority
+#' @param priority speed or memory
 #' @param pcs.keep maximum number of PCs for output
-#' @param cpu
-
+#' @param cpu the number of cpu
+#' @param verbose whether to print detail.
+#' 
 #' @return
 #' Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep 
 #' 
@@ -36,15 +33,17 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
+#' 
 #' pca <- MVP.PCA(M=genotype)
 #' str(pca)
+#' 
 MVP.PCA <-
-function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
+function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbose=TRUE){
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent = TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
     if (r.open && mac) {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
@@ -68,10 +67,10 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1){
         K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
     }
 
-    cat("Eigen Decomposition", "\n")
-    if(r.open)  try(setMKLthreads(cpu), silent=TRUE)
+    logging.log("Eigen Decomposition", "\n", verbose = verbose)
+    if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
-    cat("Deriving PCs successfully", "\n")
+    logging.log("Deriving PCs successfully", "\n", verbose = verbose)
 
     return(PCs=PCs)
 }#end of MVP.PCA function

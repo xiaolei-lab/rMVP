@@ -6,8 +6,8 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.impute(mvp_prefix, out = "mvp.imp", method = "Major",
-  ncpus = NULL)
+MVP.Data.impute(mvp_prefix, out = NULL, method = "Major",
+  ncpus = NULL, verbose = TRUE)
 }
 \arguments{
 \item{mvp_prefix}{the prefix of mvp file}
@@ -17,6 +17,8 @@ MVP.Data.impute(mvp_prefix, out = "mvp.imp", method = "Major",
 \item{method}{'Major', 'Minor', "Middle"}
 
 \item{ncpus}{number of threads for imputing}
+
+\item{verbose}{whether to print the reminder}
 }
 \value{
 NULL
@@ -30,5 +32,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
-MVP.Data.impute(mvpPath, ncpus=1)
+
+MVP.Data.impute(mvpPath, file.path(tempdir(), "rMVP.test"), ncpus=1)
+
 }

@@ -6,15 +6,19 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Hapmap2MVP(hapmap_file, out = "mvp", type.geno = "char",
-  verbose = TRUE)
+MVP.Data.Hapmap2MVP(hmp_file, out = "mvp", maxLine = 10000,
+  type.geno = "char", threads = 1, verbose = TRUE)
 }
 \arguments{
-\item{hapmap_file}{Genotype in Hapmap format}
+\item{hmp_file}{Genotype in Hapmap format}
 
 \item{out}{the name of output file}
 
+\item{maxLine}{the max number of line to write to big matrix for each loop}
+
 \item{type.geno}{the type of genotype elements}
+
+\item{threads}{number of thread for transforming}
 
 \item{verbose}{whether to print the reminder}
 }
@@ -32,5 +36,7 @@ Build date: Sep 12, 2018
 }
 \examples{
 hapmapPath <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
-MVP.Data.Hapmap2MVP(hapmapPath, "rMVP.test.hmp")
+
+MVP.Data.Hapmap2MVP(hapmapPath, file.path(tempdir(), "rMVP.test"))
+
 }

@@ -4,13 +4,14 @@
 \alias{MVP.FarmCPU}
 \title{Perform GWAS using FarmCPU method}
 \usage{
-MVP.FarmCPU(phe, geno, map, CV = NULL, priority = "speed", P = NULL,
+MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
   method.sub = "reward", method.sub.final = "reward",
-  method.bin = "EMMA", bin.size = c(5e+05, 5e+06, 5e+07),
+  method.bin = "static", bin.size = c(5e+05, 5e+06, 5e+07),
   bin.selection = seq(10, 100, 10), memo = "MVP.FarmCPU",
   Prior = NULL, ncpus = 2, bar = TRUE, maxLoop = 10,
   threshold.output = 0.01, converge = 1, iteration.output = FALSE,
-  p.threshold = NA, QTN.threshold = NULL, bound = NULL)
+  p.threshold = NA, QTN.threshold = 0.01, bound = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n by t matrix, n is sample size, t is number of phenotypes}
@@ -20,8 +21,6 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, priority = "speed", P = NULL,
 \item{map}{SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos}
 
 \item{CV}{covariates, n by c matrix, n is sample size, c is number of covariates}
-
-\item{priority}{modes, two options: 'speed' or 'memory'}
 
 \item{P}{start p values for all SNPs}
 
@@ -56,6 +55,8 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, priority = "speed", P = NULL,
 \item{QTN.threshold}{in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs}
 
 \item{bound}{maximum number of SNPs selected as pseudo QTNs in each iteration}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 a m by 4 results matrix, m is marker size, the four columns are SNP_ID, Chr, Pos, and p-value
@@ -76,12 +77,11 @@ genotype <- attach.big.matrix(genoPath)
 genotype <- genotype[, idx]
 print(dim(genotype))
 mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-map <- read.table("mvp.map" , head = TRUE)
-farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, method.bin="static", 
-  ncpus=detectCores(logical = FALSE), maxLoop=3, P=NULL, method.sub="reward", 
-  method.sub.final="reward", bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
-  Prior=NULL, p.threshold=NA, QTN.threshold=NULL, bound=NULL)
+map <- read.table(mapPath , head = TRUE)
+
+farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, maxLoop=2)
 str(farmcpu)
+
 }
 \author{
 Xiaolei Liu and Zhiwu Zhang

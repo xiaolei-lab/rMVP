@@ -1,7 +1,3 @@
-# Data pre-processing module
-# 
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -45,9 +41,11 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
+#' 
 #' K <- MVP.K.VanRaden(genotype)
 #' vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 #' print(vc)
+#' 
 MVP.EMMA.Vg.Ve <-
 function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     # NA in phenotype

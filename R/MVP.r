@@ -1,7 +1,3 @@
-# Data pre-processing module
-# 
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -52,11 +48,14 @@
 #' @param permutation.rep number of permutation replicates
 #' @param bar if TRUE, the progress bar will be drawn on the terminal
 #' @param col for color of points in each chromosome on manhattan plot
+#' @param memo Character. A text marker on output files
+#' @param outpath Effective only when file.output = TRUE, determines the path of the output file
 #' @param file.output whether to output files or not
-#' @param file figure formats, "jpg", "tiff"
+#' @param file.type figure formats, "jpg", "tiff"
 #' @param dpi resolution for output figures
 #' @param threshold a cutoff line on manhattan plot, 0.05/marker size
-
+#' @param verbose whether to print detail.
+#' 
 #' @export
 #' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
@@ -72,10 +71,15 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
-#' map <- read.table("mvp.map" , head = TRUE)
-#' mvp <- MVP(phe=phenotype, geno=genotype, map=map, 
+#' map <- read.table(mapPath , head = TRUE)
+#' 
+#' opts <- options(rMVP.OutputLog2File = FALSE)
+#' 
+#' mvp <- MVP(phe=phenotype, geno=genotype, map=map, maxLoop=3,
 #'   method=c("GLM", "MLM", "FarmCPU"), file.output=FALSE, ncpus=1)
 #' str(mvp)
+#' 
+#' options(opts)
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
@@ -83,41 +87,25 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
-         permutation.rep=100, bar=TRUE, 
+         permutation.rep=100, bar=TRUE, memo="MVP", outpath=getwd(), 
          col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
-         file.output=TRUE, file="jpg", dpi=300, threshold=0.05
+         file.output=TRUE, file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
 ) {
-    now <- Sys.time()
-    if (options("rMVP.OutputLog2File") == TRUE) {
-        # get logfile name
-        logfile <- paste("MVP", format(now, "%Y%m%d"), sep = ".")
-        count <- 1
-        while (file.exists(paste0(logfile, ".log"))) {
-            logfile <- paste("MVP", format(now, "%Y%m%d"), count, sep = ".")
-            count <- count + 1
-        }
-        logfile <- paste0(logfile, ".log")
-        sink(logfile, split=TRUE)
-    }
+    logging.initialize("MVP")
     
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
     linux <- R.ver == 'Linux'
     mac <- (!linux) & (!wind)
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+    
     
     if(wind) ncpus <- 1
-    if(r.open && ncpus>1 && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    #if(r.open && ncpus>1 && !mac){
-    #setMKLthreads(1)
-    #}
     
-    MVP.Version(width = 60)
-    cat("Start:", as.character(now), "\n")
+    MVP.Version(width = 60, verbose = verbose)
+    logging.log("Start:", as.character(Sys.time()), "\n", verbose = verbose)
     if (options("rMVP.OutputLog2File") == TRUE) {
-        cat("The log has been output to the file:", logfile, "\n")
+        logging.log("The log has been output to the file:", get("logging.file", envir = package.env), "\n", verbose = verbose)
     }
     vc.method <- match.arg(vc.method)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
@@ -146,30 +134,20 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if(length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
     #file.exsits()
     if(length(seqTaxa) != length(phe[,2])){
-        try(unlink(c("temp.geno.bin","temp.geno.desc")), silent=TRUE)
-        remove_bigmatrix("temp")
         geno = deepcopy(
           x = geno,
-          cols = seqTaxa,
-          backingpath = getwd(),
-          backingfile = "temp.geno.bin",
-          descriptorfile = "temp.geno.desc"
+          cols = seqTaxa
         )
         phe = phe[seqTaxa,]
         if(!is.null(K)){K = K[seqTaxa, seqTaxa]}
         if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
         if(!is.null(CV.MLM)){CV.MLM = CV.MLM[seqTaxa,]}
         if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
-        rm(geno)
-            gc()
-            genoName <- "temp.geno.desc"
-        geno <- attach.big.matrix(genoName)
-        unlink(c("temp.geno.desc", "temp.geno.bin"))
     }
     #Data information
     m=nrow(geno)
     n=ncol(geno)
-    cat(paste("Input data has", n, "individuals,", m, "markers", sep=" "), "\n")
+    logging.log(paste("Input data has", n, "individuals,", m, "markers", sep=" "), "\n", verbose = verbose)
     
     #initial results
     glm.results <- NULL
@@ -192,13 +170,13 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if(!is.null(K)){K <- as.matrix(K)}
     if(!is.null(nPC) | "MLM" %in% method){
         if(is.null(K)){
-            K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus)
+            K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus, verbose = verbose)
         }
-        cat("Eigen Decomposition", "\n")
+        logging.log("Eigen Decomposition", "\n", verbose = verbose)
         eigenK <- eigen(K, symmetric=TRUE)
         if(!is.null(nPC)){
             ipca <- eigenK$vectors[, 1:nPC]
-            cat("Deriving PCs successfully", "\n")
+            logging.log("Deriving PCs successfully", "\n", verbose = verbose)
         }
         if(("MLM" %in% method) & vc.method == "BRENT"){K <- NULL; gc()}
         if(!"MLM" %in% method){rm(eigenK); rm(K); gc()}
@@ -241,26 +219,38 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }
   
     #GWAS
-    cat("|------------------------GWAS Start------------------------|", "\n")
+    logging.log("|------------------------GWAS Start------------------------|", "\n", verbose = verbose)
     if(glm.run){
-        cat("General Linear Model (GLM) Start...", "\n")
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar);gc()
+        logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar, verbose = verbose);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
-        if(file.output) write.csv(cbind(map,glm.results), paste("MVP.",colnames(phe)[2],".GLM", ".csv", sep=""), row.names=FALSE)
+        if(file.output) {
+          write.csv(x = cbind(map, glm.results), 
+                    file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM.csv", sep = ".")),
+                    row.names = FALSE)
+        }
     }
 
     if(mlm.run){
-        cat("Mixed Linear Model (MLM) Start...", "\n")
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method);gc()
+        logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
-        if(file.output) write.csv(cbind(map,mlm.results), paste("MVP.",colnames(phe)[2],".MLM", ".csv", sep=""), row.names=FALSE)
+        if(file.output) {
+          write.csv(x = cbind(map, mlm.results), 
+                    file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM.csv", sep = ".")),
+                    row.names = FALSE)
+        }
     }
     
     if(farmcpu.run){
-        cat("FarmCPU Start...", "\n")
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop)
+        logging.log("FarmCPU Start...", "\n", verbose = verbose)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
-        if(file.output) write.csv(cbind(map,farmcpu.results), paste("MVP.",colnames(phe)[2],".FarmCPU", ".csv", sep=""), row.names=FALSE)
+        if(file.output) {
+          write.csv(x = cbind(map,farmcpu.results), 
+                    file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU.csv", sep = ".")),
+                    row.names = FALSE)
+        }
     }
     
     MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
@@ -285,29 +275,60 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
         threshold = permutation.cutoff * m
     }
-    cat(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n")
+    logging.log(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n", verbose = verbose)
     if(file.output){
-        cat("|--------------------Visualization Start-------------------|", "\n")
-        cat("Phenotype distribution Plotting", "\n")
-        MVP.Hist(phe=phe, file.type=file, col=col, dpi=dpi)
+        if(glm.run){
+            index <- which(glm.results[, ncol(glm.results)] < threshold/m)
+            if(length(index) != 0) {
+              write.csv(x = cbind(map,glm.results)[index, ], 
+                        file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM_signal.csv", sep = ".")),
+                        row.names = FALSE)
+            }
+        }
+        if(mlm.run){
+            index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
+            if(length(index) != 0) {
+              write.csv(x = cbind(map,mlm.results)[index, ], 
+                        file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM_signal.csv", sep = ".")),
+                        row.names = FALSE)
+            }
+        }
+        if(farmcpu.run){
+            index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
+            if(length(index) != 0) {
+              write.csv(x = cbind(map,farmcpu.results)[index, ], 
+                        file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU_signal.csv", sep = ".")),
+                        row.names = FALSE)
+            }
+        }
+    }
+    if(file.output){
+        logging.log("|--------------------Visualization Start-------------------|", "\n", verbose = verbose)
+        logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
+        MVP.Hist(memo=memo, outpath=outpath, file.output=file.output, phe=phe, file.type=file.type, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
         if(!is.null(nPC)){
-            MVP.PCAplot(
-                ipca[,1:3],
-                col=col,
-                plot3D=plot3D,
-                file=file,
-                dpi=dpi,
-            )
+          MVP.PCAplot(
+            ipca[,1:3],
+            col=col,
+            plot3D=plot3D,
+            file.output=file.output,
+            file.type=file.type,
+            outpath=outpath, 
+            memo = memo,
+            dpi=dpi,
+          )
         }
         
         MVP.Report(
             MVP.return,
             col=col,
             plot.type=c("c","m","q","d"),
-            file.output=TRUE,
-            file=file,
+            file.output=file.output,
+            file.type=file.type,
+            outpath=outpath, 
+            memo = memo,
             dpi=dpi,
             threshold=threshold/m,
         )
@@ -318,21 +339,19 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                 col=col,
                 plot.type=c("m","q"),
                 multracks=TRUE,
-                file.output=TRUE,
-                file=file,
+                file.output=file.output,
+                file.type=file.type,
+                outpath=outpath, 
+                memo = memo,
                 dpi=dpi,
                 threshold=threshold/m
             )
         }
     }
     now <- Sys.time()
-    cat("Results are stored at Working Directory:", getwd(), "\n")
-    cat("End:", as.character(now), "\n")
-    print_accomplished(width = 60)
-    
-    if (options("rMVP.OutputLog2File") == TRUE) {
-        sink()
-    }
+    logging.log("Results are stored at Working Directory:", getwd(), "\n", verbose = verbose)
+    logging.log("End:", as.character(now), "\n", verbose = verbose)
+    print_accomplished(width = 60, verbose = verbose)
     
     return(MVP.return)
 }#end of MVP function

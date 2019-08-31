@@ -4,21 +4,28 @@
 \alias{MVP.Data.PC}
 \title{Principal component analysis}
 \usage{
-MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", out = NULL,
-  perc = 1, pcs.keep = 5, sep = "\\t")
+MVP.Data.PC(filePC = TRUE, mvp_prefix = "mvp", K = NULL,
+  out = NULL, pcs.keep = 5, priority = "speed", sep = "\\t",
+  cpus = 1, verbose = TRUE)
 }
 \arguments{
 \item{filePC}{Principal components, n*npc, n is sample size, npc is number of top columns of principal components}
 
 \item{mvp_prefix}{Prefix for mvp format files}
 
-\item{out}{prefix of output file name}
+\item{K}{Kinship matrix}
 
-\item{perc}{Percentage of markers used to calculate PCA}
+\item{out}{prefix of output file name}
 
 \item{pcs.keep}{how many PCs to keep}
 
+\item{priority}{speed or memory}
+
 \item{sep}{seperator for PC file.}
+
+\item{cpus}{the number of cpu}
+
+\item{verbose}{whether to print detail.}
 }
 \value{
 Output file:
@@ -30,5 +37,7 @@ Principal component analysis
 }
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
-MVP.Data.PC(TRUE, mvp_prefix=geno, out="rMVP.test.pc")
+
+MVP.Data.PC(TRUE, mvp_prefix=geno, out=file.path(tempdir(), "rMVP.test"))
+
 }

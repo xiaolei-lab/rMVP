@@ -1,7 +1,3 @@
-# Data pre-processing module
-# 
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -31,7 +27,8 @@
 #' @param cpu number of cpus used for parallel computation
 #' @param bar whether to show the progress bar
 #' @param vc.method the methods for estimating variance component("emma" or "he" or "brent")
-
+#' @param verbose whether to print detail.
+#' 
 #' @return
 #' results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 #' @export
@@ -47,8 +44,10 @@
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
 #' K <- MVP.K.VanRaden(genotype)
+#' 
 #' mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K)
 #' str(mlm)
+#' 
 
 MVP.MLM <-
 function(
@@ -60,17 +59,18 @@ function(
     REML=NULL,
     cpu=1,
     bar=TRUE,
-    vc.method=c("BRENT", "EMMA", "HE")
+    vc.method=c("BRENT", "EMMA", "HE"),
+    verbose=TRUE
 ){
     R.ver <- Sys.info()[['sysname']]
-    r.open <- !inherits(try(Revo.version,silent=TRUE),"try-error")
+    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
     
     if (R.ver == 'Windows') cpu <- 1
     if (r.open && cpu > 1 && R.ver == 'Darwin') {
         Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
     }
 
-    math.cpu <- try(getMKLthreads(), silent=TRUE)
+    math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
     vc.method <- match.arg(vc.method)
     n <- ncol(geno)
     m <- nrow(geno)
@@ -85,9 +85,9 @@ function(
         # convert K to base:matrix
         K <- K[, ]
         if(is.null(eigenK)){
-            cat("Eigen Decomposition of Kinship...", "\n")
+            logging.log("Eigen Decomposition of Kinship...", "\n", verbose = verbose)
             eigenK <- eigen(K, symmetric=TRUE)
-            cat("Eigen-Decomposition is Done!", "\n")
+            logging.log("Eigen-Decomposition is Done!", "\n", verbose = verbose)
         }
     }
 
@@ -102,13 +102,13 @@ function(
     # number of fixed effects
     nf <- ncol(X0) + 1
     if(is.null(REML)) {
-		cat(paste("Variance components using: ", vc.method, sep=""), "\n")   
+		logging.log(paste("Variance components using: ", vc.method, sep=""), "\n", verbose = verbose)   
         if (vc.method == "EMMA") REML <- MVP.EMMA.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "HE") REML <- MVP.HE.Vg.Ve(y=ys, X=X0, K=K)
         if (vc.method == "BRENT") REML <- MVP.BRENT.Vg.Ve(y=ys, X=X0, eigenK=eigenK)
-		cat(paste("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
+		logging.log(paste("Estimated Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n", verbose = verbose)
     }else{
-        cat(paste("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n")
+        logging.log(paste("Provided Vg and Ve: ", sprintf("%.6f", REML$vg), " ", sprintf("%.6f", REML$ve), sep=""), "\n", verbose = verbose)
     }
     if(!is.null(K)){rm(K); gc()}
 
@@ -157,18 +157,18 @@ function(
         effect<- beta[(q0+1)]
         return(list(effect = effect, se = se, p = p))
     }
-    cat("scanning...\n")
+    logging.log("scanning...\n", verbose = verbose)
     #Paralleled MLM
     if(cpu == 1){
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
+        math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
         mkl.cpu <- ifelse((2^(n %/% 1000)) < math.cpu, 2^(n %/% 1000), math.cpu)
-        try(setMKLthreads(mkl.cpu), silent=TRUE)
-        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+        eval(parse(text = "try(setMKLthreads(mkl.cpu), silent=TRUE)"))
+        print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE, verbose = verbose)}
         results <- lapply(1:m, eff.mlm.parallel)
-        try(setMKLthreads(math.cpu), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(math.cpu), silent=TRUE)"))
     }else{
         if(R.ver == 'Windows'){
-            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE)}
+            print.f <- function(i){print_bar(i=i, n=m, type="type1", fixed.points=TRUE, verbose = verbose)}
             cl <- makeCluster(getOption("cl.cores", cpu))
             clusterExport(cl, varlist=c("geno", "yt", "X0", "U", "vgs", "ves", "math.cpu"), envir=environment())
             Exp.packages <- clusterEvalQ(cl, c(library(bigmemory)))
@@ -178,11 +178,11 @@ function(
             tmpf.name <- tempfile()
             tmpf <- fifo(tmpf.name, open="w+b", blocking=TRUE)
             writeBin(0, tmpf)
-            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE)}
+            print.f <- function(i){print_bar(n=m, type="type3", tmp.file=tmpf, fixed.points=TRUE, verbose = verbose)}
             mkl_env({
                 results <- mclapply(1:m, eff.mlm.parallel, mc.cores=cpu)
             })
-            close(tmpf); unlink(tmpf.name); cat('\n');
+            close(tmpf); unlink(tmpf.name); logging.log('\n', verbose = verbose)
         }
     }
     if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)

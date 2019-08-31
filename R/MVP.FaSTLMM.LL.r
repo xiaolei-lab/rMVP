@@ -1,7 +1,3 @@
-# Data pre-processing module
-# 
-# Copyright (C) 2016-2018 by Xiaolei Lab
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,7 +15,7 @@
 #'
 #' Last update: January 11, 2017
 #' 
-#' @author Qishan Wang, Feng Tian and Zhiwu Zhang (Modified by Xiaolei Liu)
+#' @author Xiaolei Liu (modified)
 #' 
 #' @param pheno a two-column phenotype matrix
 #' @param snp.pool matrix for pseudo QTNs
@@ -163,14 +159,14 @@
     #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
     R.ver <- Sys.info()[['sysname']]
     if(R.ver == 'Linux') {
-        math.cpu <- try(getMKLthreads(), silent=TRUE)
-        try(setMKLthreads(1), silent=TRUE)
+        math.cpu <- eval(parse(text = "try(getMKLthreads(), silent=TRUE)"))
+        eval(parse(text = "try(setMKLthreads(1), silent=TRUE)"))
     }
     
     llresults <- mclapply(1:m, beta.optimize.parallel, mc.cores=ncpus)
     
     if(R.ver == 'Linux') {
-        try(setMKLthreads(math.cpu), silent=TRUE)
+        eval(parse(text = "try(setMKLthreads(math.cpu), silent=TRUE)"))
     }
     
     for(i in 1:m){

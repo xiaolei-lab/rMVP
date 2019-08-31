@@ -116,6 +116,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// crossprodcpp
+SEXP crossprodcpp(SEXP X);
+RcppExport SEXP _rMVP_crossprodcpp(SEXP XSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type X(XSEXP);
+    rcpp_result_gen = Rcpp::wrap(crossprodcpp(X));
+    return rcpp_result_gen;
+END_RCPP
+}
+// geninv
+SEXP geninv(SEXP GG);
+RcppExport SEXP _rMVP_geninv(SEXP GGSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type GG(GGSEXP);
+    rcpp_result_gen = Rcpp::wrap(geninv(GG));
+    return rcpp_result_gen;
+END_RCPP
+}
 // impute_marker
 void impute_marker(SEXP pBigMat, int threads, bool verbose);
 RcppExport SEXP _rMVP_impute_marker(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
@@ -161,6 +183,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
     {"_rMVP_fit_diago_brent", (DL_FUNC) &_rMVP_fit_diago_brent, 9},
+    {"_rMVP_crossprodcpp", (DL_FUNC) &_rMVP_crossprodcpp, 1},
+    {"_rMVP_geninv", (DL_FUNC) &_rMVP_geninv, 1},
     {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 3},
     {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
     {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 2},
