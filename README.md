@@ -1,4 +1,6 @@
-# MVP [![](https://img.shields.io/badge/Issues-n%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) [![](https://img.shields.io/badge/Github-v0.99.15-blue.svg)](https://github.com/XiaoleiLiuBio/MVP/commits/master)
+# MVP 
+[![](https://img.shields.io/badge/Issues-n%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) 
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rMVP)](https://cran.r-project.org/package=rMVP)
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
@@ -50,16 +52,14 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 
 **WE STRONGLY RECOMMEND INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
 
-**MVP** can be installed on Windows, Linux and MacOS with following steps:
-```r
-#if "devtools" isn't installed, please "install.packages('devtools')" first.
-> devtools::install_github("xiaoleiLiubio/rMVP@0.99.14.1")
-```
-If you get trouble in installing "devtools", please download [rMVP_0.99.14.1.tar.gz](https://github.com/XiaoleiLiuBio/rMVP/releases/download/0.99.14.1/rMVP_0.99.14.1.tar.gz) and try following steps:
-```r
-pkg <- setdiff(c("RcppEigen", "RcppProgress", "RcppArmadillo", "bigmemory"), installed.packages()[,c("Package")])
-install.packages(pkg)
-install.packages("rMVP_0.99.14.1.tar.gz", repos=NULL)
+## Installation
+
+``` r
+install.packages("rMVP")
+
+# Or the the development version from GitHub:
+# install.packages("devtools")
+devtools::install_github("XiaoleiLiuBio/rMVP")
 ```
 
 After installed successfully, **MVP** can be loaded by typing
