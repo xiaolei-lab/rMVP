@@ -653,7 +653,7 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     if (is.character(map) && !is.data.frame(map)) {
-        map <- read.table(map, header = header)
+        map <- read.table(map, header = header, stringsAsFactors = FALSE)
     }
     map <- map[, cols]
     colnames(map) <- c("SNP", "CHROM", "POS", "REF", "ALT")
@@ -661,6 +661,10 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
     }
+    allels <- map[, 4:5]
+    allels[allels == 0] <- '.'
+    map[, 4:5] <- allels
+    
     write.table(map, paste0(out, ".geno.map"), row.names = FALSE, col.names = TRUE, sep = '\t', quote = FALSE)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for MAP data is done within", format_time(t2 - t1), "\n", verbose = verbose)

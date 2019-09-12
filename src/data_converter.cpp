@@ -243,7 +243,9 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
                 l[0] = l[2] + '-' + l[3];
             }
             
-            map << l[0] << '\t' << l[2] << '\t' << l[3] << '\t' << l[1][0] << '\t' << l[1][2]<< endl;
+            map << l[0] << '\t' << l[2] << '\t' << l[3] << 
+                '\t' << l[1][0] << 
+                '\t' << (l[1].length() < 3 ? '.' : l[1][2]) << endl;
             m++;
         }
         map.close();
