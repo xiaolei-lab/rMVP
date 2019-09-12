@@ -286,7 +286,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     
     # parser map
     logging.log("Reading file...\n", verbose = verbose)
-    m <- MVP.Data.Map(paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4), header = FALSE)
+    m <- MVP.Data.Map(paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4, 6, 5), header = FALSE)
     
     # parser phenotype, ind file
     fam <- read.table(paste0(bfile, '.fam'), header = FALSE)
@@ -650,13 +650,13 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
 #' 
 #' MVP.Data.Map(mapPath, file.path(tempdir(), "rMVP.test"))
 #' 
-MVP.Data.Map <- function(map, out='mvp', cols=c(1, 2, 3), header=TRUE, sep='\t', verbose=TRUE) {
+MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     if (is.character(map) && !is.data.frame(map)) {
         map <- read.table(map, header = header)
     }
     map <- map[, cols]
-    colnames(map) <- c("SNP", "CHROM", "POS")
+    colnames(map) <- c("SNP", "CHROM", "POS", "REF", "ALT")
     if (length(unique(map[, 1])) != nrow(map)) {
         warning("WARNING: SNP is not unique and has been automatically renamed.")
         map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")

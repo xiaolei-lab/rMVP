@@ -18,7 +18,7 @@ test_that("MVP.Data() - vcf", {
     out <- "rMVP.test.1"
     expect_output(
         MVP.Data(fileVCF = vcfPath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
-        "successfully!"
+        "done"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -43,7 +43,7 @@ test_that("MVP.Data() - Bfile", {
     out <- "rMVP.test.2"
     expect_output(
         MVP.Data(fileBed = bfilePath, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
-        "successfully!"
+        "done"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -68,7 +68,7 @@ test_that("MVP.Data() - HMP", {
     out <- "rMVP.test.3"
     expect_output(
         MVP.Data(fileHMP = hmp1Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
-        "successfully!"
+        "done"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -91,7 +91,7 @@ test_that("MVP.Data() - HMP Diploid", {
     out <- "rMVP.test.4"
     expect_output(
         MVP.Data(fileHMP = hmp2Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
-        "successfully!"
+        "done"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
     genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
@@ -109,4 +109,6 @@ test_that("MVP.Data() - HMP Diploid", {
 })
 
 files <- dir(pattern = "^rMVP.test")
+file.remove(files)
+files <- dir(pattern = "*.log")
 file.remove(files)

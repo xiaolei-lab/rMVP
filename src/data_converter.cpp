@@ -78,7 +78,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     // file.seekg(pos);
     
     // Write inds to file.
-    map << "SNP\tCHROM\tPOS"<< endl;
+    map << "SNP\tCHROM\tPOS\tREF\tALT"<< endl;
     m = 0;
     while (getline(file, line)) {
         string tmp = line.substr(0, MAP_INFO_N);
@@ -87,7 +87,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
         if (l[2] == ".") {      // snp name missing
             l[2] = l[0] + '-' + l[1];
         }
-        map << l[2] << '\t' << l[0] << '\t' << l[1] << endl;
+        map << l[2] << '\t' << l[0] << '\t' << l[1] << '\t' << l[3] << '\t' << l[4] << endl;
         m++;
     }
     map.close();
@@ -233,7 +233,7 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         indfile.close();
         
         // Write SNPs to map file.
-        map << "SNP\tCHROM\tPOS"<< endl;
+        map << "SNP\tCHROM\tPOS\tREF\tALT"<< endl;
         m = 0;
         while (getline(file, line)) {
             string tmp = line.substr(0, MAP_INFO_N);
@@ -242,7 +242,8 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
             if (l[0] == ".") {      // snp name missing
                 l[0] = l[2] + '-' + l[3];
             }
-            map << l[0] << '\t' << l[2] << '\t' << l[3] << endl;
+            
+            map << l[0] << '\t' << l[2] << '\t' << l[3] << '\t' << l[1][0] << '\t' << l[1][2]<< endl;
             m++;
         }
         map.close();
