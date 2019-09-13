@@ -1,6 +1,7 @@
 # MVP 
 [![](https://img.shields.io/badge/Issues-n%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rMVP)](https://cran.r-project.org/package=rMVP)
+[![](http://www.r-pkg.org/badges/version/rMVP)](https://cran.r-project.org/package=rMVP)
+[![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP)
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
