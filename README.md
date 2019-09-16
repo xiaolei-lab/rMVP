@@ -630,12 +630,12 @@ In the demo datasets, the first three columns are marker name, chromosome, and p
 **[back to top](#contents)**  
 
 **phe**, phenotype data  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure  
 
 ```r
-MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
+MVP.Hist(phe=phenotype, file.type="jpg", breakNum=18, dpi=300)
 ```
 
 <p align="center">
@@ -652,11 +652,11 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 **col**, colors for seperating windows with different SNP density  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
 ```r
-MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
+MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file.type="jpg", dpi=300)
 ```
 
 <p align="center">
@@ -672,15 +672,13 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **class**, the class of all individuals, for example: "breed", "location"...  
 **col**, colors for each cluster  
 **pch**, point shape for each cluster  
-**file**, format of output figure  
-**plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, **"rgl"** package should be installed beforehead  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
 ```r
 pca <- attach.big.matrix("mvp.pc.desc")[, 1:3]
 #pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", plot3D=TRUE, pch=19)
+MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file.type="jpg")
 ```
 
 <p align="center">
@@ -695,7 +693,7 @@ For GWAS results:
 
 ```r
 > MVP.Report(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
-        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
+        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file.type="jpg",
         memo="",dpi=300)
 ```
 
@@ -709,7 +707,7 @@ For GWAS results:
 > MVP.Report(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
-      bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300)
+      bin.size=1e6,outward=FALSE,file.type="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -729,7 +727,7 @@ For GS/GP results:
 > MVP.Report(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
             "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
             chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
-            cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black")
+            cir.band=1,file.type="jpg", memo="",dpi=300,chr.den.col="black")
         
 #Note: 
 Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
@@ -833,7 +831,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -849,7 +847,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```r
 > MVP.Report(imMVP,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
         signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
-        TRUE,file="jpg",memo="",dpi=300)
+        TRUE,file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
