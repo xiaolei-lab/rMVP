@@ -127,7 +127,8 @@ function(
     X0t <- crossprod(U, X0)
     X0X0 <- crossprod(X0t)
     X0Y <- crossprod(X0t,yt)
-    iX0X0 <- solve(X0X0)    
+    iX0X0 <- ginv(X0X0)
+    #iX0X0 <- solve(X0X0)    
     Xt[1:n,1:q0] <- X0t
 
     #parallel function for MLM model
