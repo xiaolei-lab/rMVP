@@ -77,8 +77,9 @@ function(
     X0X0 <- crossprod(X0)
     X0Y <- crossprod(X0,y)
     YY <- crossprod(y)
-    X0X0i <- solve(X0X0)
-
+    #X0X0i <- solve(X0X0)
+    X0X0i <- ginv(X0X0)
+			  
     #parallel function for GLM model
     eff.glm <- function(i){
         if(bar) print.f(i)
