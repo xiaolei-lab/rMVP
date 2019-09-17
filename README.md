@@ -117,8 +117,6 @@ MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed')
 If you have genotype data in **VCF** format:  
 **fileVCF**, name of genotype data in VCF format  
 **filePhe**, name of phenotype data  
-**vcf.jump**, [DEPRECATED] number of annotation (Header) rows in VCF file  
-**sep.vcf**, [DEPRECATED] seperator of vcf file  
 **sep.phe**, seperator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
@@ -158,9 +156,7 @@ If you have genotype data in **Hapmap** format:
 
 **fileHMP**, a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", "chr3.hmp.txt")  
 **filePhe**, name of phenotype file  
-**sep.hmp**, [DEPRECATED] seperator of hapmap file  
 **sep.phe**, seperator of phenotype file  
-**SNP.effect**, [DEPRECATED] "Add" or "Dom"  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
@@ -350,7 +346,6 @@ MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', au
 If you have Kinship matrix data that represents the relationship among individuals  
 
 **fileKin**, name of Kinship matrix data, the dimension is n * n (n is sample size), no taxa names included  
-**type.kin**, [DEPRECATED] type of data in Kinship matrix file, "char", "integer", or "double" and "double" is default  
 **sep.kin**, seperator of Kinship file  
 
 > `mvp.kin.txt`
@@ -434,7 +429,6 @@ MVP.Data.Kin(TRUE, mvp_prefix='mvp', out='mvp')
 If you have Principal Components data  
 
 **filePC**, name of Principal Components matrix data, the dimension is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
-**type.pc**, [DEPRECATED] type of data in Principal Components matrix file, "char", "integer", or "double", default is "double"  
 **sep.pc**, seperator of Principal Components file  
 
 > `mvp.pc.txt`
