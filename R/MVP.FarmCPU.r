@@ -89,7 +89,7 @@
 			map[map[, 2] == chr.xy[i], 2] <- max.chr + i
 		}
 	}
-	map <- matrix(as.numeric(map), nrow(map))
+	suppressWarnings(map <- matrix(as.numeric(map), nrow(map)))
 	
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
