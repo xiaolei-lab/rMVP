@@ -1,6 +1,6 @@
 # MVP 
-[![](https://img.shields.io/badge/Issues-n%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/MVP/issues) 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rMVP)](https://cran.r-project.org/package=rMVP)
+[![](http://www.r-pkg.org/badges/version/rMVP)](https://cran.r-project.org/package=rMVP)
+[![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP)
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
@@ -117,8 +117,6 @@ MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed')
 If you have genotype data in **VCF** format:  
 **fileVCF**, name of genotype data in VCF format  
 **filePhe**, name of phenotype data  
-**vcf.jump**, [DEPRECATED] number of annotation (Header) rows in VCF file  
-**sep.vcf**, [DEPRECATED] seperator of vcf file  
 **sep.phe**, seperator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
@@ -158,9 +156,7 @@ If you have genotype data in **Hapmap** format:
 
 **fileHMP**, a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", "chr3.hmp.txt")  
 **filePhe**, name of phenotype file  
-**sep.hmp**, [DEPRECATED] seperator of hapmap file  
 **sep.phe**, seperator of phenotype file  
-**SNP.effect**, [DEPRECATED] "Add" or "Dom"  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
@@ -350,7 +346,6 @@ MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', au
 If you have Kinship matrix data that represents the relationship among individuals  
 
 **fileKin**, name of Kinship matrix data, the dimension is n * n (n is sample size), no taxa names included  
-**type.kin**, [DEPRECATED] type of data in Kinship matrix file, "char", "integer", or "double" and "double" is default  
 **sep.kin**, seperator of Kinship file  
 
 > `mvp.kin.txt`
@@ -434,7 +429,6 @@ MVP.Data.Kin(TRUE, mvp_prefix='mvp', out='mvp')
 If you have Principal Components data  
 
 **filePC**, name of Principal Components matrix data, the dimension is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
-**type.pc**, [DEPRECATED] type of data in Principal Components matrix file, "char", "integer", or "double", default is "double"  
 **sep.pc**, seperator of Principal Components file  
 
 > `mvp.pc.txt`
@@ -596,8 +590,8 @@ for(i in 2:ncol(phenotype)){
 
 # Output
 **[back to top](#contents)**  
-**MVP** automatically outputs high-quality figures, three types of figure formats are available (".jpg",".pdf",".tiff", default is ".jpg"). Users could also adjust the output figure using about 40 parameters in `MVP.Report()`. 
-`MVP.Report()` not only accept the final return of `MVP()`, but also accepts results from third-party software packages, such as PLINK, GEMMA, GAPIT, TASSEL, and FarmCPU. The result from third-party software packages should at least contain four columns, which are marker name, chromosome, physical postion, and P-value of a trait, results of more than one trait could be sequentially appended column by column. Typing `?MVP.Report()` to see details of all parameters and typing `data(pig60K)` or `data(cattle50K)` to load demo datasets.
+**MVP** automatically outputs high-quality figures, three types of figure formats are available (".jpg",".pdf",".tiff", default is ".jpg"). Users could also adjust the output figure using about 50 parameters in `MVP.Report()`. 
+`MVP.Report()` not only accept the final return of `MVP()`, but also accepts results from third-party software packages, such as PLINK, GEMMA, GAPIT, TASSEL, and FarmCPU. The result from third-party software packages should at least contain four columns, which are marker name, chromosome, physical postion, and P-value of a trait, results of more than one trait could be sequentially appended column by column. Typing `?MVP.Report()` to see details of all parameters and typing `data(pig60K)` or `data(cattle50K)` to load demo datasets. Type ```?MVP.Repory``` to see parameter details.
 
 ```r
 > data(pig60K)   #GWAS result of MLM
@@ -630,12 +624,12 @@ In the demo datasets, the first three columns are marker name, chromosome, and p
 **[back to top](#contents)**  
 
 **phe**, phenotype data  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **breakNum**, nunmber of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure  
 
 ```r
-MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
+MVP.Hist(phe=phenotype, file.type="jpg", breakNum=18, dpi=300)
 ```
 
 <p align="center">
@@ -652,11 +646,11 @@ MVP.Hist(phe=phenotype, file="jpg", breakNum=18, dpi=300)
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
 **col**, colors for seperating windows with different SNP density  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
 ```r
-MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file="jpg", dpi=300)
+MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file.type="jpg", dpi=300)
 ```
 
 <p align="center">
@@ -672,15 +666,13 @@ MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"),
 **class**, the class of all individuals, for example: "breed", "location"...  
 **col**, colors for each cluster  
 **pch**, point shape for each cluster  
-**file**, format of output figure  
-**plot3D**, if TRUE, plot PC figure in 3D format, it can be only used in windows and mac operation system, **"rgl"** package should be installed beforehead  
-**file**, format of output figure  
+**file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
 ```r
 pca <- attach.big.matrix("mvp.pc.desc")[, 1:3]
 #pca <- prcomp(t(as.matrix(genotype)))$x[, 1:3]
-MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file="jpg", plot3D=TRUE, pch=19)
+MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, col=c("red", "green", "yellow"), file.type="jpg")
 ```
 
 <p align="center">
@@ -695,7 +687,7 @@ For GWAS results:
 
 ```r
 > MVP.Report(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
-        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
+        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file.type="jpg",
         memo="",dpi=300)
 ```
 
@@ -709,7 +701,7 @@ For GWAS results:
 > MVP.Report(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
-      bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300)
+      bin.size=1e6,outward=FALSE,file.type="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -729,7 +721,7 @@ For GS/GP results:
 > MVP.Report(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
             "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
             chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
-            cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black")
+            cir.band=1,file.type="jpg", memo="",dpi=300,chr.den.col="black")
         
 #Note: 
 Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
@@ -747,7 +739,7 @@ For GWAS results:
 
 ```r
 > MVP.Report(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,col=c("dodgerblue4","deepskyblue"), cex=0.7,
-            chr.den.col=NULL,file="jpg",memo="",dpi=300)
+            chr.den.col=NULL,file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -760,7 +752,7 @@ For GWAS results:
 > MVP.Report(pig60K, plot.type="m", col=c("dodgerblue4","deepskyblue"), LOG10=TRUE, ylim=NULL,
         threshold=c(1e-6,1e-4), threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black",
         "grey"), amplify=TRUE,chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),
-        signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        signal.pch=c(19,19),file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -773,7 +765,7 @@ For GWAS results:
 > MVP.Report(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         col=c("grey60","grey30"), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
-        signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        signal.cex=c(1,1),signal.pch=c(19,19),file.type="jpg",memo="",dpi=300)
         
 #Note:
 if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
@@ -791,7 +783,7 @@ For GS/GP results:
 ```r
 > MVP.Report(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
-        col=c("dodgerblue4","deepskyblue"), chr.den.col=NULL, file="jpg",memo="",dpi=300)
+        col=c("dodgerblue4","deepskyblue"), chr.den.col=NULL, file.type="jpg",memo="",dpi=300)
 
 #Note: 
 if signal.col=NULL, the significant SNPs will be plotted with original colors.
@@ -810,7 +802,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 > MVP.Report(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
-        file="jpg",memo="",dpi=300)
+        file.type="jpg",memo="",dpi=300)
 ```
 
 #### a. all traits in a axes:
@@ -833,7 +825,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 **[back to top](#contents)**  
 
 ```r
-> MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+> MVP.Report(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -849,7 +841,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```r
 > MVP.Report(imMVP,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
         signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
-        TRUE,file="jpg",memo="",dpi=300)
+        TRUE,file.type="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -858,98 +850,6 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 </a>
 </p>
 
-
-### Parameters of MVP.Report
-
-```r
-Pmap: a dataframe, at least four columns. The first column is the name of SNP, the second column is the chromosome of SNP, the third column is the position of SNP, and the remaining columns are the P-value of each trait(Note:each trait a column).
-
-col: a vector or a matrix, if "col" equals to a vector, each circle use the same colors, it means that the same chromosome is drewed in the same color, the colors are not fixed, one, two, three or more colors can be used, if the length of the "col" is shorter than the length the chromosome, then colors will be applied circularly. 
-  if "col" equals to a matrix, the row is the number of circles(traits), the columns are the colors that users want to use for different circles, so each circle can be plotted in different number of colors, the missing value can be replaced by NA. For example: 
-  col=matrix(c("grey30","grey60",NA,"red","blue","green","orange",NA,NA),3,3,byrow=T).
-
-bin.size: the size of bin for SNP_density plot.
-
-bin.max: the max value of legend of SNP_density plot, the bin whose SNP number is bigger than 'bin.max' will be use the same color.
-
-pch: a number, the type for the points, is the same with "pch" in <plot>.
-
-band: a number, the space between chromosomes, the default is 1(if the band equals to 0, then there would be no space between chromosome).
-
-cir.band: a number, the space between circles, the default is 1.
-
-H: a number, the height for each circle, each circle represents a trait, the default is 1.
-
-ylim: a vector, the range of Y-axis when plotting the two type of Manhattans, is the same with "ylim" in <plot>.
-
-cex.axis: a number, controls the size of numbers of X-axis and the size of labels of circle plot.
-
-plot.type: a character or vector, only "d", "c", "m", "q" or "b" can be used. if plot.type="d", SNP density will be plotted; if plot.type="c", only circle-Manhattan plot will be plotted; if plot.type="m",only Manhattan plot will be plotted; if plot.type="q",only Q-Q plot will be plotted;if plot.type="b", both circle-Manhattan, Manhattan and Q-Q plots will be plotted; if plot.type=c("m","q"), Both Manhattan and Q-Q plots will be plotted.
-
-multracks: a logical,if multracks=FALSE, plotting multiple traits on multiple tracks, if it is TRUE, all Manhattan plots will be plotted in only one track.
-
-cex: a number or a vector, the size for the points, is the same with "size" in <plot>, and if it is a vector, the first number controls the size of points in circle plot(the default is 0.5), the second number controls the size of points in Manhattan plot(the default is 1), the third number controls the size of points in Q-Q plot(the default is 1)
-
-r: a number, the radius for the circle(the inside radius), the default is 1.
-
-xlab: a character, the labels for x axis.
-
-ylab: a character, the labels for y axis.
-
-xaxs: a character, The style of axis interval calculation to be used for the x-axis. Possible values are "r", "i", "e", "s", "d". The styles are generally controlled by the range of data or xlim, if given.
-
-yaxs: a character, The style of axis interval calculation to be used for the y-axis. See xaxs above..
-
-outward: logical, if outward=TRUE,then all points will be plotted from inside to outside.
-
-threshold: a number or vector, the significant threshold. For example, Bonfferoni adjustment method: threshold=0.01/nrow(Pmap). More than one significant line can be added on the plots, if threshold=0 or NULL, then the threshold line will not be added.
-
-threshold.col: a character or vector, the colour for the line of threshold levels.
-
-threshold.lwd: a number or vector, the width for the line of threshold levels.
-
-threshold.lty: a number or vector, the type for the line of threshold levels.
-
-amplify: logical, CMplot can amplify the significant points, if amplify=T, then the points greater than the minimal significant level will be highlighted, the default: amplify=TRUE.
-
-chr.labels: a vector, the labels for the chromosomes of circle-Manhattan plot.
-
-signal.cex: a number, if amplify=TRUE, users can set the size of significant points.
-
-signal.pch: a number, if amplify=TRUE, users can set the shape of significant points.
-
-signal.col: a character, if amplify=TRUE, users can set the colour of significant points, if signal.col=NULL, then the colors of significant points will not be changed.
-
-signal.line: a number, the width of the lines cross the circle
-
-cir.chr: logical, a boundary represents chromosome, the default is TRUE.
-
-cir.chr.h: a number, the width for the boundary, if cir.chr=FALSE, then this parameter will be useless.
-
-chr.den.col: a character or vector or NULL, the colour for the SNP density. If the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
-   the number of SNP within given size('bin.size') will be plotted around the circle. If chr.den.col=NULL, then the default colours are the same with the parameter "col" for circle.
-
-cir.legend: logical, whether to add the legend of each circle.
-
-cir.legend.cex: a number, the size of the number of legend.
-
-cir.legend.col: a character, the color of the axis of legend.
-
-LOG10: logical, whether to change the p-value into log10(p-value).
-
-box: logical, this function draws a box around the current Manhattan plot.
-
-conf.int.col: a character, the color of the confidence interval on QQ-plot.
-
-file.output: a logical, users can choose whether to output the plot results.
-
-file: a character, users can choose the different output formats of plot, so for, "jpg", "pdf", "tiff" can be selected by users.
-
-dpi: a number, the picture element for .jpg and .tiff files. The default is 300.
-
-memo: add a character to the output file name.
-
-```
 ---
 
 # Citation

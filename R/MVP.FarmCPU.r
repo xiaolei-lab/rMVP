@@ -80,7 +80,7 @@
     }
 
 	map <- as.matrix(map)
-	max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE)
+	suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
 	if(is.infinite(max.chr))	max.chr <- 0
 	map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
 	if(length(map.xy.index) != 0){
@@ -89,7 +89,7 @@
 			map[map[, 2] == chr.xy[i], 2] <- max.chr + i
 		}
 	}
-	map <- matrix(as.numeric(map), nrow(map))
+	suppressWarnings(map <- matrix(as.numeric(map), nrow(map)))
 	
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
