@@ -330,6 +330,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             outpath=outpath, 
             memo = memo,
             dpi=dpi,
+            chr.den.col=col,
             threshold=threshold/m,
         )
 
