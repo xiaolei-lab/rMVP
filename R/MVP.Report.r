@@ -14,8 +14,7 @@
 #' MVP.Report
 #' 
 #' @param MVP a dataframe or list, at least four columns. The first column is the name of SNP, the second column is the chromosome of SNP, the third column is the position of SNP, and the remaining columns are the P-value of each trait(Note:each trait a column). 
-#' @param col a vector or a matrix, if "col" is a vector, each circle use the same colors, it means that the same chromosome is drewed in the same color, the colors are not fixed, one, two, three or more colors can be used, if the length of the "col" is shorter than the length the chromosome, then colors will be applied circularly. If "col" is a matrix, the row is the number of circles(traits), the columns are the colors that users want to use for different circles, each circle can be plotted in different number of colors, the missing value can be replaced by NA. For example: 
-col=matrix(c("grey30","grey60",NA,"red","blue","green","orange",NA,NA),3,3,byrow=T). 
+#' @param col a vector or a matrix, if "col" is a vector, each circle use the same colors, it means that the same chromosome is drewed in the same color, the colors are not fixed, one, two, three or more colors can be used, if the length of the "col" is shorter than the length the chromosome, then colors will be applied circularly. If "col" is a matrix, the row is the number of circles(traits), the columns are the colors that users want to use for different circles, each circle can be plotted in different number of colors, the missing value can be replaced by NA. For example: col=matrix(c("grey30","grey60",NA,"red","blue","green","orange",NA,NA),3,3,byrow=T). 
 #' @param bin.size the size of bin for SNP_density plot. 
 #' @param bin.range a vector, c(min, max). The min/max value of legend of SNP_density plot, the bin whose SNP number is smaller/bigger than 'bin.range' will be use the same color. 
 #' @param pch a number, the type for the points or for traits of multi-traits Manhattan plot, is the same with "pch" in <plot>. 
@@ -60,7 +59,7 @@ col=matrix(c("grey30","grey60",NA,"red","blue","green","orange",NA,NA),3,3,byrow
 #' @param conf.int logical, whether to plot confidence interval on QQ-plot.
 #' @param file.output a logical, users can choose whether to output the plot results.
 #' @param outpath Only when file.output = TRUE, determines the path of the output file
-#' @param file a character, users can choose the different output formats of plot, so for, "jpg", "pdf", "tiff" can be selected by users.
+#' @param file.type a character, users can choose the different output formats of plot, so for, "jpg", "pdf", "tiff" can be selected by users.
 #' @param dpi a number, the picture resolution for .jpg and .tiff files. The default is 300.
 #' @param height the height of output files.
 #' @param width the width of output files.
@@ -123,7 +122,7 @@ MVP.Report <- function(
 	conf.int=TRUE,
 	file.output=TRUE,
 	outpath=getwd(),
-	file="jpg",
+	file.type="jpg",
 	dpi=300,
 	height=NULL,
 	width=NULL,
