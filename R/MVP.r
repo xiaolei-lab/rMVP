@@ -159,22 +159,27 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     mlm.run <- "MLM" %in% method
     farmcpu.run <- "FarmCPU" %in% method
     
-    if(!is.null(nPC.GLM)|!is.null(nPC.MLM)|!is.null(nPC.FarmCPU)){
-        nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU)
-        if(nPC < 3){
-        	nPC <- 3
-        }
-    }else{
+    nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
+    
+    if (nPC > 0 && nPC < 3) {
+        nPC <- 3
+    } else {
         nPC <- NULL
     }
-    if(!is.null(K)){K <- as.matrix(K)}
-    if(!is.null(nPC) | "MLM" %in% method){
-        if(is.null(K)){
-            K <- MVP.K.VanRaden(M=geno, priority=priority, cpu=ncpus, verbose = verbose)
+    
+    if (!is.null(K)) { K <- as.matrix(K) }
+    if (!is.null(nPC) | "MLM" %in% method) {
+        if (is.null(K)) {
+            K <- MVP.K.VanRaden(
+              M = geno, 
+              priority = priority, 
+              cpu = ncpus, 
+              verbose = verbose
+            )
         }
         logging.log("Eigen Decomposition", "\n", verbose = verbose)
-        eigenK <- eigen(K, symmetric=TRUE)
-        if(!is.null(nPC)){
+        eigenK <- eigen(K, symmetric = TRUE)
+        if (!is.null(nPC)) {
             ipca <- eigenK$vectors[, 1:nPC]
             logging.log("Deriving PCs successfully", "\n", verbose = verbose)
         }
