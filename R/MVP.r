@@ -110,7 +110,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     vc.method <- match.arg(vc.method)
     if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
-    map <- as.matrix(map[,c(1:3])
+    map <- as.matrix(map[,c(1:3)])
     na.index <- NULL
     if(!is.null(CV.GLM)){
         CV.GLM <- as.matrix(CV.GLM)
