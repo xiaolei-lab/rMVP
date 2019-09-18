@@ -325,7 +325,7 @@ MVP.Report <- function(
     } else {
         Pmap <- MVP
     }
-    
+    file = file.type
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
 
 	taxa=colnames(Pmap)[-c(1:3)]
