@@ -335,7 +335,7 @@ MVP.Report <- function(
 
 	#SNP-Density plot
 	if("d" %in% plot.type){
-		if(verbose)	cat(" SNP_Density Plotting...\n")
+		if(verbose)	cat("SNP_Density Plotting...\n")
 		if(file.output){
 			ht=ifelse(is.null(height), 7, height)
 			wh=ifelse(is.null(width), 9, width)
@@ -594,7 +594,7 @@ MVP.Report <- function(
 			#debug
 			#print(colx)
 			
-			if(verbose)	cat(paste(" Circular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
+			if(verbose)	cat(paste("Circular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
 			pvalue <- pvalueT[,i]
 			logpvalue <- logpvalueT[,i]
 			if(is.null(ylim)){
@@ -1056,7 +1056,7 @@ MVP.Report <- function(
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				if(verbose)	cat(paste(" Rectangular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	cat(paste("Rectangular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
 					if(file.output){
 						ht=ifelse(is.null(height), 6, height)
 						wh=ifelse(is.null(width), 14, width)
@@ -1295,7 +1295,7 @@ MVP.Report <- function(
 				par(xpd=TRUE)
 			}
 			for(i in 1:R){
-				if(verbose)	cat(paste(" Multracks_Rectangular Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	cat(paste("Multracks_Rectangular Plotting ",taxa[i],"...\n",sep=""))
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
 				pvalue=pvalueT[,i]
@@ -1612,7 +1612,7 @@ MVP.Report <- function(
 				if(verbose){
 					progress <- round((nrow(Pmap) - length(sam.index[[i]])) * 100 / nrow(Pmap))
 					if(progress %in% cat_bar){
-						cat(" Multraits_Rectangular Plotting...(finished ", progress, "%)\r", sep="")
+						cat("Multraits_Rectangular Plotting...(finished ", progress, "%)\r", sep="")
 						cat_bar <- cat_bar[cat_bar != progress]
 						if(progress == 100)	cat("\n")
 					}
@@ -1683,7 +1683,7 @@ MVP.Report <- function(
 			}
 			log.Quantiles.max_no_na <- NULL
 			for(i in 1:R){
-				if(verbose)	cat(paste(" Multracks_QQ Plotting ",taxa[i],"...\n",sep=""))		
+				if(verbose)	cat(paste("Multracks_QQ Plotting ",taxa[i],"...\n",sep=""))		
 				P.values=as.numeric(Pmap[,i+2])
 				P.values=P.values[!is.na(P.values)]
 				if(LOG10){
@@ -1802,7 +1802,7 @@ MVP.Report <- function(
 				axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
 				
 				for(i in 1:R){
-					if(verbose)	cat(paste(" Multraits_QQ Plotting ",taxa[i],"...\n",sep=""))
+					if(verbose)	cat(paste("Multraits_QQ Plotting ",taxa[i],"...\n",sep=""))
 					P.values=as.numeric(Pmap[,i+2])
 					P.values=P.values[!is.na(P.values)]
 					if(LOG10){
@@ -1870,7 +1870,7 @@ MVP.Report <- function(
 			}
 		}else{
 			for(i in 1:R){
-				if(verbose)	cat(paste(" Q_Q Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	cat(paste("Q_Q Plotting ",taxa[i],"...\n",sep=""))
 				if(file.output){
 					ht=ifelse(is.null(height), 5.5, height)
 					wh=ifelse(is.null(width), 5.5, width)
@@ -1957,7 +1957,7 @@ MVP.Report <- function(
 			}
 		}
 	}
-	if(file.output & verbose)	cat(paste(" Plots are stored in: ", getwd(), sep=""), "\n")
+	if(file.output & verbose)	cat(paste("Plots are stored in: ", getwd(), sep=""), "\n")
 }
 
 Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP Density", bin = 1e6,
@@ -2442,7 +2442,7 @@ MVP.Hist <-
         
         # hist
         xx <-
-            hist(
+            suppressWarnings(hist(
                 x = phe[, i],
                 plot = FALSE,
                 breaks = Breaks,
@@ -2453,7 +2453,7 @@ MVP.Hist <-
                 font = 2,
                 font.lab = 2,
                 main = paste0("Distribution of ", trait)
-            )
+            ))
         
         maxY <- max(max(xx$density),  max(density(phe[, i])$y))
         
