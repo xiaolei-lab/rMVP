@@ -159,10 +159,11 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     mlm.run <- "MLM" %in% method
     farmcpu.run <- "FarmCPU" %in% method
     
-    nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
-    
-    if (nPC > 0 && nPC < 3) {
-        nPC <- 3
+    if(!is.null(nPC.GLM)|!is.null(nPC.MLM)|!is.null(nPC.FarmCPU)){
+        nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
+        if (nPC > 0 && nPC < 3) {
+            nPC <- 3
+        }
     } else {
         nPC <- NULL
     }
@@ -196,7 +197,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                     CV.GLM <- cbind(ipca[,1:nPC.GLM], CV.GLM)
                 }
             }else{
-                CV.GLM <- ipca[,1:nPC.GLM]
+                if(!is.null(nPC.GLM))   CV.GLM <- ipca[,1:nPC.GLM]
             }
         }
         
@@ -207,7 +208,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                     CV.MLM <- cbind(ipca[,1:nPC.MLM], CV.MLM)
                 }
             }else{
-                CV.MLM <- ipca[,1:nPC.MLM]
+                if(!is.null(nPC.MLM))   CV.MLM <- ipca[,1:nPC.MLM]
             }
         }
         
@@ -218,7 +219,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                     CV.FarmCPU <- cbind(ipca[,1:nPC.FarmCPU], CV.FarmCPU)
                 }
             }else{
-                CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
+                if(!is.null(nPC.FarmCPU))   CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
             }
         }  
     }
