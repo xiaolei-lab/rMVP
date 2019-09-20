@@ -103,7 +103,7 @@ MVP.Report <- function(
 	amplify= FALSE,
 	signal.cex = 1.5,
 	signal.pch = 19,
-	signal.col=,
+	signal.col="red",
 	signal.line=1,
 	highlight=NULL,
 	highlight.cex=1.5,
