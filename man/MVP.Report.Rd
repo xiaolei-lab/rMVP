@@ -4,110 +4,129 @@
 \alias{MVP.Report}
 \title{MVP.Report}
 \usage{
-MVP.Report(MVP, col = c("#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
-  bin.size = 1e+06, bin.max = NULL, pch = 19, band = 1,
-  cir.band = 0.5, H = 1.5, ylim = NULL, cex.axis = 1,
-  plot.type = "b", multracks = FALSE, cex = c(0.5, 0.8, 1),
-  r = 0.3, xlab = "Chromosome",
+MVP.Report(MVP, col = c("#4197d8", "#f8c120", "#413496", "#495226",
+  "#d60b6f", "#e66519", "#d581b7", "#83d3ad", "#7c162c", "#26755d"),
+  bin.size = 1e+06, bin.range = NULL, pch = 19, band = 1,
+  H = 1.5, ylim = NULL, cex.axis = 1, lwd.axis = 1.5,
+  cex.lab = 1.5, plot.type = "b", multracks = FALSE, cex = c(0.5,
+  1, 1), r = 0.3, xlab = "Chromosome",
   ylab = expression(-log[10](italic(p))), xaxs = "i", yaxs = "r",
   outward = FALSE, threshold = NULL, threshold.col = "red",
-  threshold.lwd = 1, threshold.lty = 2, amplify = TRUE,
-  chr.labels = NULL, signal.cex = 0.8, signal.pch = 19,
-  signal.col = "red", signal.line = NULL, cir.chr = TRUE,
-  cir.chr.h = 1.3, chr.den.col = c("darkgreen", "yellow", "red"),
-  cir.legend = TRUE, cir.legend.cex = 0.8, cir.legend.col = "grey45",
-  LOG10 = TRUE, box = FALSE, conf.int.col = "grey",
-  file.output = TRUE, outpath = getwd(), file.type = "jpg",
-  dpi = 300, memo = "MVP", verbose = TRUE)
+  threshold.lwd = 1, threshold.lty = 2, amplify = FALSE,
+  signal.cex = 1.5, signal.pch = 19, signal.col = "red",
+  signal.line = 1, highlight = NULL, highlight.cex = 1.5,
+  highlight.pch = 19, highlight.col = "green", chr.labels = NULL,
+  chr.den.col = "black", cir.band = 1, cir.chr = TRUE,
+  cir.chr.h = 1.5, cir.legend = TRUE, cir.legend.cex = 0.6,
+  cir.legend.col = "black", LOG10 = TRUE, box = FALSE,
+  conf.int = TRUE, file.output = TRUE, outpath = getwd(),
+  file.type = "jpg", dpi = 300, height = NULL, width = NULL,
+  memo = "", verbose = TRUE)
 }
 \arguments{
-\item{MVP}{Data frame. Includes at least four columns. The first three columns are Marker ID, Chromosome ID, and Physical position. The fourth and following optional columns are P-values or effects of markers}
+\item{MVP}{a dataframe or list, at least four columns. The first column is the name of SNP, the second column is the chromosome of SNP, the third column is the position of SNP, and the remaining columns are the P-value of each trait(Note:each trait a column).}
 
-\item{col}{Vector or matrix. If 'col' is a vector, multiple-group GWAS results will use the same color scheme for plotting points on different Chromosomes. The vector length can be shorter than the number of Chromosomes and the colors will be used circularly. If 'col' is a matrix, multiple-group GWAS results will be drawn with colors from different rows, NA is allowed in the color matrix, e.g. col = matrix(c("grey30", "grey60", NA, "red", "blue", "green", "orange", NA, NA), 3, 3, byrow=T)}
+\item{col}{a vector or a matrix, if "col" is a vector, each circle use the same colors, it means that the same chromosome is drewed in the same color, the colors are not fixed, one, two, three or more colors can be used, if the length of the "col" is shorter than the length the chromosome, then colors will be applied circularly. If "col" is a matrix, the row is the number of circles(traits), the columns are the colors that users want to use for different circles, each circle can be plotted in different number of colors, the missing value can be replaced by NA. For example: col=matrix(c("grey30","grey60",NA,"red","blue","green","orange",NA,NA),3,3,byrow=T).}
 
-\item{bin.size}{Number. Number of markers will be counted for each marker window and used for plotting marker density}
+\item{bin.size}{the size of bin for SNP_density plot.}
 
-\item{bin.max}{Number. The maximum marker density value used for plotting marker density. Windows with marker density higher than 'bin.max' will use the same color as 'bin.max'}
+\item{bin.range}{a vector, c(min, max). The min/max value of legend of SNP_density plot, the bin whose SNP number is smaller/bigger than 'bin.range' will be use the same color.}
 
-\item{pch}{Number. Type of points, same as 'pch' in <plot> R function}
+\item{pch}{a number, the type for the points or for traits of multi-traits Manhattan plot, is the same with "pch" in <plot>.}
 
-\item{band}{Number. The space among chromosomes.}
+\item{band}{a number, the space between chromosomes, the default is 1(if the band equals to 0, then there would be no space between chromosomes).}
 
-\item{cir.band}{Number. The space between circles when plotting Manhattan plot in circular manner}
+\item{H}{a number, the height for each circle, each circle represents a trait, the default is 1.}
 
-\item{H}{Number. The height for each circle when plotting multiple-group GWAS results using Manhattan plot in circular manner}
+\item{ylim}{a vector, the range of Y-axis when plotting the two type of Manhattan plots, is the same with "ylim" in <plot>.}
 
-\item{ylim}{Vector. The range of Y-axis when plotting Manhattan plot, same as "ylim" in <plot> R function}
+\item{cex.axis}{a number, controls the size of ticks' numbers of X/Y-axis and the size of labels of circle plot.}
 
-\item{cex.axis}{Number. The size of Chromosome ID and labels when plotting Manhattan plot in circular manner}
+\item{lwd.axis}{a number, controls the width of X/Y-axis lines.}
 
-\item{plot.type}{Character or Vector, options are "d", "c", "m", "q", and "b". If plot.type="d", marker density will be plotted; if plot.type="c", Manhattan plot in circular manner will be plotted; if plot.type="m", Manhattan plot in rectangular manner will be plotted; if plot.type="q", Q-Q plot will be plotted; if plot.type="b", both Manhattan plot and Q-Q plot will be plotted}
+\item{cex.lab}{a number, controls the size of labels of X/Y-axis.}
 
-\item{multracks}{Logical value. If FALSE, multiple-group GWAS results will be plotted on multiple tracks; if TRUE, multiple-group GWAS results will be plotted on a single track}
+\item{plot.type}{a character or vector, only "d", "c", "m", "q" or "b" can be used. if plot.type="d", SNP density will be plotted; if plot.type="c", only circle-Manhattan plot will be plotted; if plot.type="m",only Manhattan plot will be plotted; if plot.type="q",only Q-Q plot will be plotted;if plot.type="b", both circle-Manhattan, Manhattan and Q-Q plots will be plotted; if plot.type=c("m","q"), Both Manhattan and Q-Q plots will be plotted.}
 
-\item{cex}{Number or Vector. The size of points. It is the same as "size" in <plot> R function. If given as a vector, the numbers are used to control the point size on Manhattan plot in circular manner, Manhattan plot in rectangular manner, and Q-Q plot, respectively}
+\item{multracks}{a logical,if multracks=FALSE, all Manhattan plots will be drew in separated files, if it is TRUE, all Manhattan plots will be plotted in only one file.}
 
-\item{r}{Number. The radius of the inside circle when plotting Manhattan plot in circular manner}
+\item{cex}{a number or a vector, the size for the points, is the same with "size" in <plot>, and if it is a vector, the first number controls the size of points in circle plot(the default is 0.5), the second number controls the size of points in Manhattan plot(the default is 1), the third number controls the size of points in Q-Q plot(the default is 1)}
 
-\item{xlab}{Character. The label of X axis}
+\item{r}{a number, the radius for the circle(the inside radius), the default is 1.}
 
-\item{ylab}{Character. The label of Y axis}
+\item{xlab}{a character, the labels for x axis.}
 
-\item{xaxs}{Character. Options are "r", and "i". It is the same as "xaxs" in <plot> R function}
+\item{ylab}{a character, the labels for y axis.}
 
-\item{yaxs}{Character. Options are "r", and "i". It is the same as "yaxs" in <plot> R function}
+\item{xaxs}{a character, The style of axis interval calculation to be used for the x-axis. Possible values are "r", "i", "e", "s", "d". The styles are generally controlled by the range of data or xlim, if given.}
 
-\item{outward}{Logical value. If TRUE, all points will be plotted from inside toward outside; otherwise, all points will be plotted from outside toward inside}
+\item{yaxs}{a character, The style of axis interval calculation to be used for the y-axis. See xaxs above..}
 
-\item{threshold}{Number or Vector. The cutoff line on Manhattan plot, e.g. Bonfferoni correction. More than one significant line can be added onto one figure. If threshold=0 or NULL, the threshold line will not be added}
+\item{outward}{logical, if outward=TRUE,then all points will be plotted from inside to outside for circular Manhattan plot.}
 
-\item{threshold.col}{Character or Vector. The colors of threshold lines}
+\item{threshold}{a number or vector, the significant threshold. For example, Bonfferoni adjustment method: threshold=0.01/nrow(Pmap). More than one significant line can be added on the plots, if threshold=0 or NULL, then the threshold line will not be added.}
 
-\item{threshold.lwd}{Number or Vector. The widths of threshold lines}
+\item{threshold.col}{a character or vector, the colour for the line of threshold levels.}
 
-\item{threshold.lty}{Number or Vector. The type of threshold line}
+\item{threshold.lwd}{a number or vector, the width for the line of threshold levels.}
 
-\item{amplify}{Logical value. If TRUE, the points that passed the threshold line will be highlighted}
+\item{threshold.lty}{a number or vector, the type for the line of threshold levels.}
 
-\item{chr.labels}{Vector. The labels for the Chromosome IDs on Manhattan plot in circular manner}
+\item{amplify}{logical, CMplot can amplify the significant points, if amplify=T, then the points bigger than the minimal significant level will be amplified, the default: amplify=TRUE.}
 
-\item{signal.cex}{Number. If "amplify" is TRUE, "signal.cex" is used to set the size of significant points}
+\item{signal.cex}{a number, if amplify=TRUE, users can set the size of significant points.}
 
-\item{signal.pch}{Number. If "amplify" is TRUE, users can set the type of significant points}
+\item{signal.pch}{a number, if amplify=TRUE, users can set the shape of significant points.}
 
-\item{signal.col}{Character. If "amplify" is TRUE, "signal.col" is used to set the color of significant points, if "signal.col" is NULL, the colors of significant points will not be changed}
+\item{signal.col}{a character, if amplify=TRUE, users can set the colour of significant points, if signal.col=NULL, then the colors of significant points will not be changed.}
 
-\item{signal.line}{Number. The width of dotted lines used for marking significant points}
+\item{signal.line}{a number, the width of the lines of significant SNPs cross the circle.}
 
-\item{cir.chr}{Logical value. If TRUE, a band that represents marker density information will be added onto Manhattan plot in circular manner}
+\item{highlight}{a vector, names of SNPs which need to be highlighted.}
 
-\item{cir.chr.h}{Number. If "cir.chr=TRUE", it can be used to set the width of marker density band}
+\item{highlight.cex}{a number or vector, the size of points for SNPs which need to be highlighted.}
 
-\item{chr.den.col}{Character or Vector or NULL. The colors for plotting marker density band on Manhattan plot. If "chr.den.col=NULL", it will use the colors in parameter 'col'}
+\item{highlight.pch}{a number or vector, the pch of points for SNPs which need to be highlighted.}
 
-\item{cir.legend}{Logical value. If TRUE, legends will be added on each circle of Manhattan plot in circular manner}
+\item{highlight.col}{a number or vector, the col of points for SNPs which need to be highlighted.}
 
-\item{cir.legend.cex}{Number. The size of legend on Manhattan plot in circular manner}
+\item{chr.labels}{a vector, the labels for the chromosomes of density plot and circle-Manhattan plot.}
 
-\item{cir.legend.col}{Character. The color of legends on Manhattan plot in circular manner}
+\item{chr.den.col}{a character or vector or NULL, the colour for the SNP density. If the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts the number of SNP within given size('bin.size') will be plotted around the circle. If chr.den.col=NULL, the density bar will not be attached on the bottom of manhattan plot.}
 
-\item{LOG10}{Logical value. If TRUE, the p values of GWAS results will be scaled by log10}
+\item{cir.band}{a number, the space between circles, the default is 1.}
 
-\item{box}{Logical value. If TRUE, the border line of Manhattan plot will be added}
+\item{cir.chr}{logical, a boundary that represents chromosomes will be plotted on the periphery of a circle, the default is TRUE.}
 
-\item{conf.int.col}{Character. The color of confidence interval on QQ-plot}
+\item{cir.chr.h}{a number, the width for the boundary, if cir.chr=FALSE, then this parameter will be useless.}
 
-\item{file.output}{Logical value. If TRUE, the figures will be generated.}
+\item{cir.legend}{logical, whether to add the legend of each circle.}
+
+\item{cir.legend.cex}{a number, the size of the number of legend.}
+
+\item{cir.legend.col}{a character, the color of the axis of legend.}
+
+\item{LOG10}{logical, whether to change the p-value into log10(p-value).}
+
+\item{box}{logical, this function draws a box around the current Manhattan plot.}
+
+\item{conf.int}{logical, whether to plot confidence interval on QQ-plot.}
+
+\item{file.output}{a logical, users can choose whether to output the plot results.}
 
 \item{outpath}{Only when file.output = TRUE, determines the path of the output file}
 
-\item{file.type}{Character. Options are jpg, pdf, and tiff}
+\item{file.type}{a character, users can choose the different output formats of plot, so for, "jpg", "pdf", "tiff" can be selected by users.}
 
-\item{dpi}{Number. Dots per inch for .jpg and .tiff files}
+\item{dpi}{a number, the picture resolution for .jpg and .tiff files. The default is 300.}
 
-\item{memo}{Character. A text marker on output files}
+\item{height}{the height of output files.}
 
-\item{verbose}{whether to print detail.}
+\item{width}{the width of output files.}
+
+\item{memo}{add a character to the output file name.}
+
+\item{verbose}{whether to print the reminder.}
 }
 \value{
 Output files

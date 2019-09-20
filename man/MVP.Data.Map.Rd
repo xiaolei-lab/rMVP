@@ -6,7 +6,7 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Map(map, out = "mvp", cols = c(1, 2, 3), header = TRUE,
+MVP.Data.Map(map, out = "mvp", cols = 1:5, header = TRUE,
   sep = "\\t", verbose = TRUE)
 }
 \arguments{
