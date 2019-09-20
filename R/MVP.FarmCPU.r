@@ -494,9 +494,9 @@ FarmCPU.BIN <-
         if(optimumable){
             s[s>bound]=bound
             #print("optimizing possible QTNs...")
-            GP=cbind(GM,P,NA,NA,NA)
-            mySpecify=FarmCPU.Specify(GI=GM, GP=GP, bin.size=b, inclosure.size=s)
-            seqQTN=which(mySpecify$index==TRUE)
+            #GP=cbind(GM,P,NA,NA,NA)
+            #mySpecify=FarmCPU.Specify(GI=GM, GP=GP, bin.size=b, inclosure.size=s)
+            #seqQTN=which(mySpecify$index==TRUE)
         }
         
         #Method of static
