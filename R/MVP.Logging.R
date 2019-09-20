@@ -11,11 +11,11 @@
 # limitations under the License.
 
 
-logging.initialize <- function(module) {
+logging.initialize <- function(module, outpath) {
     file <- NULL
     if (options("rMVP.OutputLog2File") == TRUE) {
         now <- Sys.time()
-        file <- paste(module, format(now, "%Y%m%d_%H%M%S"), "log", sep = ".")
+        file <- file.path(outpath, paste(module, format(now, "%Y%m%d_%H%M%S"), "log", sep = "."))
     }
     
     assign("logging.file", file, envir = package.env)

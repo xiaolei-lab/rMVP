@@ -69,7 +69,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                      type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
                      pcs.keep = 5, verbose = TRUE, ncpus = NULL, ...) {
     
-    logging.initialize("MVP.Data")
+    logging.initialize("MVP.Data", outpath)
     
     logging.log("Preparing data for MVP...\n", verbose = verbose)
     

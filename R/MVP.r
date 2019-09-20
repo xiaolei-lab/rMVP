@@ -91,7 +91,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
          file.output=TRUE, file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
 ) {
-    logging.initialize("MVP")
+    logging.initialize("MVP", outpath)
     
     R.ver <- Sys.info()[['sysname']]
     wind <- R.ver == 'Windows'
