@@ -145,9 +145,10 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
     }
     #Data information
-    m=nrow(geno)
-    n=ncol(geno)
-    logging.log(paste("Input data has", n, "individuals,", m, "markers", sep=" "), "\n", verbose = verbose)
+    m <- nrow(geno)
+    n <- ncol(geno)
+    logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
+    logging.log("Phenotype: ", colnames(phe)[2],  verbose = verbose)
     
     #initial results
     glm.results <- NULL
@@ -159,14 +160,14 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     mlm.run <- "MLM" %in% method
     farmcpu.run <- "FarmCPU" %in% method
     
-    if(!is.null(nPC.GLM)|!is.null(nPC.MLM)|!is.null(nPC.FarmCPU)){
-        nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
-        if (nPC > 0 && nPC < 3) {
-            nPC <- 3
-        }
-    } else {
+
+    nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
+    if (nPC <= 0) {
         nPC <- NULL
+    } else if (nPC < 3) {
+        nPC <- 3
     }
+
     
     if (!is.null(K)) { K <- as.matrix(K) }
     if (!is.null(nPC) | "MLM" %in% method) {
