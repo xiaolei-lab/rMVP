@@ -91,7 +91,7 @@
 	}
     map[, 1] = 1:nrow(map)
 	suppressWarnings(map <- matrix(as.numeric(map), nrow(map)))
-    if(sum(is.na(map[,3]) != 0) stop("Non-digital characters or NAs are not allowed in map for FarmCPU")
+    if(sum(is.na(map[,3]) != 0)) stop("Non-digital characters or NAs are not allowed in map for FarmCPU")
 	
     if(!is.na(p.threshold)) QTN.threshold = max(p.threshold, QTN.threshold)
     
