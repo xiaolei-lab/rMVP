@@ -583,6 +583,7 @@ for(i in 2:ncol(phenotype)){
     threshold=0.05,
     method=c("GLM", "MLM", "FarmCPU")
   )
+  gc()
 }
 ```
 
