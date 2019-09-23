@@ -1,8 +1,8 @@
 Package: rMVP
 Type: Package
 Title: Memory-Efficient, Visualize-Enhanced, Parallel-Accelerated GWAS Tool
-Version: 0.99.15.1
-Date: 2019-09-20
+Version: 0.99.16
+Date: 2019-09-23
 Authors@R: c( person("Lilin", "Yin", role = "aut"), 
               person("Haohao", "Zhang", role = "aut"),
               person("Zhenshuang", "Tang", role = "aut"),
