@@ -106,7 +106,7 @@ print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
-mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+mapPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
 
 opts <- options(rMVP.OutputLog2File = FALSE)

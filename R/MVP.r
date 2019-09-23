@@ -70,7 +70,7 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
-#' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+#' mapPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.map", package = "rMVP")
 #' map <- read.table(mapPath , head = TRUE)
 #' 
 #' opts <- options(rMVP.OutputLog2File = FALSE)
@@ -161,7 +161,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     farmcpu.run <- "FarmCPU" %in% method
     
 
-    nPC <- max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE)
+    nPC <- suppressWarnings(max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE))
     if (nPC <= 0) {
         nPC <- NULL
     } else if (nPC < 3) {
