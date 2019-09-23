@@ -33,6 +33,6 @@ Build date: Sep 12, 2018
 \examples{
 mvpPath <- file.path(system.file("extdata", "05_mvp", package = "rMVP"), "mvp")
 
-MVP.Data.impute(mvpPath, file.path(tempdir(), "rMVP.test"), ncpus=1)
+MVP.Data.impute(mvpPath, tempfile("outfile"), ncpus=1)
 
 }

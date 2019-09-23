@@ -32,8 +32,8 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
-mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+mapPath <- system.file("extdata", "05_mvp", "mvp.geno.map", package = "rMVP")
 
-MVP.Data.Map(mapPath, file.path(tempdir(), "rMVP.test"))
+MVP.Data.Map(mapPath, tempfile("outfile"))
 
 }

@@ -37,6 +37,6 @@ Build date: Sep 12, 2018
 \examples{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 
-MVP.Data.Pheno(phePath, out=file.path(tempdir(), "rMVP.test"))
+MVP.Data.Pheno(phePath, out=tempfile("outfile"))
 
 }

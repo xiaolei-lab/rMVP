@@ -55,7 +55,7 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' genotype <- genotype[, idx]
 #' print(dim(genotype))
-#' mapPath <- system.file("extdata", "07_other", "mvp.map", package = "rMVP")
+#' system.file("extdata", "05_mvp", "mvp.geno.map", package = "rMVP")
 #' map <- read.table(mapPath , head = TRUE)
 #' 
 #' farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, maxLoop=2)

@@ -33,6 +33,6 @@ Kinship
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 
-MVP.Data.Kin(TRUE, mvp_prefix=geno, out=file.path(tempdir(), "rMVP.test"))
+MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"))
 
 }

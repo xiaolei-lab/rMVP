@@ -35,6 +35,6 @@ Accept the | or / separated markers, any variant sites that are not 0 or 1 will 
 \examples{
 vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 
-MVP.Data.VCF2MVP(vcfPath, file.path(tempdir(), "rMVP.test"))
+MVP.Data.VCF2MVP(vcfPath, tempfile("outfile"))
 
 }
