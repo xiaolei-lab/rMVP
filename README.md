@@ -50,7 +50,7 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 # Installation
 **[back to top](#contents)**  
 
-**WE STRONGLY RECOMMEND INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
+**WE STRONGLY RECOMMEND TO INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
 
 ## Installation
 
