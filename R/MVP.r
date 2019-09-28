@@ -148,7 +148,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     m <- nrow(geno)
     n <- ncol(geno)
     logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
-    logging.log("Phenotype: ", colnames(phe)[2],  verbose = verbose)
+    logging.log("Phenotype: ", colnames(phe)[2], "\n", verbose = verbose)
     
     #initial results
     glm.results <- NULL
