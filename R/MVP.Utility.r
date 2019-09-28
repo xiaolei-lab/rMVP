@@ -61,11 +61,11 @@ print_bar <- function(i,
                     type = c("type1", "type3"),
                     symbol = "-",
                     tmp.file = NULL,
-                    symbol.head = "|",
+                    symbol.head = ">>>",
                     symbol.tail = ">" ,
                     fixed.points = TRUE,
                     points = seq(0, 100, 1),
-                    symbol.len = 50,
+                    symbol.len = 48,
                     verbose = TRUE
 ) {
     switch(
