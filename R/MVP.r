@@ -194,35 +194,57 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         #CV for GLM
         if(glm.run){
             if(!is.null(CV.GLM)){
+                logging.log("Number of provided covariates of GLM: ", ncol(CV.GLM), "\n", verbose = verbose)
                 if(!is.null(nPC.GLM)){
+                    logging.log("Number of PCs included: ", nPC.GLM, "\n", verbose = verbose)
                     CV.GLM <- cbind(ipca[,1:nPC.GLM], CV.GLM)
                 }
             }else{
-                if(!is.null(nPC.GLM))   CV.GLM <- ipca[,1:nPC.GLM]
+                if(!is.null(nPC.GLM)){logging.log("Number of PCs included in GLM: ", nPC.GLM, "\n", verbose = verbose); CV.GLM <- ipca[,1:nPC.GLM]}
             }
         }
         
         #CV for MLM
         if(mlm.run){
             if(!is.null(CV.MLM)){
+                logging.log("Number of provided covariates of MLM: ", ncol(CV.MLM), "\n", verbose = verbose)
                 if(!is.null(nPC.MLM)){
+                    logging.log("Number of PCs included: ", nPC.MLM, "\n", verbose = verbose)
                     CV.MLM <- cbind(ipca[,1:nPC.MLM], CV.MLM)
                 }
             }else{
-                if(!is.null(nPC.MLM))   CV.MLM <- ipca[,1:nPC.MLM]
+                if(!is.null(nPC.MLM)){logging.log("Number of PCs included in MLM: ", nPC.MLM, "\n", verbose = verbose); CV.MLM <- ipca[,1:nPC.MLM]}
             }
         }
         
         #CV for FarmCPU
         if(farmcpu.run){
             if(!is.null(CV.FarmCPU)){
+                logging.log("Number of provided covariates of FarmCPU: ", ncol(CV.FarmCPU), "\n", verbose = verbose)
                 if(!is.null(nPC.FarmCPU)){
+                    logging.log("Number of PCs included: ", nPC.FarmCPU, "\n", verbose = verbose)
                     CV.FarmCPU <- cbind(ipca[,1:nPC.FarmCPU], CV.FarmCPU)
                 }
             }else{
-                if(!is.null(nPC.FarmCPU))   CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
+                if(!is.null(nPC.FarmCPU)){logging.log("Number of PCs included in FarmCPU: ", nPC.FarmCPU, "\n", verbose = verbose); CV.FarmCPU <- ipca[,1:nPC.FarmCPU]}
             }
         }  
+    }else{
+        if(glm.run){
+            if(!is.null(CV.GLM)){
+                logging.log("Number of provided covariates of GLM: ", ncol(CV.GLM), "\n", verbose = verbose)
+            }
+        }
+        if(mlm.run){
+            if(!is.null(CV.MLM)){
+                logging.log("Number of provided covariates of MLM: ", ncol(CV.MLM), "\n", verbose = verbose)
+            }
+        }
+        if(farmcpu.run){
+            if(!is.null(CV.FarmCPU)){
+                logging.log("Number of provided covariates of FarmCPU: ", ncol(CV.FarmCPU), "\n", verbose = verbose)
+            }
+        }
     }
   
     #GWAS
