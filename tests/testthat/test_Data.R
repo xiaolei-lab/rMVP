@@ -1,8 +1,7 @@
 # read data
 vcfPath     <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
-bfilePath   <- system.file("extdata", "02_bfile", "mvp", package = "rMVP")
+bfilePath   <- file.path(system.file("extdata", "02_bfile", package = "rMVP"), "mvp")
 hmp1Path    <- system.file("extdata", "03_hapmap", "mvp.hmp.txt", package = "rMVP")
-hmp2Path    <- system.file("extdata", "03_hapmap", "mvp.diploid.hmp.txt", package = "rMVP")
 numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 genoPath    <- system.file("extdata", "05_mvp", "mvp.geno.desc", package = "rMVP")
 genoImpPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
@@ -68,29 +67,6 @@ test_that("MVP.Data() - HMP", {
     out <- "rMVP.test.3"
     expect_output(
         MVP.Data(fileHMP = hmp1Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
-        "done"
-    )
-    geno <- attach.big.matrix(paste0(out, ".geno.desc"))
-    genoImp <- attach.big.matrix(paste0(out, ".geno.desc"))
-    kinship <- attach.big.matrix(paste0(out, ".kin.desc"))
-    pcs <- attach.big.matrix(paste0(out, ".pc.desc"))
-    genoInd <- read.table(paste0(out, ".geno.ind"), stringsAsFactors = FALSE)
-    map <- read.table(paste0(out, ".geno.map"), header = TRUE, stringsAsFactors = FALSE)
-    
-    expect_known_value(geno[], "rMVP.keep.geno", update = FALSE)
-    expect_known_value(genoImp[], "rMVP.keep.genoImp", update = FALSE)
-    expect_known_value(kinship[], "rMVP.keep.kinship", update = FALSE)
-    expect_known_value(pcs[], "rMVP.keep.pcs", update = FALSE)
-    expect_known_value(genoInd, "rMVP.keep.genoInd", update = FALSE)
-    expect_known_value(map, "rMVP.keep.map", update = FALSE)
-})
-
-test_that("MVP.Data() - HMP Diploid", {
-    skip_on_cran()
-    
-    out <- "rMVP.test.4"
-    expect_output(
-        MVP.Data(fileHMP = hmp2Path, out = out, fileKin = TRUE, filePC = TRUE, verbose = FALSE, ncpus = 2, maxLine = 1e3),
         "done"
     )
     geno <- attach.big.matrix(paste0(out, ".geno.desc"))
