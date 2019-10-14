@@ -38,7 +38,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 List vcf_parser_map(std::string vcf_file, std::string out) {
     // Define
-    const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
+    const int MAP_INFO_N = 10000;      // max length of "SNP, POS and CHROM"
     ifstream file(vcf_file);
     ofstream map(out + ".geno.map");
     ofstream indfile(out + ".geno.ind");
@@ -140,8 +140,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     vector<string> buffer;
     while (file) {
         buffer.clear();
-        for (int i = 0; file && (maxLine <= 0 || i < maxLine); i++) {
-            getline(file, line);
+        for (int i = 0; getline(file, line) && (maxLine <= 0 || i < maxLine); i++) {
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
             }
@@ -196,7 +195,7 @@ void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, long maxLine, int t
 // [[Rcpp::export]]
 List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     // Define
-    const int MAP_INFO_N = 50;      // max length of "SNP, POS and CHROM"
+    const int MAP_INFO_N = 10000;      // max length of "SNP, POS and CHROM"
     ofstream map(out + ".geno.map");
     ofstream indfile(out + ".geno.ind");
     
@@ -243,14 +242,20 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
                 l[0] = l[2] + '-' + l[3];
             }
             
+            vector<string> alleles;
+            boost::split(alleles, l[1], boost::is_any_of("/"));
+            
+            if (alleles.size() > 2) {
+                Rcpp::stop("variants with more than 2 alleles!");
+            }
+            
             map << l[0] << '\t' << l[2] << '\t' << l[3] << 
-                '\t' << l[1][0] << 
-                '\t' << (l[1].length() < 3 ? '.' : l[1][2]) << endl;
+                '\t' << alleles[0] << 
+                '\t' << (alleles.size() < 2 ? "." : alleles[1]) << endl;
             m++;
         }
         map.close();
         file.close();
-        
     }
     
     
@@ -261,6 +266,7 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
 template <typename T>
 T hapmap_marker_parser(string m, char major, double NA_C) {
     if (m.length() == 1) {  // Hapmap
+        // Rcout << "major: " << major << '\t' << "now: " << m[0] << endl;
         if (m[0] == '+' || m[0] == '0' || m[0] == '-' || m[0] == 'N') {
             return static_cast<T>(NA_C);
         } else if (m[0] == major) {
@@ -319,12 +325,13 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
     vector<string> buffer;
     while (file) {
         buffer.clear();
-        for (int i = 0; file && (maxLine <= 0 || i < maxLine); i++) {
-            getline(file, line);
+        for (int i = 0; getline(file, line) && (maxLine <= 0 || i < maxLine); i++) {
+            // Rcout << i << endl << line << endl;
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
             }
         }
+        // Rcout << "buffer.size()\t" << buffer.size() << endl;
         #pragma omp parallel for private(l, markers)
         for (int i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of("\t"));
@@ -340,10 +347,12 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
                 back_inserter(markers),
                 boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
             );
-            
+            // Rcout << m << '\t' << i << endl;
             for (int j = 0; j < markers.size(); j++) {
+                // Rcout << int(markers[j]) << '\t';
                 mat[j][m + i] = markers[j];
             }
+            // Rcout << endl;
             progress.increment();
         }
         m += buffer.size();
