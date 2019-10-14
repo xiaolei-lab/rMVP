@@ -547,10 +547,10 @@ imMVP <- MVP(
     geno=genotype,
     map=map,
     #K=Kinship,
-    #CV.GLM=Covariates,
+    #CV.GLM=Covariates,     ##if you have additional covariates, please keep there open.
     #CV.MLM=Covariates,
     #CV.FarmCPU=Covariates,
-    nPC.GLM=5,
+    nPC.GLM=5,      ##if you have added PC into covariates, please keep there closed.
     nPC.MLM=3,
     nPC.FarmCPU=3,
     priority="speed",
