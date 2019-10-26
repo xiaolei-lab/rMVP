@@ -115,7 +115,7 @@ MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed')
 If you have genotype data in **VCF** format:  
 **fileVCF**, name of genotype data in VCF format  
 **filePhe**, name of phenotype data  
-**sep.phe**, seperator of phenotype file  
+**sep.phe**, separator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
@@ -154,7 +154,7 @@ If you have genotype data in **Hapmap** format:
 
 **fileHMP**, a string or a string vector, e.g. fileHMP = "hapmap.txt" or fileHMP = c("chr1.hmp.txt", "chr2.hmp.txt", "chr3.hmp.txt")  
 **filePhe**, name of phenotype file  
-**sep.phe**, seperator of phenotype file  
+**sep.phe**, separator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, the prefix of output file  
@@ -214,8 +214,8 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 **fileNum**, name of genotype data in Numeric format  
 **filePhe**, name of phenotype file  
 **fileMap**, name of map file, a header should be added, e.g. SNP Chr Pos  
-**sep.num**, seperator of Numeric file  
-**sep.phe**, seperator of phenotype file  
+**sep.num**, separator of Numeric file  
+**sep.phe**, separator of phenotype file  
 **type.geno**, the type of data in Numeric file, "char", "integer", or "double"  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
@@ -344,7 +344,7 @@ MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', au
 If you have Kinship matrix data that represents the relationship among individuals  
 
 **fileKin**, name of Kinship matrix data, the dimension is n * n (n is sample size), no taxa names included  
-**sep.kin**, seperator of Kinship file  
+**sep.kin**, separator of Kinship file  
 
 > `mvp.kin.txt`
 
@@ -427,7 +427,7 @@ MVP.Data.Kin(TRUE, mvp_prefix='mvp', out='mvp')
 If you have Principal Components data  
 
 **filePC**, name of Principal Components matrix data, the dimension is n * nPC (n is sample size, nPC is number of first columns of PCs), no taxa names and header row included  
-**sep.pc**, seperator of Principal Components file  
+**sep.pc**, separator of Principal Components file  
 
 > `mvp.pc.txt`
 
@@ -537,9 +537,9 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
 **method.bin**, a parameter for FarmCPU only, three options are available: "FaST-LMM","EMMA", and "static"  
 **permutation.threshold**, if **TRUE**, a threshold of permutation will be used in manhattan plot. The phenotypes are permuted to break the relationship with the genotypes. The experiment is replicated for a number of times. A vector of minimum p value of all experiments is recorded and the 95% quantile value of this vector is recommended to be used as significant threshold  
-**permutation.rep**, number of permutaion replicates, only used when **permutation.threshold** is **TRUE**  
+**permutation.rep**, number of permutation replicates, only used when **permutation.threshold** is **TRUE**  
 **threshold**, 0.05/marker size, a cutoff line on manhattan plot  
-**method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for assocation tests  
+**method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for association tests  
 
 ```r
 imMVP <- MVP(
@@ -599,7 +599,7 @@ for(i in 2:ncol(phenotype)){
 # Output
 **[back to top](#contents)**  
 **MVP** automatically outputs high-quality figures, three types of figure formats are available (".jpg",".pdf",".tiff", default is ".jpg"). Users could also adjust the output figure using about 50 parameters in `MVP.Report()`. 
-`MVP.Report()` not only accept the final return of `MVP()`, but also accepts results from third-party software packages, such as PLINK, GEMMA, GAPIT, TASSEL, and FarmCPU. The result from third-party software packages should at least contain four columns, which are marker name, chromosome, physical postion, and P-value of a trait, results of more than one trait could be sequentially appended column by column. Typing `?MVP.Report()` to see details of all parameters and typing `data(pig60K)` or `data(cattle50K)` to load demo datasets. Type ```?MVP.Repory``` to see parameter details.
+`MVP.Report()` not only accept the final return of `MVP()`, but also accepts results from third-party software packages, such as PLINK, GEMMA, GAPIT, TASSEL, and FarmCPU. The result from third-party software packages should at least contain four columns, which are marker name, chromosome, physical position, and P-value of a trait, results of more than one trait could be sequentially appended column by column. Typing `?MVP.Report()` to see details of all parameters and typing `data(pig60K)` or `data(cattle50K)` to load demo datasets. Type ```?MVP.Repory``` to see parameter details.
 
 ```r
 > data(pig60K)   #GWAS result of MLM
@@ -626,14 +626,14 @@ for(i in 2:ncol(phenotype)){
 6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
 
 ```
-In the demo datasets, the first three columns are marker name, chromosome, and physical postion, respectively, the rest columns are the P-value or effect of multiple traits. Number of traits is theoretically unlimited.
+In the demo datasets, the first three columns are marker name, chromosome, and physical position, respectively, the rest columns are the P-value or effect of multiple traits. Number of traits is theoretically unlimited.
 
 ## Phenotype distribution
 **[back to top](#contents)**  
 
 **phe**, phenotype data  
 **file.type**, format of output figure  
-**breakNum**, nunmber of breaking points for phenotype when plotting distribution  
+**breakNum**, number of breaking points for phenotype when plotting distribution  
 **dpi**, resolution of output figure  
 
 ```r
@@ -652,8 +652,8 @@ MVP.Hist(phe=phenotype, file.type="jpg", breakNum=18, dpi=300)
 
 **plot.type**, four options ("d", "c", "m", "q"); if "d", draw ***SNP-density plot***  
 **bin.size**, the window size for counting SNP number  
-**bin.max**, maximum SNP number, for winows, which has more SNPs than **bin.max**, will be painted in same color  
-**col**, colors for seperating windows with different SNP density  
+**bin.max**, maximum SNP number, for windows, which has more SNPs than **bin.max**, will be painted in same color  
+**col**, colors for separating windows with different SNP density  
 **file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
