@@ -205,20 +205,20 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         }
         
         #CV for MLM
-        if(mlm.run){
-            if(!is.null(CV.MLM)){
+        if (mlm.run) {
+            if (!is.null(CV.MLM)) {
                 logging.log("Number of provided covariates of MLM:", ncol(CV.MLM), "\n", verbose = verbose)
-                if(!is.null(nPC.MLM)){
+                if (!is.null(nPC.MLM)) {
                     logging.log("Number of PCs included:", nPC.MLM, "\n", verbose = verbose)
                     CV.MLM <- cbind(ipca[,1:nPC.MLM], CV.MLM)
                 }
-            }else{
-                if(!is.null(nPC.MLM)){logging.log("Number of PCs included in MLM:", nPC.MLM, "\n", verbose = verbose); CV.MLM <- ipca[,1:nPC.MLM]}
+            } else {
+                if (!is.null(nPC.MLM)){logging.log("Number of PCs included in MLM:", nPC.MLM, "\n", verbose = verbose); CV.MLM <- ipca[,1:nPC.MLM]}
             }
         }
         
         #CV for FarmCPU
-        if(farmcpu.run){
+        if (farmcpu.run) {
             if(!is.null(CV.FarmCPU)){
                 logging.log("Number of provided covariates of FarmCPU:", ncol(CV.FarmCPU), "\n", verbose = verbose)
                 if(!is.null(nPC.FarmCPU)){
@@ -304,34 +304,34 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
         threshold = permutation.cutoff * m
     }
-    logging.log(paste("Significant level: ", sprintf("%.6f", threshold/m), sep=""), "\n", verbose = verbose)
-    if(file.output){
-        if(glm.run){
+    logging.log(paste0("Significant level: ", formatC(threshold/m, format = "e", digits = 2)), "\n", verbose = verbose)
+    if (file.output) {
+        if (glm.run) {
             index <- which(glm.results[, ncol(glm.results)] < threshold/m)
-            if(length(index) != 0) {
-              write.csv(x = cbind(map,glm.results)[index, ], 
+            if (length(index) != 0) {
+              write.csv(x = cbind.data.frame(map, glm.results)[index, ], 
                         file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM_signal.csv", sep = ".")),
                         row.names = FALSE)
             }
         }
-        if(mlm.run){
+        if (mlm.run) {
             index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
-            if(length(index) != 0) {
-              write.csv(x = cbind(map,mlm.results)[index, ], 
+            if (length(index) != 0) {
+              write.csv(x = cbind.data.frame(map, mlm.results)[index, ], 
                         file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM_signal.csv", sep = ".")),
                         row.names = FALSE)
             }
         }
-        if(farmcpu.run){
+        if (farmcpu.run) {
             index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
-            if(length(index) != 0) {
-              write.csv(x = cbind(map,farmcpu.results)[index, ], 
+            if (length(index) != 0) {
+              write.csv(x = cbind.data.frame(map, farmcpu.results)[index, ], 
                         file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU_signal.csv", sep = ".")),
                         row.names = FALSE)
             }
         }
     }
-    if(file.output){
+    if (file.output) {
         logging.log("---------------------Visualization Start-------------------", "\n", verbose = verbose)
         logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
         MVP.Hist(memo=memo, outpath=outpath, file.output=file.output, phe=phe, file.type=file.type, col=col, dpi=dpi)
