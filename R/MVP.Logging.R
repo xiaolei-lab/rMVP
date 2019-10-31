@@ -13,7 +13,7 @@
 
 logging.initialize <- function(module, outpath) {
     file <- NULL
-    if (options("rMVP.OutputLog2File") == TRUE) {
+    if (!is.null(outpath)) {
         now <- Sys.time()
         file <- file.path(outpath, paste(module, format(now, "%Y%m%d_%H%M%S"), "log", sep = "."))
     }

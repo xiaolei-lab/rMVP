@@ -87,62 +87,73 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
-         permutation.rep=100, bar=TRUE, memo="MVP", outpath=getwd(), 
+         permutation.rep=100, bar=TRUE, memo="MVP", outpath=getwd(),
          col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
          file.output=TRUE, file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
 ) {
-    logging.initialize("MVP", outpath)
+    R.ver  <- Sys.info()[['sysname']]
+    wind   <- R.ver == 'Windows'
+    # linux  <- R.ver == 'Linux'
+    # mac    <- (!linux) & (!wind)
+    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
     
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+    # Compatible with old ways
+    if (file.output == TRUE) {
+      file.output <- c("pmap", "pmap.signal", "plot", "log")
+    } else if (file.output == FALSE) {
+      file.output <- c()
+    }
     
+    # Set output path of log file 
+    logging.outpath <- NULL
+    if ("log" %in% file.output) {
+      logging.outpath <- outpath
+    }
+    logging.initialize("MVP", logging.outpath)
     
-    if(wind) ncpus <- 1
+    if (wind) ncpus <- 1
     
     MVP.Version(width = 60, verbose = verbose)
     logging.log("Start:", as.character(Sys.time()), "\n", verbose = verbose)
-    if (options("rMVP.OutputLog2File") == TRUE) {
+    if ("log" %in% file.output) {
         logging.log("The log has been output to the file:", get("logging.file", envir = package.env), "\n", verbose = verbose)
     }
     vc.method <- match.arg(vc.method)
-    if(nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
+    if (nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     #list -> matrix
     map <- as.matrix(map[,c(1:3)])
     na.index <- NULL
-    if(!is.null(CV.GLM)){
+    if (!is.null(CV.GLM)) {
         CV.GLM <- as.matrix(CV.GLM)
-    if(nrow(CV.GLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
-        na.index <- c(na.index, which(is.na(CV.GLM), arr.ind=TRUE)[, 1])
+    if (nrow(CV.GLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+        na.index <- c(na.index, which(is.na(CV.GLM), arr.ind = TRUE)[, 1])
     }
-    if(!is.null(CV.MLM)){
+    if (!is.null(CV.MLM)) {
         CV.MLM <- as.matrix(CV.MLM)
-        if(nrow(CV.MLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
-       na.index <- c(na.index, which(is.na(CV.MLM), arr.ind=TRUE)[, 1])
+        if (nrow(CV.MLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+       na.index <- c(na.index, which(is.na(CV.MLM), arr.ind = TRUE)[, 1])
     }
-    if(!is.null(CV.FarmCPU)){
+    if (!is.null(CV.FarmCPU)) {
         CV.FarmCPU <- as.matrix(CV.FarmCPU)
-        if(nrow(CV.FarmCPU) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
-        na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind=TRUE)[, 1])
+        if (nrow(CV.FarmCPU) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+        na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind = TRUE)[, 1])
     }
     na.index <- unique(na.index)
     
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
-    if(length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
+    if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
     #file.exsits()
-    if(length(seqTaxa) != length(phe[,2])){
+    if (length(seqTaxa) != length(phe[,2])) {
         geno = deepcopy(
           x = geno,
           cols = seqTaxa
         )
         phe = phe[seqTaxa,]
-        if(!is.null(K)){K = K[seqTaxa, seqTaxa]}
-        if(!is.null(CV.GLM)){CV.GLM = CV.GLM[seqTaxa,]}
-        if(!is.null(CV.MLM)){CV.MLM = CV.MLM[seqTaxa,]}
-        if(!is.null(CV.FarmCPU)){CV.FarmCPU = CV.FarmCPU[seqTaxa,]}
+        if (!is.null(K)) { K = K[seqTaxa, seqTaxa] }
+        if (!is.null(CV.GLM)) { CV.GLM = CV.GLM[seqTaxa,] }
+        if (!is.null(CV.MLM)) { CV.MLM = CV.MLM[seqTaxa,] }
+        if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa,] }
     }
     #Data information
     m <- nrow(geno)
@@ -168,7 +179,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         nPC <- 3
     }
 
-    
     if (!is.null(K)) { K <- as.matrix(K) }
     if (!is.null(nPC) | "MLM" %in% method) {
         if (is.null(K)) {
@@ -185,22 +195,22 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             ipca <- eigenK$vectors[, 1:nPC]
             logging.log("Deriving PCs successfully", "\n", verbose = verbose)
         }
-        if(("MLM" %in% method) & vc.method == "BRENT"){K <- NULL; gc()}
-        if(!"MLM" %in% method){rm(eigenK); rm(K); gc()}
+        if (("MLM" %in% method) & vc.method == "BRENT") { K <- NULL; gc()}
+        if (!"MLM" %in% method) { rm(eigenK); rm(K); gc() }
     }
 
     if (!is.null(nPC)) {
-
         #CV for GLM
-        if(glm.run){
-            if(!is.null(CV.GLM)){
+        if (glm.run) {
+            if (!is.null(CV.GLM)) {
                 logging.log("Number of provided covariates of GLM:", ncol(CV.GLM), "\n", verbose = verbose)
-                if(!is.null(nPC.GLM)){
+                if (!is.null(nPC.GLM)) {
                     logging.log("Number of PCs included:", nPC.GLM, "\n", verbose = verbose)
                     CV.GLM <- cbind(ipca[,1:nPC.GLM], CV.GLM)
                 }
-            }else{
-                if(!is.null(nPC.GLM)){logging.log("Number of PCs included in GLM:", nPC.GLM, "\n", verbose = verbose); CV.GLM <- ipca[,1:nPC.GLM]}
+            } else if (!is.null(nPC.GLM)) {
+                logging.log("Number of PCs included in GLM:", nPC.GLM, "\n", verbose = verbose)
+                CV.GLM <- ipca[,1:nPC.GLM]
             }
         }
         
@@ -212,36 +222,38 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                     logging.log("Number of PCs included:", nPC.MLM, "\n", verbose = verbose)
                     CV.MLM <- cbind(ipca[,1:nPC.MLM], CV.MLM)
                 }
-            } else {
-                if (!is.null(nPC.MLM)){logging.log("Number of PCs included in MLM:", nPC.MLM, "\n", verbose = verbose); CV.MLM <- ipca[,1:nPC.MLM]}
+            } else if (!is.null(nPC.MLM)) {
+                logging.log("Number of PCs included in MLM:", nPC.MLM, "\n", verbose = verbose)
+                CV.MLM <- ipca[,1:nPC.MLM]
             }
         }
         
         #CV for FarmCPU
         if (farmcpu.run) {
-            if(!is.null(CV.FarmCPU)){
+            if (!is.null(CV.FarmCPU)) {
                 logging.log("Number of provided covariates of FarmCPU:", ncol(CV.FarmCPU), "\n", verbose = verbose)
-                if(!is.null(nPC.FarmCPU)){
+                if (!is.null(nPC.FarmCPU)) {
                     logging.log("Number of PCs included:", nPC.FarmCPU, "\n", verbose = verbose)
                     CV.FarmCPU <- cbind(ipca[,1:nPC.FarmCPU], CV.FarmCPU)
                 }
-            }else{
-                if(!is.null(nPC.FarmCPU)){logging.log("Number of PCs included in FarmCPU:", nPC.FarmCPU, "\n", verbose = verbose); CV.FarmCPU <- ipca[,1:nPC.FarmCPU]}
+            }else if (!is.null(nPC.FarmCPU)) { 
+                logging.log("Number of PCs included in FarmCPU:", nPC.FarmCPU, "\n", verbose = verbose)
+                CV.FarmCPU <- ipca[,1:nPC.FarmCPU]
             }
         }  
     }else{
-        if(glm.run){
-            if(!is.null(CV.GLM)){
+        if (glm.run) {
+            if (!is.null(CV.GLM)) {
                 logging.log("Number of provided covariates of GLM:", ncol(CV.GLM), "\n", verbose = verbose)
             }
         }
-        if(mlm.run){
-            if(!is.null(CV.MLM)){
+        if (mlm.run) {
+            if (!is.null(CV.MLM)) {
                 logging.log("Number of provided covariates of MLM:", ncol(CV.MLM), "\n", verbose = verbose)
             }
         }
-        if(farmcpu.run){
-            if(!is.null(CV.FarmCPU)){
+        if (farmcpu.run) {
+            if (!is.null(CV.FarmCPU)) {
                 logging.log("Number of provided covariates of FarmCPU:", ncol(CV.FarmCPU), "\n", verbose = verbose)
             }
         }
@@ -249,42 +261,42 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
   
     #GWAS
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
-    if(glm.run){
+    if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
         glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar, verbose = verbose);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
-        if(file.output) {
+        if ("pmap" %in% file.output) {
           write.csv(x = cbind(map, glm.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM.csv", sep = ".")),
                     row.names = FALSE)
         }
     }
 
-    if(mlm.run){
+    if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
         mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
-        if(file.output) {
+        if ("pmap" %in% file.output) {
           write.csv(x = cbind(map, mlm.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM.csv", sep = ".")),
                     row.names = FALSE)
         }
     }
     
-    if(farmcpu.run){
+    if (farmcpu.run) {
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
         farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
         z = farmcpu.results[, 1]/farmcpu.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
-        if(file.output) {
+        if ("pmap" %in% file.output) {
           write.csv(x = cbind(map,farmcpu.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU.csv", sep = ".")),
                     row.names = FALSE)
@@ -314,7 +326,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         threshold = permutation.cutoff * m
     }
     logging.log(paste0("Significant level: ", formatC(threshold/m, format = "e", digits = 2)), "\n", verbose = verbose)
-    if (file.output) {
+    if ("pmap.signal" %in% file.output) {
         if (glm.run) {
             index <- which(glm.results[, ncol(glm.results)] < threshold/m)
             if (length(index) != 0) {
@@ -340,10 +352,10 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             }
         }
     }
-    if (file.output) {
+    if ("plot" %in% file.output) {
         logging.log("---------------------Visualization Start-------------------", "\n", verbose = verbose)
         logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
-        MVP.Hist(memo=memo, outpath=outpath, file.output=file.output, phe=phe, file.type=file.type, col=col, dpi=dpi)
+        MVP.Hist(memo=memo, outpath=outpath, file.output=TRUE, phe=phe, file.type=file.type, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
         plot3D <- TRUE
         if(!is.null(nPC)){
@@ -351,7 +363,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             ipca[,1:3],
             col=col,
             plot3D=plot3D,
-            file.output=file.output,
+            file.output=TRUE,
             file.type=file.type,
             outpath=outpath, 
             memo = memo,
@@ -363,7 +375,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             MVP.return,
             col=col,
             plot.type=c("c","m","q","d"),
-            file.output=file.output,
+            file.output=TRUE,
             file.type=file.type,
             outpath=outpath, 
             memo = memo,
@@ -378,7 +390,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                 col=col,
                 plot.type=c("m","q"),
                 multracks=TRUE,
-                file.output=file.output,
+                file.output=TRUE,
                 file.type=file.type,
                 outpath=outpath, 
                 memo = memo,
@@ -388,7 +400,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         }
     }
     now <- Sys.time()
-    logging.log("Results are stored at Working Directory:", getwd(), "\n", verbose = verbose)
+    if (length(file.output) > 0) {
+      logging.log("Results are stored at Working Directory:", outpath, "\n", verbose = verbose)
+    }
     logging.log("End:", as.character(now), "\n", verbose = verbose)
     print_accomplished(width = 60, verbose = verbose)
     
