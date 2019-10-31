@@ -253,6 +253,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
         glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar, verbose = verbose);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
+        z = glm.results$effect/glm.results$se
+        lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=F)
+        logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if(file.output) {
           write.csv(x = cbind(map, glm.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM.csv", sep = ".")),
@@ -264,6 +267,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
         mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
+        z = mlm.results$effect/mlm.results$se
+        lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=F)
+        logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if(file.output) {
           write.csv(x = cbind(map, mlm.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM.csv", sep = ".")),
@@ -275,6 +281,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
         farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map, CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
+        z = farmcpu.results$effect/farmcpu.results$se
+        lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=F)
+        logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if(file.output) {
           write.csv(x = cbind(map,farmcpu.results), 
                     file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU.csv", sep = ".")),
