@@ -319,7 +319,7 @@ MVP.Report <- function(
         Cnames <- Cnames[seq(3, ncol(MVP.res), 3)]
         MVP.res <- MVP.res[, seq(3, ncol(MVP.res), 3)]
         MVP.res[is.na(MVP.res)] <- 1
-        MVP.res <- cbind(MVP$map, MVP.res)
+        MVP.res <- cbind(MVP$map[,c(1:3)], MVP.res)
         Pmap <- MVP.res
         colnames(Pmap)[-c(1:3)] <- Cnames
     } else {
