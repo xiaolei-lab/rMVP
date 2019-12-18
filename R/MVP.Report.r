@@ -2383,6 +2383,10 @@ MVP.Report.QQplot <-
 #'    greater than break.n, only the previous break.n colors will be used.
 #' @param breakNum the number of cells for the histogram. The default value 
 #'    is 15.
+#' @param test.method The method used to test the normal distribution. The options are "auto", 
+#'    "Shapiro-Wilk", "Kolmogorov-Smirnov", and NULL. When set to "auto", "Shapiro- Wilk" method,
+#'    "Kolmogorov-Smirnov" method will be used when it is greater than 5000, and it will not be 
+#'    tested when set to NULL.
 #' @param outpath Effective only when file.output = TRUE, determines the path of the output file
 #' @param file.type A string or NULL is used to determine the type of output 
 #'    file. Can be "jpg", "pdf", "tiff". If it is NULL, it will use 
@@ -2415,6 +2419,7 @@ MVP.Hist <-
              breakNum = 15,
              memo = TRUE,
              outpath = getwd(), 
+             test.method = "auto",
              file.type = "pdf",
              file.output = TRUE,
              dpi = 300) {
@@ -2473,18 +2478,27 @@ MVP.Hist <-
         lines(density(phe[, i]), lwd = 2)
         
         # test normal distribution
-        if (length(phe[, i]) <= 5000) {
-            norm.p <- round(shapiro.test(phe[, i])$p, 4)
-            test.method <- "Shapiro-Wilk"
-        } else {
-            norm.p <- round(ks.test(phe[, i],"pnorm")$p, 4)
-            test.method <- "Kolmogorov-Smirnov"
+        if (is.null(test.method)) {
+            if (test.method == "auto") {
+                if (length(phe[, i]) <= 5000) {
+                    test.method <- "Shapiro-Wilk"
+                } else {
+                    test.method <- "Kolmogorov-Smirnov"
+                }
+            }
+            
+            if (test.method == "Shapiro-Wilk") {
+                norm.p <- round(shapiro.test(phe[, i])$p, 4)
+            } else if (test.method == "Kolmogorov-Smirnov") {
+                norm.p <- round(ks.test(phe[, i], "pnorm")$p, 4)
+            }
+            
+            text(xx$breaks[1], y = maxY*0.85, labels = paste0(test.method, ": ", norm.p), font = 2, adj = 0)
         }
         
         # draw text
         text(xx$breaks[1], y = maxY*0.95, labels = paste0("Mean: ", round(mean(phe[, i]), 2)), font = 2, adj = 0)
         text(xx$breaks[1], y = maxY*0.90, labels = paste0("  Sd: ", round(sd(phe[, i]), 2)), font = 2, adj = 0)
-        text(xx$breaks[1], y = maxY*0.85, labels = paste0(test.method, ": ", norm.p), font = 2, adj = 0)
         if (file.output && !is.null(file.type)) { dev.off() }
         phe <- phex
     }
