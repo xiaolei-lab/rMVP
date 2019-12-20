@@ -406,5 +406,5 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("End:", as.character(now), "\n", verbose = verbose)
     print_accomplished(width = 60, verbose = verbose)
     
-    return(MVP.return)
+    return(invisible(MVP.return))
 }#end of MVP function
