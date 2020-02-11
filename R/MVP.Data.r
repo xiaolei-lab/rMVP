@@ -659,7 +659,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
     colnames(map) <- c("SNP", "CHROM", "POS", "REF", "ALT")
     if (length(unique(map[, 1])) != nrow(map)) {
         warning("WARNING: SNP is not unique and has been automatically renamed.")
-        map[, 1] <- apply(map[, c(2, 3)], 1, paste, collapse = "-")
+        map[, 1] <- paste(map[, 2], map[, 3], sep = "-")
     }
     allels <- map[, 4:5]
     allels[allels == 0] <- '.'
