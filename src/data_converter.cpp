@@ -443,7 +443,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     
     // write bfile
     for (size_t i = 0; i < m; i++) {
-        #pragma omp parallel for
+        #pragma omp parallel for private(c)
         for (size_t j = 0; j < n; j++) {
             uint8_t p = 0;
             for (size_t x = 0; x < 4 && (4 * j + x) < pMat->ncol(); x++) {
