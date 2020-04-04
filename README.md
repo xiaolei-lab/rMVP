@@ -57,7 +57,7 @@ install.packages("rMVP")
 
 # Or the the development version from GitHub:
 # install.packages("devtools")
-devtools::install_github("XiaoleiLiuBio/rMVP")
+devtools::install_github("xiaolei-lab/rMVP")
 ```
 
 After installed successfully, **MVP** can be loaded by typing
