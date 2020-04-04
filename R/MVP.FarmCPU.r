@@ -232,9 +232,9 @@
             
             #Step 4: Background unit substitution
             if(!isDone){
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,],method=method.sub)
+                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,,drop=FALSE],method=method.sub)
             }else{
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,],method=method.sub.final)
+                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN,,drop=FALSE],method=method.sub.final)
             }
             P=myGLM$P[,ncol(myGLM$P)]
             P[P==0] <- min(P[P!=0], na.rm=TRUE)*0.01
@@ -871,7 +871,7 @@ FarmCPU.LM <-
             results <- lapply(1:m, eff.farmcpu.parallel)
         }
         if(is.list(results)) results <- matrix(unlist(results), m, byrow=TRUE)
-        return(list(P=results[,-c(1,2)], betapred=betapred, B=results[,1], S=results[,2]))
+        return(list(P=results[,-c(1,2),drop=FALSE], betapred=betapred, B=results[,1], S=results[,2]))
     } #end of FarmCPU.LM function
 
 
@@ -964,12 +964,10 @@ FarmCPU.SUB <-
         if(is.null(QTN)) return(NULL)  #QTN is required
         #print("FarmCPU.SUB Started")
         #print(length(QTN))
-        if(length(QTN)==3){
-            QTN=QTN[1]
-        }else{
-            QTN=QTN[,1]
-        }
-        position=match(QTN, GM[,1], nomatch = 0)
+	    
+        QTN=QTN[ , 1, drop=TRUE]
+	    
+        position=match(QTN, GM[,1,drop=FALSE], nomatch = 0)
         nqtn=length(position)
         if(is.numeric(GLM$P)){
             GLM$P = as.matrix(GLM$P)
@@ -979,16 +977,16 @@ FarmCPU.SUB <-
         spot=ncol(GLM$P)
         if(ncol(GLM$P)!=1){
             if(length(index)>1){
-                if(method=="penalty") P.QTN=apply(GLM$P[,index],2,max,na.rm=TRUE)
-                if(method=="reward") P.QTN=apply(GLM$P[,index],2,min,na.rm=TRUE)
-                if(method=="mean") P.QTN=apply(GLM$P[,index],2,mean,na.rm=TRUE)
-                if(method=="median") P.QTN=apply(GLM$P[,index],2,median,na.rm=TRUE)
+                if(method=="penalty") P.QTN=apply(GLM$P[,index,drop=FALSE],2,max,na.rm=TRUE)
+                if(method=="reward") P.QTN=apply(GLM$P[,index,drop=FALSE],2,min,na.rm=TRUE)
+                if(method=="mean") P.QTN=apply(GLM$P[,index,drop=FALSE],2,mean,na.rm=TRUE)
+                if(method=="median") P.QTN=apply(GLM$P[,index,drop=FALSE],2,median,na.rm=TRUE)
                 if(method=="onsite") P.QTN=GLM$P0[(length(GLM$P0)-nqtn+1):length(GLM$P0)]
             }else{
-                if(method=="penalty") P.QTN=max(GLM$P[,index],na.rm=TRUE)
-                if(method=="reward") P.QTN=min(GLM$P[,index],na.rm=TRUE)
-                if(method=="mean") P.QTN=mean(GLM$P[,index],na.rm=TRUE)
-                if(method=="median") P.QTN=median(GLM$P[,index],median,na.rm=TRUE)
+                if(method=="penalty") P.QTN=max(GLM$P[,index,drop=FALSE],na.rm=TRUE)
+                if(method=="reward") P.QTN=min(GLM$P[,index,drop=FALSE],na.rm=TRUE)
+                if(method=="mean") P.QTN=mean(GLM$P[,index,drop=FALSE],na.rm=TRUE)
+                if(method=="median") P.QTN=median(GLM$P[,index,drop=FALSE],median,na.rm=TRUE)
                 if(method=="onsite") P.QTN=GLM$P0[(length(GLM$P0)-nqtn+1):length(GLM$P0)]
             }
             #replace SNP pvalues with QTN pvalue
@@ -1027,7 +1025,7 @@ FarmCPU.Remove <-
         n=length(seqQTN)
         #fielter bins by physical location
         
-        binmap=GM[seqQTN,]
+        binmap=GM[seqQTN,,drop=FALSE]
         
         cb=as.numeric(binmap[,2])*hugeNum+as.numeric(binmap[,3])#create ID for chromosome and bp
         cb.unique=unique(cb)
@@ -1060,7 +1058,7 @@ FarmCPU.Remove <-
         if(is.big.matrix(GDP)){
             x=t(as.matrix(deepcopy(GDP,rows=seqQTN,cols=index) ))
         }else{
-            x=t(GDP[seqQTN,index] )
+            x=t(GDP[seqQTN,index,drop=FALSE] )
         }
         
         r=cor(as.matrix(x))
@@ -1084,7 +1082,7 @@ FarmCPU.Remove <-
         if(is.big.matrix(GDP)){
             bin=t(as.matrix(deepcopy(GDP,rows=seqQTN,) ))
         }else{
-            bin=t(GDP[seqQTN,] )
+            bin=t(GDP[seqQTN,,drop=FALSE] )
         }
         
         binmap=GM[seqQTN,]
