@@ -977,16 +977,16 @@ FarmCPU.SUB <-
         spot=ncol(GLM$P)
         if(ncol(GLM$P)!=1){
             if(length(index)>1){
-                if(method=="penalty") P.QTN=apply(GLM$P[,index,drop=FALSE],2,max,na.rm=TRUE)
-                if(method=="reward") P.QTN=apply(GLM$P[,index,drop=FALSE],2,min,na.rm=TRUE)
-                if(method=="mean") P.QTN=apply(GLM$P[,index,drop=FALSE],2,mean,na.rm=TRUE)
-                if(method=="median") P.QTN=apply(GLM$P[,index,drop=FALSE],2,median,na.rm=TRUE)
+                if(method=="penalty") P.QTN=apply(GLM$P[,index],2,max,na.rm=TRUE)
+                if(method=="reward") P.QTN=apply(GLM$P[,index],2,min,na.rm=TRUE)
+                if(method=="mean") P.QTN=apply(GLM$P[,index],2,mean,na.rm=TRUE)
+                if(method=="median") P.QTN=apply(GLM$P[,index],2,median,na.rm=TRUE)
                 if(method=="onsite") P.QTN=GLM$P0[(length(GLM$P0)-nqtn+1):length(GLM$P0)]
             }else{
-                if(method=="penalty") P.QTN=max(GLM$P[,index,drop=FALSE],na.rm=TRUE)
-                if(method=="reward") P.QTN=min(GLM$P[,index,drop=FALSE],na.rm=TRUE)
-                if(method=="mean") P.QTN=mean(GLM$P[,index,drop=FALSE],na.rm=TRUE)
-                if(method=="median") P.QTN=median(GLM$P[,index,drop=FALSE],median,na.rm=TRUE)
+                if(method=="penalty") P.QTN=max(GLM$P[,index],na.rm=TRUE)
+                if(method=="reward") P.QTN=min(GLM$P[,index],na.rm=TRUE)
+                if(method=="mean") P.QTN=mean(GLM$P[,index],na.rm=TRUE)
+                if(method=="median") P.QTN=median(GLM$P[,index],median,na.rm=TRUE)
                 if(method=="onsite") P.QTN=GLM$P0[(length(GLM$P0)-nqtn+1):length(GLM$P0)]
             }
             #replace SNP pvalues with QTN pvalue
@@ -1025,7 +1025,7 @@ FarmCPU.Remove <-
         n=length(seqQTN)
         #fielter bins by physical location
         
-        binmap=GM[seqQTN,,drop=FALSE]
+        binmap=GM[seqQTN,]
         
         cb=as.numeric(binmap[,2])*hugeNum+as.numeric(binmap[,3])#create ID for chromosome and bp
         cb.unique=unique(cb)
