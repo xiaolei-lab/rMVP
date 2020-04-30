@@ -40,7 +40,7 @@
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
 #' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
-#' @param method.bin EMMA or FaSTLMM
+#' @param method.bin 'static' or 'FaST-LMM'
 #' @param bin.size window size in genome
 #' @param bin.selection a vector, how many windows selected
 #' @param maxLoop maximum number of iterations
