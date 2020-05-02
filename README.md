@@ -5,7 +5,7 @@
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
-<img src="results/mvp_logo.png" height="180px" width="370px">
+<img src="results/mvp_logo.png" height="190px" width="370px">
 </a>
 </p>
 
@@ -558,7 +558,7 @@ imMVP <- MVP(
     #ncpus=10,
     vc.method="BRENT",
     maxLoop=10,
-    method.bin="FaST-LMM",#"FaST-LMM", "static"
+    method.bin="EMMA",# "EMMA", "FaST-LMM", "static"
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
@@ -585,7 +585,7 @@ for(i in 2:ncol(phenotype)){
     #ncpus=10,
     vc.method="BRENT",
     maxLoop=10,
-    method.bin="FaST-LMM",#"FaST-LMM","EMMA", "static"
+    method.bin="EMMA",#"FaST-LMM","EMMA", "static"
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
