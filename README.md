@@ -52,11 +52,13 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 
 ## Installation
 
-``` r
+* The stable version: 
+```R
 install.packages("rMVP")
+```
 
-# Or the the development version from GitHub:
-# install.packages("devtools")
+* The latest version: 
+```R
 devtools::install_github("xiaolei-lab/rMVP")
 ```
 
