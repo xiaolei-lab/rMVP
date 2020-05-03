@@ -50,8 +50,6 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 
 **WE STRONGLY RECOMMEND TO INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**  
 
-## Installation
-
 * The stable version: 
 ```R
 install.packages("rMVP")
