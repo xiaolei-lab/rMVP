@@ -191,7 +191,8 @@ MVP.Report <- function(
 		legend.cex=1,
 		legend.y.intersp=1,
 		legend.x.intersp=1,
-		plot=TRUE
+		plot=TRUE,
+		dpi=NULL
 	)
 	{
 		if(is.null(legend.min))	legend.min = 1
@@ -250,8 +251,9 @@ MVP.Report <- function(
 			}
 			col.index[[i]][col.index[[i]] < legend.min] <- legend.min
 			col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
-			if(plot)	segments(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]], width/5 - band * (i - length(chr.num) - 1), 
-			col=col[round(col.index[[i]] * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1], lwd=1)
+			is_visable <-  filter.points(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), 9, 6, dpi = dpi)
+			if(plot)	segments(pos.x[[i]][is_visable], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]][is_visable], width/5 - band * (i - length(chr.num) - 1), 
+			col=col[round(col.index[[i]] * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1][is_visable], lwd=1)
 		}
 		if(length(map.xy.index) != 0){
 			for(i in 1:length(chr.xy)){
@@ -329,22 +331,20 @@ MVP.Report <- function(
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
 
 	taxa=colnames(Pmap)[-c(1:3)]
-	if(!is.null(memo) && memo != "")	memo <- paste("_", memo, sep="")
 	if(length(taxa) == 0)	taxa <- paste("Col", 1:(ncol(Pmap)-3), sep="")
-	taxa <- paste(taxa, memo, sep="")
 
 	#SNP-Density plot
 	if("d" %in% plot.type){
-		if(verbose)	cat("SNP_Density Plotting...\n")
+		if(verbose)	logging.log("SNP_Density Plotting", "\n", verbose = verbose)
 		if(file.output){
-			ht=ifelse(is.null(height), 7, height)
+			ht=ifelse(is.null(height), 6, height)
 			wh=ifelse(is.null(width), 9, width)
-			if(file=="jpg")	jpeg(paste(outpath, "/SNP_Density.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-			if(file=="pdf")	pdf(paste(outpath, "/SNP_Density.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-			if(file=="tiff")	tiff(paste(outpath, "/SNP_Density.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+			if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".SNP-Density.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+			if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".SNP-Density.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+			if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".SNP-Density.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
 			par(xpd=TRUE)
 		}else{
-			ht=ifelse(is.null(height), 7, height)
+			ht=ifelse(is.null(height), 6, height)
 			wh=ifelse(is.null(width), 9, width)
 			if(is.null(dev.list()))	dev.new(width = wh,height=ht)
 			par(xpd=TRUE)
@@ -353,7 +353,7 @@ MVP.Report <- function(
 			if(length(bin.range) != 2)	stop("Two values (min and max) should be provided for bin.range!")
 			if(bin.range[1] == 0)	stop("Min value of bin.range should be more than 1!")
 		}
-		Densitplot(map=Pmap[,c(1:3)], chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
+		Densitplot(map=Pmap[,c(1:3)], chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""), dpi=dpi)
 		if(file.output)	dev.off()
 	}
 
@@ -559,9 +559,9 @@ MVP.Report <- function(
 		if(file.output){
 			ht=ifelse(is.null(height), 10, height)
 			wh=ifelse(is.null(width), 10, width)
-			if(file=="jpg")	jpeg(paste(outpath, "/Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-			if(file=="pdf")	pdf(paste(outpath, "/Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-			if(file=="tiff")	tiff(paste(outpath, "/Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+			if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".Circular-Manhattan.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+			if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".Circular-Manhattan.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+			if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".Circular-Manhattan.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
 			par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
 		}
 		if(!file.output){
@@ -594,7 +594,7 @@ MVP.Report <- function(
 			#debug
 			#print(colx)
 			
-			if(verbose)	cat(paste("Circular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
+			if(verbose)	logging.log(paste("Circular_Manhattan Plotting ",taxa[i],sep=""), "\n", verbose = verbose)
 			pvalue <- pvalueT[,i]
 			logpvalue <- logpvalueT[,i]
 			if(is.null(ylim)){
@@ -659,7 +659,7 @@ MVP.Report <- function(
 							(RR)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
-							col=density.list$den.col, lwd=0.1
+							col=density.list$den.col, lwd=0.5
 						)
 						legend(
 							x=RR+4*cir.chr.h,
@@ -688,7 +688,8 @@ MVP.Report <- function(
 				
 				X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
 				Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				is_visable <- filter.points(X, Y, 10, 10, dpi = dpi)
+				points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[is_visable])
 				
 				#plot the legend for each trait
 				if(cir.legend==TRUE){
@@ -878,7 +879,7 @@ MVP.Report <- function(
 							(RR)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2))/TotalN),
 							(RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2))/TotalN),
-							col=density.list$den.col, lwd=0.1
+							col=density.list$den.col, lwd=0.5
 						)
 						legend(
 							x=RR+4*cir.chr.h,
@@ -904,7 +905,8 @@ MVP.Report <- function(
 				
 				X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
 				Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				is_visable <- filter.points(X, Y, 10, 10, dpi = dpi)
+				points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[is_visable])
 				
 				if(cir.legend==TRUE){
 					
@@ -1056,14 +1058,14 @@ MVP.Report <- function(
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				if(verbose)	cat(paste("Rectangular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	logging.log(paste("Rectangular_Manhattan Plotting ",taxa[i],sep=""), "\n", verbose = verbose)
 					if(file.output){
 						ht=ifelse(is.null(height), 6, height)
 						wh=ifelse(is.null(width), 14, width)
-						if(file=="jpg")	jpeg(paste(outpath, "/Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-						if(file=="pdf")	pdf(paste(outpath, "/Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = wh,height=ht)
-						if(file=="tiff")	tiff(paste(outpath, "/Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-						par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
+						if(file=="jpg")	jpeg(paste(outpath, "/", taxa[i], ".Rectangular-Manhattan.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+						if(file=="pdf")	pdf(paste(outpath, "/", taxa[i], ".Rectangular-Manhattan.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+						if(file=="tiff")	tiff(paste(outpath, "/", taxa[i], ".Rectangular-Manhattan.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+						par(mar = c(5,6,4,5),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 					}
 					if(!file.output){
 						ht=ifelse(is.null(height), 6, height)
@@ -1074,6 +1076,7 @@ MVP.Report <- function(
 					
 					pvalue=pvalueT[,i]
 					logpvalue=logpvalueT[,i]
+					is_visable <- filter.points(pvalue.posN, logpvalue, 14, 6, dpi = dpi)
 					if(is.null(ylim)){
 						if(!is.null(threshold)){
 							if(sum(threshold!=0)==length(threshold)){
@@ -1116,18 +1119,18 @@ MVP.Report <- function(
 						}
 						if((Max-Min)<=1){
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ylab=ylab,
+								plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ylab=ylab,
 									cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
+								plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 							}
 						}else{
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ylab=ylab,
+								plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
+								plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 							}
 						}
@@ -1135,10 +1138,10 @@ MVP.Report <- function(
 						Max <- max_no_na(ylim)
 						Min <- min_no_na(ylim)
 						if(cir.density){
-							plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ylab=ylab,
+							plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable],logpvalue[logpvalue>=min_no_na(ylim) & is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable],xlim=c(min_no_na(pvalue.posN)-band,1.01*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 						}else{
-							plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ylab=ylab,
+							plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable],logpvalue[logpvalue>=min_no_na(ylim) & is_visable],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ylab=ylab,
 							cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 						}
 					}
@@ -1253,13 +1256,13 @@ MVP.Report <- function(
 								ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
 								col="grey", border="grey")
 						}
-						
+						is_visable <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, 14, 6, dpi = dpi)
 						segments(
-							pvalue.posN,
+							pvalue.posN[is_visable],
 							ymin-0.5*(Max-Min)/den.fold,
-							pvalue.posN,
+							pvalue.posN[is_visable],
 							ymin-1.5*(Max-Min)/den.fold,
-							col=density.list$den.col, lwd=0.1
+							col=density.list$den.col[is_visable], lwd=0.5
 						)
 						legend(
 							x=max_no_na(pvalue.posN)+band,
@@ -1283,9 +1286,9 @@ MVP.Report <- function(
 			if(file.output){
 				ht=ifelse(is.null(height), 6, height)
 				wh=ifelse(is.null(width), 14, width)
-				if(file=="jpg")	jpeg(paste(outpath, "/Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
-				if(file=="pdf")	pdf(paste(outpath, "/Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht*R)
-				if(file=="tiff")	tiff(paste(outpath, "/Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
+				if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-Manhattan.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-Manhattan.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht*R)
+				if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-Manhattan.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
 				par(mfcol=c(R,1),mar=c(0+cex.lab, 6+cex.lab, 0, 2+cex.lab),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 			}
 			if(!file.output){
@@ -1295,11 +1298,12 @@ MVP.Report <- function(
 				par(xpd=TRUE)
 			}
 			for(i in 1:R){
-				if(verbose)	cat(paste("Multracks_Rectangular Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	logging.log(paste("Multracks_Rectangular Plotting ",taxa[i],sep=""), "\n", verbose = verbose)
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
 				pvalue=pvalueT[,i]
 				logpvalue=logpvalueT[,i]
+				is_visable <- filter.points(pvalue.posN, logpvalue, 14, 6, dpi = dpi)
 				if(is.null(ylim)){
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
@@ -1341,16 +1345,16 @@ MVP.Report <- function(
 						}
 					}
 					if((Max-Min)<=1){
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
+						plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
+						plot(pvalue.posN[is_visable],logpvalue[is_visable],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
 					}
 				}else{
 					Max <- max_no_na(ylim)
 					Min <- min_no_na(ylim)
-					plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
+					plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable],logpvalue[logpvalue>=min_no_na(ylim) & is_visable],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=1,axes=FALSE,xlab="")
 				}
 				# Max1 <- Max
@@ -1463,10 +1467,10 @@ MVP.Report <- function(
 			if(file.output){
 				ht=ifelse(is.null(height), 6, height)
 				wh=ifelse(is.null(width), 14, width)
-				if(file=="jpg")	jpeg(paste(outpath, "/Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-				if(file=="pdf")	pdf(paste(outpath, "/Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-				if(file=="tiff")	tiff(paste(outpath, "/Multraits.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-				par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
+				if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-Manhattan.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-Manhattan.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+				if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-Manhattan.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+				par(mar = c(5,6,4,5),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 			}
 			if(!file.output){
 				ht=ifelse(is.null(height), 6, height)
@@ -1588,8 +1592,15 @@ MVP.Report <- function(
 			}
 			do <- TRUE
 			sam.index <- list()
+			trait_max_n <- 0
+			trait_max <- 0
 			for(l in 1:R){
-				sam.index[[l]] <- 1:nrow(Pmap)
+				is_visable <- filter.points(pvalue.posN, logpvalueT[ ,l], 14, 6, dpi = dpi)
+				sam.index[[l]] <- c(1:nrow(Pmap))[is_visable]
+				if(length(sam.index[[l]]) >= trait_max_n){
+					trait_max_n = length(sam.index[[l]])
+					trait_max = l
+				}
 			}
 			
 			#change the sample number according to Pmap
@@ -1598,26 +1609,30 @@ MVP.Report <- function(
 			cat_bar <- seq(1, 100, 1)
 			while(do){
 				for(i in 1:R){
-					if(length(sam.index[[i]]) < sam.num){
-						plot.index <- sam.index[[i]]
+					if(length(sam.index[[i]]) == 0){
+						# nothing
 					}else{
-						plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
+						if(length(sam.index[[i]]) < sam.num){
+							plot.index <- sam.index[[i]]
+						}else{
+							plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
+						}
+						sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
+						logpvalue=logpvalueT[plot.index,i]
+						if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim)}else{indexx <- 1:length(logpvalue)}
+						points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+						#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 					}
-					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
-					logpvalue=logpvalueT[plot.index,i]
-					if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim)}else{indexx <- 1:length(logpvalue)}
-					points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
-					#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 				}
 				if(verbose){
-					progress <- round((nrow(Pmap) - length(sam.index[[i]])) * 100 / nrow(Pmap))
+					progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
 					if(progress %in% cat_bar){
-						cat("Multraits_Rectangular Plotting...(finished ", progress, "%)\r", sep="")
+						if(verbose)	cat("Multraits_Rectangular Plotting...(finished ", progress, "%)\r", sep="")
 						cat_bar <- cat_bar[cat_bar != progress]
-						if(progress == 100)	cat("\n")
+						if(progress == 100 & verbose)	cat("\n")
 					}
 				}
-				if(length(sam.index[[i]]) == 0) do <- FALSE
+				if(length(sam.index[[trait_max]]) == 0) do <- FALSE
 			}
 			
 			# for(i in 1:R){
@@ -1641,13 +1656,13 @@ MVP.Report <- function(
 								ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
 								col="grey", border="grey")
 						}
-						
+						is_visable <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, 14, 6, dpi = dpi)
 						segments(
-							pvalue.posN,
+							pvalue.posN[is_visable],
 							ymin-0.5*(Max-Min)/den.fold,
-							pvalue.posN,
+							pvalue.posN[is_visable],
 							ymin-1.5*(Max-Min)/den.fold,
-							col=density.list$den.col, lwd=0.1
+							col=density.list$den.col[is_visable], lwd=0.5
 						)
 						legend(
 							x=max_no_na(pvalue.posN)+band,
@@ -1670,20 +1685,20 @@ MVP.Report <- function(
 		if(multracks){
 			if(file.output){
 				ht=ifelse(is.null(height), 5.5, height)
-				wh=ifelse(is.null(width), 2.5, width)
-				if(file=="jpg")	jpeg(paste(outpath, "/Multracks.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-				if(file=="pdf")	pdf(paste(outpath, "/Multracks.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = R*wh,height=ht)
-				if(file=="tiff")	tiff(paste(outpath, "/Multracks.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
+				wh=ifelse(is.null(width), 3.5, width)
+				if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-QQplot.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-QQplot.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = R*wh,height=ht)
+				if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".Multracks-QQplot.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
 				par(mfcol=c(1,R),mar = c(0,1,4,1.5),oma=c(3,5,0,0),xpd=TRUE)
 			}else{
 				ht=ifelse(is.null(height), 5.5, height)
-				wh=ifelse(is.null(width), 2.5, width)
+				wh=ifelse(is.null(width), 3.5, width)
 				if(is.null(dev.list()))	dev.new(width = wh*R, height = ht)
 				par(xpd=TRUE)
 			}
 			log.Quantiles.max_no_na <- NULL
 			for(i in 1:R){
-				if(verbose)	cat(paste("Multracks_QQ Plotting ",taxa[i],"...\n",sep=""))		
+				if(verbose)	logging.log(paste("Multracks_QQ Plotting ",taxa[i],sep=""), "\n", verbose = verbose)		
 				P.values=as.numeric(Pmap[,i+2])
 				P.values=P.values[!is.na(P.values)]
 				if(LOG10){
@@ -1734,7 +1749,8 @@ MVP.Report <- function(
 				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
 				
 				if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
-				points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
+				is_visable <- filter.points(log.Quantiles, log.P.values, 3.5, 5.5, dpi = dpi)
+				points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						thre.line=-log10(min_no_na(threshold))
@@ -1761,9 +1777,9 @@ MVP.Report <- function(
 				if(file.output){
 					ht=ifelse(is.null(height), 5.5, height)
 					wh=ifelse(is.null(width), 5.5, width)
-					if(file=="jpg")	jpeg(paste(outpath, "/Multraits.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-					if(file=="pdf")	pdf(paste(outpath, "/Multraits.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-					if(file=="tiff")	tiff(paste(outpath, "/Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+					if(file=="jpg")	jpeg(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-QQplot.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+					if(file=="pdf")	pdf(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-QQplot.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+					if(file=="tiff")	tiff(paste(outpath, "/", paste(taxa, collapse="."), ".Multraits-QQplot.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
 					par(mar = c(5,5,4,2),xpd=TRUE)
 				}else{	
 					ht=ifelse(is.null(height), 5.5, height)
@@ -1802,7 +1818,7 @@ MVP.Report <- function(
 				axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
 				
 				for(i in 1:R){
-					if(verbose)	cat(paste("Multraits_QQ Plotting ",taxa[i],"...\n",sep=""))
+					if(verbose)	logging.log(paste("Multraits_QQ Plotting ",taxa[i],sep=""), "\n", verbose = verbose)
 					P.values=as.numeric(Pmap[,i+2])
 					P.values=P.values[!is.na(P.values)]
 					if(LOG10){
@@ -1844,7 +1860,8 @@ MVP.Report <- function(
 				
 						
 					if((i == 1) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
-					points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
+					is_visable <- filter.points(log.Quantiles, log.P.values, 5.5, 5.5, dpi = dpi)
+					points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
 						
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
@@ -1870,13 +1887,13 @@ MVP.Report <- function(
 			}
 		}else{
 			for(i in 1:R){
-				if(verbose)	cat(paste("Q_Q Plotting ",taxa[i],"...\n",sep=""))
+				if(verbose)	logging.log(paste("Q_Q Plotting ",taxa[i],sep=""), "\n", verbose = verbose)
 				if(file.output){
 					ht=ifelse(is.null(height), 5.5, height)
 					wh=ifelse(is.null(width), 5.5, width)
-					if(file=="jpg")	jpeg(paste(outpath, "/QQplot.",taxa[i],".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-					if(file=="pdf")	pdf(paste(outpath, "/QQplot.",taxa[i],".pdf",sep=""), width = wh,height=ht)
-					if(file=="tiff")	tiff(paste(outpath, "/QQplot.",taxa[i],".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+					if(file=="jpg")	jpeg(paste(outpath, "/", taxa[i], ".QQplot.", memo, ifelse(is.null(memo), "jpg", ".jpg"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+					if(file=="pdf")	pdf(paste(outpath, "/", taxa[i], ".QQplot.", memo, ifelse(is.null(memo), "pdf", ".pdf"),sep=""), width = wh,height=ht)
+					if(file=="tiff")	tiff(paste(outpath, "/", taxa[i], ".QQplot.", memo, ifelse(is.null(memo), "tiff", ".tiff"),sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
 					par(mar = c(5,5,4,2),xpd=TRUE)
 				}else{
 					ht=ifelse(is.null(height), 5.5, height)
@@ -1932,7 +1949,9 @@ MVP.Report <- function(
 				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
 				
 				if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
-				points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
+				
+				is_visable <- filter.points(log.Quantiles, log.P.values, 5.5, 5.5, dpi = dpi)
+				points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
 				
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
@@ -1957,7 +1976,6 @@ MVP.Report <- function(
 			}
 		}
 	}
-	if(file.output & verbose)	cat(paste("Plots are stored in: ", getwd(), sep=""), "\n")
 }
 
 Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP Density", bin = 1e6,
@@ -2199,8 +2217,8 @@ MVP.Report.Density <- function(Pmap, col = c("darkgreen", "yellow", "red"), dpi 
 }
 
 filter.points <- function(x, y, w, h, dpi=300, scale=1) {
-    x <- ceiling((x - min(x)) / (max(x) - min(x)) * w * dpi / scale)
-    y <- ceiling((y - min(y)) / (max(y) - min(y)) * h * dpi / scale)
+    x <- ceiling((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)) * w * dpi / scale)
+    y <- ceiling((y - min(y, na.rm = TRUE)) / (max(y, na.rm = TRUE) - min(y, na.rm = TRUE)) * h * dpi / scale)
     index <- !duplicated(cbind(x, y))
 }
 
@@ -2417,7 +2435,7 @@ MVP.Hist <-
                      "darkgoldenrod1",
                      "purple4"),
              breakNum = 15,
-             memo = TRUE,
+             memo = NULL,
              outpath = getwd(), 
              test.method = "auto",
              file.type = "pdf",
@@ -2431,7 +2449,12 @@ MVP.Hist <-
     for (i in 2:ncol(phe)) {
         # create file
         trait <- colnames(phe)[i]
-        name  <- file.path(outpath, paste0(memo, ".Phe_Distribution.", paste(trait, collapse = "_")))
+        if(is.null(memo)){
+        	name  <- file.path(outpath, paste(trait, "Phe_Dist", sep = "."))
+    	}else{
+    		name  <- file.path(outpath, paste(trait, "Phe_Dist", memo, sep = "."))
+    	}
+        
         
         if (file.output && !is.null(file.type)) {
             if (file.type == "jpg") { jpeg(paste0(name, ".jpg"), width = w * dpi, height = h * dpi, res = dpi, quality = 100) }

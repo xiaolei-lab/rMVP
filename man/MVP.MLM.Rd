@@ -5,8 +5,7 @@
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
 MVP.MLM(phe, geno, K = NULL, eigenK = NULL, CV = NULL, REML = NULL,
-  cpu = 1, bar = TRUE, vc.method = c("BRENT", "EMMA", "HE"),
-  verbose = TRUE)
+  cpu = 1, vc.method = c("BRENT", "EMMA", "HE"), verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
@@ -23,8 +22,6 @@ MVP.MLM(phe, geno, K = NULL, eigenK = NULL, CV = NULL, REML = NULL,
 
 \item{cpu}{number of cpus used for parallel computation}
 
-\item{bar}{whether to show the progress bar}
-
 \item{vc.method}{the methods for estimating variance component("emma" or "he" or "brent")}
 
 \item{verbose}{whether to print detail.}
@@ -40,11 +37,12 @@ Last update: Aug 30, 2016
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 idx <- !is.na(phenotype[, 2])
+idx <- !is.na(phenotype[, 2])
 phenotype <- phenotype[idx, ]
 print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
-genotype <- genotype[, idx]
+genotype <- deepcopy(genotype, cols=idx)
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype)
 

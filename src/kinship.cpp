@@ -1,7 +1,3 @@
-#if !defined(ARMA_64BIT_WORD)
-#define ARMA_64BIT_WORD 1
-#endif
-
 #include <RcppArmadillo.h>
 #include <omp.h>
 #include <iostream>

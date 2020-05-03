@@ -363,8 +363,7 @@ MatrixXd conjugate_gradient(const MatrixXd& A, const VectorXd& b, int maxit, dou
   double rsold;
   double rsnew;
   double alpha;
-  int iters = maxit; 
-  
+ 
   r = b; 
   p = r;
   rsold = r.squaredNorm();
@@ -376,7 +375,6 @@ MatrixXd conjugate_gradient(const MatrixXd& A, const VectorXd& b, int maxit, dou
     r = r - (alpha * Ap.array()).matrix();
     rsnew = r.squaredNorm();
     if (sqrt(rsnew) < tol) {
-      iters = i;
       break;
     }
     p = r + ((rsnew / rsold) * p.array()).matrix();

@@ -6,9 +6,9 @@
 \usage{
 MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
   method.sub = "reward", method.sub.final = "reward",
-  method.bin = "static", bin.size = c(5e+05, 5e+06, 5e+07),
-  bin.selection = seq(10, 100, 10), memo = "MVP.FarmCPU",
-  Prior = NULL, ncpus = 2, bar = TRUE, maxLoop = 10,
+  method.bin = c("EMMA", "static", "FaST-LMM"), bin.size = c(5e+05,
+  5e+06, 5e+07), bin.selection = seq(10, 100, 10),
+  memo = "MVP.FarmCPU", Prior = NULL, ncpus = 2, maxLoop = 10,
   threshold.output = 0.01, converge = 1, iteration.output = FALSE,
   p.threshold = NA, QTN.threshold = 0.01, bound = NULL,
   verbose = TRUE)
@@ -28,7 +28,7 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
 
 \item{method.sub.final}{method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'}
 
-\item{method.bin}{method for selecting the most appropriate bins, two options: 'EMMA' or 'FaSTLMM'}
+\item{method.bin}{method for selecting the most appropriate bins, three options: 'static', 'EMMA' or 'FaST-LMM'}
 
 \item{bin.size}{bin sizes for all iterations, a vector, the bin size is always from large to small}
 
@@ -39,8 +39,6 @@ MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
 \item{Prior}{prior information, four columns, which are SNP_ID, Chr, Pos, P-value}
 
 \item{ncpus}{number of threads used for parallele computation}
-
-\item{bar}{if TRUE, the progress bar will be drawn on the terminal}
 
 \item{maxLoop}{maximum number of iterations}
 
@@ -74,12 +72,12 @@ phenotype <- phenotype[idx, ]
 print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
-genotype <- genotype[, idx]
+genotype <- deepcopy(genotype, cols=idx)
 print(dim(genotype))
 mapPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.map", package = "rMVP")
 map <- read.table(mapPath , head = TRUE)
 
-farmcpu <- MVP.FarmCPU(phe=phenotype, geno=genotype, map=map, maxLoop=2)
+farmcpu <- MVP.FarmCPU(phe=phenotype,geno=genotype,map=map,maxLoop=2,method.bin="static")
 str(farmcpu)
 
 }

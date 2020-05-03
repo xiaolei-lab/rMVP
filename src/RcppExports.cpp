@@ -7,6 +7,51 @@
 
 using namespace Rcpp;
 
+// getRow
+NumericVector getRow(SEXP pBigMat, const int row);
+RcppExport SEXP _rMVP_getRow(SEXP pBigMatSEXP, SEXP rowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< const int >::type row(rowSEXP);
+    rcpp_result_gen = Rcpp::wrap(getRow(pBigMat, row));
+    return rcpp_result_gen;
+END_RCPP
+}
+// glm_c
+SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, SEXP pBigMat, const bool verbose, const int threads);
+RcppExport SEXP _rMVP_glm_c(SEXP ySEXP, SEXP XSEXP, SEXP iXXSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type iXX(iXXSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(glm_c(y, X, iXX, pBigMat, verbose, threads));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mlm_c
+SEXP mlm_c(const arma::vec y, const arma::mat X, const arma::mat U, const double vgs, SEXP pBigMat, const bool verbose, const int threads);
+RcppExport SEXP _rMVP_mlm_c(SEXP ySEXP, SEXP XSEXP, SEXP USEXP, SEXP vgsSEXP, SEXP pBigMatSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type U(USEXP);
+    Rcpp::traits::input_parameter< const double >::type vgs(vgsSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mlm_c(y, X, U, vgs, pBigMat, verbose, threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vcf_parser_map
 List vcf_parser_map(std::string vcf_file, std::string out);
 RcppExport SEXP _rMVP_vcf_parser_map(SEXP vcf_fileSEXP, SEXP outSEXP) {
@@ -175,6 +220,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rMVP_getRow", (DL_FUNC) &_rMVP_getRow, 2},
+    {"_rMVP_glm_c", (DL_FUNC) &_rMVP_glm_c, 6},
+    {"_rMVP_mlm_c", (DL_FUNC) &_rMVP_mlm_c, 7},
     {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
     {"_rMVP_vcf_parser_genotype", (DL_FUNC) &_rMVP_vcf_parser_genotype, 5},
     {"_rMVP_hapmap_parser_map", (DL_FUNC) &_rMVP_hapmap_parser_map, 2},

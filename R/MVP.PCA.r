@@ -67,7 +67,7 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbo
         K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
     }
 
-    logging.log("Eigen Decomposition", "\n", verbose = verbose)
+    logging.log("Eigen Decomposition on Genomic Relationship Matrix", "\n", verbose = verbose)
     if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
     logging.log("Deriving PCs successfully", "\n", verbose = verbose)

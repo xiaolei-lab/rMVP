@@ -65,7 +65,8 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     // Write inds to file.
     boost::split(ind, line, boost::is_any_of("\t"));
     vector<string>(ind.begin() + 9, ind.end()).swap(ind);   // delete first 9 columns
-    for (int i = 0; i < ind.size(); i++) {
+    int indn = ind.size();
+    for (int i = 0; i < indn; i++) {
         indfile << ind[i] << endl;
     }
     n = ind.size();
@@ -146,7 +147,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
             }
         }
         #pragma omp parallel for private(l, markers)
-        for (int i = 0; i < buffer.size(); i++) {
+        for (std::size_t i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of("\t"));
             markers.clear();
             // There is only one char in REF and ALT
@@ -162,7 +163,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
             //     fill_n(markers.begin(), l.size() - 9, NA_C);
             // }
             
-            for (int j = 0; j < markers.size(); j++) {
+            for (std::size_t j = 0; j < markers.size(); j++) {
                 mat[j][m + i] = markers[j];
             }
             progress.increment();
@@ -225,7 +226,7 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         // Write inds to file.
         boost::split(ind, line, boost::is_any_of("\t"));
         vector<string>(ind.begin() + 11, ind.end()).swap(ind);   // delete first 11 columns
-        for (int i = 0; i < ind.size(); i++) {
+        for (size_t i = 0; i < ind.size(); i++) {
             indfile << ind[i] << endl;
         }
         n = ind.size();
@@ -333,7 +334,7 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
         }
         // Rcout << "buffer.size()\t" << buffer.size() << endl;
         #pragma omp parallel for private(l, markers)
-        for (int i = 0; i < buffer.size(); i++) {
+        for (std::size_t i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of("\t"));
             major = l[1][0];
             if (l[1].length() > 3) {
@@ -348,7 +349,7 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
                 boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
             );
             // Rcout << m << '\t' << i << endl;
-            for (int j = 0; j < markers.size(); j++) {
+            for (std::size_t j = 0; j < markers.size(); j++) {
                 // Rcout << int(markers[j]) << '\t';
                 mat[j][m + i] = markers[j];
             }
@@ -417,8 +418,9 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     // define
     T c;
     omp_setup(threads, verbose);
-    long m = pMat->nrow();
-    long n = pMat->ncol() / 4;  // 4 individual = 1 bit
+    int m = pMat->nrow();
+    int nind = pMat->ncol();
+    int n = pMat->ncol() / 4;  // 4 individual = 1 bit
     if (pMat->ncol() % 4 != 0) 
         n++;
     
@@ -442,11 +444,11 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     code[static_cast<T>(NA_C)] = 1;
     
     // write bfile
-    for (size_t i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++) {
         #pragma omp parallel for private(c)
-        for (size_t j = 0; j < n; j++) {
+        for (int j = 0; j < n; j++) {
             uint8_t p = 0;
-            for (size_t x = 0; x < 4 && (4 * j + x) < pMat->ncol(); x++) {
+            for (int x = 0; x < 4 && (4 * j + x) < nind; x++) {
                 c = mat[4 * j + x][i];
                 p |= code[c] << (x*2);
             }
@@ -486,7 +488,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // define
     omp_setup(threads, verbose);
-    long ind = pMat->ncol();
+    size_t ind = pMat->ncol();
     long n = ind / 4;  // 4 individual = 1 bit
     if (ind % 4 != 0) 
         n++; 
@@ -517,16 +519,15 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     Progress progress(n_block, verbose);
     
     // magic number of bfile
-    size_t n_bytes_read = 0;
     buffer = new char [3];
-    n_bytes_read = fread(buffer, 1, 3, fin);
+    fread(buffer, 1, 3, fin);
     
     // loop file
     size_t cond;
     long block_start;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
-        n_bytes_read = fread(buffer, 1, buffer_size, fin);
+        fread(buffer, 1, buffer_size, fin);
         
         // i: current block, j: current bit.
         block_start = i * buffer_size;

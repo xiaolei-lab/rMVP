@@ -11,10 +11,10 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
   "HE"), method = c("GLM", "MLM", "FarmCPU"), p.threshold = NA,
   QTN.threshold = 0.01, method.bin = "static", bin.size = c(5e+05,
   5e+06, 5e+07), bin.selection = seq(10, 100, 10), maxLoop = 10,
-  permutation.threshold = FALSE, permutation.rep = 100, bar = TRUE,
-  memo = "MVP", outpath = getwd(), col = c("dodgerblue4",
-  "olivedrab4", "violetred", "darkgoldenrod1", "purple4"),
-  file.output = TRUE, file.type = "jpg", dpi = 300,
+  permutation.threshold = FALSE, permutation.rep = 100, memo = NULL,
+  outpath = getwd(), col = c("#4197d8", "#f8c120", "#413496",
+  "#495226", "#d60b6f", "#e66519", "#d581b7", "#83d3ad", "#7c162c",
+  "#26755d"), file.output = TRUE, file.type = "jpg", dpi = 300,
   threshold = 0.05, verbose = TRUE)
 }
 \arguments{
@@ -52,7 +52,7 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 
 \item{QTN.threshold}{in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs}
 
-\item{method.bin}{EMMA or FaSTLMM}
+\item{method.bin}{'static' or 'FaST-LMM'}
 
 \item{bin.size}{window size in genome}
 
@@ -63,8 +63,6 @@ MVP(phe, geno, map, K = NULL, nPC.GLM = NULL, nPC.MLM = NULL,
 \item{permutation.threshold}{if use a permutation cutoff or not (bonferroni cutoff)}
 
 \item{permutation.rep}{number of permutation replicates}
-
-\item{bar}{if TRUE, the progress bar will be drawn on the terminal}
 
 \item{memo}{Character. A text marker on output files}
 

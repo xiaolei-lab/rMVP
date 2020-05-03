@@ -24,5 +24,5 @@ package.env <- NULL
 
 .onAttach <- function(...){
     packageStartupMessage("Full description, Bug report, Suggestion and the latest version:")
-    packageStartupMessage("https://github.com/XiaoleiLiuBio/rMVP")
+    packageStartupMessage("https://github.com/xiaolei-lab/rMVP")
 }

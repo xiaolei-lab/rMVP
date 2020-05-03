@@ -46,7 +46,6 @@
 #' @param maxLoop maximum number of iterations
 #' @param permutation.threshold if use a permutation cutoff or not (bonferroni cutoff)
 #' @param permutation.rep number of permutation replicates
-#' @param bar if TRUE, the progress bar will be drawn on the terminal
 #' @param col for color of points in each chromosome on manhattan plot
 #' @param memo Character. A text marker on output files
 #' @param outpath Effective only when file.output = TRUE, determines the path of the output file
@@ -87,16 +86,12 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
-         permutation.rep=100, bar=TRUE, memo="MVP", outpath=getwd(),
-         col=c("dodgerblue4","olivedrab4","violetred","darkgoldenrod1","purple4"), 
-         file.output=TRUE, file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
+         permutation.rep=100, memo=NULL, outpath=getwd(),
+         col=c("#4197d8", "#f8c120", "#413496", "#495226", "#d60b6f", "#e66519", 
+         "#d581b7", "#83d3ad", "#7c162c", "#26755d"), file.output=TRUE, 
+         file.type="jpg", dpi=300, threshold=0.05, verbose=TRUE
 ) {
-    R.ver  <- Sys.info()[['sysname']]
-    wind   <- R.ver == 'Windows'
-    # linux  <- R.ver == 'Linux'
-    # mac    <- (!linux) & (!wind)
-    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
-    
+
     # Compatible with old ways
     if (file.output == TRUE) {
       file.output <- c("pmap", "pmap.signal", "plot", "log")
@@ -110,9 +105,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
       logging.outpath <- outpath
     }
     logging.initialize("MVP", logging.outpath)
-    
-    if (wind) ncpus <- 1
-    
+
     MVP.Version(width = 60, verbose = verbose)
     logging.log("Start:", as.character(Sys.time()), "\n", verbose = verbose)
     if ("log" %in% file.output) {
@@ -120,8 +113,14 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }
     vc.method <- match.arg(vc.method)
     if (nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
+    if (!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
+
     #list -> matrix
     map <- as.data.frame(map)
+    for(i in 1 : ncol(map)){
+        if(is.factor(map[, i])) map[, i] <- as.character.factor(map[, i])
+    }
+
     na.index <- NULL
     if (!is.null(CV.GLM)) {
         CV.GLM <- as.matrix(CV.GLM)
@@ -139,12 +138,18 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind = TRUE)[, 1])
     }
     na.index <- unique(na.index)
+
+    #Data information
+    m <- nrow(geno)
+    n <- ncol(geno)
+    logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
+    logging.log("Analyzed trait:", colnames(phe)[2], "\n", verbose = verbose)
     
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
-    if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:nrow(phe))[-na.index])
-    #file.exsits()
-    if (length(seqTaxa) != length(phe[,2])) {
+    if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:n)[-na.index])
+    if (length(seqTaxa) != n) {
+        logging.log("Total", n - length(seqTaxa), "individuals removed due to missings", "\n", verbose = verbose)
         geno = deepcopy(
           x = geno,
           cols = seqTaxa
@@ -155,11 +160,9 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (!is.null(CV.MLM)) { CV.MLM = CV.MLM[seqTaxa,] }
         if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa,] }
     }
-    #Data information
+
     m <- nrow(geno)
     n <- ncol(geno)
-    logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
-    logging.log("Phenotype:", colnames(phe)[2], "\n", verbose = verbose)
     
     #initial results
     glm.results <- NULL
@@ -189,7 +192,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
               verbose = verbose
             )
         }
-        logging.log("Eigen Decomposition", "\n", verbose = verbose)
+        logging.log("Eigen Decomposition on Genomic Relationship Matrix", "\n", verbose = verbose)
         eigenK <- eigen(K, symmetric = TRUE)
         if (!is.null(nPC)) {
             ipca <- eigenK$vectors[, 1:nPC]
@@ -258,47 +261,51 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             }
         }
     }
-  
+    logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
+
     #GWAS
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, bar=bar, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, verbose = verbose);gc()
         colnames(glm.results) <- c("effect", "se", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
-          write.csv(x = cbind(map, glm.results), 
-                    file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM.csv", sep = ".")),
+            logging.log("Writing results to local file", "\n", verbose = verbose)
+            write.csv(x = cbind(map, glm.results), 
+                    file = file.path(outpath, paste(colnames(phe)[2], ".GLM.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
     }
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, bar=bar, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("effect", "se", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
-          write.csv(x = cbind(map, mlm.results), 
-                    file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM.csv", sep = ".")),
+            logging.log("Writing results to local file", "\n", verbose = verbose)
+            write.csv(x = cbind(map, mlm.results), 
+                    file = file.path(outpath, paste(colnames(phe)[2], ".MLM.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
     }
     
     if (farmcpu.run) {
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ncpus=ncpus, bar=bar, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("effect", "se", paste(colnames(phe)[2],"FarmCPU",sep="."))
         z = farmcpu.results[, 1]/farmcpu.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
-          write.csv(x = cbind(map,farmcpu.results), 
-                    file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU.csv", sep = ".")),
+            logging.log("Writing results to local file", "\n", verbose = verbose)
+            write.csv(x = cbind(map,farmcpu.results), 
+                    file = file.path(outpath, paste(colnames(phe)[2], ".FarmCPU.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
     }
@@ -308,7 +315,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if(permutation.threshold){
         # set.seed(12345)
         i=1
-            for(i in 1:permutation.rep){
+        for(i in 1:permutation.rep){
             index = 1:nrow(phe)
             index.shuffle = sample(index,length(index),replace=FALSE)
             myY.shuffle = phe
@@ -331,7 +338,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             index <- which(glm.results[, ncol(glm.results)] < threshold/m)
             if (length(index) != 0) {
               write.csv(x = cbind.data.frame(map, glm.results)[index, ], 
-                        file = file.path(outpath, paste(memo, colnames(phe)[2], "GLM_signal.csv", sep = ".")),
+                        file = file.path(outpath, paste(colnames(phe)[2], ".GLM_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }
         }
@@ -339,7 +346,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
             if (length(index) != 0) {
               write.csv(x = cbind.data.frame(map, mlm.results)[index, ], 
-                        file = file.path(outpath, paste(memo, colnames(phe)[2], "MLM_signal.csv", sep = ".")),
+                        file = file.path(outpath, paste(colnames(phe)[2], ".MLM_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }
         }
@@ -347,7 +354,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
             if (length(index) != 0) {
               write.csv(x = cbind.data.frame(map, farmcpu.results)[index, ], 
-                        file = file.path(outpath, paste(memo, colnames(phe)[2], "FarmCPU_signal.csv", sep = ".")),
+                        file = file.path(outpath, paste(colnames(phe)[2], ".FarmCPU_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }
         }
@@ -357,7 +364,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
         MVP.Hist(memo=memo, outpath=outpath, file.output=TRUE, phe=phe, file.type=file.type, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")
-        plot3D <- TRUE
+        plot3D <- FALSE
         if(!is.null(nPC)){
           MVP.PCAplot(
             ipca[,1:3],
@@ -366,7 +373,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             file.output=TRUE,
             file.type=file.type,
             outpath=outpath, 
-            memo = memo,
+            memo = ifelse(is.null(memo), colnames(phe)[2], paste(colnames(phe)[2], memo, sep=".")),
             dpi=dpi,
           )
         }
@@ -379,8 +386,8 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             file.type=file.type,
             outpath=outpath, 
             memo = memo,
+            chr.den.col=c("darkgreen", "yellow", "red"),
             dpi=dpi,
-            chr.den.col=col,
             threshold=threshold/m,
         )
 
