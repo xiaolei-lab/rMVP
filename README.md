@@ -107,7 +107,7 @@ MVP.Data(fileBed="plink",
          )
          
 # Only convert genotypes
-MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed')
+MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed') # the genotype data should be fully imputed before using this function
 ```
 
 ## VCF
@@ -145,7 +145,7 @@ MVP.Data(fileVCF="myVCF.vcf",
          )
 
 # Only convert genotypes
-MVP.Data.VCF2MVP("myVCF.vcf", out='mvp')
+MVP.Data.VCF2MVP("myVCF.vcf", out='mvp') # the genotype data should be fully imputed before using this function
 ```
 
 ## Hapmap
@@ -187,7 +187,7 @@ MVP.Data(fileHMP="hapmap.txt",
          )
 
 # Only convert genotypes
-MVP.Data.Hapmap2MVP("hapmap.txt", out='mvp')
+MVP.Data.Hapmap2MVP("hapmap.txt", out='mvp') # the genotype data should be fully imputed before using this function
 ```
 
 If you have **more than one** hapmap file, such as **"hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", ... , "hmp.chr10.txt"**  
@@ -336,7 +336,7 @@ MVP.Data(fileNum="Numeric.txt",
          )
 
 # Only convert genotypes
-MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', auto_transpose=T)
+MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', auto_transpose=T) # the genotype data should be fully imputed before using this function
 ```
 
 ## Kinship
