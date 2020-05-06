@@ -337,6 +337,9 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
         for (std::size_t i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of("\t"));
             major = l[1][0];
+            if (major != 'A' && major != 'T' && major != 'G' && major != 'C') {
+                Rcpp::stop("ERROR: Wrong HAPMAP file, Major must be 'ATGC'.");
+            }
             if (l[1].length() > 3) {
                 major = 'N';
             }
