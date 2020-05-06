@@ -100,10 +100,10 @@ If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh
 MVP.Data(fileBed="plink",
          filePhe=NULL,
          fileKin=FALSE,
-         filePC=FALSE,
-         out="mvp.plink",         
+         filePC=FALSE,       
          #priority="speed",
          #maxLine=10000,
+         out="mvp.plink"
          )
          
 # Only convert genotypes
@@ -181,9 +181,9 @@ MVP.Data(fileHMP="hapmap.txt",
          SNP.effect="Add",
          fileKin=FALSE,
          filePC=FALSE,
-         out="mvp.hmp",
          #priority="memory",
-         #maxLine=10000
+         #maxLine=10000,
+         out="mvp.hmp"
          )
 
 # Only convert genotypes
@@ -201,9 +201,9 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
          SNP.effect="Add",
          fileKin=FALSE,
          filePC=FALSE,
-         out="mvp.hmp",
          #priority="memory",
-         #maxLine=10000
+         #maxLine=10000,
+         out="mvp.hmp"
          )
 ```
 
@@ -330,9 +330,9 @@ MVP.Data(fileNum="Numeric.txt",
          sep.phe="\t",
          fileKin=FALSE,
          filePC=FALSE,
-         out="mvp.num",
          #priority="memory"，
-         #maxLine=10000
+         #maxLine=10000,
+         out="mvp.num"
          )
 
 # Only convert genotypes
