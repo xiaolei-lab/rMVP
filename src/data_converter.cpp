@@ -363,7 +363,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
             }
         }
         // Rcout << "buffer.size()\t" << buffer.size() << endl;
-        #pragma omp parallel for private(l, markers)
+        #pragma omp parallel for private(l, markers, major)
         for (std::size_t i = 0; i < buffer.size(); i++) {
             boost::split(l, buffer[i], boost::is_any_of(" \t"));
             major = Major[idx2 + i][0];
