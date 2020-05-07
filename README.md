@@ -189,7 +189,7 @@ MVP.Data(fileHMP="hapmap.txt",
 # Only convert genotypes
 MVP.Data.Hapmap2MVP("hapmap.txt", out='mvp') # the genotype data should be fully imputed before using this function
 ```
-
+<!--
 If you have **more than one** hapmap file, such as **"hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", ... , "hmp.chr10.txt"**  
 **[Supported only in older versions]**
 
@@ -206,6 +206,7 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
          out="mvp.hmp"
          )
 ```
+-->
 
 ## Numeric
 **[back to top](#contents)**  
