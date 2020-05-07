@@ -62,7 +62,7 @@ devtools::install_github("xiaolei-lab/rMVP")
 
 After installed successfully, **MVP** can be loaded by typing
 ```r
-> library(rMVP)
+library(rMVP)
 ```
 Typing ```?MVP``` could get the details of all parameters.
 
