@@ -1,5 +1,5 @@
 #include <RcppArmadillo.h>
-#include <omp.h>
+#include "mvp_omp.h"
 #include <iostream>
 #include <bigmemory/BigMatrix.h>
 #include <bigmemory/MatrixAccessor.hpp>
@@ -45,11 +45,7 @@ class MinimalProgressBar: public ProgressBar{
 template <typename T>
 arma::vec BigRowMean(XPtr<BigMatrix> pMat, int threads = 0){
 
-    if (threads == 0) {
-        omp_set_num_threads(omp_get_num_procs());
-    }else if(threads > 0) {
-        omp_set_num_threads(threads);
-    }
+    omp_setup(threads);
 
 	MatrixAccessor<T> bigm = MatrixAccessor<T>(*pMat);
 
@@ -93,11 +89,7 @@ arma::vec BigRowMean(SEXP pBigMat, int threads = 0){
 template <typename T>
 SEXP kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
 
-    if (threads == 0) {
-        omp_set_num_threads(omp_get_num_procs());
-    }else if(threads > 0) {
-        omp_set_num_threads(threads);
-    }
+    omp_setup(threads);
 
 	MatrixAccessor<T> bigm = MatrixAccessor<T>(*pMat);
 

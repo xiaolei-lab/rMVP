@@ -343,7 +343,8 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
     
     # parser map
     logging.log("Reading file...\n", verbose = verbose)
-    scan <- hapmap_parser_map(hmp_file, out)
+    logging.log("Writing map into file\n", verbose = verbose)
+    scan <- hapmap_parser_map(hmp_file[1], out)
     m <- scan$m
     n <- scan$n
     logging.log(paste0("inds: ", n, "\tmarkers:", m, '\n'), verbose = verbose)
@@ -358,7 +359,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
-    hapmap_parser_genotype(hmp_file = hmp_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
+    hapmap_parser_genotype(hmp_file = hmp_file, Major = scan$Major, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n", verbose = verbose)
     return(invisible(c(m, n)))

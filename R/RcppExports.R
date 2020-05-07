@@ -25,8 +25,8 @@ hapmap_parser_map <- function(hmp_file, out) {
     .Call(`_rMVP_hapmap_parser_map`, hmp_file, out)
 }
 
-hapmap_parser_genotype <- function(hmp_file, pBigMat, maxLine, threads = 0L, verbose = TRUE) {
-    invisible(.Call(`_rMVP_hapmap_parser_genotype`, hmp_file, pBigMat, maxLine, threads, verbose))
+hapmap_parser_genotype <- function(hmp_file, Major, pBigMat, maxLine, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_rMVP_hapmap_parser_genotype`, hmp_file, Major, pBigMat, maxLine, threads, verbose))
 }
 
 numeric_scan <- function(num_file) {

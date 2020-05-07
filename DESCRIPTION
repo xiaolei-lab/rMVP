@@ -43,7 +43,7 @@ NeedsCompilation: yes
 Suggests: knitr, testthat, rmarkdown
 RoxygenNote: 6.1.1
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
-Packaged: 2020-05-03 09:00:51 UTC; lxl
+Packaged: 2020-05-07 02:00:52 UTC; lxl
 Author: Lilin Yin [aut],
   Haohao Zhang [aut],
   Zhenshuang Tang [aut],

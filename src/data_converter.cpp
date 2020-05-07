@@ -15,7 +15,7 @@
 // limitations under the License.
 
 
-#include "utility.h"
+#include "mvp_omp.h"
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <progress.hpp>
@@ -112,7 +112,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     // define
     ifstream file(vcf_file);
     
-    omp_setup(threads, verbose);
+    omp_setup(threads);
     string line;
     vector<string> l;
     vector<char> markers;
@@ -203,6 +203,8 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     string line;
     vector<string> l;
     vector<string> ind;
+    vector<string> Major;
+
     size_t n;
     size_t m;
     
@@ -224,7 +226,7 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         }
         
         // Write inds to file.
-        boost::split(ind, line, boost::is_any_of("\t"));
+        boost::split(ind, line, boost::is_any_of(" \t"));
         vector<string>(ind.begin() + 11, ind.end()).swap(ind);   // delete first 11 columns
         for (size_t i = 0; i < ind.size(); i++) {
             indfile << ind[i] << endl;
@@ -237,22 +239,45 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         m = 0;
         while (getline(file, line)) {
             string tmp = line.substr(0, MAP_INFO_N);
-            boost::split(l, tmp, boost::is_any_of("\t"));
+            boost::split(l, tmp, boost::is_any_of(" \t"));
             
             if (l[0] == ".") {      // snp name missing
                 l[0] = l[2] + '-' + l[3];
             }
             
+            vector<string> alleles1;
             vector<string> alleles;
-            boost::split(alleles, l[1], boost::is_any_of("/"));
+            vector<string> atcg{"A", "T", "C", "G"};
+
+            boost::split(alleles1, l[1], boost::is_any_of("/"));
             
-            if (alleles.size() > 2) {
-                Rcpp::stop("variants with more than 2 alleles!");
+            for(size_t ii = 0; ii < alleles1.size(); ii++){
+                if (alleles1[ii].length() != 1) {
+                    Rcpp::stop(("ERROR: unknown variants [" + l[1] + "] at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
+                }
+                for(int jj = 0; jj < 4; jj++){
+                    if(atcg[jj] == alleles1[ii]){
+                        alleles.push_back(alleles1[ii]);
+                        break;
+                    }
+                }
             }
-            
+
+            if (alleles.size() == 0) {
+                Rcpp::stop(("ERROR: unknown variants at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
+            }
+
+            if (alleles.size() == 1) {
+                alleles.push_back(alleles[0]);
+            }
+
+            if (alleles.size() > 2) {
+                Rcpp::stop(("ERROR: variants with more than 2 alleles at " + to_string(m+2) + "th row in HAPMAP file.").c_str());
+            }
+            Major.push_back(alleles[0]);
             map << l[0] << '\t' << l[2] << '\t' << l[3] << 
                 '\t' << alleles[0] << 
-                '\t' << (alleles.size() < 2 ? "." : alleles[1]) << endl;
+                '\t' << alleles[1] << endl;
             m++;
         }
         map.close();
@@ -261,7 +286,8 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     
     
     return List::create(_["n"] = n,
-                        _["m"] = m);
+                        _["m"] = m,
+                        _["Major"] = Major);
 }
 
 template <typename T>
@@ -291,11 +317,11 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
 }
 
 template <typename T>
-void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major, XPtr<BigMatrix> pMat, long maxLine, double NA_C, int threads=0, bool verbose=true) {
     // define
     ifstream file(hmp_file);
-    
-    omp_setup(threads, verbose);
+
+    omp_setup(threads);
     string line;
     char major;
     vector<string> l;
@@ -324,25 +350,23 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
     // parser genotype
     m = 0;
     vector<string> buffer;
+    int idx1 = 0;
+    int idx2 = 0;
     while (file) {
         buffer.clear();
+        idx2 = idx1;
         for (int i = 0; getline(file, line) && (maxLine <= 0 || i < maxLine); i++) {
             // Rcout << i << endl << line << endl;
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
+                idx1++;
             }
         }
         // Rcout << "buffer.size()\t" << buffer.size() << endl;
         #pragma omp parallel for private(l, markers)
         for (std::size_t i = 0; i < buffer.size(); i++) {
-            boost::split(l, buffer[i], boost::is_any_of("\t"));
-            major = l[1][0];
-            if (major != 'A' && major != 'T' && major != 'G' && major != 'C') {
-                Rcpp::stop("ERROR: Wrong HAPMAP file, Major must be 'ATGC'.");
-            }
-            if (l[1].length() > 3) {
-                major = 'N';
-            }
+            boost::split(l, buffer[i], boost::is_any_of(" \t"));
+            major = Major[idx2 + i][0];
             vector<string>(l.begin() + 11, l.end()).swap(l);
             markers.clear();
             transform(
@@ -364,18 +388,18 @@ void hapmap_parser_genotype(std::string hmp_file, XPtr<BigMatrix> pMat, long max
 }
 
 // [[Rcpp::export]]
-void hapmap_parser_genotype(std::string hmp_file, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
+void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major, SEXP pBigMat, long maxLine, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hapmap_parser_genotype<char>(hmp_file, xpMat, maxLine, NA_CHAR, threads, verbose);
+        return hapmap_parser_genotype<char>(hmp_file, Major, xpMat, maxLine, NA_CHAR, threads, verbose);
     case 2:
-        return hapmap_parser_genotype<short>(hmp_file, xpMat, maxLine, NA_SHORT, threads, verbose);
+        return hapmap_parser_genotype<short>(hmp_file, Major, xpMat, maxLine, NA_SHORT, threads, verbose);
     case 4:
-        return hapmap_parser_genotype<int>(hmp_file, xpMat, maxLine, NA_INTEGER, threads, verbose);
+        return hapmap_parser_genotype<int>(hmp_file, Major, xpMat, maxLine, NA_INTEGER, threads, verbose);
     case 8:
-        return hapmap_parser_genotype<double>(hmp_file, xpMat, maxLine, NA_REAL, threads, verbose);
+        return hapmap_parser_genotype<double>(hmp_file, Major, xpMat, maxLine, NA_REAL, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -420,7 +444,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     
     // define
     T c;
-    omp_setup(threads, verbose);
+    omp_setup(threads);
     int m = pMat->nrow();
     int nind = pMat->ncol();
     int n = pMat->ncol() / 4;  // 4 individual = 1 bit
@@ -490,7 +514,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     }
     
     // define
-    omp_setup(threads, verbose);
+    omp_setup(threads);
     size_t ind = pMat->ncol();
     long n = ind / 4;  // 4 individual = 1 bit
     if (ind % 4 != 0) 
@@ -569,25 +593,3 @@ void read_bfile(std::string bed_file, SEXP pBigMat, long maxLine, int threads=0,
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
 }
-
-/*** R
-# setwd("~/code/MVP/src")
-library(bigmemory)
-
-# # Test case
-# # MVP.Data.vcf_parser('/Volumes/Hyacz-WD/Biodata/demo/vcf/maize.vcf', 'maize1')
-# MVP.Data.vcf_parser('/Users/hyacz/code/MVP/demo.data/VCF/myVCF.vcf', 'mvp1')
-# system.time({MVP.Data.impute('mvp1.geno.desc')})
-# x <- attach.big.matrix('mvp1.geno.desc')
-# x[1:5,1:5]
-
-c <- big.matrix(3093, 279)
-read_bfile('demo.data/bed/plink.bed', c@address, -1)
-library(plink2R)
-a <- read_plink('demo.data/bed/plink')
-b <- unname(t(as.matrix(a$bed)))
-b[1, 1:20]
-c[1, 1:20]
-write_bfile(c@address, 'test.bed')
-# numeric_scan('/Users/hyacz/code/MVP/demo.data/numeric/mvp.hmp.Numeric.txt')
-*/

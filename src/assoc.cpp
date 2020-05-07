@@ -1,5 +1,5 @@
 #include <RcppArmadillo.h>
-#include <omp.h>
+#include "mvp_omp.h"
 #include <iostream>
 #include <bigmemory/BigMatrix.h>
 #include <bigmemory/MatrixAccessor.hpp>
@@ -211,12 +211,8 @@ NumericVector getRow(SEXP pBigMat, const int row){
 template <typename T>
 SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
 	
-	if (threads == 0) {
-		omp_set_num_threads(omp_get_num_procs());
-	}else if(threads > 0) {
-		omp_set_num_threads(threads);
-	}
-
+	omp_setup(threads);
+	
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
 
 	int ind = pMat->ncol();
@@ -302,11 +298,7 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, SEXP pBigM
 template <typename T>
 SEXP mlm_c(const arma::vec y, const arma::mat X, const arma::mat U, const double vgs, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
 	
-	if (threads == 0) {
-		omp_set_num_threads(omp_get_num_procs());
-	}else if(threads > 0) {
-		omp_set_num_threads(threads);
-	}
+	omp_setup(threads);
 
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
 
