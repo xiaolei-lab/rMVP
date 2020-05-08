@@ -1,11 +1,11 @@
-# MVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP)
+# MVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.0.1-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP)
 
 ## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
 
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
-<img src="results/mvp_logo.png" height="190px" width="370px">
+<img src="results/mvp_logo.png" height="190px" width="360px">
 </a>
 </p>
 
