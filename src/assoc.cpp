@@ -228,7 +228,7 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
 
 	// arma::mat iXX = GInv(X.t() * X);
 	arma::mat xy = X.t() * y;
-	double yy = dot(y, y);
+	double yy = sum(y % y);
 	arma::mat res(mkr, 1 + 1 + q0);
 	arma::vec snp(ind);
 	arma::mat iXXs(q0 + 1, q0 + 1);
@@ -240,8 +240,8 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
 			snp[ii] = genomat[ii][i];
 		}
 		
-		double sy = dot(snp, y);
-		double ss = dot(snp, snp);
+		double sy = sum(snp % y);
+		double ss = sum(snp % snp);
 		arma::mat xs = X.t() * snp;
 		arma::mat B21 = xs.t() * iXX;
 		double t2 = as_scalar(B21 * xs);

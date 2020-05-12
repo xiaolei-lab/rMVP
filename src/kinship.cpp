@@ -87,9 +87,12 @@ arma::vec BigRowMean(SEXP pBigMat, int threads = 0){
 
 
 template <typename T>
-SEXP kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
+SEXP kin_cal_m(XPtr<BigMatrix> pMat, int threads = 0, bool verbose = true){
 
     omp_setup(threads);
+
+	if(verbose)
+		Rcout << "Computing GRM under mode: Memory" << endl;
 
 	MatrixAccessor<T> bigm = MatrixAccessor<T>(*pMat);
 
@@ -100,57 +103,137 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, int threads = 0){
 	MinimalProgressBar pb;
 
 	arma::vec Mean = BigRowMean(pMat, threads);
-	double SUM = arma::dot((0.5 * Mean), (1 - 0.5 * Mean));
+	double SUM = sum((0.5 * Mean) % (1 - 0.5 * Mean));
 
 	arma::mat kin(n, n);
+	arma::vec coli(m);
+	arma::vec colj(m);
 
-	Progress p(n, true, pb);
+	Progress p(n, verbose, pb);
 
-	#pragma omp parallel for schedule(dynamic) private(j, k, p12)
+	if(verbose)
+		Rcout << "Scale the genotype matrix and compute Z'Z" << endl;
+
+	#pragma omp parallel for schedule(dynamic) firstprivate(coli, colj) private(i, j, k) 
 	for(i = 0; i < n; i++){
+		for(k = 0; k < m; k++){
+			coli[k] = bigm[i][k] - Mean[k];
+		}
 		if ( ! Progress::check_abort() ) {
 			p.increment();
 			for(j = i; j < n; j++){
-				p12 = 0.0;
 				for(k = 0; k < m; k++){
-					p12 += (bigm[i][k] - Mean[k]) * (bigm[j][k] - Mean[k]);
+					colj[k] = bigm[j][k] - Mean[k];
 				}
-				kin(i, j) = 0.5 * p12 / SUM;
-				kin(j, i) = kin(i, j);
+				kin(i, j) = kin(j, i) = 0.5 * sum(coli % colj) / SUM;
 			}
 		}
 	}
 
-	// #pragma omp parallel for schedule(dynamic) private(j, p12)
-	// std::vector<double> Means = as<std::vector<double> >(wrap(Mean));
-	// for(i = 0; i < n; i++){
-		// vector<int> m_i(bigm[i], bigm[i] + m);
-		// for(j = i; j < n; j++){
-			// vector<int> m_j(bigm[j], bigm[j] + m);
-			// p12 = std::inner_product(m_i.begin(), m_i.end(), m_j.begin(), 0);
-			// kin(i, j) = p12 / SUM;
-			// kin(j, i) = kin(i, j);
-		// }
-	// }
-	
 	return Rcpp::wrap(kin);
 }
 
 
 // [[Rcpp::export]]
-SEXP kin_cal(SEXP pBigMat, int threads = 0){
+SEXP kin_cal_m(SEXP pBigMat, int threads = 0, bool verbose = true){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return kin_cal<char>(xpMat, threads);
+		return kin_cal_m<char>(xpMat, threads, verbose);
 	case 2:
-		return kin_cal<short>(xpMat, threads);
+		return kin_cal_m<short>(xpMat, threads, verbose);
 	case 4:
-		return kin_cal<int>(xpMat, threads);
+		return kin_cal_m<int>(xpMat, threads, verbose);
 	case 8:
-		return kin_cal<double>(xpMat, threads);
+		return kin_cal_m<double>(xpMat, threads, verbose);
+	default:
+		throw Rcpp::exception("unknown type detected for big.matrix object!");
+	}
+}
+
+
+template <typename T>
+SEXP kin_cal_s(XPtr<BigMatrix> pMat, int threads = 0, bool mkl = false, bool verbose = true){
+
+    omp_setup(threads);
+
+	if(verbose)
+		Rcout << "Computing GRM under mode: Speed" << endl;
+
+	MatrixAccessor<T> bigm = MatrixAccessor<T>(*pMat);
+
+	#ifdef _OPENMP
+	#else
+		if(!mkl)
+			mkl = true;
+	#endif
+	if(threads == 1)
+		mkl = true;
+
+	int n = pMat->ncol();
+	int m = pMat->nrow();
+	int i = 0, j = 0;
+	MinimalProgressBar pb;
+
+	arma::vec Mean = BigRowMean(pMat, threads);
+	double SUM = sum((0.5 * Mean) % (1 - 0.5 * Mean));
+
+	arma::fmat kin(n, n);
+	arma::fmat geno(m, n);
+
+	if(verbose)
+		Rcout << "Scale the genotype matrix" << endl;
+
+	#pragma omp parallel for schedule(dynamic) private(i, j)
+	for(i = 0; i < n; i++){
+		for(j = 0; j < m; j++){
+			geno(j, i) = bigm[i][j] - Mean[j];
+		}
+	}
+
+	if(verbose)
+		Rcout << "Computing Z'Z" << endl;
+
+	if(mkl){
+		kin = geno.t() * geno / SUM / 2;
+	}else{
+
+		Progress p(n, verbose, pb);
+		arma::fcolvec coli;
+
+		#pragma omp parallel for schedule(dynamic) private(i, j, coli)
+		for(i = 0; i < n; i++){
+			coli = geno.col(i);
+			if ( ! Progress::check_abort() ) {
+				p.increment();
+				for(j = i; j < n; j++){
+					kin(j, i) = kin(i, j) = 0.5 * sum(coli % geno.col(j)) / SUM;
+				}
+			}
+		}
+
+	}
+
+	return Rcpp::wrap(kin);
+}
+
+
+// [[Rcpp::export]]
+SEXP kin_cal_s(SEXP pBigMat, int threads = 0, bool mkl = false, bool verbose = true){
+
+	XPtr<BigMatrix> xpMat(pBigMat);
+
+	switch(xpMat->matrix_type()){
+	case 1:
+		return kin_cal_s<char>(xpMat, threads, mkl, verbose);
+	case 2:
+		return kin_cal_s<short>(xpMat, threads, mkl, verbose);
+	case 4:
+		return kin_cal_s<int>(xpMat, threads, mkl, verbose);
+	case 8:
+		return kin_cal_s<double>(xpMat, threads, mkl, verbose);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}

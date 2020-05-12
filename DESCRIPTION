@@ -36,14 +36,13 @@ License: Apache License 2.0
 SystemRequirements: C++11
 URL: https://github.com/xiaolei-lab/rMVP
 BugReports: https://github.com/xiaolei-lab/rMVP/issues
-Imports: utils, stats, methods, graphics, grDevices, MASS, Rcpp
-Depends: R (>= 3.3), bigmemory
+Imports: utils, stats, methods, graphics, grDevices, MASS, Rcpp, bigmemory
+Depends: R (>= 3.3)
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: knitr, testthat, rmarkdown
 RoxygenNote: 6.1.1
 Maintainer: Xiaolei Liu <xiaoleiliu@mail.hzau.edu.cn>
-Packaged: 2020-05-07 02:00:52 UTC; lxl
 Author: Lilin Yin [aut],
   Haohao Zhang [aut],
   Zhenshuang Tang [aut],

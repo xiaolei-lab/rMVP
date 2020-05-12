@@ -192,7 +192,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
               verbose = verbose
             )
         }
-        logging.log("Eigen Decomposition on Genomic Relationship Matrix", "\n", verbose = verbose)
+        logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
         eigenK <- eigen(K, symmetric = TRUE)
         if (!is.null(nPC)) {
             ipca <- eigenK$vectors[, 1:nPC]

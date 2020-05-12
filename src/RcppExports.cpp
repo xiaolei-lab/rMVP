@@ -207,15 +207,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// kin_cal
-SEXP kin_cal(SEXP pBigMat, int threads);
-RcppExport SEXP _rMVP_kin_cal(SEXP pBigMatSEXP, SEXP threadsSEXP) {
+// kin_cal_m
+SEXP kin_cal_m(SEXP pBigMat, int threads, bool verbose);
+RcppExport SEXP _rMVP_kin_cal_m(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(kin_cal(pBigMat, threads));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(kin_cal_m(pBigMat, threads, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kin_cal_s
+SEXP kin_cal_s(SEXP pBigMat, int threads, bool mkl, bool verbose);
+RcppExport SEXP _rMVP_kin_cal_s(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP mklSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
+    Rcpp::traits::input_parameter< bool >::type mkl(mklSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(kin_cal_s(pBigMat, threads, mkl, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -236,7 +251,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_geninv", (DL_FUNC) &_rMVP_geninv, 1},
     {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 3},
     {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
-    {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 2},
+    {"_rMVP_kin_cal_m", (DL_FUNC) &_rMVP_kin_cal_m, 3},
+    {"_rMVP_kin_cal_s", (DL_FUNC) &_rMVP_kin_cal_s, 4},
     {NULL, NULL, 0}
 };
 

@@ -61,13 +61,13 @@ function(
     vc.method=c("BRENT", "EMMA", "HE"),
     verbose=TRUE
 ){
-    R.ver <- Sys.info()[['sysname']]
-    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+    # R.ver <- Sys.info()[['sysname']]
+    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
     
-    if (R.ver == 'Windows') cpu <- 1
-    if (r.open && cpu > 1 && R.ver == 'Darwin') {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
+    # if (R.ver == 'Windows') cpu <- 1
+    # if (r.open && cpu > 1 && R.ver == 'Darwin') {
+    #     Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
+    # }
 
     vc.method <- match.arg(vc.method)
     n <- ncol(geno)
@@ -87,7 +87,7 @@ function(
         # convert K to base:matrix
         K <- K[, ]
         if(is.null(eigenK)){
-            logging.log("Eigen Decomposition on Genomic Relationship Matrix", "\n", verbose = verbose)
+            logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
             eigenK <- eigen(K, symmetric=TRUE)
         }
     }

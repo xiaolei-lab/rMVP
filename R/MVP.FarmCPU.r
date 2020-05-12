@@ -270,8 +270,7 @@
 #' Output: LL - log-likelihood
 #' Output: vg - genetic variance
 #' Output: ve - residual variance
-#' 
-#' @export
+#'
 `FarmCPU.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0

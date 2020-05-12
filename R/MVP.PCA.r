@@ -39,15 +39,15 @@
 #' 
 MVP.PCA <-
 function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbose=TRUE){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
-    r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+    # R.ver <- Sys.info()[['sysname']]
+    # wind <- R.ver == 'Windows'
+    # linux <- R.ver == 'Linux'
+    # mac <- (!linux) & (!wind)
+    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
-    if (r.open && mac) {
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
+    # if (r.open && mac) {
+    #     Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
+    # }
     #Data Check
     if (is.null(M) & is.null(K)) {
         stop("There is no genotype data or relationship matrix!")
@@ -67,8 +67,8 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbo
         K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
     }
 
-    logging.log("Eigen Decomposition on Genomic Relationship Matrix", "\n", verbose = verbose)
-    if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
+    logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
+    # if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
     logging.log("Deriving PCs successfully", "\n", verbose = verbose)
 

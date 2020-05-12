@@ -197,10 +197,11 @@ MVP.Report <- function(
 	{
 		if(is.null(legend.min))	legend.min = 1
 		if(is.null(col) | length(col) == 1){col=c("darkgreen", "yellow", "red")}
+		suppressWarnings(map <- map[map[, 2] != "0", ])
 		map <- as.matrix(map)
 		map <- map[!is.na(map[, 2]), ]
-		map <- map[!is.na(as.numeric(map[, 3])), ]
-		map <- map[as.numeric(map[, 2]) != 0, ]
+		suppressWarnings(map <- map[!is.na(as.numeric(map[, 3])), ])
+		
 		#map <- map[map[, 3] != 0, ]
 		suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
 		if(is.infinite(max.chr))	max.chr <- 0
@@ -361,10 +362,11 @@ MVP.Report <- function(
 	
 		#order Pmap by the name of SNP
 		#Pmap=Pmap[order(Pmap[,1]),]
+		Pmap <- Pmap[Pmap[, 2] != "0", ]
 		Pmap <- as.matrix(Pmap)
 		Pmap <- Pmap[!is.na(Pmap[, 2]), ]
-        Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ]
-        Pmap <- Pmap[as.numeric(Pmap[, 2]) != 0, ]
+        suppressWarnings(Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ])
+        
 
 		#scale and adjust the parameters
 		cir.chr.h <- cir.chr.h/5
@@ -438,10 +440,10 @@ MVP.Report <- function(
 
 		pvalueT <- as.matrix(Pmap[,-c(1:2)])
 		pvalue.pos <- Pmap[, 2]
-		p0.index <- Pmap[, 1] == 0
-		if(sum(p0.index) != 0){
-			pvalue.pos[p0.index] <- 1:sum(p0.index)
-		}
+		# p0.index <- Pmap[, 1] == 0
+		# if(sum(p0.index) != 0){
+		# 	pvalue.pos[p0.index] <- 1:sum(p0.index)
+		# }
 		pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
 		
 		#scale the space parameter between chromosomes

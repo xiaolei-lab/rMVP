@@ -38,41 +38,41 @@ function(
     cpu=1,
     verbose=TRUE
 ){
-    R.ver <- Sys.info()[['sysname']]
-    wind <- R.ver == 'Windows'
-    linux <- R.ver == 'Linux'
-    mac <- (!linux) & (!wind)
+    # R.ver <- Sys.info()[['sysname']]
+    # wind <- R.ver == 'Windows'
+    # linux <- R.ver == 'Linux'
+    # mac <- (!linux) & (!wind)
     r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
-    if(r.open && mac){
-        Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    }
-    logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
-    if(is.null(dim(M))) M <- t(as.matrix(M))
+    # if(r.open && mac){
+    #     Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
+    # }
+
+    if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
+    # logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
+    # if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
         match.arg(priority),
         "speed" = {
-            if (!is.matrix(M)) M <- as.matrix(M)
-            n <- ncol(M)
-            m <- nrow(M)
-            Pi <- 0.5 * rowMeans(M)
-            logging.log("Scale the genotype matrix", "\n", verbose = verbose)
-            M <- M - 2 * Pi
-            SUM <- sum(Pi * (1 - Pi))
-            logging.log("Computing Z'Z", "\n", verbose = verbose)
-            if(r.open){
-                K <- try(0.5 * crossprod(M)/SUM, silent=TRUE)
-            }else{
-                K <- try(0.5 * crossprodcpp(M)/SUM, silent=TRUE)
-            }
+            # if (!is.matrix(M)) M <- as.matrix(M)
+            # n <- ncol(M)
+            # m <- nrow(M)
+            # Pi <- 0.5 * rowMeans(M)
+            # logging.log("Scale the genotype matrix", "\n", verbose = verbose)
+            # M <- M - 2 * Pi
+            # SUM <- sum(Pi * (1 - Pi))
+            # logging.log("Computing Z'Z", "\n", verbose = verbose)
+
+            K <- try(kin_cal_s(M@address, threads = cpu, verbose = verbose, mkl = r.open), silent=TRUE)
+            
             if(inherits(K,"try-error")){
                 logging.log("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n", verbose = verbose)
                 stop(K[[1]])
             }
         },
+        
         "memory" = {
-            if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
-            K <- kin_cal(M@address, threads=cpu)
+            K <- kin_cal_m(M@address, threads=cpu, verbose = verbose)
             # n <- ncol(M)
             # m <- nrow(M)
             # bac <- paste0("Z", memo, ".temp.bin")

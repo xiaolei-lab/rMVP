@@ -61,7 +61,11 @@ hasNA <- function(pBigMat) {
     .Call(`_rMVP_hasNA`, pBigMat)
 }
 
-kin_cal <- function(pBigMat, threads = 0L) {
-    .Call(`_rMVP_kin_cal`, pBigMat, threads)
+kin_cal_m <- function(pBigMat, threads = 0L, verbose = TRUE) {
+    .Call(`_rMVP_kin_cal_m`, pBigMat, threads, verbose)
+}
+
+kin_cal_s <- function(pBigMat, threads = 0L, mkl = FALSE, verbose = TRUE) {
+    .Call(`_rMVP_kin_cal_s`, pBigMat, threads, mkl, verbose)
 }
 
