@@ -98,6 +98,11 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     } else if (file.output == FALSE) {
       file.output <- c()
     }
+
+    for(mt in method){
+        if(!mt %in% c("GLM", "MLM", "FarmCPU"))
+            stop("Unknow method: ", mt)
+    }
     
     # Set output path of log file 
     logging.outpath <- NULL
@@ -144,7 +149,8 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     n <- ncol(geno)
     logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
     logging.log("Analyzed trait:", colnames(phe)[2], "\n", verbose = verbose)
-    
+    logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
+
     #remove samples with missing phenotype
     seqTaxa = which(!is.na(phe[,2]))
     if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:n)[-na.index])
@@ -261,7 +267,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             }
         }
     }
-    logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
 
     #GWAS
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
@@ -360,7 +365,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         }
     }
     if ("plot" %in% file.output) {
-        logging.log("---------------------Visualization Start-------------------", "\n", verbose = verbose)
+        logging.log("---------------------Visualization Start--------------------", "\n", verbose = verbose)
         logging.log("Phenotype distribution Plotting", "\n", verbose = verbose)
         MVP.Hist(memo=memo, outpath=outpath, file.output=TRUE, phe=phe, file.type=file.type, col=col, dpi=dpi)
         #plot3D <- !is(try(library("rgl"),silent=TRUE), "try-error")

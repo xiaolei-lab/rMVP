@@ -865,7 +865,7 @@ FarmCPU.Burger <-
         }
         
         if(method=="EMMA"){
-            K <- MVP.K.VanRaden(M=t(theGK), priority="speed",verbose=FALSE)
+            K <- MVP.K.VanRaden(M=as.big.matrix(t(theGK)), priority="speed",verbose=FALSE)
             myEMMAREML <- MVP.EMMA.Vg.Ve(y=matrix(Y[,-1],nrow(Y),1), X=theCV, K=K)
             REMLs=-2*myEMMAREML$REML
             delta=myEMMAREML$delta
