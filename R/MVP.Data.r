@@ -718,10 +718,6 @@ MVP.Data.PC <- function(
     } else if (filePC == TRUE) {
         if(is.null(K)){
             geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-            if (hasNA(geno@address)) {
-                message("NA in genotype, Calculate PCA has been skipped.")
-                return()
-            }
             myPC <- MVP.PCA(M=geno, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
         }else{
             myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
@@ -786,10 +782,6 @@ MVP.Data.Kin <- function(
         myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-        if (hasNA(geno@address)) {
-            message("NA in genotype, Calculate Kinship has been skipped.")
-            return()
-        }
         logging.log("Calculate KINSHIP using Vanraden method...", "\n", verbose = verbose)
         myKin <- MVP.K.VanRaden(geno, priority = priority, cpu = cpus)
     } else {

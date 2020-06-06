@@ -57,8 +57,8 @@ impute_marker <- function(pBigMat, threads = 0L, verbose = TRUE) {
     invisible(.Call(`_rMVP_impute_marker`, pBigMat, threads, verbose))
 }
 
-hasNA <- function(pBigMat) {
-    .Call(`_rMVP_hasNA`, pBigMat)
+hasNA <- function(pBigMat, threads = 0L) {
+    .Call(`_rMVP_hasNA`, pBigMat, threads)
 }
 
 kin_cal_m <- function(pBigMat, threads = 0L, verbose = TRUE) {

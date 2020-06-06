@@ -79,39 +79,40 @@ void impute_marker(SEXP pBigMat, int threads=0, bool verbose=true) {
 }
 
 template <typename T>
-bool hasNA(XPtr<BigMatrix> pMat, double NA_C) {
+bool hasNA(XPtr<BigMatrix> pMat, double NA_C, const int threads=0) {
+    
+    omp_setup(threads);
     size_t m = pMat->nrow();
     size_t n = pMat->ncol();
+    bool HasNA = false;
 
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
+    #pragma omp parallel for schedule(dynamic) shared(HasNA)
     for (size_t j = 0; j < n; j++) {
+        if(HasNA)   continue;
         for (size_t i = 0; i < m; i++) {
             if (mat[j][i] == NA_C) {
-                return true;
+                HasNA = true;
             }
         }
     }
-    return false;
+    return HasNA;
 }
 
 // [[Rcpp::export]]
-bool hasNA(SEXP pBigMat) {
+bool hasNA(SEXP pBigMat, const int threads=0) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hasNA<char>(xpMat, NA_CHAR);
+        return hasNA<char>(xpMat, NA_CHAR, threads);
     case 2:
-        return hasNA<short>(xpMat, NA_SHORT);
+        return hasNA<short>(xpMat, NA_SHORT, threads);
     case 4:
-        return hasNA<int>(xpMat, NA_INTEGER);
+        return hasNA<int>(xpMat, NA_INTEGER, threads);
     case 8:
-        return hasNA<double>(xpMat, NA_REAL);
+        return hasNA<double>(xpMat, NA_REAL, threads);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
 }
-
-/*** R
-
-*/

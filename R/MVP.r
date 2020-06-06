@@ -120,7 +120,8 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if (nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     if (nrow(geno) != nrow(map)) stop("The number of markers in genotype and map doesn't match!")
     if (!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
-
+    if(hasNA(geno@address))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
+    
     #list -> matrix
     map <- as.data.frame(map)
     for(i in 1 : ncol(map)){

@@ -197,13 +197,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // hasNA
-bool hasNA(SEXP pBigMat);
-RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP) {
+bool hasNA(SEXP pBigMat, const int threads);
+RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
-    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat));
+    Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat, threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -250,7 +251,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_crossprodcpp", (DL_FUNC) &_rMVP_crossprodcpp, 1},
     {"_rMVP_geninv", (DL_FUNC) &_rMVP_geninv, 1},
     {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 3},
-    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 1},
+    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 2},
     {"_rMVP_kin_cal_m", (DL_FUNC) &_rMVP_kin_cal_m, 3},
     {"_rMVP_kin_cal_s", (DL_FUNC) &_rMVP_kin_cal_s, 4},
     {NULL, NULL, 0}

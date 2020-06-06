@@ -49,6 +49,8 @@ function(
     # }
 
     if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
+    if(hasNA(M@address))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
+    
     # logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
     # if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
@@ -66,7 +68,7 @@ function(
             K <- try(kin_cal_s(M@address, threads = cpu, verbose = verbose, mkl = r.open), silent=TRUE)
             
             if(inherits(K,"try-error")){
-                logging.log("   Out of memory, please set parameter (..., priority='memory') and try again.", "\n", verbose = verbose)
+                logging.log("Out of memory, please set parameter (..., priority='memory') and try again.", "\n", verbose = verbose)
                 stop(K[[1]])
             }
         },
