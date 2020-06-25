@@ -9,7 +9,7 @@
 </a>
 </p>
 
-### #-------------------------***rMVP [v1.0.0]() is coming, and better again!***-------------------------#
+### #-----------------------***rMVP [v1.0.0]() is coming, and better again!***------------------------#
 
 ### Authors:
 Designed and Maintained by [Lilin Yin](https://github.com/YinLiLin)#, [Haohao Zhang](https://github.com/hyacz)#, and [**Xiaolei Liu**](https://github.com/XiaoleiLiuBio).  
