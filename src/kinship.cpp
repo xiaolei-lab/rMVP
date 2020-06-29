@@ -181,8 +181,8 @@ SEXP kin_cal_s(XPtr<BigMatrix> pMat, int threads = 0, bool mkl = false, bool ver
 	arma::vec Mean = BigRowMean(pMat, threads);
 	double SUM = sum((0.5 * Mean) % (1 - 0.5 * Mean));
 
-	arma::fmat kin(n, n);
-	arma::fmat geno(m, n);
+	arma::mat kin(n, n);
+	arma::mat geno(m, n);
 
 	if(verbose)
 		Rcout << "Scale the genotype matrix" << endl;
@@ -202,7 +202,7 @@ SEXP kin_cal_s(XPtr<BigMatrix> pMat, int threads = 0, bool mkl = false, bool ver
 	}else{
 
 		Progress p(n, verbose, pb);
-		arma::fcolvec coli;
+		arma::colvec coli;
 
 		#pragma omp parallel for schedule(dynamic) private(i, j, coli)
 		for(i = 0; i < n; i++){
