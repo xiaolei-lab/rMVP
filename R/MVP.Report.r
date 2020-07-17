@@ -2271,7 +2271,7 @@ filter.points <- function(x, y, w, h, dpi=300, scale=1) {
 #' @examples
 #' data(pig60K, package = "rMVP")
 #' 
-#' MVP.Report(pig60K, plot.type="q", file.output=FALSE)
+#' MVP.Report(pig60K[1:10000,], plot.type="q", file.output=FALSE)
 #' 
 MVP.Report.QQplot <-
     function(P.values,

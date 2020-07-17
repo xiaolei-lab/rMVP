@@ -556,11 +556,11 @@ imMVP <- MVP(
     nPC.GLM=5,      ##if you have added PC into covariates, please keep there closed.
     nPC.MLM=3,
     nPC.FarmCPU=3,
-    priority="speed",
+    priority="speed",       ##for Kinship construction
     #ncpus=10,
-    vc.method="BRENT",
+    vc.method="BRENT",      ##only works for MLM
     maxLoop=10,
-    method.bin="EMMA",# "EMMA", "FaST-LMM", "static"
+    method.bin="EMMA",      ## "EMMA", "FaST-LMM", "static" (#only works for FarmCPU)
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
@@ -587,7 +587,7 @@ for(i in 2:ncol(phenotype)){
     #ncpus=10,
     vc.method="BRENT",
     maxLoop=10,
-    method.bin="EMMA",#"FaST-LMM","EMMA", "static"
+    method.bin="EMMA",
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,

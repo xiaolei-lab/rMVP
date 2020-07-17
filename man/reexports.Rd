@@ -19,3 +19,4 @@ below to see their documentation.
 
   \item{methods}{\code{\link[methods]{new}}}
 }}
+

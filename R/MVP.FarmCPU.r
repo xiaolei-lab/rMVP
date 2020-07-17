@@ -233,6 +233,9 @@
             }
 
             myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc, verbose=verbose)
+            if(!is.null(seqQTN)){
+                if(ncol(myGLM$P) != (npc + length(seqQTN) + 1))    stop("wrong dimensions.")
+            }
             
             #Step 4: Background unit substitution
             if(!isDone){
@@ -793,21 +796,40 @@ FarmCPU.LM <-
         #Statistics on the reduced model without marker
         rhs=wy
         beta <- crossprod(wwi,rhs)
+        ve <- (yy - crossprod(beta, rhs)) / df
+        se <- sqrt(diag(wwi) * ve[1])
         
         if(npc!=0){
             betapc = beta[2:(npc+1)]
             betapred = beta[-c(1:(npc+1))]
+            sepred = se[-c(1:(npc+1))]
         }else{
             betapc = NULL
             betapred = beta[-1]
+            sepred = se[-1]
         }
 
         #print(ncpus)
         logging.log("scanning...", "\n", verbose = verbose)
+
+        # P <- NULL
+        # B <- NULL
+        # S <- NULL
+
+        # setMKLthreads(10)
+        # for(i in 1:nrow(GDP)){
+        #     xx <- summary(lm(y~cbind(w,GDP[i, ])))$coeff
+        #     P <- rbind(P, xx[-1,4,drop=TRUE])
+        #     B <- c(B, xx[nrow(xx), 1])
+        #     S <- c(S, xx[nrow(xx), 2])
+        # }
+        # if(ncol(w) == 50)  write.csv(P, "P.csv")
+
         mkl_env({
             results <- glm_c(y=y, X=w, iXX = wwi, GDP@address, verbose=verbose, threads=ncpus)
         })
-        return(list(P=results[ ,-c(1,2), drop=FALSE], betapred=betapred, B=results[ , 1, drop=FALSE], S=results[ , 2, drop=FALSE]))
+        return(list(P=results[ ,-c(1:3), drop=FALSE], betapred=betapred, sepred=sepred, B=results[ , 1, drop=FALSE], S=results[ , 2, drop=FALSE]))
+        # return(list(P=P, betapred=betapred, B=as.matrix(B), S=S))
     } #end of FarmCPU.LM function
 
 
@@ -930,6 +952,7 @@ FarmCPU.SUB <-
             #replace SNP pvalues with QTN pvalue
             GLM$P[position, spot] = P.QTN
             GLM$B[position, ] = GLM$betapred
+            GLM$S[position, ] = GLM$sepred
         }
         return(GLM)
     }#The function FarmCPU.SUB ends here

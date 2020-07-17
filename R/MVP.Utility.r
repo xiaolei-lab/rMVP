@@ -22,7 +22,6 @@
 #' @param verbose whether to print detail.
 #' 
 #' @return version number.
-#' @export
 #'
 #' @examples
 #' MVP.Version()

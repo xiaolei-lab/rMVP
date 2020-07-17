@@ -29,7 +29,6 @@
 #' Output: vg - genetic variance
 #' Output: ve - residual variance
 #' 
-#' @export
 `MVP.FaSTLMM.LL` <- function(pheno, snp.pool, X0=NULL, ncpus=2){
     y=pheno
     p=0

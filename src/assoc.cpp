@@ -210,7 +210,7 @@ NumericVector getRow(SEXP pBigMat, const int row){
 }
 
 template <typename T>
-SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 	
@@ -230,7 +230,7 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
 	// arma::mat iXX = GInv(X.t() * X);
 	arma::mat xy = X.t() * y;
 	double yy = sum(y % y);
-	arma::mat res(mkr, 1 + 1 + q0);
+	arma::mat res(mkr, 1 + 1 + 1 + q0);
 	arma::vec snp(ind);
 	arma::mat iXXs(q0 + 1, q0 + 1);
 
@@ -246,7 +246,17 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
 		arma::mat xs = X.t() * snp;
 		arma::mat B21 = xs.t() * iXX;
 		double t2 = as_scalar(B21 * xs);
-		double invB22 = 1 / (ss - t2);
+		double B22 = (ss - t2);
+		double invB22;
+		int df;
+		if(B22 < 1e-8){
+			invB22 = 0;
+			df = ind - q0;
+		}else{
+			invB22 = 1 / B22;
+			df = ind - q0 - 1;
+		}
+
 		arma::mat NeginvB22B21 = -1 * invB22 * B21;
 
 		iXXs(q0, q0)=invB22;
@@ -260,14 +270,20 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
         rhs.rows(0, xy.n_rows - 1) = xy;
         rhs(xy.n_rows, 0) = sy;
 		arma::mat beta = iXXs * rhs;
-        int df = ind - q0 - 1;
+
         double ve = (yy - as_scalar(beta.t() * rhs)) / df;
        	arma::vec se(q0 + 1);
         arma::vec pvalue(q0 + 1);
         for(int ff = 0; ff < (q0 + 1); ff++){
         	se[ff] = sqrt(iXXs(ff, ff) * ve);
         	pvalue[ff] = 2 * R::pt(abs(beta[ff] / se[ff]), df, false, false);
-        	if(ff > 0)	res(i, ff + 1) = pvalue[ff];
+        	res(i, ff + 2) = pvalue[ff];
+        }
+
+        if(invB22 == 0){
+        	beta[q0] = NA_REAL;
+        	se[q0] = NA_REAL;
+        	res(i, q0) = NA_REAL;
         }
         res(i, 0) = beta[q0];
         res(i, 1) = se[q0]; 
@@ -278,7 +294,7 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, XPtr<BigMa
 }
 
 // [[Rcpp::export]]
-SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, SEXP pBigMat, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec & y, const arma::mat & X, const arma::mat & iXX, SEXP pBigMat, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
@@ -297,7 +313,7 @@ SEXP glm_c(const arma::vec y, const arma::mat X, const arma::mat iXX, SEXP pBigM
 }
 
 template <typename T>
-SEXP mlm_c(const arma::vec y, const arma::mat X, const arma::mat U, const double vgs, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, XPtr<BigMatrix> pMat, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 
@@ -361,7 +377,7 @@ SEXP mlm_c(const arma::vec y, const arma::mat X, const arma::mat U, const double
 }
 
 // [[Rcpp::export]]
-SEXP mlm_c(const arma::vec y, const arma::mat X, const arma::mat U, const double vgs, SEXP pBigMat, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, SEXP pBigMat, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
