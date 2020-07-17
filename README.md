@@ -542,6 +542,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **permutation.rep**, number of permutation replicates, only used when **permutation.threshold** is **TRUE**  
 **threshold**, 0.05/marker size, a cutoff line on manhattan plot  
 **method**, models for association tests, three models are available in MVP, **"GLM"**, **"MLM"**, and **"FarmCPU"**, one or two or three models can be selected for association tests  
+**file.output**, a Boolean value or a string vector. If TRUE, output all types of files. If FALSE, no files are output. For string vectors, the available values are c("pmap", "pmap.signal", "plot", "log"). Among them, pmap represents all SNP P-Val files, pmap.signal represents significant SNP files, Plot represents visualization results, and log represents log files.
 
 ```r
 imMVP <- MVP(
