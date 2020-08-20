@@ -868,7 +868,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 ```
 For MVP:
-Hope it will be coming soon!
+Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X, Liu X: rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study. bioRxiv 2020:2020.2008.2020.258491
 
 For calculation of K matrix:
 Vanraden, P. M. "Efficient Methods to Compute Genomic Predictions." Journal of Dairy Science 91.11(2008):4414-4423.
