@@ -141,7 +141,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     vector<string> buffer;
     while (file) {
         buffer.clear();
-        for (int i = 0; getline(file, line) && (maxLine <= 0 || i < maxLine); i++) {
+        for (int i = 0; (maxLine <= 0 || i < maxLine) && getline(file, line); i++) {
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
             }
@@ -355,7 +355,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
     while (file) {
         buffer.clear();
         idx2 = idx1;
-        for (int i = 0; getline(file, line) && (maxLine <= 0 || i < maxLine); i++) {
+        for (int i = 0; (maxLine <= 0 || i < maxLine) && getline(file, line); i++) {
             // Rcout << i << endl << line << endl;
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
