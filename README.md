@@ -562,7 +562,7 @@ imMVP <- MVP(
     #ncpus=10,
     vc.method="BRENT",      ##only works for MLM
     maxLoop=10,
-    method.bin="EMMA",      ## "EMMA", "FaST-LMM", "static" (#only works for FarmCPU)
+    method.bin="static",      ## "FaST-LMM", "static" (#only works for FarmCPU)
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
@@ -589,7 +589,7 @@ for(i in 2:ncol(phenotype)){
     #ncpus=10,
     vc.method="BRENT",
     maxLoop=10,
-    method.bin="EMMA",
+    method.bin="static",
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
