@@ -100,7 +100,6 @@ SEXP kin_cal_m(XPtr<BigMatrix> pMat, int threads = 0, bool verbose = true){
 	int n = pMat->ncol();
 	int m = pMat->nrow();
 	int i = 0, j = 0, k = 0;
-	double p12 = 0.0;
 	MinimalProgressBar pb;
 
 	arma::vec Mean = BigRowMean(pMat, threads);
