@@ -529,6 +529,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **CV.GLM**, Covariates added in GLM  
 **CV.MLM**, Covariates added in MLM  
 **CV.FarmCPU**, Covariates added in FarmCPU  
+**If you don't want to add PCs as covariates, please comment out the parameters instead of setting the nPC to 0**  
 **please attention that if nPC.GLM > 0, no PCs should be added in CV.GLM**  
 **nPC.GLM**, number of first columns of Principal Components added in GLM  
 **please attention that if nPC.MLM > 0, no PCs should be added in CV.MLM**  
@@ -555,8 +556,8 @@ imMVP <- MVP(
     #CV.GLM=Covariates,     ##if you have additional covariates, please keep there open.
     #CV.MLM=Covariates,
     #CV.FarmCPU=Covariates,
-    nPC.GLM=5,      ##if you have added PC into covariates, please keep there closed.
-    nPC.MLM=3,
+    nPC.GLM=5,      ##if you have added PCs into covariates, please keep there closed.
+    nPC.MLM=3,     ##if you don't want to add PCs as covariates, please comment out the parameters instead of setting the nPC to 0.
     nPC.FarmCPU=3,
     priority="speed",       ##for Kinship construction
     #ncpus=10,
