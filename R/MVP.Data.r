@@ -227,6 +227,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' 
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
+    vcf_file <- normalizePath(vcf_file, mustWork = TRUE)
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -279,6 +280,9 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' 
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
+    bim_file <- normalizePath(paste0(bfile, '.bim'), mustWork = TRUE)
+    fam_file <- normalizePath(paste0(bfile, '.fam'), mustWork = TRUE)
+    bed_file <- normalizePath(paste0(bfile, '.bed'), mustWork = TRUE)
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -286,10 +290,10 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     
     # parser map
     logging.log("Reading file...\n", verbose = verbose)
-    m <- MVP.Data.Map(paste0(bfile, '.bim'), out = out, cols = c(2, 1, 4, 6, 5), header = FALSE)
+    m <- MVP.Data.Map(bim_file, out = out, cols = c(2, 1, 4, 6, 5), header = FALSE)
     
     # parser phenotype, ind file
-    fam <- read.table(paste0(bfile, '.fam'), header = FALSE)
+    fam <- read.table(fam_file, header = FALSE)
     n <- nrow(fam)
     write.table(fam[, 2], paste0( out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
     
@@ -307,7 +311,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     )
     
     if (priority == "speed") { maxLine <- -1 }
-    read_bfile(bed_file = bfile, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
+    read_bfile(bed_file = bed_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n", verbose = verbose)
     return(invisible(c(m, n)))
@@ -336,6 +340,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' 
 MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
+    hmp_file <- normalizePath(hmp_file, mustWork = TRUE)
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
@@ -392,6 +397,8 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
 #' 
 MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
+    num_file <- normalizePath(num_file, mustWork = TRUE)
+    map_file <- normalizePath(map_file, mustWork = TRUE)
     # check old file
     backingfile <- paste0(basename(out), ".geno.bin")
     descriptorfile <- paste0(basename(out), ".geno.desc")
