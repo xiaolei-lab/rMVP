@@ -333,7 +333,7 @@ MVP.Data(fileNum="Numeric.txt",
          sep.phe="\t",
          fileKin=FALSE,
          filePC=FALSE,
-         #priority="memory"，
+         #priority="memory",
          #maxLine=10000,
          out="mvp.num"
          )
