@@ -221,7 +221,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                 }
             } else if (!is.null(nPC.GLM)) {
                 logging.log("Number of PCs included in GLM:", nPC.GLM, "\n", verbose = verbose)
-                CV.GLM <- ipca[,1:nPC.GLM]
+                CV.GLM <- ipca[,1:nPC.GLM, drop = FALSE]
             }
         }
         
@@ -235,7 +235,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
                 }
             } else if (!is.null(nPC.MLM)) {
                 logging.log("Number of PCs included in MLM:", nPC.MLM, "\n", verbose = verbose)
-                CV.MLM <- ipca[,1:nPC.MLM]
+                CV.MLM <- ipca[,1:nPC.MLM, drop = FALSE]
             }
         }
         
