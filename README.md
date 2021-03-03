@@ -14,7 +14,7 @@
 ### Authors:
 **Design and Maintenance:** [Lilin Yin](https://github.com/YinLiLin)#, [Haohao Zhang](https://github.com/hyacz)#, and [**Xiaolei Liu**](https://github.com/XiaoleiLiuBio).  
 **Contributors:** Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li<br>
-**Citation:** Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X et al. 2020. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study](https://www.biorxiv.org/content/10.1101/2020.08.20.258491v1). bioRxiv doi:10.1101/2020.08.20.258491
+**Citation:** Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study, ***Genomics, Proteomics & Bioinformatics*** (2021), doi: https://doi.org/10.1016/j.gpb.2020.10.007.
 
 
 Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu@mail.hzau.edu.cn](mailto:xiaoleiliu@mail.hzau.edu.cn)
@@ -871,7 +871,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 ```
 For MVP (Please cite MVP package for all the functions):
-Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X et al. 2020. rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study. bioRxiv doi:10.1101/2020.08.20.258491
+Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study, ***Genomics, Proteomics & Bioinformatics*** (2021), doi: https://doi.org/10.1016/j.gpb.2020.10.007.
 
 For calculation of K matrix:
 Vanraden, P. M. "Efficient Methods to Compute Genomic Predictions." Journal of Dairy Science 91.11(2008):4414-4423.
