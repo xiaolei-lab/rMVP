@@ -468,10 +468,10 @@ If you have Principal Components data
 
 ```r
 # read from file
-MVP.Data.PC("mvp.pc.txt", mvp_prefix='mvp', out=NULL, sep='\t')
+MVP.Data.PC("mvp.pc.txt", out='mvp', out=NULL, sep='\t')
 
 # calculate from mvp_geno_file
-MVP.Data.PC(TRUE, out='mvp', perc=1, pcs.keep=5)
+MVP.Data.PC(TRUE, mvp_prefix='mvp', perc=1, pcs.keep=5)
 ```
 
 ---
