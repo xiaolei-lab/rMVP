@@ -158,3 +158,38 @@ function(
     return(K)
 }#end of MVP.k.VanRaden function
 
+#' Calculate Kinship matrix by Blocking strategy
+#'
+#' Build date: Apr 14, 2021
+#' Last update: Apr 14, 2021
+#' 
+#' @param M Genotype, m * n, m is marker size, n is population size
+#' @param step Number of markers processed at one time
+#'
+#' @return K, n * n matrix
+#' @export
+#'
+#' @examples
+#' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
+#' genotype <- attach.big.matrix(genoPath)
+#' print(dim(genotype))
+#' 
+#' K <- MVP.calk(genotype)
+#' 
+MVP.calk <- function(M, step = 1000) {
+    n_marker = nrow(M)
+    n_sample = ncol(M)
+    idx = 0
+    sum = 0
+    K = matrix(0, n_sample, n_sample)
+    while(idx < n_marker){
+        G_buffer = M[idx + seq_len(step), ]
+        means = rowMeans(G_buffer)
+        sum   = sum + (0.5 * means) %*% (1 - 0.5 * means)
+        K = K + crossprod(G_buffer - means)
+        idx = idx + step
+        if (idx + step > n_marker) { step = n_marker - idx }
+    }
+    K = K / (2 * drop(sum))
+    return(K)
+}
