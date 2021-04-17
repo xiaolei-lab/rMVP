@@ -329,7 +329,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
             #GWAS using t.test...
             myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, cpu=ncpus)
-            pvalue = min(myPermutation[,2],na.rm=TRUE)
+            pvalue = min(myPermutation[,3],na.rm=TRUE)
             if(i==1){
                     pvalue.final=pvalue
                }else{
