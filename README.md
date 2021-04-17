@@ -5,7 +5,7 @@
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/XiaoleiLiuBio/MVP/master/results/mvp_logo.png">
-<img src="results/mvp_logo.png" height="220px" width="360px">
+<img src="results/mvp_logo.png" height="260px" width="360px">
 </a>
 </p>
 
