@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,7 @@
 #'
 #' Build date: Dec 12, 2016
 #' Last update: Dec 12, 2019
-#' 
+#'
 #' @param M Genotype, m * n, m is marker size, n is population size
 #' @param priority speed or memory
 #' @param cpu the number of cpu
@@ -28,13 +28,13 @@
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
-#' 
+#'
 #' K <- MVP.K.VanRaden(genotype)
-#' 
+#'
 MVP.K.VanRaden <-
 function(
-    M, 
-    priority=c("speed", "memory"), 
+    M,
+    priority=c("speed", "memory"),
     cpu=1,
     verbose=TRUE
 ){
@@ -50,7 +50,7 @@ function(
 
     if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
     if(hasNA(M@address))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
-    
+
     # logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
     # if(is.null(dim(M))) M <- t(as.matrix(M))
     switch(
@@ -66,13 +66,13 @@ function(
             # logging.log("Computing Z'Z", "\n", verbose = verbose)
 
             K <- try(kin_cal_s(M@address, threads = cpu, verbose = verbose, mkl = r.open), silent=TRUE)
-            
+
             if(inherits(K,"try-error")){
                 logging.log("Out of memory, please set parameter (..., priority='memory') and try again.", "\n", verbose = verbose)
                 stop(K[[1]])
             }
         },
-        
+
         "memory" = {
             K <- kin_cal_m(M@address, threads=cpu, verbose = verbose)
             # n <- ncol(M)
@@ -86,7 +86,7 @@ function(
             #     nrow = m,
             #     ncol = n,
             #     type = "double",
-            #     backingfile = bac, 
+            #     backingfile = bac,
             #     descriptorfile = des,
             #     init = 0.1
             # )
@@ -143,7 +143,7 @@ function(
             #     SUM <- sum(Pi * (1-Pi))
             # }
             # fl.suc <- flush(Z)
-            # if(!fl.suc){ stop("flush failed\n") } 
+            # if(!fl.suc){ stop("flush failed\n") }
             # RR <- describe(Z); rm(list=c("Z", "Pi", "means")); gc()
             # Z <- attach.big.matrix(RR)
             # print("Computing Z'Z in big.matrix...")
@@ -162,7 +162,7 @@ function(
 #'
 #' Build date: Apr 14, 2021
 #' Last update: Apr 14, 2021
-#' 
+#'
 #' @param M Genotype, m * n, m is marker size, n is population size
 #' @param step Number of markers processed at one time
 #'
@@ -173,12 +173,13 @@ function(
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
-#' 
+#'
 #' K <- MVP.calk(genotype)
-#' 
+#'
 MVP.calk <- function(M, step = 1000) {
     n_marker = nrow(M)
     n_sample = ncol(M)
+    if (step > n_marker) { step = n_marker }
     idx = 0
     sum = 0
     K = matrix(0, n_sample, n_sample)
