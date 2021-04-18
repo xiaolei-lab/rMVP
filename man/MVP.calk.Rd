@@ -1,0 +1,27 @@
+\name{MVP.calk}
+\alias{MVP.calk}
+\title{Calculate Kinship matrix by Blocking strategy}
+\usage{
+MVP.calk(M, step = 1000)
+}
+\arguments{
+\item{M}{Genotype, m * n, m is marker size, n is population size}
+
+\item{step}{Number of markers processed at one time}
+
+}
+\value{
+K, n * n matrix
+}
+\description{
+Build date: Apr 14, 2021
+Last update: Apr 14, 2021
+}
+\examples{
+genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
+genotype <- attach.big.matrix(genoPath)
+print(dim(genotype))
+
+K <- MVP.calk(genotype)
+
+}
