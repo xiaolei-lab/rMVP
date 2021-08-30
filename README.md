@@ -1,6 +1,6 @@
 # MVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.0.6-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
 
-## A [M](https://github.com/XiaoleiLiuBio/MVP)emory-efficient, [V](https://github.com/XiaoleiLiuBio/MVP)isualization-enhanced, and [P](https://github.com/XiaoleiLiuBio/MVP)arallel-accelerated Tool for Genome-Wide Association Study
+## A [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Tool for Genome-Wide Association Study
 
 
 <p align="center">
@@ -10,6 +10,10 @@
 </p>
 
 ### #-----------------------***rMVP [v1.0.0]() is coming, and better again!***------------------------#
+
+### Repos:
+**Github:** https://github.com/xiaolei-lab/rMVP  
+**Gitee(quick access in China):** https://gitee.com/xiaolei-lab/rMVP
 
 ### Authors:
 **Design and Maintenance:** [Lilin Yin](https://github.com/YinLiLin)#, [Haohao Zhang](https://github.com/hyacz)#, Shuhong Zhao, Xinyun Li, and [**Xiaolei Liu**](https://github.com/XiaoleiLiuBio).  
