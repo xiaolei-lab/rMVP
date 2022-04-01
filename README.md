@@ -18,7 +18,7 @@
 ### Authors:
 **Design and Maintenance:** [Lilin Yin](https://github.com/YinLiLin)#, [Haohao Zhang](https://github.com/hyacz)#, Shuhong Zhao, Xinyun Li, and [**Xiaolei Liu**](https://github.com/XiaoleiLiuBio).  
 **Contributors:** Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu<br>
-**Citation:** Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study](https://doi.org/10.1016/j.gpb.2020.10.007), ***Genomics, Proteomics & Bioinformatics*** 2021, 19 (4), 619-628, doi: 10.1016/j.gpb.2020.10.007.
+**Citation:** Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study](https://doi.org/10.1016/j.gpb.2020.10.007), ***Genomics, Proteomics & Bioinformatics*** , 2021, 19 (4), 619-628, doi: 10.1016/j.gpb.2020.10.007.
 
 Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu@mail.hzau.edu.cn](mailto:xiaoleiliu@mail.hzau.edu.cn)
 
@@ -874,7 +874,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 ```
 For MVP (Please cite MVP package for all the functions):
-Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study](https://doi.org/10.1016/j.gpb.2020.10.007), ***Genomics, Proteomics & Bioinformatics*** 2021, 19 (4), doi: 10.1016/j.gpb.2020.10.007.
+Yin L, Zhang H, Tang Z, Xu J, Yin D, Zhang Z, Yuan X, Zhu M, Zhao S, Li X. rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study, Genomics, Proteomics & Bioinformatics, 2021, 19 (4), 619-628, doi: 10.1016/j.gpb.2020.10.007.
 
 For calculation of K matrix:
 Vanraden, P. M. "Efficient Methods to Compute Genomic Predictions." Journal of Dairy Science 91.11(2008):4414-4423.
