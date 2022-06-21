@@ -22,7 +22,7 @@
 
 Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu@mail.hzau.edu.cn](mailto:xiaoleiliu@mail.hzau.edu.cn)
 
-## :toolbox: Software tools for genetic analyses and genomic breeding
+## :toolbox: Relevant software tools for genetic analyses and genomic breeding
 <table>
     <tr>
 	<td><g-emoji class="g-emoji" alias="mailbox" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4eb.png">📫</g-emoji> <strong><a href="https://www.hiblup.com/" rel="nofollow">HIBLUP</a></strong>: Versatile and easy-to-use GS toolbox.</td>
