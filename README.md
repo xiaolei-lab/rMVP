@@ -488,7 +488,7 @@ If you have Principal Components data
 
 ```r
 # read from file
-MVP.Data.PC("mvp.pc.txt", out='mvp', out=NULL, sep='\t')
+MVP.Data.PC("mvp.pc.txt", out='mvp', sep='\t')
 
 # calculate from mvp_geno_file
 MVP.Data.PC(TRUE, mvp_prefix='mvp', perc=1, pcs.keep=5)
