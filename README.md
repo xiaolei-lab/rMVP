@@ -586,7 +586,8 @@ imMVP <- MVP(
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
-    method=c("GLM", "MLM", "FarmCPU")
+    method=c("GLM", "MLM", "FarmCPU"),
+    file.output=c("pmap", "pmap.signal", "plot", "log")
 )
 ```
 
@@ -613,7 +614,8 @@ for(i in 2:ncol(phenotype)){
     #permutation.threshold=TRUE,
     #permutation.rep=100,
     threshold=0.05,
-    method=c("GLM", "MLM", "FarmCPU")
+    method=c("GLM", "MLM", "FarmCPU"),
+    file.output=c("pmap", "pmap.signal", "plot", "log")
   )
   gc()
 }
