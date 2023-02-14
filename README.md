@@ -557,7 +557,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **nPC.FarmCPU**, number of first columns of Principal Components added in FarmCPU  
 **priority**, **"speed"** or **"memory" when calculating the genomic relationship matrix**  
 **ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default  
-**vc.method**, methods of variance components analysis, three methods are avaiblable, "BRENT", "EMMA", and "GEMMA"  
+**vc.method**, methods of variance components analysis, three methods are avaiblable, "BRENT", "EMMA", and "HE"  
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
 **method.bin**, a parameter for FarmCPU only, two options are available: 'static' or 'FaST-LMM'  
 **permutation.threshold**, if **TRUE**, a threshold of permutation will be used in manhattan plot. The phenotypes are permuted to break the relationship with the genotypes. The experiment is replicated for a number of times. A vector of minimum p value of all experiments is recorded and the 95% quantile value of this vector is recommended to be used as significant threshold  
