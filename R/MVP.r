@@ -93,10 +93,12 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 ) {
 
     # Compatible with old ways
-    if (file.output == TRUE) {
-      file.output <- c("pmap", "pmap.signal", "plot", "log")
-    } else if (file.output == FALSE) {
-      file.output <- c()
+    if (is.logical(file.output)) {
+        if (file.output == TRUE) {
+            file.output <- c("pmap", "pmap.signal", "plot", "log")
+        } else if (file.output == FALSE) {
+            file.output <- c()
+        }
     }
 
     for(mt in method){
