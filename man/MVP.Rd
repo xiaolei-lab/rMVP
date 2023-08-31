@@ -120,6 +120,7 @@ Build date: Aug 30, 2017
 Last update: Dec 14, 2018
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
@@ -136,6 +137,7 @@ mvp <- MVP(phe=phenotype, geno=genotype, map=map, maxLoop=3,
 str(mvp)
 
 options(opts)
+}
 }
 \author{
 Lilin Yin, Haohao Zhang, and Xiaolei Liu

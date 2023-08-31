@@ -39,9 +39,11 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
+\donttest{
 bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
 
 MVP.Data.MVP2Bfile(bigmat, map, out=tempfile("outfile"), threads=1)
+}
 
 }

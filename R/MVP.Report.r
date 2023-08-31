@@ -69,10 +69,12 @@
 #' @export
 #' @return Output files
 #' @examples
+#' \donttest{
 #' data(pig60K, package = "rMVP")
 #' 
 #' MVP.Report(pig60K[,c(1:3, 5)], plot.type="m",
 #'     threshold=0.05/nrow(pig60K), file.output=FALSE)
+#' }
 #' 
 
 MVP.Report <- function(
@@ -2559,12 +2561,14 @@ MVP.Hist <-
 #' MVP.PCA_2D.<type>
 #'
 #' @examples
+#' \donttest{
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' geno <- attach.big.matrix(genoPath)
 #' pca <- MVP.PCA(M=geno, cpu=1)
 #' 
 #' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
 #'     col=c("red", "green", "yellow"), file.output=FALSE, pch=19)
+#' }
 #' 
 MVP.PCAplot <- function(PCA,
                         memo = "MVP",

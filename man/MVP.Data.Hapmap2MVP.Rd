@@ -41,8 +41,10 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
+\donttest{
 hapmapPath <- system.file("extdata", "03_hapmap", "mvp.hmp.txt", package = "rMVP")
 
 MVP.Data.Hapmap2MVP(hapmapPath, tempfile("outfile"), threads=1)
+}
 
 }

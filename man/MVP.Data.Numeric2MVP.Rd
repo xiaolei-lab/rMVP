@@ -53,8 +53,10 @@ Author: Haohao Zhang
 Build date: Sep 12, 2018
 }
 \examples{
+\donttest{
 numericPath <- system.file("extdata", "04_numeric", "mvp.num", package = "rMVP")
 mapPath <- system.file("extdata", "04_numeric", "mvp.map", package = "rMVP")
 MVP.Data.Numeric2MVP(numericPath, mapPath, tempfile("outfile"))
+}
 
 }

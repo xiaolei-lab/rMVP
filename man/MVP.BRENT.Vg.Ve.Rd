@@ -24,6 +24,7 @@ MVP.BRENT.Vg.Ve
 variance component estimation using the BRENT method
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
@@ -34,5 +35,6 @@ print(dim(genotype))
 eigenK <- eigen(MVP.K.VanRaden(genotype, cpu=1))
 vc <- MVP.BRENT.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), eigenK=eigenK)
 print(vc)
+}
 
 }

@@ -63,6 +63,7 @@
 #' Output: MVP.return$farmcpu.results - p-values obtained by FarmCPU method
 #'
 #' @examples
+#' \donttest{
 #' phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 #' phenotype <- read.table(phePath, header=TRUE)
 #' print(dim(phenotype))
@@ -79,6 +80,7 @@
 #' str(mvp)
 #' 
 #' options(opts)
+#' }
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 

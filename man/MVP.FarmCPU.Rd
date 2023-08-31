@@ -80,6 +80,7 @@ Last update: May 25, 2017
 Requirement: Y, GD, and CV should have same taxa order. GD and GM should have the same order on SNPs
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 idx <- !is.na(phenotype[, 2])
@@ -94,6 +95,7 @@ map <- read.table(mapPath , head = TRUE)
 
 farmcpu <- MVP.FarmCPU(phe=phenotype,geno=genotype,map=map,maxLoop=2,method.bin="static")
 str(farmcpu)
+}
 
 }
 \author{

@@ -44,8 +44,10 @@ Output file:
 Principal component analysis
 }
 \examples{
+\donttest{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 
 MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
+}
 
 }

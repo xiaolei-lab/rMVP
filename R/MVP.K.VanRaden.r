@@ -25,11 +25,13 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #'
 #' K <- MVP.K.VanRaden(genotype, cpu=1)
+#' }
 #'
 MVP.K.VanRaden <-
 function(

@@ -32,6 +32,7 @@ Build date: August 30, 2016
 Last update: January 27, 2017
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 print(dim(phenotype))
@@ -42,6 +43,7 @@ print(dim(genotype))
 K <- MVP.K.VanRaden(genotype, cpu=1)
 vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 print(vc)
+}
 
 }
 \author{

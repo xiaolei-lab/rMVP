@@ -109,10 +109,12 @@ Build date: Aug 30, 2016
 Last update: Sep 12, 2018
 }
 \examples{
+\donttest{
 bfilePath <- file.path(system.file("extdata", "02_bfile", package = "rMVP"), "mvp")
 opts <- options(rMVP.OutputLog2File = FALSE)
 
 MVP.Data(fileBed=bfilePath, out=tempfile("outfile"), ncpus=1)
 
 options(opts)
+}
 }

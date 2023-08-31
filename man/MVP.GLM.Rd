@@ -25,6 +25,7 @@ Build date: Aug 30, 2016
 Last update: May 25, 2017
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
 idx <- !is.na(phenotype[, 2])
@@ -35,8 +36,9 @@ genotype <- attach.big.matrix(genoPath)
 genotype <- deepcopy(genotype, cols=idx)
 print(dim(genotype))
 
-glm <- MVP.GLM(phe=phenotype, geno=genotype)
+glm <- MVP.GLM(phe=phenotype, geno=genotype, cpu=1)
 str(glm)
+}
 }
 \author{
 Lilin Yin and Xiaolei Liu

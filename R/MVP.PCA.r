@@ -30,12 +30,14 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' 
 #' pca <- MVP.PCA(M=genotype, cpu=1)
 #' str(pca)
+#' }
 #' 
 MVP.PCA <-
 function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbose=TRUE){

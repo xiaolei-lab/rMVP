@@ -43,9 +43,9 @@ Build date: Aug 30, 2016
 Last update: Aug 30, 2016
 }
 \examples{
+\donttest{
 phePath <- system.file("extdata", "07_other", "mvp.phe", package = "rMVP")
 phenotype <- read.table(phePath, header=TRUE)
-idx <- !is.na(phenotype[, 2])
 idx <- !is.na(phenotype[, 2])
 phenotype <- phenotype[idx, ]
 print(dim(phenotype))
@@ -57,6 +57,7 @@ K <- MVP.K.VanRaden(genotype, cpu=1)
 
 mlm <- MVP.MLM(phe=phenotype, geno=genotype, K=K, cpu=1)
 str(mlm)
+}
 
 }
 \author{
