@@ -22,7 +22,6 @@
 #endif
 
 #include <Rcpp.h>
-// [[Rcpp::plugins(cpp11)]]
 
 static int omp_setup(int threads);
 static inline int omp_setup(int threads=0) {

@@ -8,7 +8,6 @@
 #include <progress.hpp>
 #include "progress_bar.hpp"
 
-// [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(bigmemory, BH)]]
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]

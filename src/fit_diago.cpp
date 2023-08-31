@@ -3,7 +3,6 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 
-// [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppEigen)]]
 
 using namespace Rcpp;

@@ -34,7 +34,6 @@ Description: A memory-efficient, visualize-enhanced, parallel-accelerated Genome
     (Xiang Zhou (2017) <DOI:10.1214/17-AOAS1052>).
 License: Apache License 2.0
 Encoding: UTF-8
-SystemRequirements: C++11
 URL: https://github.com/xiaolei-lab/rMVP
 BugReports: https://github.com/xiaolei-lab/rMVP/issues
 Imports: utils, stats, methods, graphics, grDevices, MASS, bigmemory

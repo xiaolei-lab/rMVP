@@ -24,7 +24,6 @@
 using namespace std;
 using namespace Rcpp;
 
-// [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(BH, bigmemory)]]
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppProgress)]]
