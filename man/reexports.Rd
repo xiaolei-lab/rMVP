@@ -15,7 +15,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{bigmemory}{\code{\link[bigmemory]{is.big.matrix}}, \code{\link[bigmemory]{as.big.matrix}}, \code{\link[bigmemory]{attach.big.matrix}}, \code{\link[bigmemory]{deepcopy}}}
+  \item{bigmemory}{\code{\link[bigmemory:big.matrix]{as.big.matrix}}, \code{\link[bigmemory]{attach.big.matrix}}, \code{\link[bigmemory]{deepcopy}}, \code{\link[bigmemory:big.matrix]{is.big.matrix}}}
 
   \item{methods}{\code{\link[methods]{new}}}
 }}

@@ -4,8 +4,7 @@
 \alias{MVP.EMMA.Vg.Ve}
 \title{Estimate variance components using EMMA}
 \usage{
-MVP.EMMA.Vg.Ve(y, X, K, ngrids = 100, llim = -10, ulim = 10,
-  esp = 1e-10)
+MVP.EMMA.Vg.Ve(y, X, K, ngrids = 100, llim = -10, ulim = 10, esp = 1e-10)
 }
 \arguments{
 \item{y}{phenotype, n * 2}
@@ -40,7 +39,7 @@ genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 
-K <- MVP.K.VanRaden(genotype)
+K <- MVP.K.VanRaden(genotype, cpu=1)
 vc <- MVP.EMMA.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 print(vc)
 

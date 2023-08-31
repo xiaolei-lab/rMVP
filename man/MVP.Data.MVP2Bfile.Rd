@@ -6,8 +6,14 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.MVP2Bfile(bigmat, map, pheno = NULL, out = "mvp.plink",
-  verbose = TRUE)
+MVP.Data.MVP2Bfile(
+  bigmat,
+  map,
+  pheno = NULL,
+  out = "mvp.plink",
+  threads = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{bigmat}{Genotype in bigmatrix format (0,1,2)}
@@ -17,6 +23,8 @@ MVP.Data.MVP2Bfile(bigmat, map, pheno = NULL, out = "mvp.plink",
 \item{pheno}{the phenotype file}
 
 \item{out}{the name of output file}
+
+\item{threads}{number of thread for transforming}
 
 \item{verbose}{whether to print the reminder}
 }
@@ -34,6 +42,6 @@ Build date: Sep 12, 2018
 bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
 
-MVP.Data.MVP2Bfile(bigmat, map, out=tempfile("outfile"))
+MVP.Data.MVP2Bfile(bigmat, map, out=tempfile("outfile"), threads=1)
 
 }

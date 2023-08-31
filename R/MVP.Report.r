@@ -2561,7 +2561,7 @@ MVP.Hist <-
 #' @examples
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' geno <- attach.big.matrix(genoPath)
-#' pca <- MVP.PCA(M=geno)
+#' pca <- MVP.PCA(M=geno, cpu=1)
 #' 
 #' MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
 #'     col=c("red", "green", "yellow"), file.output=FALSE, pch=19)

@@ -4,12 +4,28 @@
 \alias{MVP.Report.QQplot}
 \title{QQ Plot}
 \usage{
-MVP.Report.QQplot(P.values, taxa_name, col = c("blue"), cex = 0.5,
-  threshold = NULL, amplify = TRUE, signal.col = "red",
-  signal.pch = 19, signal.cex = 0.8, conf.int = TRUE, cex.axis = 1,
-  conf.int.col = "grey", threshold.col = "red", outpath = getwd(),
-  file.type = "jpg", memo = "MVP", box = TRUE, dpi = 300,
-  file.output = TRUE, verbose = TRUE)
+MVP.Report.QQplot(
+  P.values,
+  taxa_name,
+  col = c("blue"),
+  cex = 0.5,
+  threshold = NULL,
+  amplify = TRUE,
+  signal.col = "red",
+  signal.pch = 19,
+  signal.cex = 0.8,
+  conf.int = TRUE,
+  cex.axis = 1,
+  conf.int.col = "grey",
+  threshold.col = "red",
+  outpath = getwd(),
+  file.type = "jpg",
+  memo = "MVP",
+  box = TRUE,
+  dpi = 300,
+  file.output = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{P.values}{P values}

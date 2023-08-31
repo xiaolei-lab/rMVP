@@ -4,8 +4,15 @@
 \alias{MVP.Data.Kin}
 \title{Kinship}
 \usage{
-MVP.Data.Kin(fileKin = TRUE, mvp_prefix = "mvp", out = NULL,
-  priority = "speed", sep = "\\t", cpus = 1, verbose = TRUE)
+MVP.Data.Kin(
+  fileKin = TRUE,
+  mvp_prefix = "mvp",
+  out = NULL,
+  priority = "speed",
+  sep = "\\t",
+  cpus = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{fileKin}{Kinship that represents relationship among individuals, n * n matrix, n is sample size}
@@ -33,6 +40,6 @@ Kinship
 \examples{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 
-MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"))
+MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
 
 }

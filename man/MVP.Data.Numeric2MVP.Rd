@@ -6,9 +6,18 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Numeric2MVP(num_file, map_file, out = "mvp", maxLine = 10000,
-  priority = "speed", row_names = FALSE, col_names = FALSE,
-  type.geno = "char", auto_transpose = TRUE, verbose = TRUE)
+MVP.Data.Numeric2MVP(
+  num_file,
+  map_file,
+  out = "mvp",
+  maxLine = 10000,
+  priority = "speed",
+  row_names = FALSE,
+  col_names = FALSE,
+  type.geno = "char",
+  auto_transpose = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{num_file}{Genotype in Numeric format (0,1,2)}

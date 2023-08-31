@@ -4,10 +4,18 @@
 \alias{MVP.Report.Density}
 \title{SNP Density}
 \usage{
-MVP.Report.Density(Pmap, col = c("darkgreen", "yellow", "red"),
-  dpi = 300, outpath = getwd(), memo = "MVP", bin.size = 1e+06,
-  bin.max = NULL, file.type = "jpg", file.output = TRUE,
-  verbose = TRUE)
+MVP.Report.Density(
+  Pmap,
+  col = c("darkgreen", "yellow", "red"),
+  dpi = 300,
+  outpath = getwd(),
+  memo = "MVP",
+  bin.size = 1e+06,
+  bin.max = NULL,
+  file.type = "jpg",
+  file.output = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{Pmap}{P value Map}

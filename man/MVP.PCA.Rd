@@ -4,8 +4,14 @@
 \alias{MVP.PCA}
 \title{Principal Component Analysis}
 \usage{
-MVP.PCA(M = NULL, K = NULL, priority = c("speed", "memory"),
-  pcs.keep = 5, cpu = 1, verbose = TRUE)
+MVP.PCA(
+  M = NULL,
+  K = NULL,
+  priority = c("speed", "memory"),
+  pcs.keep = 5,
+  cpu = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{M}{Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size}
@@ -32,7 +38,7 @@ genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package
 genotype <- attach.big.matrix(genoPath)
 print(dim(genotype))
 
-pca <- MVP.PCA(M=genotype)
+pca <- MVP.PCA(M=genotype, cpu=1)
 str(pca)
 
 }

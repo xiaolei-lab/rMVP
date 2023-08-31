@@ -6,8 +6,15 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Pheno(pheno_file, out = "mvp", cols = NULL, header = TRUE,
-  sep = "\\t", missing = c(NA, "NA", "-9", 9999), verbose = TRUE)
+MVP.Data.Pheno(
+  pheno_file,
+  out = "mvp",
+  cols = NULL,
+  header = TRUE,
+  sep = "\\t",
+  missing = c(NA, "NA", "-9", 9999),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{pheno_file}{the name of phenotype file}

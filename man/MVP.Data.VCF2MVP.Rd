@@ -6,8 +6,14 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.VCF2MVP(vcf_file, out = "mvp", maxLine = 10000,
-  type.geno = "char", threads = 1, verbose = TRUE)
+MVP.Data.VCF2MVP(
+  vcf_file,
+  out = "mvp",
+  maxLine = 10000,
+  type.geno = "char",
+  threads = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{vcf_file}{Genotype in VCF format}
@@ -35,6 +41,6 @@ Accept the | or / separated markers, any variant sites that are not 0 or 1 will 
 \examples{
 vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 
-MVP.Data.VCF2MVP(vcfPath, tempfile("outfile"))
+MVP.Data.VCF2MVP(vcfPath, tempfile("outfile"), threads=1)
 
 }

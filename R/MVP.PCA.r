@@ -34,7 +34,7 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' 
-#' pca <- MVP.PCA(M=genotype)
+#' pca <- MVP.PCA(M=genotype, cpu=1)
 #' str(pca)
 #' 
 MVP.PCA <-

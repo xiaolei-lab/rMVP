@@ -4,10 +4,22 @@
 \alias{MVP.PCAplot}
 \title{PCA Plot}
 \usage{
-MVP.PCAplot(PCA, memo = "MVP", col = NULL, pch = NULL,
-  class = NULL, legend.pos = "topright", Ncluster = 1,
-  plot3D = FALSE, file.type = "pdf", dpi = 300, box = FALSE,
-  file.output = TRUE, outpath = getwd(), verbose = TRUE)
+MVP.PCAplot(
+  PCA,
+  memo = "MVP",
+  col = NULL,
+  pch = NULL,
+  class = NULL,
+  legend.pos = "topright",
+  Ncluster = 1,
+  plot3D = FALSE,
+  file.type = "pdf",
+  dpi = 300,
+  box = FALSE,
+  file.output = TRUE,
+  outpath = getwd(),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{PCA}{Principal component analysis result, 2-column matrix}
@@ -52,7 +64,7 @@ PCA Plot
 \examples{
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 geno <- attach.big.matrix(genoPath)
-pca <- MVP.PCA(M=geno)
+pca <- MVP.PCA(M=geno, cpu=1)
 
 MVP.PCAplot(PCA=pca, Ncluster=3, class=NULL, 
     col=c("red", "green", "yellow"), file.output=FALSE, pch=19)

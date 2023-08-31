@@ -7,14 +7,34 @@ Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
 Build date: Aug 30, 2016
 Last update: Sep 12, 2018}
 \usage{
-MVP.Data(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL,
-  fileBed = NULL, fileNum = NULL, fileMap = NULL, filePhe = NULL,
-  fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp",
-  sep.num = "\\t", auto_transpose = TRUE, sep.map = "\\t",
-  sep.phe = "\\t", sep.kin = "\\t", sep.pc = "\\t",
-  type.geno = "char", pheno_cols = NULL, SNP.impute = "Major",
-  maxLine = 10000, priority = "speed", pcs.keep = 5,
-  verbose = TRUE, ncpus = NULL, ...)
+MVP.Data(
+  fileMVP = NULL,
+  fileVCF = NULL,
+  fileHMP = NULL,
+  fileBed = NULL,
+  fileNum = NULL,
+  fileMap = NULL,
+  filePhe = NULL,
+  fileInd = NULL,
+  fileKin = NULL,
+  filePC = NULL,
+  out = "mvp",
+  sep.num = "\\t",
+  auto_transpose = TRUE,
+  sep.map = "\\t",
+  sep.phe = "\\t",
+  sep.kin = "\\t",
+  sep.pc = "\\t",
+  type.geno = "char",
+  pheno_cols = NULL,
+  SNP.impute = "Major",
+  maxLine = 10000,
+  priority = "speed",
+  pcs.keep = 5,
+  verbose = TRUE,
+  ncpus = NULL,
+  ...
+)
 }
 \arguments{
 \item{fileMVP}{Genotype in MVP format}

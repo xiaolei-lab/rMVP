@@ -198,12 +198,7 @@ print_accomplished <- function(width = 60, verbose = TRUE) {
 #' welcome <- "Welcome to MVP"
 #' title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
 #' authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
-#' contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
-#' logo_s  <- c(" __  __  __   __  ___",
-#'              "|  \/  | \ \ / / | _ \",
-#'              "| |\/| |  \ V /  |  _/",
-#'              "|_|  |_|   \_/   |_|")
-#' print_info(welcome = welcome, title = title, logo = logo_s, authors = authors, contact = contact, linechar = '=', width = width)
+#' print_info(welcome = welcome, title = title, logo = NULL, authors = authors, contact = NULL, linechar = '=', width = width)
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {
     msg <- c()
     # width

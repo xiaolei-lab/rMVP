@@ -6,9 +6,15 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Bfile2MVP(bfile, out = "mvp", maxLine = 10000,
-  priority = "speed", type.geno = "char", threads = 0,
-  verbose = TRUE)
+MVP.Data.Bfile2MVP(
+  bfile,
+  out = "mvp",
+  maxLine = 10000,
+  priority = "speed",
+  type.geno = "char",
+  threads = 0,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{bfile}{Genotype in binary format (.bed, .bim, .fam)}
@@ -40,6 +46,6 @@ Build date: Sep 12, 2018
 \examples{
 bfilePath <- file.path(system.file("extdata", "02_bfile", package = "rMVP"), "mvp")
 
-MVP.Data.Bfile2MVP(bfilePath, tempfile("outfile"))
+MVP.Data.Bfile2MVP(bfilePath, tempfile("outfile"), threads=1)
 
 }

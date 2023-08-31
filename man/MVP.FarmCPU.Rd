@@ -4,14 +4,29 @@
 \alias{MVP.FarmCPU}
 \title{Perform GWAS using FarmCPU method}
 \usage{
-MVP.FarmCPU(phe, geno, map, CV = NULL, P = NULL,
-  method.sub = "reward", method.sub.final = "reward",
-  method.bin = c("EMMA", "static", "FaST-LMM"), bin.size = c(5e+05,
-  5e+06, 5e+07), bin.selection = seq(10, 100, 10),
-  memo = "MVP.FarmCPU", Prior = NULL, ncpus = 2, maxLoop = 10,
-  threshold.output = 0.01, converge = 1, iteration.output = FALSE,
-  p.threshold = NA, QTN.threshold = 0.01, bound = NULL,
-  verbose = TRUE)
+MVP.FarmCPU(
+  phe,
+  geno,
+  map,
+  CV = NULL,
+  P = NULL,
+  method.sub = "reward",
+  method.sub.final = "reward",
+  method.bin = c("EMMA", "static", "FaST-LMM"),
+  bin.size = c(5e+05, 5e+06, 5e+07),
+  bin.selection = seq(10, 100, 10),
+  memo = "MVP.FarmCPU",
+  Prior = NULL,
+  ncpus = 2,
+  maxLoop = 10,
+  threshold.output = 0.01,
+  converge = 1,
+  iteration.output = FALSE,
+  p.threshold = NA,
+  QTN.threshold = 0.01,
+  bound = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{phe}{phenotype, n by t matrix, n is sample size, t is number of phenotypes}

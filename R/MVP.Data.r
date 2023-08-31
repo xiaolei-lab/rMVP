@@ -223,7 +223,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' @examples 
 #' vcfPath <- system.file("extdata", "01_vcf", "mvp.vcf", package = "rMVP")
 #' 
-#' MVP.Data.VCF2MVP(vcfPath, tempfile("outfile"))
+#' MVP.Data.VCF2MVP(vcfPath, tempfile("outfile"), threads=1)
 #' 
 MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -276,7 +276,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' @examples 
 #' bfilePath <- file.path(system.file("extdata", "02_bfile", package = "rMVP"), "mvp")
 #' 
-#' MVP.Data.Bfile2MVP(bfilePath, tempfile("outfile"))
+#' MVP.Data.Bfile2MVP(bfilePath, tempfile("outfile"), threads=1)
 #' 
 MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -336,7 +336,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' @examples 
 #' hapmapPath <- system.file("extdata", "03_hapmap", "mvp.hmp.txt", package = "rMVP")
 #' 
-#' MVP.Data.Hapmap2MVP(hapmapPath, tempfile("outfile"))
+#' MVP.Data.Hapmap2MVP(hapmapPath, tempfile("outfile"), threads=1)
 #' 
 MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='char', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
@@ -497,6 +497,7 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
 #' @param map the map file
 #' @param pheno the phenotype file
 #' @param out the name of output file
+#' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
 #'
 #' @return NULL
@@ -507,12 +508,12 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
 #' bigmat <- as.big.matrix(matrix(1:6, 3, 2))
 #' map <- matrix(c("rs1", "rs2", "rs3", 1, 1, 1, 10, 20, 30), 3, 3)
 #' 
-#' MVP.Data.MVP2Bfile(bigmat, map, out=tempfile("outfile"))
+#' MVP.Data.MVP2Bfile(bigmat, map, out=tempfile("outfile"), threads=1)
 #' 
-MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', verbose=TRUE) {
+MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     # write bed file
-    write_bfile(bigmat@address, out, verbose = verbose)
+    write_bfile(bigmat@address, out, threads=threads, verbose = verbose)
     
     # write fam
     #  1. Family ID ('FID')
@@ -700,7 +701,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"))
+#' MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
 #' 
 MVP.Data.PC <- function(
     filePC=TRUE, 
@@ -767,7 +768,7 @@ MVP.Data.PC <- function(
 #' @examples
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"))
+#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
 #' 
 MVP.Data.Kin <- function(
     fileKin=TRUE, 

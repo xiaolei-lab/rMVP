@@ -6,8 +6,13 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.impute(mvp_prefix, out = NULL, method = "Major",
-  ncpus = NULL, verbose = TRUE)
+MVP.Data.impute(
+  mvp_prefix,
+  out = NULL,
+  method = "Major",
+  ncpus = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{mvp_prefix}{the prefix of mvp file}

@@ -33,7 +33,7 @@
 #' genotype <- attach.big.matrix(genoPath)
 #' print(dim(genotype))
 #' 
-#' K <- MVP.K.VanRaden(genotype)
+#' K <- MVP.K.VanRaden(genotype, cpu=1)
 #' vc <- MVP.HE.Vg.Ve(y=phenotype[,2], X=matrix(1, nrow(phenotype)), K=K)
 #' print(vc)
 #' 

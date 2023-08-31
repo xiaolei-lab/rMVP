@@ -6,8 +6,14 @@
 Author: Haohao Zhang
 Build date: Sep 12, 2018}
 \usage{
-MVP.Data.Map(map, out = "mvp", cols = 1:5, header = TRUE,
-  sep = "\\t", verbose = TRUE)
+MVP.Data.Map(
+  map,
+  out = "mvp",
+  cols = 1:5,
+  header = TRUE,
+  sep = "\\t",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{map}{the name of map file or map object(data.frame or matrix)}
