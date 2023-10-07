@@ -476,12 +476,12 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
             line <- do.call(rbind, strsplit(line, '\\s+'))
             if (row_names) { line <- line[, 2:ncol(line)]}
             if (transposed) {
-                bigmat[, (i + 1):(i + length(line))] <- line
-                i <- i + length(line)
+                bigmat[, (i + 1):(i + ncol(line))] <- line
+                i <- i + ncol(line)
                 percent <- 100 * i / n
             } else {
-                bigmat[(i + 1):(i + length(line)), ] <- line
-                i <- i + length(line)
+                bigmat[(i + 1):(i + nrow(line)), ] <- line
+                i <- i + nrow(line)
                 percent <- 100 * i / m
             }
 
