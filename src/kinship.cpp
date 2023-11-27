@@ -26,13 +26,13 @@ class MinimalProgressBar: public ProgressBar{
 	void update(float progress) {
 		if (_finalized) return;
 		REprintf("\r");
-		REprintf("Calculating in process...(finished %.2f%)", progress * 100);
+		REprintf("Calculating in process...(finished %.2f%%)", progress * 100);
 	}
 	void end_display() {
 	if (_finalized) return;
 		REprintf("\r");
 		
-		REprintf("Calculating in process...(finished 100.00%)");
+		REprintf("Calculating in process...(finished 100.00%%)");
 		REprintf("\n");
 		_finalized = true;
 	}
