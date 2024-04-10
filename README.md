@@ -441,7 +441,7 @@ If you have Kinship matrix data that represents the relationship among individua
 MVP.Data.Kin("mvp.kin.txt", out="mvp", maxLine=1e4, priority='memory', sep='\t')
 
 # calculate from mvp_geno_file
-MVP.Data.Kin(TRUE, mvp_prefix='mvp', out='mvp')
+MVP.Data.Kin(TRUE, mvp_prefix='mvp.vcf', out='mvp')
 ```
 
 ## Principal Components
@@ -491,7 +491,7 @@ If you have Principal Components data
 MVP.Data.PC("mvp.pc.txt", out='mvp', sep='\t')
 
 # calculate from mvp_geno_file
-MVP.Data.PC(TRUE, mvp_prefix='mvp', perc=1, pcs.keep=5)
+MVP.Data.PC(TRUE, mvp_prefix='mvp.vcf', pcs.keep=5)
 ```
 
 ---
