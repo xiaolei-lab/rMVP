@@ -23,6 +23,7 @@
 #' @param geno genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
 #' @param map SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
+#' @param geno_ind_idx the index of effective genotyped individuals
 #' @param P start p values for all SNPs
 #' @param method.sub method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
 #' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
@@ -62,21 +63,24 @@
 #' str(farmcpu)
 #' }
 #' 
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, geno_ind_idx=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
                           method.bin=c("EMMA", "static", "FaST-LMM"), bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
                           memo="MVP.FarmCPU", Prior=NULL, ncpus=2, maxLoop=10, 
                           threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, 
                           QTN.threshold=0.01, bound=NULL, verbose=TRUE){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
 
+    n <- ifelse(is.null(geno_ind_idx), ncol(geno), length(geno_ind_idx))
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(phe[, 2])) != 0) stop("NAs are not allowed in phenotype.")
-    if(nrow(phe) != ncol(geno)) stop("number of individuals not match in phenotype and genotype.")
+    if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
 
     echo=TRUE
     nm=nrow(map)
     if(!is.null(CV)){
         CV=as.matrix(CV)
+        if(nrow(CV) != n)   stop("number of individuals does not match in phenotype and fixed effects.")
+        if(sum(is.na(CV)) != 0) stop("NAs are not allowed in fixed effects.")
         CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
 	    CV <- CV[, CV.index, drop=FALSE]
         npc=ncol(CV)
@@ -127,9 +131,9 @@
 
         #Step 2b: Set bins
         if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=geno_ind_idx,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
         }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=geno_ind_idx,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
         }
         
         #Step 2c: Remove bin dependency
@@ -190,7 +194,7 @@
                 }
             }
 
-            myRemove=FarmCPU.Remove(GDP=geno,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
+            myRemove=FarmCPU.Remove(GDP=geno,GDP_index=geno_ind_idx,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
             
             #Recoding QTNs history
             seqQTN=myRemove$seqQTN
@@ -234,7 +238,7 @@
                 theCV=cbind(CV,myRemove$bin)
             }
 
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,w=theCV,ncpus=ncpus,npc=npc, verbose=verbose)
+            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=geno_ind_idx,w=theCV,ncpus=ncpus,npc=npc, verbose=verbose)
             if(!is.null(seqQTN)){
                 if(ncol(myGLM$P) != (npc + length(seqQTN) + 1))    stop("wrong dimensions.")
             }
@@ -463,6 +467,7 @@
 #' 
 #' @param Y a n by 2 matrix, the fist column is taxa id and the second is trait
 #' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA
+#' @param GDP_index the index of effective genotyped individuals
 #' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
 #' @param P start p values for all SNPs
@@ -479,11 +484,12 @@
 #'
 #' @keywords internal
 FarmCPU.BIN <-
-    function(Y=NULL, GDP=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2, verbose=TRUE){
+    function(Y=NULL, GDP=NULL, GDP_index=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2, verbose=TRUE){
         #print("FarmCPU.BIN Started")
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
         
+        if(is.null(GDP_index))  GDP_index=seq(1, ncol(GDP))
         #Set upper bound for bin selection to squareroot of sample size
         n=nrow(Y)
         #bound=round(sqrt(n)/log10(n))
@@ -537,7 +543,7 @@ FarmCPU.BIN <-
                     GP=cbind(GM,P,NA,NA,NA)
                     mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                     seqQTN=which(mySpecify$index==TRUE)
-                    GK=t(GDP[seqQTN,])
+                    GK=t(GDP[seqQTN, GDP_index])
                     myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                     myREML=myBurger$REMLs
                     myVG=myBurger$vg #it is unused
@@ -581,7 +587,7 @@ FarmCPU.BIN <-
                 GP=cbind(GM,P,NA,NA,NA)
                 mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                 seqQTN=which(mySpecify$index==TRUE)
-                GK=t(GDP[seqQTN,])
+                GK=t(GDP[seqQTN,GDP_index])
                 myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
@@ -618,7 +624,7 @@ FarmCPU.BIN <-
                 GP=cbind(GM,P,NA,NA,NA)
                 mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
                 seqQTN=which(mySpecify$index==TRUE)
-                GK=t(GDP[seqQTN,])
+                GK=t(GDP[seqQTN,GDP_index])
                 myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
@@ -741,6 +747,7 @@ FarmCPU.Specify <-
 #' @param y one column matrix, dependent variable
 #' @param w covariates, n by c matrix, n is sample size, c is number of covariates
 #' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
+#' @param GDP_index index of effective genotyped individuals
 #' @param ncpus number of threads used for parallele computation
 #' @param npc number of covariates without pseudo QTNs
 #' @param verbose whether to print detail.
@@ -752,7 +759,7 @@ FarmCPU.Specify <-
 #' 
 #' @keywords internal
 FarmCPU.LM <-
-    function(y, w=NULL, GDP, ncpus=2, npc=0, verbose=TRUE){
+    function(y, w=NULL, GDP, GDP_index=NULL, ncpus=2, npc=0, verbose=TRUE){
         #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
@@ -828,7 +835,7 @@ FarmCPU.LM <-
         # if(ncol(w) == 50)  write.csv(P, "P.csv")
 
         mkl_env({
-            results <- glm_c(y=y, X=w, iXX = wwi, GDP@address, verbose=verbose, threads=ncpus)
+            results <- glm_c(y=y, X=w, iXX = wwi, GDP@address, geno_ind=GDP_index, verbose=verbose, threads=ncpus)
         })
         return(list(P=results[ ,-c(1:3), drop=FALSE], betapred=betapred, sepred=sepred, B=results[ , 1, drop=FALSE], S=results[ , 2, drop=FALSE]))
         # return(list(P=P, betapred=betapred, B=as.matrix(B), S=S))
@@ -889,7 +896,7 @@ FarmCPU.Burger <-
         }
         
         if(method=="EMMA"){
-            K <- MVP.K.VanRaden(M=as.big.matrix(t(theGK)), priority="speed",verbose=FALSE)
+            K <- MVP.K.VanRaden(M=as.big.matrix(t(theGK)), verbose=FALSE)
             myEMMAREML <- MVP.EMMA.Vg.Ve(y=matrix(Y[,-1],nrow(Y),1), X=theCV, K=K)
             REMLs=-2*myEMMAREML$REML
             delta=myEMMAREML$delta
@@ -968,6 +975,7 @@ FarmCPU.SUB <-
 #' @author Xiaolei Liu and Zhiwu Zhang
 #' 
 #' @param GDP genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA
+#' @param GDP_index the index of effective genotyped individuals
 #' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param seqQTN s by 1 vecter for index of QTN on GM
 #' @param seqQTN.p p value of each @param seqQTN
@@ -980,10 +988,13 @@ FarmCPU.SUB <-
 #' Relationship: bin=GDP[,c(seqQTN)], binmap=GM[seqQTN,], s0<=s
 #' @keywords internal
 FarmCPU.Remove <-
-    function(GDP=NULL, GM=NULL, seqQTN=NULL, seqQTN.p=NULL, threshold=.99){
+    function(GDP=NULL, GDP_index=NULL, GM=NULL, seqQTN=NULL, seqQTN.p=NULL, threshold=.99){
+        
         if(is.null(seqQTN))return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
         seqQTN=seqQTN[order(seqQTN.p)]
         
+        if(is.null(GDP_index))  GDP_index=seq(1, ncol(GDP))
+
         hugeNum=10e10
         n=length(seqQTN)
         #fielter bins by physical location
@@ -1006,20 +1017,20 @@ FarmCPU.Remove <-
         #Set sample
         ratio=.1
         maxNum=100000
-        m=nrow(GDP) #sample size
-        s=ncol(GDP) #number of markers
+        m=nrow(GDP)
+        s=length(GDP_index)
         
         sampled=s
-        if(sampled>maxNum)sampled=maxNum
+        if(sampled>maxNum)  sampled=maxNum
         
         
         #index=sample(s,sampled)
-        index=1:sampled
+        index=GDP_index[1:sampled]
         
         #This section has problem of turning big.matrix to R matrix
         #It is OK as x is small
         if(is.big.matrix(GDP)){
-            x=t(as.matrix(deepcopy(GDP,rows=seqQTN,cols=index) ))
+            x=t(as.matrix(deepcopy(GDP,rows=seqQTN,cols=index)))
         }else{
             x=t(GDP[seqQTN,index] )
         }
@@ -1043,9 +1054,9 @@ FarmCPU.Remove <-
         
         #This section has problem of turning big.matrix to R matrix
         if(is.big.matrix(GDP)){
-            bin=t(as.matrix(deepcopy(GDP,rows=seqQTN,) ))
+            bin=t(as.matrix(deepcopy(GDP,rows=seqQTN,cols=GDP_index) ))
         }else{
-            bin=t(GDP[seqQTN, , drop=FALSE] )
+            bin=t(GDP[seqQTN, GDP_index, drop=FALSE] )
         }
         
         binmap=GM[seqQTN, , drop=FALSE]

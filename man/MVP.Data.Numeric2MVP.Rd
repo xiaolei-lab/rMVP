@@ -11,7 +11,6 @@ MVP.Data.Numeric2MVP(
   map_file,
   out = "mvp",
   maxLine = 10000,
-  priority = "speed",
   row_names = FALSE,
   col_names = FALSE,
   type.geno = "char",
@@ -26,9 +25,7 @@ MVP.Data.Numeric2MVP(
 
 \item{out}{the name of output file}
 
-\item{maxLine}{the max number of line to write to big matrix for each loop}
-
-\item{priority}{'memory' or 'speed'}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{row_names}{whether the numeric genotype has row names}
 

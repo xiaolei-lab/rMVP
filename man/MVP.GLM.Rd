@@ -4,7 +4,7 @@
 \alias{MVP.GLM}
 \title{To perform GWAS with GLM and MLM model and get the P value of SNPs}
 \usage{
-MVP.GLM(phe, geno, CV = NULL, cpu = 1, verbose = TRUE)
+MVP.GLM(phe, geno, CV = NULL, geno_ind_idx = NULL, cpu = 1, verbose = TRUE)
 }
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
@@ -12,6 +12,8 @@ MVP.GLM(phe, geno, CV = NULL, cpu = 1, verbose = TRUE)
 \item{geno}{Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size}
 
 \item{CV}{Covariance, design matrix(n * x) for the fixed effects}
+
+\item{geno_ind_idx}{the index of effective genotyped individuals}
 
 \item{cpu}{number of cpus used for parallel computation}
 

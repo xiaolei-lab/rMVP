@@ -14,15 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include "mvp_omp.h"
+#include "rMVP.h"
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
-#include <progress.hpp>
 #include <fstream>
 
 using namespace std;
 using namespace Rcpp;
+using namespace arma;
 
 // [[Rcpp::depends(BH, bigmemory)]]
 // [[Rcpp::plugins(openmp)]]
@@ -31,6 +30,24 @@ using namespace Rcpp;
 #include <bigmemory/isna.hpp>
 #include <bigmemory/MatrixAccessor.hpp>
 
+vector<string> split_line(const string& str, const string& whitespace = " ,\t\r\n")
+{
+    vector<string> result;
+    size_t col_end = 0;
+    while (true) {
+        size_t col_begin = str.find_first_not_of(whitespace, col_end);
+        // LOG_TRACE_FUNC << "col_begin: " << col_begin << endl;
+        if (col_begin == std::string::npos)
+            return result;
+        col_end = str.find_first_of(whitespace, col_begin);
+        // LOG_TRACE_FUNC << "col_end: " << col_end << endl;
+        if (col_end == std::string::npos)
+            col_end = str.size();
+        string stri = str.substr(col_begin, col_end - col_begin);
+        stri.erase(stri.find_last_not_of(" \n\r\t") + 1);
+        result.push_back(stri);
+    }
+}
 
 // ***** VCF *****
 
@@ -58,11 +75,12 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
         }
     }
     if (!have_header) {
-        Rcpp::stop("ERROR: Wrong VCF file, no line begin with \"#CHROM\".");
+        Rcpp::stop("wrong VCF file, no line begin with \"#CHROM\".");
     }
     
     // Write inds to file.
-    boost::split(ind, line, boost::is_any_of("\t"));
+    ind = split_line(line);
+    // boost::split(ind, line, boost::is_any_of("\t"));
     vector<string>(ind.begin() + 9, ind.end()).swap(ind);   // delete first 9 columns
     int indn = ind.size();
     for (int i = 0; i < indn; i++) {
@@ -82,7 +100,8 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     m = 0;
     while (getline(file, line)) {
         string tmp = line.substr(0, MAP_INFO_N);
-        boost::split(l, tmp, boost::is_any_of("\t"));
+        l = split_line(tmp);
+        // boost::split(l, tmp, boost::is_any_of("\t"));
 
         if (l[2] == ".") {      // snp name missing
             l[2] = l[0] + '-' + l[1];
@@ -119,7 +138,8 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // progress bar
-    Progress progress(pMat->nrow(), verbose);
+    MinimalProgressBar_perc pb;
+    Progress progress(pMat->nrow(), verbose, pb);
     
     // Skip Header
     string prefix("#CHROM");
@@ -132,7 +152,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
     }
     if (!have_header) {
-        Rcpp::stop("ERROR: Wrong VCF file, no line begin with \"#CHROM\".");
+        Rcpp::stop("wrong VCF file, no line begin with \"#CHROM\".");
     }
     
     // parser genotype
@@ -147,7 +167,8 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
         #pragma omp parallel for private(l, markers)
         for (std::size_t i = 0; i < buffer.size(); i++) {
-            boost::split(l, buffer[i], boost::is_any_of("\t"));
+            l = split_line(buffer[i]);
+            // boost::split(l, buffer[i], boost::is_any_of("\t"));
             markers.clear();
             // There is only one char in REF and ALT
             // if (l[3].length() == 1 && l[4].length() == 1) {  
@@ -165,8 +186,8 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
             for (std::size_t j = 0; j < markers.size(); j++) {
                 mat[j][m + i] = markers[j];
             }
-            progress.increment();
         }
+        progress.increment(buffer.size());
         m += buffer.size();
     }
 }
@@ -193,9 +214,9 @@ void vcf_parser_genotype(std::string vcf_file, SEXP pBigMat, long maxLine, int t
 // ***** HAPMAP *****
 
 // [[Rcpp::export]]
-List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
+List hapmap_parser_map(std::string hmp_file, std::string out) {
     // Define
-    const int MAP_INFO_N = 10000;      // max length of "SNP, POS and CHROM"
+    const int MAP_INFO_N = 1000;      // max length of "SNP, POS and CHROM"
     ofstream map(out + ".geno.map");
     ofstream indfile(out + ".geno.ind");
     
@@ -207,8 +228,8 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
     size_t n;
     size_t m;
     
-    for (int i = 0; i < hmp_file.size(); i++) { // TODO(haohao): Support mulit hmp file.
-        ifstream file(hmp_file(i));
+    // for (int i = 0; i < hmp_file.size(); i++) { // TODO(haohao): Support mulit hmp file.
+        ifstream file(hmp_file);
         
         // Skip Header
         string prefix("rs#");
@@ -221,11 +242,12 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
             }
         }
         if (!have_header) {
-            Rcpp::stop("ERROR: Wrong HAPMAP file, no line begin with \"rs#\".");
+            Rcpp::stop("wrong HAPMAP file, no line begin with \"rs#\".");
         }
         
         // Write inds to file.
-        boost::split(ind, line, boost::is_any_of(" \t"));
+        ind = split_line(line);
+        // boost::split(ind, line, boost::is_any_of(" \t"));
         vector<string>(ind.begin() + 11, ind.end()).swap(ind);   // delete first 11 columns
         for (size_t i = 0; i < ind.size(); i++) {
             indfile << ind[i] << endl;
@@ -238,7 +260,8 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         m = 0;
         while (getline(file, line)) {
             string tmp = line.substr(0, MAP_INFO_N);
-            boost::split(l, tmp, boost::is_any_of(" \t"));
+            l = split_line(tmp);
+            // boost::split(l, tmp, boost::is_any_of(" \t"));
             
             if (l[0] == ".") {      // snp name missing
                 l[0] = l[2] + '-' + l[3];
@@ -246,33 +269,30 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
             
             vector<string> alleles1;
             vector<string> alleles;
-            vector<string> atcg{"A", "T", "C", "G"};
+            // vector<string> atcg{"A", "T", "C", "G"};
+            std::unordered_set<string> atcg{"A", "T", "C", "G"};
 
-            boost::split(alleles1, l[1], boost::is_any_of("/"));
+            alleles1 = split_line(l[1], "/");
+            // boost::split(alleles1, l[1], boost::is_any_of("/"));
             
             for(size_t ii = 0; ii < alleles1.size(); ii++){
                 if (alleles1[ii].length() != 1) {
-                    Rcpp::stop(("ERROR: unknown variants [" + l[1] + "] at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
+                    Rcpp::stop(("unknown variants [" + l[1] + "] at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
                 }
-                for(int jj = 0; jj < 4; jj++){
-                    if(atcg[jj] == alleles1[ii]){
-                        alleles.push_back(alleles1[ii]);
-                        break;
-                    }
+                if (atcg.find(alleles1[ii]) != atcg.end()) {
+                    alleles.push_back(alleles1[ii]);
                 }
             }
-
             if (alleles.size() == 0) {
-                Rcpp::stop(("ERROR: unknown variants at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
+                Rcpp::stop(("unknown variants at " + to_string(m+2) + "th row of second column in HAPMAP file.").c_str());
             }
-
             if (alleles.size() == 1) {
                 alleles.push_back(alleles[0]);
             }
-
             if (alleles.size() > 2) {
-                Rcpp::stop(("ERROR: variants with more than 2 alleles at " + to_string(m+2) + "th row in HAPMAP file.").c_str());
+                Rcpp::stop(("variants with more than 2 alleles at " + to_string(m+2) + "th row in HAPMAP file.").c_str());
             }
+
             Major.push_back(alleles[0]);
             map << l[0] << '\t' << l[2] << '\t' << l[3] << 
                 '\t' << alleles[0] << 
@@ -281,20 +301,18 @@ List hapmap_parser_map(Rcpp::StringVector hmp_file, std::string out) {
         }
         map.close();
         file.close();
-    }
-    
+    // }
     
     return List::create(_["n"] = n,
                         _["m"] = m,
                         _["Major"] = Major);
 }
 
-template <typename T>
-T hapmap_marker_parser(string m, char major, double NA_C) {
+double hapmap_marker_parser(string m, char major, double NA_C) {
     if (m.length() == 1) {  // Hapmap
         // Rcout << "major: " << major << '\t' << "now: " << m[0] << endl;
         if (m[0] == '+' || m[0] == '0' || m[0] == '-' || m[0] == 'N') {
-            return static_cast<T>(NA_C);
+            return NA_C;
         } else if (m[0] == major) {
             return 0;
         } else if (m[0] == 'R' || m[0] == 'Y' || m[0] == 'S' || m[0] == 'W' || m[0] == 'K' || m[0] == 'M') {
@@ -305,14 +323,12 @@ T hapmap_marker_parser(string m, char major, double NA_C) {
     } else if (m.length() == 2) {   // Hapmap Diploid
         if ((m[0] != 'A' && m[0] != 'T' && m[0] != 'G' && m[0] != 'C') ||
             (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')) {
-            return static_cast<T>(NA_C);
+            return NA_C;
         } else {
-            return static_cast<T>(
-                ((m[0] == major)?0:1) + ((m[1] == major)?0:1)
-            );
+            return ((m[0] == major) ? 0 : 1) + ((m[1] == major) ? 0 : 1);
         }
     }
-    return static_cast<T>(NA_C);
+    return NA_C;
 }
 
 template <typename T>
@@ -324,12 +340,11 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
     string line;
     char major;
     vector<string> l;
-    vector<char> markers;
-    size_t m;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // progress bar
-    Progress progress(pMat->nrow(), verbose);
+    MinimalProgressBar_perc pb;
+    Progress progress(pMat->nrow(), verbose, pb);
     
     // Skip Header
     string prefix("rs#");
@@ -343,46 +358,37 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
     }
 
     if (!have_header) {
-        Rcpp::stop("ERROR: Wrong HAPMAP file, no line begin with \"rs#\".");
+        Rcpp::stop("wrong HAPMAP file, no line begin with \"rs#\".");
     }
+
+    l = split_line(line);
+    size_t n_col = l.size();
     
     // parser genotype
-    m = 0;
+    size_t m = 0;
     vector<string> buffer;
-    int idx1 = 0;
-    int idx2 = 0;
     while (file) {
         buffer.clear();
-        idx2 = idx1;
         for (int i = 0; (maxLine <= 0 || i < maxLine) && getline(file, line); i++) {
             // Rcout << i << endl << line << endl;
             if (line.length() > 1) {    // Handling the blank line at the end of the file.
                 buffer.push_back(line);
-                idx1++;
             }
         }
-        // Rcout << "buffer.size()\t" << buffer.size() << endl;
-        #pragma omp parallel for private(l, markers, major)
-        for (std::size_t i = 0; i < buffer.size(); i++) {
-            boost::split(l, buffer[i], boost::is_any_of(" \t"));
-            major = Major[idx2 + i][0];
-            vector<string>(l.begin() + 11, l.end()).swap(l);
-            markers.clear();
-            transform(
-                l.begin(),
-                l.end(),
-                back_inserter(markers),
-                boost::bind<T>(&hapmap_marker_parser<T>, _1, major, NA_C)
-            );
-            // Rcout << m << '\t' << i << endl;
-            for (std::size_t j = 0; j < markers.size(); j++) {
-                // Rcout << int(markers[j]) << '\t';
-                mat[j][m + i] = markers[j];
+        size_t n_marker = buffer.size();
+        #pragma omp parallel for private(l, major)
+        for (size_t i = 0; i < n_marker; i++) {
+            l = split_line(buffer[i]);
+            // boost::split(l, buffer[i], boost::is_any_of(" \t"));
+            if(l.size() != n_col)
+                Rcpp::stop(("line " + to_string(m+i+2) + " does not have " + to_string(n_col) + " elements in HAPMAP file.").c_str());
+            major = Major[m + i][0];
+            for(size_t j = 0; j < (l.size() - 11); j++) {
+                mat[j][m + i] = static_cast<T>(hapmap_marker_parser(l[j + 11], major, NA_C));
             }
-            // Rcout << endl;
-            progress.increment();
         }
-        m += buffer.size();
+        progress.increment(n_marker);
+        m += n_marker;
     }
 }
 
@@ -418,7 +424,8 @@ List numeric_scan(std::string num_file) {
     ifstream file(num_file);
     
     getline(file, line);
-    boost::split(l, line, boost::is_any_of("\t ,"));
+    l = split_line(line);
+    // boost::split(l, line, boost::is_any_of("\t ,"));
 
     n = l.size();
     m = 1;
@@ -456,7 +463,8 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     fout = fopen(bed_file.c_str(), "wb");
     
     // progress bar
-    Progress progress(m, verbose);
+    MinimalProgressBar_perc pb;
+    Progress progress(pMat->nrow(), verbose, pb);
     
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
@@ -523,7 +531,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // map
-    std::map<int, T> code;
+    std::map<int, uword> code;
     code[3] = 0;
     code[2] = 1;
     code[1] = static_cast<T>(NA_C);
@@ -542,7 +550,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     // progress bar
     int n_block = (length - 3) / buffer_size;
     if ((length - 3) % buffer_size != 0) { n_block++; }
-    Progress progress(n_block, verbose);
+    MinimalProgressBar_perc pb;
+    Progress progress(n_block, verbose, pb);
     
     // magic number of bfile
     buffer = new char [3];
@@ -561,8 +570,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         #pragma omp parallel for schedule(static)
         for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
-            size_t r = (block_start + j) / n;
-            size_t c = (block_start + j) % n * 4;
+            size_t r = j / n + i * maxLine;
+            size_t c = j % n * 4;
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < ind; x++) {

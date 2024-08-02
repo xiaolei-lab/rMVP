@@ -16,7 +16,7 @@ MVP(
   CV.MLM = NULL,
   CV.FarmCPU = NULL,
   REML = NULL,
-  priority = "speed",
+  maxLine = 10000,
   ncpus = detectCores(logical = FALSE),
   vc.method = c("BRENT", "EMMA", "HE"),
   method = c("GLM", "MLM", "FarmCPU"),
@@ -62,7 +62,7 @@ MVP(
 
 \item{REML}{a list contains ve and vg}
 
-\item{priority}{speed or memory}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{ncpus}{number of cpus used for parallel}
 

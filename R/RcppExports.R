@@ -5,12 +5,12 @@ getRow <- function(pBigMat, row) {
     .Call(`_rMVP_getRow`, pBigMat, row)
 }
 
-glm_c <- function(y, X, iXX, pBigMat, verbose = TRUE, threads = 0L) {
-    .Call(`_rMVP_glm_c`, y, X, iXX, pBigMat, verbose, threads)
+glm_c <- function(y, X, iXX, pBigMat, geno_ind = NULL, verbose = TRUE, threads = 0L) {
+    .Call(`_rMVP_glm_c`, y, X, iXX, pBigMat, geno_ind, verbose, threads)
 }
 
-mlm_c <- function(y, X, U, vgs, pBigMat, verbose = TRUE, threads = 0L) {
-    .Call(`_rMVP_mlm_c`, y, X, U, vgs, pBigMat, verbose, threads)
+mlm_c <- function(y, X, U, vgs, pBigMat, geno_ind = NULL, verbose = TRUE, threads = 0L) {
+    .Call(`_rMVP_mlm_c`, y, X, U, vgs, pBigMat, geno_ind, verbose, threads)
 }
 
 vcf_parser_map <- function(vcf_file, out) {
@@ -67,5 +67,9 @@ kin_cal_m <- function(pBigMat, threads = 0L, verbose = TRUE) {
 
 kin_cal_s <- function(pBigMat, threads = 0L, mkl = FALSE, verbose = TRUE) {
     .Call(`_rMVP_kin_cal_s`, pBigMat, threads, mkl, verbose)
+}
+
+kin_cal <- function(pBigMat, geno_ind = NULL, threads = 0L, step = 10000L, mkl = FALSE, verbose = TRUE) {
+    .Call(`_rMVP_kin_cal`, pBigMat, geno_ind, threads, step, mkl, verbose)
 }
 

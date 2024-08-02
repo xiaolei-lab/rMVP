@@ -39,8 +39,7 @@
 #' @param type.geno type parameter in bigmemory, genotype data. The default is char, it is highly recommended *NOT* to modify this parameter.
 #' @param pheno_cols Extract which columns of the phenotype file (including individual IDs)
 #' @param SNP.impute "Left", "Middle", "Right", or NULL for skip impute.
-#' @param maxLine number of SNPs, only used for saving memory when calculate kinship matrix
-#' @param priority "speed" or "memory"
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param pcs.keep how many PCs to keep
 #' @param verbose whether to print detail.
 #' @param ncpus The number of threads used, if NULL, (logical core number - 1) is automatically used
@@ -68,10 +67,10 @@
 MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = NULL, fileNum = NULL, fileMap = NULL,
                      filePhe = NULL, fileInd = NULL, fileKin = NULL, filePC = NULL, out = "mvp", sep.num = "\t",
                      auto_transpose = TRUE, sep.map = "\t", sep.phe = "\t", sep.kin = "\t", sep.pc = "\t",
-                     type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000, priority = "speed",
+                     type.geno = "char", pheno_cols = NULL, SNP.impute = "Major", maxLine = 10000,
                      pcs.keep = 5, verbose = TRUE, ncpus = NULL, ...) {
     
-    logging.initialize("MVP.Data", dirname(out))
+    # logging.initialize("MVP.Data", dirname(out))
     
     logging.log("Preparing data for MVP...\n", verbose = verbose)
     
@@ -113,6 +112,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             stop("Both Map and Numeric genotype files are needed!")
         }
     }
+    
     switch(flag,
            # fileMVP, fileVCF, fileHMP, fileBed, fileNum, fileMap
            # TODO: Fix it
@@ -135,7 +135,6 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    bfile = fileBed, 
                    out = out, 
                    maxLine = maxLine, 
-                   priority = priority, 
                    type.geno = type.geno,
                    verbose = verbose,
                    threads = ncpus
@@ -146,7 +145,6 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
                    map_file = fileMap,
                    out = out, 
                    maxLine = maxLine, 
-                   priority = priority, 
                    type.geno = type.geno,
                    auto_transpose = auto_transpose,
                    verbose = verbose
@@ -181,9 +179,9 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
         K <- MVP.Data.Kin(
             fileKin = fileKin, 
             mvp_prefix = out, 
-            priority = priority, 
+            maxLine = maxLine, 
             sep = sep.kin,
-            cpus = ncpus
+            cpu = ncpus
         )
     }
     
@@ -194,9 +192,9 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             mvp_prefix = out, 
             K = K[,],
             pcs.keep = pcs.keep,
-            priority = priority, 
+            maxLine = maxLine,
             sep = sep.pc,
-            cpus = ncpus
+            cpu = ncpus
         )
     }
 
@@ -212,7 +210,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
 #' 
 #' @param vcf_file Genotype in VCF format
 #' @param out the name of output file
-#' @param maxLine the max number of line to write to big matrix for each loop
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param type.geno the type of genotype elements
 #' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
@@ -242,7 +240,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     scan <- vcf_parser_map(vcf_file = vcf_file, out = out)
     m <- scan$m
     n <- scan$n
-    logging.log(paste0("inds: ", n, "\tmarkers:", m, '\n'), verbose = verbose)
+    logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -254,6 +252,8 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
+
+    logging.log(paste0("Loading genotype at a step of ", maxLine, '...\n'), verbose = verbose)
     vcf_parser_genotype(vcf_file = vcf_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n", verbose = verbose)
@@ -266,8 +266,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' 
 #' @param bfile Genotype in binary format (.bed, .bim, .fam)
 #' @param out the name of output file
-#' @param maxLine the max number of line to write to big matrix for each loop
-#' @param priority 'memory' or 'speed'
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param type.geno the type of genotype elements
 #' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
@@ -284,7 +283,7 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
 #' MVP.Data.Bfile2MVP(bfilePath, tempfile("outfile"), threads=1)
 #' }
 #' 
-MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', type.geno='char', threads=0, verbose=TRUE) {
+MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, type.geno='char', threads=0, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     bim_file <- normalizePath(paste0(bfile, '.bim'), mustWork = TRUE)
     fam_file <- normalizePath(paste0(bfile, '.fam'), mustWork = TRUE)
@@ -303,7 +302,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
     n <- nrow(fam)
     write.table(fam[, 2], paste0( out, '.geno.ind'), row.names = FALSE, col.names = FALSE, quote = FALSE)
     
-    logging.log(paste0("inds: ", n, "\tmarkers:", m, '\n'), verbose = verbose)
+    logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -316,7 +315,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
         dimnames = c(NULL, NULL)
     )
     
-    if (priority == "speed") { maxLine <- -1 }
+    logging.log(paste0("Loading genotype at a step of ", maxLine, '...\n'), verbose = verbose)
     read_bfile(bed_file = bed_file, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n", verbose = verbose)
@@ -329,7 +328,7 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, priority='speed', 
 #' 
 #' @param hmp_file Genotype in Hapmap format
 #' @param out the name of output file
-#' @param maxLine the max number of line to write to big matrix for each loop
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param type.geno the type of genotype elements
 #' @param threads number of thread for transforming
 #' @param verbose whether to print the reminder
@@ -360,7 +359,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
     scan <- hapmap_parser_map(hmp_file[1], out)
     m <- scan$m
     n <- scan$n
-    logging.log(paste0("inds: ", n, "\tmarkers:", m, '\n'), verbose = verbose)
+    logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
@@ -372,6 +371,8 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
+
+    logging.log(paste0("Loading genotype at a step of ", maxLine, '...\n'), verbose = verbose)
     hapmap_parser_genotype(hmp_file = hmp_file, Major = scan$Major, pBigMat = bigmat@address, maxLine = maxLine, threads = threads, verbose = verbose)
     t2 <- as.numeric(Sys.time())
     logging.log("Preparation for GENOTYPE data is done within", format_time(t2 - t1), "\n", verbose = verbose)
@@ -385,8 +386,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
 #' @param num_file Genotype in Numeric format (0,1,2)
 #' @param map_file Genotype map file, SNP_name, Chr, Pos 
 #' @param out the name of output file
-#' @param maxLine the max number of line to write to big matrix for each loop
-#' @param priority 'memory' or 'speed'
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param row_names whether the numeric genotype has row names
 #' @param col_names whether the numeric genotype has column names
 #' @param type.geno the type of genotype elements
@@ -405,7 +405,7 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
 #' MVP.Data.Numeric2MVP(numericPath, mapPath, tempfile("outfile"))
 #' }
 #' 
-MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, priority='speed', row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
+MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row_names=FALSE, col_names=FALSE, type.geno='char', auto_transpose=TRUE, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
     num_file <- normalizePath(num_file, mustWork = TRUE)
     map_file <- normalizePath(map_file, mustWork = TRUE)
@@ -426,7 +426,7 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
         transposed <- TRUE
         t <- n; n <- m; m <- t;
     }
-    logging.log(paste0("inds: ", n, "\tmarkers:", m, '\n'), verbose = verbose)
+    logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
     
     # define bigmat
     bigmat <- filebacked.big.matrix(
@@ -438,32 +438,33 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
         descriptorfile = descriptorfile,
         dimnames = c(NULL, NULL)
     )
+    logging.log(paste0("Loading genotype at a step of ", maxLine, '...\n'), verbose = verbose)
     
     # convert to bigmat - speed
-    if (priority == "speed") {
-        opts <- options(bigmemory.typecast.warning = FALSE)
-        on.exit(options(opts))
+    # if (priority == "speed") {
+    #     opts <- options(bigmemory.typecast.warning = FALSE)
+    #     on.exit(options(opts))
         
-        # detecte sep
-        con <- file(num_file, open = 'r')
-        line <- readLines(con, 1)
-        close(con)
-        sep <- substr(line, 2, 2)
+    #     # detecte sep
+    #     con <- file(num_file, open = 'r')
+    #     line <- readLines(con, 1)
+    #     close(con)
+    #     sep <- substr(line, 2, 2)
         
-        # load geno
-        suppressWarnings(
-            geno <- read.big.matrix(num_file, header = FALSE, sep = sep)
-        )
-        if (transposed) {
-            bigmat[, ] <- t(geno[, ])
-        } else {
-            bigmat[, ] <- geno[, ]
-        }
-        rm("geno")
-    }
+    #     # load geno
+    #     suppressWarnings(
+    #         geno <- read.big.matrix(num_file, header = FALSE, sep = sep)
+    #     )
+    #     if (transposed) {
+    #         bigmat[, ] <- t(geno[, ])
+    #     } else {
+    #         bigmat[, ] <- geno[, ]
+    #     }
+    #     rm("geno")
+    # }
     
     # convert to bigmat - memory
-    if (priority == "memory") {
+    # if (priority == "memory") {
         i <- 0
         con <- file(num_file, open = 'r')
         if (col_names) { readLines(con, n = 1) }
@@ -488,7 +489,7 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, pri
             logging.log(paste0("Written into MVP File: ", percent, "%"), verbose = verbose)
         }
         close(con)
-    }
+    # }
     
     file.copy(map_file, paste0(out, ".geno.map"))
     
@@ -700,9 +701,9 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
 #' @param K Kinship matrix
 #' @param out prefix of output file name
 #' @param pcs.keep how many PCs to keep
-#' @param priority speed or memory
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param sep seperator for PC file.
-#' @param cpus the number of cpu
+#' @param cpu the number of cpu
 #' @param verbose whether to print detail.
 #' 
 #' @export
@@ -714,7 +715,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
 #' \donttest{
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
+#' MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpu=1)
 #' }
 #' 
 MVP.Data.PC <- function(
@@ -723,9 +724,9 @@ MVP.Data.PC <- function(
     K=NULL, 
     out=NULL,  
     pcs.keep=5,
-    priority='speed',
+    maxLine=10000,
     sep='\t',
-    cpus=1,
+    cpu=1,
     verbose=TRUE
 ){
     if (is.null(out)) out <- mvp_prefix
@@ -740,9 +741,9 @@ MVP.Data.PC <- function(
     } else if (filePC == TRUE) {
         if(is.null(K)){
             geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-            myPC <- MVP.PCA(M=geno, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
+            myPC <- MVP.PCA(M=geno, pcs.keep = pcs.keep, maxLine = maxLine, cpu=cpu)
         }else{
-            myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, priority=priority, cpu=cpus)
+            myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, maxLine = maxLine, cpu=cpu)
         }
     } else {
         stop("ERROR: The value of filePC is invalid.")
@@ -769,9 +770,9 @@ MVP.Data.PC <- function(
 #' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
 #' @param mvp_prefix Prefix for mvp format files
 #' @param out prefix of output file name
-#' @param priority "speed" or "memory"
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param sep seperator for Kinship file.
-#' @param cpus the number of cpu
+#' @param cpu the number of cpu
 #' @param verbose whether to print detail.
 #'
 #' @export
@@ -783,16 +784,16 @@ MVP.Data.PC <- function(
 #' \donttest{
 #' geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 #' 
-#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
+#' MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpu=1)
 #' }
 #' 
 MVP.Data.Kin <- function(
     fileKin=TRUE, 
     mvp_prefix='mvp', 
     out=NULL, 
-    priority='speed', 
+    maxLine=10000, 
     sep='\t',
-    cpus=1,
+    cpu=1,
     verbose=TRUE
 ) {
     if (is.null(out)) out <- mvp_prefix
@@ -806,8 +807,7 @@ MVP.Data.Kin <- function(
         myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-        logging.log("Calculate KINSHIP using Vanraden method...", "\n", verbose = verbose)
-        myKin <- MVP.K.VanRaden(geno, priority = priority, cpu = cpus)
+        myKin <- MVP.K.VanRaden(geno, step = maxLine, cpu = cpu, verbose = verbose)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }

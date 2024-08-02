@@ -10,9 +10,9 @@ MVP.Data.PC(
   K = NULL,
   out = NULL,
   pcs.keep = 5,
-  priority = "speed",
+  maxLine = 10000,
   sep = "\\t",
-  cpus = 1,
+  cpu = 1,
   verbose = TRUE
 )
 }
@@ -27,11 +27,11 @@ MVP.Data.PC(
 
 \item{pcs.keep}{how many PCs to keep}
 
-\item{priority}{speed or memory}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{sep}{seperator for PC file.}
 
-\item{cpus}{the number of cpu}
+\item{cpu}{the number of cpu}
 
 \item{verbose}{whether to print detail.}
 }
@@ -47,7 +47,7 @@ Principal component analysis
 \donttest{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 
-MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
+MVP.Data.PC(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpu=1)
 }
 
 }

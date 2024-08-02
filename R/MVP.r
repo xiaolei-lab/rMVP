@@ -34,7 +34,7 @@
 #' @param CV.MLM covariates added in MLM
 #' @param CV.FarmCPU covariates added in FarmCPU
 #' @param REML a list contains ve and vg
-#' @param priority speed or memory
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param ncpus number of cpus used for parallel
 #' @param vc.method methods for estimating variance component("EMMA" or "HE" or "BRENT")
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
@@ -83,7 +83,7 @@
 #' }
 MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
-         CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, priority="speed", 
+         CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, maxLine=10000, 
          ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), 
          method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
@@ -162,10 +162,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:n)[-na.index])
     if (length(seqTaxa) != n) {
         logging.log("Total", n - length(seqTaxa), "individuals removed due to missings", "\n", verbose = verbose)
-        geno = deepcopy(
-          x = geno,
-          cols = seqTaxa
-        )
         phe = phe[seqTaxa,]
         if (!is.null(K)) { K = K[seqTaxa, seqTaxa] }
         if (!is.null(CV.GLM)) { CV.GLM = CV.GLM[seqTaxa,] }
@@ -173,9 +169,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa,] }
     }
 
-    m <- nrow(geno)
-    n <- ncol(geno)
-    
     #initial results
     glm.results <- NULL
     mlm.results <- NULL
@@ -199,9 +192,11 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (is.null(K)) {
             K <- MVP.K.VanRaden(
               M = geno, 
-              priority = priority, 
+              ind_idx = seqTaxa, 
+              step = maxLine, 
               cpu = ncpus, 
-              verbose = verbose
+              verbose = verbose,
+              checkNA = FALSE
             )
         }
         logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
@@ -278,7 +273,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, cpu=ncpus, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, geno_ind_idx=seqTaxa, cpu=ncpus, verbose = verbose);gc()
         colnames(glm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -293,7 +288,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, geno_ind_idx=seqTaxa, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -308,7 +303,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     
     if (farmcpu.run) {
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, geno_ind_idx=seqTaxa, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("Effect", "SE", paste(colnames(phe)[2],"FarmCPU",sep="."))
         z = farmcpu.results[, 1]/farmcpu.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)

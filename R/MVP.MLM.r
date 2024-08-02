@@ -23,6 +23,7 @@
 #' @param K Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite
 #' @param eigenK list of eigen Kinship
 #' @param CV covariates
+#' @param geno_ind_idx the index of effective genotyped individuals
 #' @param REML a list that contains ve and vg
 #' @param cpu number of cpus used for parallel computation
 #' @param vc.method the methods for estimating variance component("emma" or "he" or "brent")
@@ -57,36 +58,32 @@ function(
     K=NULL,
     eigenK=NULL,
     CV=NULL, 
+    geno_ind_idx=NULL,
     REML=NULL,
     cpu=1,
     vc.method=c("BRENT", "EMMA", "HE"),
     verbose=TRUE
 ){
-    # R.ver <- Sys.info()[['sysname']]
-    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
-    
-    # if (R.ver == 'Windows') cpu <- 1
-    # if (r.open && cpu > 1 && R.ver == 'Darwin') {
-    #     Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    # }
 
     vc.method <- match.arg(vc.method)
-    n <- ncol(geno)
+    n <- ifelse(is.null(geno_ind_idx), ncol(geno), length(geno_ind_idx))
     m <- nrow(geno)
     ys <- as.numeric(as.matrix(phe[,2]))
 
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(ys)) != 0) stop("NAs are not allowed in phenotype.")
-    if(nrow(phe) != ncol(geno)) stop("number of individuals not match in phenotype and genotype.")
+    if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
     
     if(is.null(K)){
         if(vc.method == "EMMA" | vc.method == "he")  stop("Kinship must be provided!")
         if(vc.method == "BRENT"){
             if(is.null(eigenK)) stop("eigenK must be provided!")
+            if(length(eigenK$values) != n) stop("number of individuals does not match in phenotype and eigen values.")
         }
     }else{
         # convert K to base:matrix
         K <- K[, ]
+        if(nrow(K) != n) stop("number of individuals does not match in phenotype and relationship matrix.")
         if(is.null(eigenK)){
             logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
             eigenK <- eigen(K, symmetric=TRUE)
@@ -95,7 +92,9 @@ function(
 
     if (is.null(CV)) {
         X0 <- matrix(1, n)
-    } else {
+    }else{
+        if(nrow(CV) != n)   stop("number of individuals does not match in phenotype and fixed effects.")
+        if(sum(is.na(CV)) != 0) stop("NAs are not allowed in fixed effects.")
         CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
         CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
@@ -121,7 +120,7 @@ function(
     
     logging.log("scanning...\n", verbose = verbose)
     mkl_env({
-        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, verbose = verbose, threads = cpu)
+        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, geno_ind_idx, verbose = verbose, threads = cpu)
     })
 
     return(results)

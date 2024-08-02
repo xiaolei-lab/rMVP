@@ -7,7 +7,8 @@
 MVP.PCA(
   M = NULL,
   K = NULL,
-  priority = c("speed", "memory"),
+  maxLine,
+  ind_idx = NULL,
   pcs.keep = 5,
   cpu = 1,
   verbose = TRUE
@@ -18,7 +19,7 @@ MVP.PCA(
 
 \item{K}{kinship matrix}
 
-\item{priority}{speed or memory}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{pcs.keep}{maximum number of PCs for output}
 

@@ -20,7 +20,7 @@ MVP.Data.Hapmap2MVP(
 
 \item{out}{the name of output file}
 
-\item{maxLine}{the max number of line to write to big matrix for each loop}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{type.geno}{the type of genotype elements}
 

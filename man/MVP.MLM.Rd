@@ -10,6 +10,7 @@ MVP.MLM(
   K = NULL,
   eigenK = NULL,
   CV = NULL,
+  geno_ind_idx = NULL,
   REML = NULL,
   cpu = 1,
   vc.method = c("BRENT", "EMMA", "HE"),
@@ -26,6 +27,8 @@ MVP.MLM(
 \item{eigenK}{list of eigen Kinship}
 
 \item{CV}{covariates}
+
+\item{geno_ind_idx}{the index of effective genotyped individuals}
 
 \item{REML}{a list that contains ve and vg}
 

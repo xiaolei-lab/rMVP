@@ -19,7 +19,7 @@
 #' 
 #' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param K kinship matrix
-#' @param priority speed or memory
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param pcs.keep maximum number of PCs for output
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
@@ -40,22 +40,12 @@
 #' }
 #' 
 MVP.PCA <-
-function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbose=TRUE){
-    # R.ver <- Sys.info()[['sysname']]
-    # wind <- R.ver == 'Windows'
-    # linux <- R.ver == 'Linux'
-    # mac <- (!linux) & (!wind)
-    # r.open <- eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
+function(M=NULL, K=NULL, maxLine, ind_idx=NULL, pcs.keep=5, cpu=1, verbose=TRUE){
 
-    # if (r.open && mac) {
-    #     Sys.setenv("VECLIB_MAXIMUM_THREADS" = "1")
-    # }
     #Data Check
     if (is.null(M) & is.null(K)) {
         stop("There is no genotype data or relationship matrix!")
     }
-
-    priority <- match.arg(priority)
 
     if (pcs.keep < 0) {
         pcs.keep = 0
@@ -66,11 +56,10 @@ function(M=NULL, K=NULL, priority=c("speed", "memory"), pcs.keep=5, cpu=1, verbo
     }
 
     if(is.null(K)){
-        K <- MVP.K.VanRaden(M=M, priority=priority, cpu=cpu)
+        K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, step = maxLine, cpu = cpu, verbose = verbose)
     }
 
     logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)
-    # if(r.open)  eval(parse(text = "try(setMKLthreads(cpu), silent=TRUE)"))
     PCs <- eigen(K, symmetric=TRUE)$vectors[, 1:pcs.keep]
     logging.log("Deriving PCs successfully", "\n", verbose = verbose)
 

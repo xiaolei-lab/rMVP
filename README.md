@@ -1,6 +1,6 @@
-# MVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.0.6-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
+# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.1.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
 
-## A [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Tool for Genome-Wide Association Study
+## An [r](https://) package for [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Genome-Wide Association Study
 
 
 <p align="center">
@@ -9,7 +9,7 @@
 </a>
 </p>
 
-### #-----------------------***rMVP [v1.0.0]() is coming, and better again!***------------------------#
+### #-----------------------***rMVP [v1.1.0]() is coming, and stronger again!***------------------------#
 
 ### Repos:
 **Github:** https://github.com/xiaolei-lab/rMVP  
@@ -37,39 +37,39 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
         <td><g-emoji class="g-emoji" alias="bar_chart" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4ca.png">📊</g-emoji> <strong><a href="https://github.com/YinLiLin/CMplot">CMplot</a></strong>: A drawing tool for genetic analyses.</td>
     </tr>
 </table>
-
+<!-- omit in toc -->
 ### Contents
-<!-- TOC updateOnSave:false -->
-
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
-    - [Phenotype](#phenotype)
-    - [PLINK binary](#plink-binary)/[VCF](#vcf)/[Hapmap](#hapmap)/[Numeric](#numeric)
-    - [Kinship](#kinship)/[Principal Components](#principal-components)
+  - [Phenotype](#phenotype)
+  - [Genotype](#genotype)
+    - [PLINK binary](#plink-binary)
+    - [VCF](#vcf)
+    - [Hapmap](#hapmap)
+    - [Numeric](#numeric)
+  - [Genomic relationship matrix (Optional)](#genomic-relationship-matrix-optional)
+  - [Principal Components (Optional)](#principal-components-optional)
 - [Data Input](#data-input)
-    - [Basic](#basic)
-    - [Advanced](#advanced)
+  - [Basic](#basic)
+  - [Advanced](#advanced)
 - [Start GWAS](#start-gwas)
 - [Output](#output)
-    - [Phenotype distribution](#phenotype-distribution)
-    - [SNP-density plot](#snp-density-plot)
-    - [PCA plot](#pca-plot)
-    - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
-    - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
+  - [Phenotype distribution](#phenotype-distribution)
+  - [SNP-density plot](#snp-density-plot)
+  - [PCA plot](#pca-plot)
+  - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
+  - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
     - [Manhattan plot in Rectangular fashion for multiple traits or methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits-or-methods)
     - [Q-Q plot for single trait or method](#q-q-plot-for-single-trait-or-method)
     - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)
 - [Citation](#citation)
 - [FAQ and Hints](#faq-and-hints)
-
-<!-- /TOC -->
-
 ---
 
 # Installation
 **[back to top](#contents)**  
 
-~~**WE STRONGLY RECOMMEND TO INSTALL MVP ON Microsoft R Open(https://mran.microsoft.com/download/)**~~ (deprecated)  
+WE STRONGLY RECOMMEND TO link MKL or OpenBLAS with R to accelerate parallel computing. To install **rMVP** in R:
 
 * The stable version: 
 ```R
@@ -81,11 +81,11 @@ install.packages("rMVP")
 devtools::install_github("xiaolei-lab/rMVP")
 ```
 
-After installed successfully, **MVP** can be loaded by typing
+After installed successfully, **rMVP** can be loaded by typing
 ```r
 library(rMVP)
 ```
-Typing ```?MVP``` could get the details of all parameters.
+Typing ```?rMVP``` could get the details of all parameters.
 
 **For more help on Windows installation, see the [wiki page](https://github.com/XiaoleiLiuBio/rMVP/wiki/R-%E8%AF%AD%E8%A8%80%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97%EF%BC%88Windows%EF%BC%89) (Chinese)**
 
@@ -94,7 +94,7 @@ Typing ```?MVP``` could get the details of all parameters.
 # Data Preparation
 ## Phenotype
 **[back to top](#contents)**  
-We suggest to provide the phenotype file, users needn't to manually pre-treat the order of phenotype and genotype individuals, rMVP could automatically adjust the order of genotype file to be consistent with phenotype file. **Note that if the phenotype is provided in data conversion, rMVP will generate a new phenotype file, please remember to load it for analysis rather than original one**.
+We suggest to provide the phenotype file, because users needn't to manually pre-treat the order of phenotype and genotype individuals, rMVP could automatically adjust the order of phenotype file to be consistent with genotype file. **Note that if the phenotype is provided in data conversion, rMVP will generate a new phenotype file, please remember to load it for analysis rather than original one**.
 
 | Taxa | trait1 | trait2 | trait3 |
 | :---: | :---: |:---: |:---: |
@@ -106,7 +106,8 @@ We suggest to provide the phenotype file, users needn't to manually pre-treat th
 |A214N|	95.13|0.87|0|
 |A239	|100.2|-0.16|1|
 
-## PLINK binary
+## Genotype
+### PLINK binary
 **[back to top](#contents)**  
 If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh.harvard.edu/plink/data.shtml#bed):  
 
@@ -114,24 +115,22 @@ If you have genotype data in **PLINK Binary** format (details see http://zzz.bwh
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
 **out**, prefix of output file  
-**priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
-**maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
+**maxLine**, number, the number of markers read into memory  
 ```r
 # Full-featured function (Recommended)
 MVP.Data(fileBed="plink",
          filePhe=NULL,
          fileKin=FALSE,
          filePC=FALSE,       
-         #priority="speed",
          #maxLine=10000,
          out="mvp.plink"
          )
          
 # Only convert genotypes
-MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4, priority='speed') # the genotype data should be fully imputed before using this function
+MVP.Data.Bfile2MVP(bfile="plink", out='mvp', maxLine=1e4) # the genotype data should be fully imputed before using this function
 ```
 
-## VCF
+### VCF
 **[back to top](#contents)**  
 If you have genotype data in **VCF** format:  
 **fileVCF**, name of genotype data in VCF format  
@@ -169,7 +168,7 @@ MVP.Data(fileVCF="myVCF.vcf",
 MVP.Data.VCF2MVP("myVCF.vcf", out='mvp') # the genotype data should be fully imputed before using this function
 ```
 
-## Hapmap
+### Hapmap
 **[back to top](#contents)**  
 If you have genotype data in **Hapmap** format:  
 
@@ -178,9 +177,8 @@ If you have genotype data in **Hapmap** format:
 **sep.phe**, separator of phenotype file  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
-**out**, the prefix of output file  
-**priority**, "speed" or "memory", the 'speed' mode is faster but uses more memory while 'memory' is slower but uses less memory  
-**maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
+**out**, the prefix of output file   
+**maxLine**, number, the number of markers read into memory  
 
 > `hapmap.txt`
 
@@ -202,7 +200,6 @@ MVP.Data(fileHMP="hapmap.txt",
          SNP.effect="Add",
          fileKin=FALSE,
          filePC=FALSE,
-         #priority="memory",
          #maxLine=10000,
          out="mvp.hmp"
          )
@@ -222,14 +219,13 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
          SNP.effect="Add",
          fileKin=FALSE,
          filePC=FALSE,
-         #priority="memory",
          #maxLine=10000,
          out="mvp.hmp"
          )
 ```
 -->
 
-## Numeric
+### Numeric
 **[back to top](#contents)**  
 If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the number of SNPs, n is the number of individuals) format:  
 
@@ -241,9 +237,8 @@ If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the 
 **type.geno**, the type of data in Numeric file, "char", "integer", or "double"  
 **fileKin**, TRUE or FALSE, if TRUE, kinship matrix represents relationship among individuals will be calculated  
 **filePC**, TRUE or FALSE, if TRUE, principal component analysis will be performed  
-**out**, the prefix of output file  
-**priority**, "speed" or "memory", the "speed" mode is faster but uses more memory while "memory" is slower but uses less memory  
-**maxLine**, number, if **priority = "memory"**, it is the number of markers read into memory  
+**out**, the prefix of output file   
+**maxLine**, number, the number of markers read into memory  
 **auto_transpose**, bool, if **auto_transpose = TRUE**, it is automatically transposed to ensure that the number of rows (markers) is greater than the number of columns (individuals).  
 
 <table>
@@ -352,16 +347,15 @@ MVP.Data(fileNum="Numeric.txt",
          sep.phe="\t",
          fileKin=FALSE,
          filePC=FALSE,
-         #priority="memory",
          #maxLine=10000,
          out="mvp.num"
          )
 
 # Only convert genotypes
-MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, priority='speed', auto_transpose=T) # the genotype data should be fully imputed before using this function
+MVP.Data.Numeric2MVP("Numeric.txt", out='mvp', maxLine=1e4, auto_transpose=T) # the genotype data should be fully imputed before using this function
 ```
 
-## Kinship
+## Genomic relationship matrix (Optional)
 **[back to top](#contents)**  
 If you have Kinship matrix data that represents the relationship among individuals  
 
@@ -438,13 +432,13 @@ If you have Kinship matrix data that represents the relationship among individua
 
 ```r
 # read from file
-MVP.Data.Kin("mvp.kin.txt", out="mvp", maxLine=1e4, priority='memory', sep='\t')
+MVP.Data.Kin("mvp.kin.txt", out="mvp", maxLine=1e4, sep='\t')
 
 # calculate from mvp_geno_file
 MVP.Data.Kin(TRUE, mvp_prefix='mvp.vcf', out='mvp')
 ```
 
-## Principal Components
+## Principal Components (Optional)
 **[back to top](#contents)**  
 If you have Principal Components data  
 
@@ -513,7 +507,7 @@ map <- read.table("mvp.geno.map" , head = TRUE)
 
 ## Advanced
 **[back to top](#contents)**  
-You can give MVP the prepared Kinship matrix and Covariates data generated by **'MVP.Data'** function  
+You can load the prepared Kinship matrix and Covariates data generated by **'MVP.Data'** function  
 **Kinship**, Kinship matrix, the dimension of Kinship matrix is n * n (n is sample size), no taxa names included  
 **Covariates**, Covariates matrix, the dimension of Covariates matrix is n * nCV (n is sample size, nCV is number of covariates, no taxa names and header row included  
 ***NOTE***: **If pcs have been added in covariate files, PLEASE DO NOT assign value to nPC.GLM, nPC.MLM, nPC.FarmCPU.**
@@ -522,15 +516,16 @@ You can give MVP the prepared Kinship matrix and Covariates data generated by **
 Kinship <- attach.big.matrix("mvp.kin.desc")
 Covariates_PC <- bigmemory::as.matrix(attach.big.matrix("mvp.pc.desc"))
 ```
-If you have additional fixed effects (breed, sex) or covariates (weight), please use it as following:
+If you have additional environmental fixed effects (e.g., breed, sex) or covariates (weight), please use it as following:
 ```
-Covariates <- model.matrix(~as.factor(breed)+as.factor(sex)+as.numeric(weight), data=yourdata)
+Covariates <- model.matrix.lm(~as.factor(breed)+as.factor(sex)+as.numeric(weight), data=yourdata, na.action = "na.pass")
+# NA is acceptable in 'Covariates'
 
 # if you are supposed to take PC to covariate
 Covariates <- cbind(Covariates, Covariates_PC)
 
 ```
-***NOTE***: **rMVP has no function of adjusting the order of individuals in covariates. PLEASE make sure the order of individuals in covariates file must be consistent with the output phenotype file of 'MVP.Data'.**
+***NOTE***: **rMVP has no function of adjusting the order of individuals in covariates. PLEASE make sure the order of individuals in covariates file must be consistent with that in genotype file.**
 
 If you have prepared Kinship matrix and Covariates data generated by other software packages, see **[Kinship](#kinship)** and **[Principal Components](#principal-components)**
 
@@ -555,7 +550,7 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 **nPC.MLM**, number of first columns of Principal Components added in MLM  
 **please attention that if nPC.FarmCPU > 0, no PCs should be added in CV.FarmCPU**  
 **nPC.FarmCPU**, number of first columns of Principal Components added in FarmCPU  
-**priority**, **"speed"** or **"memory" when calculating the genomic relationship matrix**  
+**maxLine**, the number of markers handled at a time, smaller value would reduce the memory cost  
 **ncpus**, number of CPUs used for parallel computation, If not set, all CPUs will be used by default  
 **vc.method**, methods of variance components analysis, three methods are avaiblable, "BRENT", "EMMA", and "HE"  
 **maxLoop**, a parameter for FarmCPU only, the maximum iterations allowed in FarmCPU  
@@ -568,23 +563,20 @@ Three models are included in MVP package: General Linear Model (GLM), Mixed Line
 
 ```r
 imMVP <- MVP(
-    phe=phenotype,
+    phe=phenotype,          #NA is acceptable in phenotype
     geno=genotype,
     map=map,
-    #K=Kinship,
-    #CV.GLM=Covariates,  ##if you have additional covariates, please keep there open.
+    #K=Kinship,             #if you have pre-computed GRM, please keep there open, otherwise rMVP will compute it automatically
+    #CV.GLM=Covariates,     #if you have environmental covariates, please keep all 'CV.*' open
     #CV.MLM=Covariates,
     #CV.FarmCPU=Covariates,
-    nPC.GLM=5,   ##if you have added PCs into covariates, please keep there closed.
-    nPC.MLM=3,  ##if you don't want to add PCs as covariates, please comment out the parameters instead of setting the nPC to 0.
+    nPC.GLM=5,              #if you have added PCs into covariates, please keep there closed
+    nPC.MLM=3,              #if you don't want to add PCs as covariates, please comment out the parameter instead of setting it to 0.
     nPC.FarmCPU=3,
-    priority="speed",   ##for Kinship construction
+    maxLine=10000,          #smaller value would reduce the memory cost
     #ncpus=10,
-    vc.method="BRENT",  ##only works for MLM
-    maxLoop=10,
-    method.bin="static",   ## "FaST-LMM", "static" (#only works for FarmCPU)
-    #permutation.threshold=TRUE,
-    #permutation.rep=100,
+    vc.method="BRENT",      #only works for MLM
+    method.bin="static",    # "FaST-LMM", "static" (#only works for FarmCPU)
     threshold=0.05,
     method=c("GLM", "MLM", "FarmCPU"),
     file.output=c("pmap", "pmap.signal", "plot", "log")
@@ -606,13 +598,10 @@ for(i in 2:ncol(phenotype)){
     nPC.GLM=5,
     nPC.MLM=3,
     nPC.FarmCPU=3,
-    priority="speed",
+    maxLine=10000,
     #ncpus=10,
     vc.method="BRENT",
-    maxLoop=10,
     method.bin="static",
-    #permutation.threshold=TRUE,
-    #permutation.rep=100,
     threshold=0.05,
     method=c("GLM", "MLM", "FarmCPU"),
     file.output=c("pmap", "pmap.signal", "plot", "log")

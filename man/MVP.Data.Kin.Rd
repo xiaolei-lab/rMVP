@@ -8,9 +8,9 @@ MVP.Data.Kin(
   fileKin = TRUE,
   mvp_prefix = "mvp",
   out = NULL,
-  priority = "speed",
+  maxLine = 10000,
   sep = "\\t",
-  cpus = 1,
+  cpu = 1,
   verbose = TRUE
 )
 }
@@ -21,11 +21,11 @@ MVP.Data.Kin(
 
 \item{out}{prefix of output file name}
 
-\item{priority}{"speed" or "memory"}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{sep}{seperator for Kinship file.}
 
-\item{cpus}{the number of cpu}
+\item{cpu}{the number of cpu}
 
 \item{verbose}{whether to print detail.}
 }
@@ -41,7 +41,7 @@ Kinship
 \donttest{
 geno <- file.path(system.file("extdata", "06_mvp-impute", package = "rMVP"), "mvp.imp")
 
-MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpus=1)
+MVP.Data.Kin(TRUE, mvp_prefix=geno, out=tempfile("outfile"), cpu=1)
 }
 
 }

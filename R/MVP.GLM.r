@@ -21,6 +21,7 @@
 #' @param phe phenotype, n * 2 matrix
 #' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
+#' @param geno_ind_idx the index of effective genotyped individuals
 #' @param cpu number of cpus used for parallel computation
 #' @param verbose whether to print detail.
 #'
@@ -47,21 +48,24 @@ function(
     phe, 
     geno, 
     CV=NULL, 
-    cpu=1, 
+    geno_ind_idx = NULL,
+    cpu=1,
     verbose=TRUE
 ){
 
-    n <- ncol(geno)
+    n <- ifelse(is.null(geno_ind_idx), ncol(geno), length(geno_ind_idx))
     m <- nrow(geno)
     ys <- as.numeric(as.matrix(phe[,2]))
     
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(ys)) != 0) stop("NAs are not allowed in phenotype.")
-    if(nrow(phe) != ncol(geno)) stop("number of individuals not match in phenotype and genotype.")
+    if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
     
     if(is.null(CV)){
         X0 <- matrix(1, n)
     }else{
+        if(nrow(CV) != n)   stop("number of individuals does not match in phenotype and fixed effects.")
+        if(sum(is.na(CV)) != 0) stop("NAs are not allowed in fixed effects.")
         CV.index <- apply(CV, 2, function(x) length(table(x)) > 1)
         CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
@@ -72,7 +76,7 @@ function(
     logging.log("scanning...\n", verbose = verbose)
 
     mkl_env({
-        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, verbose = verbose, threads = cpu)
+        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, geno_ind = geno_ind_idx, verbose = verbose, threads = cpu)
     })
 
     return(results[, c(1, 2, ncol(results))])

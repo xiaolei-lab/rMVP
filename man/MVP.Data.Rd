@@ -29,7 +29,6 @@ MVP.Data(
   pheno_cols = NULL,
   SNP.impute = "Major",
   maxLine = 10000,
-  priority = "speed",
   pcs.keep = 5,
   verbose = TRUE,
   ncpus = NULL,
@@ -80,9 +79,7 @@ the column represents the individual.}
 
 \item{SNP.impute}{"Left", "Middle", "Right", or NULL for skip impute.}
 
-\item{maxLine}{number of SNPs, only used for saving memory when calculate kinship matrix}
-
-\item{priority}{"speed" or "memory"}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{pcs.keep}{how many PCs to keep}
 
