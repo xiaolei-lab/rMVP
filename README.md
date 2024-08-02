@@ -9,7 +9,7 @@
 </a>
 </p>
 
-### #-----------------------***rMVP [v1.1.0]() is coming, and stronger again!***------------------------#
+### #----------------------***rMVP [v1.1.0]() is coming, and stronger again!***------------------------#
 
 ### Repos:
 **Github:** https://github.com/xiaolei-lab/rMVP  
@@ -37,7 +37,7 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
         <td><g-emoji class="g-emoji" alias="bar_chart" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4ca.png">📊</g-emoji> <strong><a href="https://github.com/YinLiLin/CMplot">CMplot</a></strong>: A drawing tool for genetic analyses.</td>
     </tr>
 </table>
-<!-- omit in toc -->
+
 ### Contents
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
