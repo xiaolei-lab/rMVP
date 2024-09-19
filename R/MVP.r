@@ -38,6 +38,7 @@
 #' @param ncpus number of cpus used for parallel
 #' @param vc.method methods for estimating variance component("EMMA" or "HE" or "BRENT")
 #' @param method the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")
+#' @param maf the threshold of minor allele frequency to filter SNPs in analysis
 #' @param p.threshold if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops
 #' @param QTN.threshold in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs
 #' @param method.bin 'static' or 'FaST-LMM'
@@ -48,7 +49,7 @@
 #' @param permutation.rep number of permutation replicates
 #' @param col for color of points in each chromosome on manhattan plot
 #' @param memo Character. A text marker on output files
-#' @param outpath Effective only when file.output = TRUE, determines the path of the output file
+#' @param tmppath the path of the temporary file
 #' @param file.output whether to output files or not
 #' @param file.type figure formats, "jpg", "tiff"
 #' @param dpi resolution for output figures
@@ -85,7 +86,7 @@ MVP <-
 function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
          CV.GLM=NULL, CV.MLM=NULL, CV.FarmCPU=NULL, REML=NULL, maxLine=10000, 
          ncpus=detectCores(logical = FALSE), vc.method=c("BRENT", "EMMA", "HE"), 
-         method=c("GLM", "MLM", "FarmCPU"), p.threshold=NA, 
+         method=c("GLM", "MLM", "FarmCPU"), maf=NULL, p.threshold=NA, 
          QTN.threshold=0.01, method.bin="static", bin.size=c(5e5,5e6,5e7), 
          bin.selection=seq(10,100,10), maxLoop=10, permutation.threshold=FALSE, 
          permutation.rep=100, memo=NULL, outpath=getwd(),
@@ -124,7 +125,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if (nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
     if (nrow(geno) != nrow(map)) stop("The number of markers in genotype and map doesn't match!")
     if (!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
-    if(hasNA(geno@address))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
     
     #list -> matrix
     map <- as.data.frame(map)
@@ -158,15 +158,54 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
 
     #remove samples with missing phenotype
-    seqTaxa = which(!is.na(phe[,2]))
+    seqTaxa <- which(!is.na(phe[,2]))
     if (length(na.index) != 0) seqTaxa <- intersect(seqTaxa, c(1:n)[-na.index])
-    if (length(seqTaxa) != n) {
-        logging.log("Total", n - length(seqTaxa), "individuals removed due to missings", "\n", verbose = verbose)
+    if (length(seqTaxa) == 0)   stop("no effective individuals left due to missings")
+    if (length(seqTaxa) == n) seqTaxa <- NULL
+    if (!is.null(seqTaxa)) {
+        logging.log("Total", n - length(seqTaxa), "individuals are removed due to missings", "\n", verbose = verbose)
         phe = phe[seqTaxa,]
         if (!is.null(K)) { K = K[seqTaxa, seqTaxa] }
-        if (!is.null(CV.GLM)) { CV.GLM = CV.GLM[seqTaxa,] }
-        if (!is.null(CV.MLM)) { CV.MLM = CV.MLM[seqTaxa,] }
-        if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa,] }
+        if (!is.null(CV.GLM)) { CV.GLM = CV.GLM[seqTaxa, , drop = FALSE] }
+        if (!is.null(CV.MLM)) { CV.MLM = CV.MLM[seqTaxa, , drop = FALSE] }
+        if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa, , drop = FALSE] }
+        if(length(seqTaxa) < n * 0.85){
+            geno <- deepcopy(geno, cols = seqTaxa)
+            seqTaxa <- NULL
+        }
+    }
+
+    logging.log("Check if NAs exist in genotype...", verbose = verbose)
+    if(hasNA(geno@address, geno_ind = seqTaxa, threads = ncpus))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
+    logging.log("(OK!)", "\n", verbose = verbose)
+
+    #remove SNPs with low MAF
+    geno_marker_index <- NULL
+    map_sub <- map
+    if (!is.null(maf)){
+        if(length(maf) != 1) stop("maf should be a value")
+        if(maf <= 0 || maf >= 0.5) stop("maf should be at the range of 0-0.5")
+        logging.log("Calculate allele frequency...", "\n", verbose = verbose)
+        marker_maf <- BigRowMean(geno@address, threads = ncpus, geno_ind = seqTaxa) / 2
+        marker_maf <- ifelse(marker_maf > 0.5, 1 - marker_maf, marker_maf)
+        geno_marker_index <- which(marker_maf > maf)
+        if(length(geno_marker_index) == 0) stop(paste("MAFs of all markers are smaller than the threshold", maf))
+        if(length(geno_marker_index) == 1) stop(paste("only 1 marker left on the given MAF threshold", maf))
+        if(length(geno_marker_index) == m)  geno_marker_index <- NULL
+    }
+    if(!is.null(geno_marker_index)){
+        logging.log("Total", m - length(geno_marker_index), "markers are removed at MAF threshold", maf, "\n", verbose = verbose)
+        m <- length(geno_marker_index)
+        map_sub <- map[geno_marker_index, ]
+        if(length(geno_marker_index) < m * 0.85){
+            if(!is.null(seqTaxa)){
+                geno <- deepcopy(geno, cols = seqTaxa, rows = geno_marker_index)
+                seqTaxa <- NULL
+            }else{
+                geno <- deepcopy(geno, rows = geno_marker_index)
+            }
+            geno_marker_index <- NULL
+        }
     }
 
     #initial results
@@ -179,7 +218,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     mlm.run <- "MLM" %in% method
     farmcpu.run <- "FarmCPU" %in% method
     
-
     nPC <- suppressWarnings(max(nPC.GLM, nPC.MLM, nPC.FarmCPU, na.rm = TRUE))
     if (nPC <= 0) {
         nPC <- NULL
@@ -193,7 +231,8 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             K <- MVP.K.VanRaden(
               M = geno, 
               ind_idx = seqTaxa, 
-              step = maxLine, 
+              mrk_idx = geno_marker_index,
+              maxLine = maxLine, 
               cpu = ncpus, 
               verbose = verbose,
               checkNA = FALSE
@@ -273,14 +312,14 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, geno_ind_idx=seqTaxa, cpu=ncpus, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus, verbose = verbose);gc()
         colnames(glm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
             logging.log("Writing results to local file", "\n", verbose = verbose)
-            write.csv(x = cbind(map, glm.results), 
+            write.csv(x = cbind(map_sub, glm.results), 
                     file = file.path(outpath, paste(colnames(phe)[2], ".GLM.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
@@ -288,14 +327,14 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, geno_ind_idx=seqTaxa, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
             logging.log("Writing results to local file", "\n", verbose = verbose)
-            write.csv(x = cbind(map, mlm.results), 
+            write.csv(x = cbind(map_sub, mlm.results), 
                     file = file.path(outpath, paste(colnames(phe)[2], ".MLM.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
@@ -303,20 +342,20 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     
     if (farmcpu.run) {
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, geno_ind_idx=seqTaxa, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ind_idx=seqTaxa, mrk_idx=geno_marker_index, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("Effect", "SE", paste(colnames(phe)[2],"FarmCPU",sep="."))
         z = farmcpu.results[, 1]/farmcpu.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
         logging.log("Genomic inflation factor (lambda):", round(lambda, 4), "\n", verbose = verbose)
         if ("pmap" %in% file.output) {
             logging.log("Writing results to local file", "\n", verbose = verbose)
-            write.csv(x = cbind(map,farmcpu.results), 
+            write.csv(x = cbind(map_sub, farmcpu.results), 
                     file = file.path(outpath, paste(colnames(phe)[2], ".FarmCPU.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                     row.names = FALSE)
         }
     }
     
-    MVP.return <- list(map=map, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
+    MVP.return <- list(map=map_sub, glm.results=glm.results, mlm.results=mlm.results, farmcpu.results=farmcpu.results)
     
     if(permutation.threshold){
         # set.seed(12345)
@@ -327,7 +366,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             myY.shuffle = phe
             myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
             #GWAS using t.test...
-            myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, cpu=ncpus)
+            myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus)
             pvalue = min(myPermutation[,3],na.rm=TRUE)
             if(i==1){
                     pvalue.final=pvalue
@@ -343,7 +382,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (glm.run) {
             index <- which(glm.results[, ncol(glm.results)] < threshold/m)
             if (length(index) != 0) {
-              write.csv(x = cbind.data.frame(map, glm.results)[index, ], 
+              write.csv(x = cbind.data.frame(map_sub, glm.results)[index, ], 
                         file = file.path(outpath, paste(colnames(phe)[2], ".GLM_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }
@@ -351,7 +390,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (mlm.run) {
             index <- which(mlm.results[, ncol(mlm.results)] < threshold/m)
             if (length(index) != 0) {
-              write.csv(x = cbind.data.frame(map, mlm.results)[index, ], 
+              write.csv(x = cbind.data.frame(map_sub, mlm.results)[index, ], 
                         file = file.path(outpath, paste(colnames(phe)[2], ".MLM_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }
@@ -359,7 +398,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (farmcpu.run) {
             index <- which(farmcpu.results[, ncol(farmcpu.results)] < threshold/m)
             if (length(index) != 0) {
-              write.csv(x = cbind.data.frame(map, farmcpu.results)[index, ], 
+              write.csv(x = cbind.data.frame(map_sub, farmcpu.results)[index, ], 
                         file = file.path(outpath, paste(colnames(phe)[2], ".FarmCPU_signals.", memo, ifelse(is.null(memo),"csv",".csv"), sep = "")),
                         row.names = FALSE)
             }

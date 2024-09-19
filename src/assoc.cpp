@@ -67,40 +67,66 @@ NumericVector getRow(SEXP pBigMat, const int row){
 }
 
 template <typename T>
-SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 	
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
 
+	int n;
 	uvec _geno_ind;
 	if(geno_ind.isNotNull()){
         _geno_ind = as<uvec>(geno_ind) - 1;
+		n = _geno_ind.n_elem;
     }else{
-		_geno_ind = regspace<uvec>(0, pMat->ncol() - 1);
+		n = pMat->ncol();
 	}
 
-	int ind = _geno_ind.n_elem;
-	int mkr = pMat->nrow();
-	int q0 = X.n_cols;
+	int m;
+	uvec _marker_ind;
+	if(marker_ind.isNotNull()){
+        _marker_ind = as<uvec>(marker_ind) - 1;
+		m = _marker_ind.n_elem;
+    }else{
+		m = pMat->nrow();
+	}
 
-	if(y.n_elem != ind)	throw Rcpp::exception("number of individuals not match!");
+	int q0 = X.n_cols;
+	if(y.n_elem != n)	throw Rcpp::exception("number of individuals not match!");
 
 	MinimalProgressBar_plus pb;
-	Progress progress(mkr, verbose, pb);
+	Progress progress(m, verbose, pb);
 
 	// arma::mat iXX = GInv(X.t() * X);
 	arma::mat xy = X.t() * y;
 	double yy = sum(y % y);
-	arma::mat res(mkr, 1 + 1 + 1 + q0);
-	arma::vec snp(ind);
+	arma::mat res(m, 1 + 1 + 1 + q0);
+	arma::vec snp(n);
 	arma::mat iXXs(q0 + 1, q0 + 1);
 
 	#pragma omp parallel for schedule(dynamic) firstprivate(snp, iXXs)
-	for(int i = 0; i < mkr; i++){
+	for(int i = 0; i < m; i++){
 
-		for(uword ii = 0; ii < ind; ii++){
-			snp[ii] = genomat[_geno_ind[ii]][i];
+		if(_geno_ind.is_empty()){
+			if(_marker_ind.is_empty()){
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[ii][i];
+				}
+			}else{
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[ii][_marker_ind[i]];
+				}
+			}
+		}else{
+			if(_marker_ind.is_empty()){
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[_geno_ind[ii]][i];
+				}
+			}else{
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[_geno_ind[ii]][_marker_ind[i]];
+				}
+			}
 		}
 		
 		double sy = sum(snp % y);
@@ -113,10 +139,10 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 		int df;
 		if(B22 < 1e-8){
 			invB22 = 0;
-			df = ind - q0;
+			df = n - q0;
 		}else{
 			invB22 = 1 / B22;
-			df = ind - q0 - 1;
+			df = n - q0 - 1;
 		}
 
 		arma::mat NeginvB22B21 = -1 * invB22 * B21;
@@ -156,61 +182,87 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 }
 
 // [[Rcpp::export]]
-SEXP glm_c(const arma::vec & y, const arma::mat & X, const arma::mat & iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec & y, const arma::mat & X, const arma::mat & iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return glm_c<char>(y, X, iXX, xpMat, geno_ind, verbose, threads);
+		return glm_c<char>(y, X, iXX, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 2:
-		return glm_c<short>(y, X, iXX, xpMat, geno_ind, verbose, threads);
+		return glm_c<short>(y, X, iXX, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 4:
-		return glm_c<int>(y, X, iXX, xpMat, geno_ind, verbose, threads);
+		return glm_c<int>(y, X, iXX, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 8:
-		return glm_c<double>(y, X, iXX, xpMat, geno_ind, verbose, threads);
+		return glm_c<double>(y, X, iXX, xpMat, geno_ind, marker_ind, verbose, threads);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}
 }
 
 template <typename T>
-SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
 
+	int n;
 	uvec _geno_ind;
 	if(geno_ind.isNotNull()){
         _geno_ind = as<uvec>(geno_ind) - 1;
+		n = _geno_ind.n_elem;
     }else{
-		_geno_ind = regspace<uvec>(0, pMat->ncol() - 1);
+		n = pMat->ncol();
 	}
 
-	int ind = _geno_ind.n_elem;
-	int mkr = pMat->nrow();
-	int q0 = X.n_cols;
+	int m;
+	uvec _marker_ind;
+	if(marker_ind.isNotNull()){
+        _marker_ind = as<uvec>(marker_ind) - 1;
+		m = _marker_ind.n_elem;
+    }else{
+		m = pMat->nrow();
+	}
 
-	if(y.n_elem != ind)	throw Rcpp::exception("number of individuals not match.!");
+	int q0 = X.n_cols;
+	if(y.n_elem != n)	throw Rcpp::exception("number of individuals not match.!");
 
 	MinimalProgressBar_plus pb;
-	Progress progress(mkr, verbose, pb);
+	Progress progress(m, verbose, pb);
 
 	arma::mat Uy = U.t() * y;
 	arma::mat UX = U.t() * X;
 	arma::mat UXUy = UX.t() * Uy;
 	arma::mat iUXUX = GInv(UX.t() * UX);
 	
-	arma::mat res(mkr, 3);		
-	arma::vec snp(ind);
+	arma::mat res(m, 3);		
+	arma::vec snp(n);
 	arma::mat iXXs(q0 + 1, q0 + 1);
 
 	#pragma omp parallel for schedule(dynamic) firstprivate(snp, iXXs)
-	for(int i = 0; i < mkr; i++){
+	for(int i = 0; i < m; i++){
 
-		for(uword ii = 0; ii < ind; ii++){
-			snp[ii] = genomat[_geno_ind[ii]][i];
+		if(_geno_ind.is_empty()){
+			if(_marker_ind.is_empty()){
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[ii][i];
+				}
+			}else{
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[ii][_marker_ind[i]];
+				}
+			}
+		}else{
+			if(_marker_ind.is_empty()){
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[_geno_ind[ii]][i];
+				}
+			}else{
+				for(int ii = 0; ii < n; ii++){
+					snp[ii] = genomat[_geno_ind[ii]][_marker_ind[i]];
+				}
+			}
 		}
 		
 		arma::mat Us = U.t() * snp;
@@ -233,7 +285,7 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
         rhs.rows(0, UXUy.n_rows - 1) = UXUy;
         rhs(UXUy.n_rows, 0) = UsUy;
 		arma::mat beta = iXXs * rhs;
-		int df = ind - q0 - 1;
+		int df = n - q0 - 1;
 
         res(i, 0) = beta(q0, 0);
         res(i, 1) = sqrt(iXXs(q0, q0) * vgs); 
@@ -245,19 +297,19 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 }
 
 // [[Rcpp::export]]
-SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return mlm_c<char>(y, X, U, vgs, xpMat, geno_ind, verbose, threads);
+		return mlm_c<char>(y, X, U, vgs, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 2:
-		return mlm_c<short>(y, X, U, vgs, xpMat, geno_ind, verbose, threads);
+		return mlm_c<short>(y, X, U, vgs, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 4:
-		return mlm_c<int>(y, X, U, vgs, xpMat, geno_ind, verbose, threads);
+		return mlm_c<int>(y, X, U, vgs, xpMat, geno_ind, marker_ind, verbose, threads);
 	case 8:
-		return mlm_c<double>(y, X, U, vgs, xpMat, geno_ind, verbose, threads);
+		return mlm_c<double>(y, X, U, vgs, xpMat, geno_ind, marker_ind, verbose, threads);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}

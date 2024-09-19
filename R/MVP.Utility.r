@@ -367,10 +367,15 @@ mkl_env <- function(exprs, threads = 1) {
     if (load_if_installed("RevoUtilsMath")) {
         math.cores <- eval(parse(text = "getMKLthreads()"))
         eval(parse(text = "setMKLthreads(threads)"))
+    }else{
+        math.cores <- blas_get_num_procs()
+        blas_set_num_threads(threads)
     }
     result <- exprs
     if (load_if_installed("RevoUtilsMath")) {
         eval(parse(text = "setMKLthreads(math.cores)"))
+    }else{
+        blas_set_num_threads(math.cores)
     }
     return(result)
 }

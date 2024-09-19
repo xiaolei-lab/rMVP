@@ -807,7 +807,7 @@ MVP.Data.Kin <- function(
         myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-        myKin <- MVP.K.VanRaden(geno, step = maxLine, cpu = cpu, verbose = verbose)
+        myKin <- MVP.K.VanRaden(geno, maxLine = maxLine, cpu = cpu, verbose = verbose)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
@@ -865,7 +865,6 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL, ve
     if (is.null(ncpus)) ncpus <- detectCores()
     
     if (is.null(out)) {
-        message("out is NULL, impute inplace.")
         outmat <- attach.big.matrix(desc)
     } else {
         # output to new genotype file.

@@ -20,6 +20,7 @@ MVP(
   ncpus = detectCores(logical = FALSE),
   vc.method = c("BRENT", "EMMA", "HE"),
   method = c("GLM", "MLM", "FarmCPU"),
+  maf = NULL,
   p.threshold = NA,
   QTN.threshold = 0.01,
   method.bin = "static",
@@ -70,6 +71,8 @@ MVP(
 
 \item{method}{the GWAS model, "GLM", "MLM", and "FarmCPU", models can be selected simutaneously, i.e. c("GLM", "MLM", "FarmCPU")}
 
+\item{maf}{the threshold of minor allele frequency to filter SNPs in analysis}
+
 \item{p.threshold}{if all p values generated in the first iteration are bigger than p.threshold, FarmCPU stops}
 
 \item{QTN.threshold}{in second and later iterations, only SNPs with lower p-values than QTN.threshold have chances to be selected as pseudo QTNs}
@@ -88,8 +91,6 @@ MVP(
 
 \item{memo}{Character. A text marker on output files}
 
-\item{outpath}{Effective only when file.output = TRUE, determines the path of the output file}
-
 \item{col}{for color of points in each chromosome on manhattan plot}
 
 \item{file.output}{whether to output files or not}
@@ -101,6 +102,8 @@ MVP(
 \item{threshold}{a cutoff line on manhattan plot, 0.05/marker size}
 
 \item{verbose}{whether to print detail.}
+
+\item{tmppath}{the path of the temporary file}
 }
 \value{
 a m * 2 matrix, the first column is the SNP effect, the second column is the P values

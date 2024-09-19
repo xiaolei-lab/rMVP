@@ -23,7 +23,8 @@
 #' @param geno genotype, m by n matrix, m is marker size, n is sample size. This is Pure Genotype Data Matrix(GD). THERE IS NO COLUMN FOR TAXA.
 #' @param map SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
-#' @param geno_ind_idx the index of effective genotyped individuals
+#' @param ind_idx the index of effective genotyped individuals
+#' @param mrk_idx the index of effective markers used in analysis
 #' @param P start p values for all SNPs
 #' @param method.sub method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
 #' @param method.sub.final method used in substitution process, five options: 'penalty', 'reward', 'mean', 'median', or 'onsite'
@@ -63,14 +64,14 @@
 #' str(farmcpu)
 #' }
 #' 
-`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, geno_ind_idx=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
+`MVP.FarmCPU` <- function(phe, geno, map, CV=NULL, ind_idx=NULL, mrk_idx=NULL, P=NULL, method.sub="reward", method.sub.final="reward", 
                           method.bin=c("EMMA", "static", "FaST-LMM"), bin.size=c(5e5,5e6,5e7), bin.selection=seq(10,100,10), 
                           memo="MVP.FarmCPU", Prior=NULL, ncpus=2, maxLoop=10, 
                           threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, 
                           QTN.threshold=0.01, bound=NULL, verbose=TRUE){
     #print("--------------------- Welcome to FarmCPU ----------------------------")
 
-    n <- ifelse(is.null(geno_ind_idx), ncol(geno), length(geno_ind_idx))
+    n <- ifelse(is.null(ind_idx), ncol(geno), length(ind_idx))
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(phe[, 2])) != 0) stop("NAs are not allowed in phenotype.")
     if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
@@ -131,9 +132,9 @@
 
         #Step 2b: Set bins
         if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=geno_ind_idx,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
         }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=geno_ind_idx,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
+            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
         }
         
         #Step 2c: Remove bin dependency
@@ -161,6 +162,7 @@
                 P[P==0] <- min(P[P!=0],na.rm=TRUE)*0.01
                 results = cbind(myGLM$B, myGLM$S, P)
                 colnames(results) = c("effect", "se", "p")
+                if(!is.null(mrk_idx)) results <- results[mrk_idx, ]
                 break
             }#force to exit for GLM model while seqQTN=NULL and h2=0
 
@@ -194,7 +196,7 @@
                 }
             }
 
-            myRemove=FarmCPU.Remove(GDP=geno,GDP_index=geno_ind_idx,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
+            myRemove=FarmCPU.Remove(GDP=geno,GDP_index=ind_idx,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.7)
             
             #Recoding QTNs history
             seqQTN=myRemove$seqQTN
@@ -238,7 +240,7 @@
                 theCV=cbind(CV,myRemove$bin)
             }
 
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=geno_ind_idx,w=theCV,ncpus=ncpus,npc=npc, verbose=verbose)
+            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=ind_idx,w=theCV,ncpus=ncpus,npc=npc, verbose=verbose)
             if(!is.null(seqQTN)){
                 if(ncol(myGLM$P) != (npc + length(seqQTN) + 1))    stop("wrong dimensions.")
             }
@@ -249,10 +251,16 @@
             }else{
                 myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN, , drop=FALSE],method=method.sub.final)
             }
+            if(!is.null(mrk_idx)){
+                myGLM$P[-mrk_idx] = NA
+                myGLM$B[-mrk_idx] = NA
+                myGLM$S[-mrk_idx] = NA
+            }
             P=myGLM$P[,ncol(myGLM$P)]
             P[P==0] <- min(P[P!=0], na.rm=TRUE)*0.01
             results = cbind(myGLM$B, myGLM$S, P)
             colnames(results) = c("effect", "se", "p")
+            if(isDone && !is.null(mrk_idx)) results <- results[mrk_idx, ]
         } #end of while loop
         #print("****************FarmCPU ACCOMPLISHED****************")
         return(results)

@@ -10,7 +10,8 @@ MVP.MLM(
   K = NULL,
   eigenK = NULL,
   CV = NULL,
-  geno_ind_idx = NULL,
+  ind_idx = NULL,
+  mrk_idx = NULL,
   REML = NULL,
   cpu = 1,
   vc.method = c("BRENT", "EMMA", "HE"),
@@ -28,7 +29,9 @@ MVP.MLM(
 
 \item{CV}{covariates}
 
-\item{geno_ind_idx}{the index of effective genotyped individuals}
+\item{ind_idx}{the index of effective genotyped individuals}
+
+\item{mrk_idx}{the index of effective markers used in analysis}
 
 \item{REML}{a list that contains ve and vg}
 

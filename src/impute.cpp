@@ -14,16 +14,20 @@
 
 #include "rMVP.h"
 
-using namespace Rcpp;
-
-// [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(BH, bigmemory)]]
+// [[Rcpp::depends(bigmemory, BH)]]
+// [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]
+
+using namespace std;
+using namespace Rcpp;
+using namespace arma;
 
 template <typename T>
 void impute_marker(XPtr<BigMatrix> pMat, int threads=0, bool verbose=true) {
     omp_setup(threads);
-    Progress progress(pMat->nrow(), verbose);
+
+    MinimalProgressBar_perc pb;
+    Progress progress(pMat->nrow(), verbose, pb);
     
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     const size_t n = pMat->ncol();
@@ -75,21 +79,41 @@ void impute_marker(SEXP pBigMat, int threads=0, bool verbose=true) {
 }
 
 template <typename T>
-bool hasNA(XPtr<BigMatrix> pMat, double NA_C, const int threads=0) {
+bool hasNA(XPtr<BigMatrix> pMat, double NA_C, const Nullable<arma::uvec> geno_ind=R_NilValue, const int threads=1) {
     
     omp_setup(threads);
     size_t m = pMat->nrow();
-    size_t n = pMat->ncol();
-    bool HasNA = false;
+    size_t n;
+    
+    uvec _geno_ind;
+	if(geno_ind.isNotNull()){
+        _geno_ind = as<uvec>(geno_ind) - 1;
+        n = _geno_ind.n_elem;
+    }else{
+		n = pMat->ncol();
+	}
 
+    bool HasNA = false;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
-    #pragma omp parallel for shared(HasNA)
-    for (size_t j = 0; j < n; j++) {
-        if(HasNA)   continue;
-        for (size_t i = 0; i < m; i++) {
-            if (mat[j][i] == NA_C) {
-                HasNA = true;
+    if(_geno_ind.is_empty()){
+        #pragma omp parallel for shared(HasNA)
+        for (size_t j = 0; j < n; j++) {
+            if(HasNA)   continue;
+            for (size_t i = 0; i < m; i++) {
+                if (mat[j][i] == NA_C) {
+                    HasNA = true;
+                }
+            }
+        }
+    }else{
+        #pragma omp parallel for shared(HasNA)
+        for (size_t j = 0; j < n; j++) {
+            if(HasNA)   continue;
+            for (size_t i = 0; i < m; i++) {
+                if (mat[_geno_ind[j]][i] == NA_C) {
+                    HasNA = true;
+                }
             }
         }
     }
@@ -97,18 +121,18 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, const int threads=0) {
 }
 
 // [[Rcpp::export]]
-bool hasNA(SEXP pBigMat, const int threads=0) {
+bool hasNA(SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const int threads=1) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hasNA<char>(xpMat, NA_CHAR, threads);
+        return hasNA<char>(xpMat, NA_CHAR, geno_ind, threads);
     case 2:
-        return hasNA<short>(xpMat, NA_SHORT, threads);
+        return hasNA<short>(xpMat, NA_SHORT, geno_ind, threads);
     case 4:
-        return hasNA<int>(xpMat, NA_INTEGER, threads);
+        return hasNA<int>(xpMat, NA_INTEGER, geno_ind, threads);
     case 8:
-        return hasNA<double>(xpMat, NA_REAL, threads);
+        return hasNA<double>(xpMat, NA_REAL, geno_ind, threads);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

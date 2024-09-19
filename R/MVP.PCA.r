@@ -20,6 +20,8 @@
 #' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param K kinship matrix
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
+#' @param ind_idx the index of effective genotyped individuals used in analysis
+#' @param mrk_idx the index of effective markers used in analysis
 #' @param pcs.keep maximum number of PCs for output
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
@@ -40,7 +42,7 @@
 #' }
 #' 
 MVP.PCA <-
-function(M=NULL, K=NULL, maxLine, ind_idx=NULL, pcs.keep=5, cpu=1, verbose=TRUE){
+function(M=NULL, K=NULL, maxLine=10000, ind_idx=NULL, mrk_idx=NULL, pcs.keep=5, cpu=1, verbose=TRUE){
 
     #Data Check
     if (is.null(M) & is.null(K)) {
@@ -56,7 +58,9 @@ function(M=NULL, K=NULL, maxLine, ind_idx=NULL, pcs.keep=5, cpu=1, verbose=TRUE)
     }
 
     if(is.null(K)){
-        K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, step = maxLine, cpu = cpu, verbose = verbose)
+        K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, mrk_idx = mrk_idx, maxLine = maxLine, cpu = cpu, verbose = verbose)
+    }else{
+        K <- K[ind_idx, ind_idx]
     }
 
     logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)

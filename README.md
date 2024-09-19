@@ -1,4 +1,4 @@
-# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.1.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
+# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.2.1-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
 
 ## An [r](https://) package for [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Genome-Wide Association Study
 
@@ -39,6 +39,13 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 </table>
 
 ### Contents
+- [rMVP       ](#rmvp-------)
+  - [An r package for Memory-efficient, Visualization-enhanced, and Parallel-accelerated Genome-Wide Association Study](#an-r-package-for-memory-efficient-visualization-enhanced-and-parallel-accelerated-genome-wide-association-study)
+    - [#----------------------***rMVP v1.1.0 is coming, and stronger again!***------------------------#](#----------------------rmvp-v110-is-coming-and-stronger-again------------------------)
+    - [Repos:](#repos)
+    - [Authors:](#authors)
+  - [:toolbox: Relevant software tools for genetic analyses and genomic breeding](#toolbox-relevant-software-tools-for-genetic-analyses-and-genomic-breeding)
+    - [Contents](#contents)
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
   - [Phenotype](#phenotype)
@@ -60,6 +67,8 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
   - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
   - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
     - [Manhattan plot in Rectangular fashion for multiple traits or methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits-or-methods)
+      - [a. all traits in a axes:](#a-all-traits-in-a-axes)
+      - [b. all traits in separated axes:](#b-all-traits-in-separated-axes)
     - [Q-Q plot for single trait or method](#q-q-plot-for-single-trait-or-method)
     - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)
 - [Citation](#citation)

@@ -14,43 +14,60 @@ using namespace Rcpp;
 using namespace arma;
 
 template <typename T>
-arma::vec BigRowMean(XPtr<BigMatrix> pMat, int threads = 0){
+arma::vec BigRowMean(XPtr<BigMatrix> pMat, int threads = 0, const Nullable<arma::uvec> geno_ind = R_NilValue){
 
     omp_setup(threads);
-
 	MatrixAccessor<T> bigm = MatrixAccessor<T>(*pMat);
 
-	int ind = pMat->ncol();
-	int j, k, m = pMat->nrow();
-	double p1 = 0.0;
+	int n;
+	int m = pMat->nrow();
 	arma::vec mean(m);
 
-	#pragma omp parallel for private(p1, k)
-	for (j = 0; j < m; j++){
-		p1 = 0.0;
-		for(k = 0; k < ind; k++){
-			p1 += bigm[k][j];
+	uvec _geno_ind;
+	if(geno_ind.isNotNull()){
+        _geno_ind = as<uvec>(geno_ind) - 1;
+        n = _geno_ind.n_elem;
+    }else{
+		n = pMat->ncol();
+	}
+
+	if(_geno_ind.is_empty()){
+		#pragma omp parallel for
+		for (int j = 0; j < m; j++){
+			double p1 = 0.0;
+			for(int k = 0; k < n; k++){
+				p1 += bigm[k][j];
+			}
+			mean[j] = p1 / n;
 		}
-		mean[j] = p1 / ind;
+	}else{
+		#pragma omp parallel for
+		for (int j = 0; j < m; j++){
+			double p1 = 0.0;
+			for(int k = 0; k < n; k++){
+				p1 += bigm[_geno_ind[k]][j];
+			}
+			mean[j] = p1 / n;
+		}
 	}
 
 	return mean;
 }
 
-
-arma::vec BigRowMean(SEXP pBigMat, int threads = 0){
+// [[Rcpp::export]]
+arma::vec BigRowMean(SEXP pBigMat, int threads = 0, const Nullable<arma::uvec> geno_ind = R_NilValue){
 	
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()) {
 	case 1:
-		return BigRowMean<char>(xpMat, threads);
+		return BigRowMean<char>(xpMat, threads, geno_ind);
 	case 2:
-		return BigRowMean<short>(xpMat, threads);
+		return BigRowMean<short>(xpMat, threads, geno_ind);
 	case 4:
-		return BigRowMean<int>(xpMat, threads);
+		return BigRowMean<int>(xpMat, threads, geno_ind);
 	case 8:
-		return BigRowMean<double>(xpMat, threads);
+		return BigRowMean<double>(xpMat, threads, geno_ind);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}
@@ -211,7 +228,7 @@ SEXP kin_cal_s(SEXP pBigMat, int threads = 0, bool mkl = false, bool verbose = t
 
 
 template <typename T>
-SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, int threads = 0, size_t step = 5000, bool mkl = false, bool verbose = true){
+SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, int threads = 0, int step = 5000, bool mkl = false, bool verbose = true){
 
     omp_setup(threads);
 
@@ -225,33 +242,75 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 	if(threads == 1)
 		mkl = true;
 
+	int n;
 	uvec _geno_ind;
 	if(geno_ind.isNotNull()){
         _geno_ind = as<uvec>(geno_ind) - 1;
+		n = _geno_ind.n_elem;
     }else{
-		_geno_ind = regspace<uvec>(0, pMat->ncol() - 1);
+		n = pMat->ncol();
 	}
 
-	int n = _geno_ind.n_elem;
-	int m = pMat->nrow();
+	int m;
+	uvec _marker_ind;
+	if(marker_ind.isNotNull()){
+        _marker_ind = as<uvec>(marker_ind) - 1;
+		m = _marker_ind.n_elem;
+    }else{
+		m = pMat->nrow();
+	}
 
 	arma::vec means(m);
-	#pragma omp parallel for
-	for (size_t j = 0; j < m; j++){
-		double p1 = 0.0;
-		for(size_t k = 0; k < n; k++){
-			p1 += bigm[_geno_ind[k]][j];
+	if(_geno_ind.is_empty()){
+		if(_marker_ind.is_empty()){
+			#pragma omp parallel for
+			for(int j = 0; j < m; j++){
+				double p1 = 0.0;
+				for(int k = 0; k < n; k++){
+					p1 += bigm[k][j];
+				}
+				means[j] = p1 / n;
+			}
+		}else{
+			#pragma omp parallel for
+			for(int j = 0; j < m; j++){
+				double p1 = 0.0;
+				for(int k = 0; k < n; k++){
+					p1 += bigm[k][_marker_ind[j]];
+				}
+				means[j] = p1 / n;
+			}
 		}
-		means[j] = p1 / n;
+	}else{
+		if(_marker_ind.is_empty()){
+			#pragma omp parallel for
+			for(int j = 0; j < m; j++){
+				double p1 = 0.0;
+				for(int k = 0; k < n; k++){
+					p1 += bigm[_geno_ind[k]][j];
+				}
+				means[j] = p1 / n;
+			}
+		}else{
+			#pragma omp parallel for
+			for(int j = 0; j < m; j++){
+				double p1 = 0.0;
+				for(int k = 0; k < n; k++){
+					p1 += bigm[_geno_ind[k]][_marker_ind[j]];
+				}
+				means[j] = p1 / n;
+			}
+		}
 	}
-
+	
 	arma::mat kin = zeros<mat>(n, n);
 	arma::mat Z_buffer(step, n, fill::none);
 
-	size_t i = 0, j = 0;
-	size_t i_marker = 0;
+	int i = 0, j = 0;
+	int i_marker = 0;
 	MinimalProgressBar_plus pb;
 	Progress progress(m, verbose, pb);
+
 	for (;i < m;) {
 		
 		int cnt = 0;
@@ -264,13 +323,40 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 			Z_buffer.set_size(cnt, n);
 		}
 
-		#pragma omp parallel for
-		for(size_t k = 0; k < n; k++){
-			for(size_t l = 0; l < cnt; l++){
-				Z_buffer(l, k) = bigm[_geno_ind[k]][i_marker + l] - means[i_marker + l];
+		if(_geno_ind.is_empty()){
+			if(_marker_ind.is_empty()){
+				#pragma omp parallel for
+				for(int k = 0; k < n; k++){
+					for(int l = 0; l < cnt; l++){
+						Z_buffer(l, k) = bigm[k][(i_marker + l)] - means[(i_marker + l)];
+					}
+				}
+			}else{
+				#pragma omp parallel for
+				for(int k = 0; k < n; k++){
+					for(int l = 0; l < cnt; l++){
+						Z_buffer(l, k) = bigm[k][_marker_ind[(i_marker + l)]] - means[(i_marker + l)];
+					}
+				}
+			}
+		}else{
+			if(_marker_ind.is_empty()){
+				#pragma omp parallel for
+				for(int k = 0; k < n; k++){
+					for(int l = 0; l < cnt; l++){
+						Z_buffer(l, k) = bigm[_geno_ind[k]][(i_marker + l)] - means[(i_marker + l)];
+					}
+				}
+			}else{
+				#pragma omp parallel for
+				for(int k = 0; k < n; k++){
+					for(int l = 0; l < cnt; l++){
+						Z_buffer(l, k) = bigm[_geno_ind[k]][_marker_ind[(i_marker + l)]] - means[(i_marker + l)];
+					}
+				}
 			}
 		}
-
+		
 		if(mkl){
 			double alp = 1.0;
 			double beta = 1.0;
@@ -279,9 +365,9 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 		}else{
 			arma::colvec coli;
 			#pragma omp parallel for schedule(dynamic) private(coli)
-			for(size_t k = 0; k < n; k++){
+			for(int k = 0; k < n; k++){
 				coli = Z_buffer.col(k);
-				for(size_t l = k; l < n; l++){
+				for(int l = k; l < n; l++){
 					kin(l, k) += sum(coli % Z_buffer.col(l));
 				}
 			}
@@ -305,19 +391,19 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 }
 
 // [[Rcpp::export]]
-SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, int threads = 0, size_t step = 10000, bool mkl = false, bool verbose = true){
+SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, int threads = 0, size_t step = 10000, bool mkl = false, bool verbose = true){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return kin_cal<char>(xpMat, geno_ind, threads, step, mkl, verbose);
+		return kin_cal<char>(xpMat, geno_ind, marker_ind, threads, step, mkl, verbose);
 	case 2:
-		return kin_cal<short>(xpMat, geno_ind, threads, step, mkl, verbose);
+		return kin_cal<short>(xpMat, geno_ind, marker_ind, threads, step, mkl, verbose);
 	case 4:
-		return kin_cal<int>(xpMat, geno_ind, threads, step, mkl, verbose);
+		return kin_cal<int>(xpMat, geno_ind, marker_ind, threads, step, mkl, verbose);
 	case 8:
-		return kin_cal<double>(xpMat, geno_ind, threads, step, mkl, verbose);
+		return kin_cal<double>(xpMat, geno_ind, marker_ind, threads, step, mkl, verbose);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}

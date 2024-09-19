@@ -15,7 +15,7 @@
 // limitations under the License.
 
 #include "rMVP.h"
-#include <boost/bind.hpp>
+// #include <boost/bind/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 
@@ -24,7 +24,6 @@ using namespace Rcpp;
 using namespace arma;
 
 // [[Rcpp::depends(BH, bigmemory)]]
-// [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppProgress)]]
 
 #include <bigmemory/isna.hpp>
@@ -116,12 +115,12 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
                         _["m"] = m);
 }
 
-template <typename T>
-T vcf_marker_parser(string m, double NA_C) {
+
+double vcf_marker_parser(string m, double NA_C) {
     if (('0' == m[0] || '1' == m[0]) && ('0' == m[2] || '1' == m[2])) {
-        return static_cast<T>(m[0] - '0' + m[2] - '0');
+        return (m[0] - '0' + m[2] - '0');
     } else {
-        return static_cast<T>(NA_C);
+        return NA_C;
     }
 }
 
@@ -169,22 +168,18 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         for (std::size_t i = 0; i < buffer.size(); i++) {
             l = split_line(buffer[i]);
             // boost::split(l, buffer[i], boost::is_any_of("\t"));
-            markers.clear();
-            // There is only one char in REF and ALT
-            // if (l[3].length() == 1 && l[4].length() == 1) {  
-                vector<string>(l.begin() + 9, l.end()).swap(l);
-                transform(
-                    l.begin(), l.end(), 
-                    back_inserter(markers),
-                    boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
-                );
-            // } else {
-            //     // Delete multiple variant sites
-            //     fill_n(markers.begin(), l.size() - 9, NA_C);
+            // markers.clear();
+            // vector<string>(l.begin() + 9, l.end()).swap(l);
+            // transform(
+            //     l.begin(), l.end(), 
+            //     back_inserter(markers),
+            //     boost::bind<T>(&vcf_marker_parser<T>, _1, NA_C)
+            // );
+            // for (std::size_t j = 0; j < markers.size(); j++) {
+            //     mat[j][m + i] = markers[j];
             // }
-            
-            for (std::size_t j = 0; j < markers.size(); j++) {
-                mat[j][m + i] = markers[j];
+            for(size_t j = 0; j < (l.size() - 9); j++) {
+                mat[j][m + i] = static_cast<T>(vcf_marker_parser(l[j + 9], NA_C));
             }
         }
         progress.increment(buffer.size());
@@ -325,7 +320,7 @@ double hapmap_marker_parser(string m, char major, double NA_C) {
             (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')) {
             return NA_C;
         } else {
-            return ((m[0] == major) ? 0 : 1) + ((m[1] == major) ? 0 : 1);
+            return ((m[0] == major) ? '0' : '1') + ((m[1] == major) ? '0' : '1');
         }
     }
     return NA_C;
@@ -376,6 +371,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
             }
         }
         size_t n_marker = buffer.size();
+
         #pragma omp parallel for private(l, major)
         for (size_t i = 0; i < n_marker; i++) {
             l = split_line(buffer[i]);
@@ -531,11 +527,11 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // map
-    std::map<int, uword> code;
-    code[3] = 0;
-    code[2] = 1;
+    std::map<int, T> code;
+    code[3] = static_cast<T>(0);
+    code[2] = static_cast<T>(1);
     code[1] = static_cast<T>(NA_C);
-    code[0] = 2;
+    code[0] = static_cast<T>(2);
     
     // open file
     FILE *fin;
@@ -567,7 +563,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         // i: current block, j: current bit.
         block_start = i * buffer_size;
         cond = min(buffer_size, length - 3 - block_start);
-        #pragma omp parallel for schedule(static)
+
+        #pragma omp parallel for
         for (size_t j = 0; j < cond; j++) {
             // bit -> item in matrix
             size_t r = j / n + i * maxLine;

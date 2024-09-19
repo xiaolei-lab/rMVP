@@ -2,8 +2,8 @@ Package: rMVP
 Type: Package
 Title: Memory-Efficient, Visualize-Enhanced, Parallel-Accelerated GWAS
         Tool
-Version: 1.1.0
-Date: 2024-08-01
+Version: 1.2.0
+Date: 2024-09-18
 Authors@R: c( person("Lilin", "Yin", role = "aut"), 
               person("Haohao", "Zhang", role = "aut"),
               person("Zhenshuang", "Tang", role = "aut"),
@@ -36,12 +36,12 @@ License: Apache License 2.0
 Encoding: UTF-8
 URL: https://github.com/xiaolei-lab/rMVP
 BugReports: https://github.com/xiaolei-lab/rMVP/issues
-Imports: utils, stats, methods, graphics, grDevices, MASS, bigmemory
+Imports: utils, stats, methods, graphics, grDevices, MASS, bigmemory, RhpcBLASctl
 Depends: R (>= 3.3)
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: knitr, testthat, rmarkdown
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Maintainer: Xiaolei Liu <xll198708@gmail.com>
 Author: Lilin Yin [aut],
   Haohao Zhang [aut],

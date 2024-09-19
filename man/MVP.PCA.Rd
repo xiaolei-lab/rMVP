@@ -7,8 +7,9 @@
 MVP.PCA(
   M = NULL,
   K = NULL,
-  maxLine,
+  maxLine = 10000,
   ind_idx = NULL,
+  mrk_idx = NULL,
   pcs.keep = 5,
   cpu = 1,
   verbose = TRUE
@@ -20,6 +21,10 @@ MVP.PCA(
 \item{K}{kinship matrix}
 
 \item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
+
+\item{ind_idx}{the index of effective genotyped individuals used in analysis}
+
+\item{mrk_idx}{the index of effective markers used in analysis}
 
 \item{pcs.keep}{maximum number of PCs for output}
 

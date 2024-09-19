@@ -21,7 +21,8 @@
 #' @param phe phenotype, n * 2 matrix
 #' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
-#' @param geno_ind_idx the index of effective genotyped individuals
+#' @param ind_idx the index of effective genotyped individuals
+#' @param mrk_idx the index of effective markers used in analysis
 #' @param cpu number of cpus used for parallel computation
 #' @param verbose whether to print detail.
 #'
@@ -48,13 +49,13 @@ function(
     phe, 
     geno, 
     CV=NULL, 
-    geno_ind_idx = NULL,
+    ind_idx = NULL,
+    mrk_idx=NULL,
     cpu=1,
     verbose=TRUE
 ){
 
-    n <- ifelse(is.null(geno_ind_idx), ncol(geno), length(geno_ind_idx))
-    m <- nrow(geno)
+    n <- ifelse(is.null(ind_idx), ncol(geno), length(ind_idx))
     ys <- as.numeric(as.matrix(phe[,2]))
     
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
@@ -76,7 +77,7 @@ function(
     logging.log("scanning...\n", verbose = verbose)
 
     mkl_env({
-        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, geno_ind = geno_ind_idx, verbose = verbose, threads = cpu)
+        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, geno_ind = ind_idx, marker_ind = mrk_idx, verbose = verbose, threads = cpu)
     })
 
     return(results[, c(1, 2, ncol(results))])

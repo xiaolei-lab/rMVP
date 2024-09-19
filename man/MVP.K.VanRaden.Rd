@@ -6,8 +6,9 @@
 \usage{
 MVP.K.VanRaden(
   M,
-  step = 5000,
+  maxLine = 5000,
   ind_idx = NULL,
+  mrk_idx = NULL,
   cpu = 1,
   verbose = TRUE,
   checkNA = TRUE
@@ -16,9 +17,11 @@ MVP.K.VanRaden(
 \arguments{
 \item{M}{Genotype, m * n, m is marker size, n is population size}
 
-\item{step}{the number of markers handled at a time, smaller value would reduce the memory cost}
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
-\item{ind_idx}{the index of effective genotyped individuals}
+\item{ind_idx}{the index of effective genotyped individuals used in analysis}
+
+\item{mrk_idx}{the index of effective markers used in analysis}
 
 \item{cpu}{the number of cpu}
 

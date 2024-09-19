@@ -23,10 +23,16 @@ NULL
 #' @import bigmemory
 NULL
 
+#' @import RhpcBLASctl
+NULL
+
 #' @importFrom parallel detectCores
 NULL
 
-#' @importFrom utils read.delim read.table write.table write.csv memory.limit packageVersion
+#' @importFrom utils read.delim read.table write.table write.csv memory.limit packageVersion sessionInfo
+NULL
+
+#' @importFrom RhpcBLASctl blas_get_num_procs blas_set_num_threads
 NULL
 
 #' @importFrom bigmemory is.big.matrix

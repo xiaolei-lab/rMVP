@@ -9,7 +9,8 @@ MVP.FarmCPU(
   geno,
   map,
   CV = NULL,
-  geno_ind_idx = NULL,
+  ind_idx = NULL,
+  mrk_idx = NULL,
   P = NULL,
   method.sub = "reward",
   method.sub.final = "reward",
@@ -38,7 +39,9 @@ MVP.FarmCPU(
 
 \item{CV}{covariates, n by c matrix, n is sample size, c is number of covariates}
 
-\item{geno_ind_idx}{the index of effective genotyped individuals}
+\item{ind_idx}{the index of effective genotyped individuals}
+
+\item{mrk_idx}{the index of effective markers used in analysis}
 
 \item{P}{start p values for all SNPs}
 

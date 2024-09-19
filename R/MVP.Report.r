@@ -207,7 +207,7 @@ MVP.Report <- function(
 		#map <- map[map[, 3] != 0, ]
 		suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
 		if(is.infinite(max.chr))	max.chr <- 0
-		map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
+		map.xy.index <- suppressWarnings(which(!as.numeric(map[, 2]) %in% c(0 : max.chr)))
 		if(length(map.xy.index) != 0){
 			chr.xy <- unique(map[map.xy.index, 2])
 			for(i in 1:length(chr.xy)){
@@ -2001,7 +2001,7 @@ Densitplot <- function(map, col = c("darkgreen", "yellow", "red"), main = "SNP D
     if (is.infinite(max.chr)) { max.chr <- 0 }
     
     # deal with x,y
-    map.xy.index <- suppressWarnings(which(!as.numeric(map[, 2]) %in% c(0:max.chr)))
+    map.xy.index <- suppressWarnings(which(!as.numeric(map[, 2]) %in% c(0 : max.chr)))
     if (length(map.xy.index) != 0) {
         chr.xy <- unique(map[map.xy.index, 2])
         for (i in 1:length(chr.xy)) {
