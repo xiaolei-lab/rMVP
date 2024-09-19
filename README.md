@@ -39,13 +39,6 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
 </table>
 
 ### Contents
-- [rMVP       ](#rmvp-------)
-  - [An r package for Memory-efficient, Visualization-enhanced, and Parallel-accelerated Genome-Wide Association Study](#an-r-package-for-memory-efficient-visualization-enhanced-and-parallel-accelerated-genome-wide-association-study)
-    - [#----------------------***rMVP v1.1.0 is coming, and stronger again!***------------------------#](#----------------------rmvp-v110-is-coming-and-stronger-again------------------------)
-    - [Repos:](#repos)
-    - [Authors:](#authors)
-  - [:toolbox: Relevant software tools for genetic analyses and genomic breeding](#toolbox-relevant-software-tools-for-genetic-analyses-and-genomic-breeding)
-    - [Contents](#contents)
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
   - [Phenotype](#phenotype)
@@ -67,8 +60,6 @@ Questions, suggestions, and bug reports are welcome and appreciated: [xiaoleiliu
   - [Manhattan plot in Circular fashion](#manhattan-plot-in-circular-fashion)
   - [Manhattan plot in Rectangular fashion for single trait or method](#manhattan-plot-in-rectangular-fashion-for-single-trait-or-method)
     - [Manhattan plot in Rectangular fashion for multiple traits or methods](#manhattan-plot-in-rectangular-fashion-for-multiple-traits-or-methods)
-      - [a. all traits in a axes:](#a-all-traits-in-a-axes)
-      - [b. all traits in separated axes:](#b-all-traits-in-separated-axes)
     - [Q-Q plot for single trait or method](#q-q-plot-for-single-trait-or-method)
     - [Q-Q plot for multiple traits or methods](#q-q-plot-for-multiple-traits-or-methods)
 - [Citation](#citation)
