@@ -60,7 +60,7 @@ function(M=NULL, K=NULL, maxLine=10000, ind_idx=NULL, mrk_idx=NULL, pcs.keep=5, 
     if(is.null(K)){
         K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, mrk_idx = mrk_idx, maxLine = maxLine, cpu = cpu, verbose = verbose)
     }else{
-        K <- K[ind_idx, ind_idx]
+        if(!is.null(ind_idx))    K <- K[ind_idx, ind_idx]
     }
 
     logging.log("Eigen Decomposition on GRM", "\n", verbose = verbose)

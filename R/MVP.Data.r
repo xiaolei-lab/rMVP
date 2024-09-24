@@ -183,6 +183,8 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
             sep = sep.kin,
             cpu = ncpus
         )
+    }else{
+        K <- NULL
     }
     
     # get pc
