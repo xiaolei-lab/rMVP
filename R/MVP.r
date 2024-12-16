@@ -18,13 +18,10 @@
 #' Object 3: Estimate variance components using EMMA, FaST-LMM, and HE regression
 #' Object 4: Generate high-quality figures
 #' 
-#' Build date: Aug 30, 2017
-#' Last update: Dec 14, 2018
-#' 
 #' @author Lilin Yin, Haohao Zhang, and Xiaolei Liu
 #' 
 #' @param phe phenotype, n * 2 matrix, n is sample size
-#' @param geno Genotype in bigmatrix format; m * n, m is marker size, n is sample size
+#' @param geno genotype, either m by n or n by m is supportable, m is marker size, n is population size
 #' @param map SNP map information, SNP name, Chr, Pos
 #' @param K Kinship, Covariance matrix(n * n) for random effects, must be positive semi-definite
 #' @param nPC.GLM number of PCs added as fixed effects in GLM
@@ -49,7 +46,7 @@
 #' @param permutation.rep number of permutation replicates
 #' @param col for color of points in each chromosome on manhattan plot
 #' @param memo Character. A text marker on output files
-#' @param tmppath the path of the temporary file
+#' @param outpath the path of the output files
 #' @param file.output whether to output files or not
 #' @param file.type figure formats, "jpg", "tiff"
 #' @param dpi resolution for output figures
@@ -57,7 +54,7 @@
 #' @param verbose whether to print detail.
 #' 
 #' @export
-#' @return a m * 2 matrix, the first column is the SNP effect, the second column is the P values
+#' @return
 #' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
 #' Output: MVP.return$glm.results - p-values obtained by GLM method
 #' Output: MVP.return$mlm.results - p-values obtained by MLM method
@@ -116,14 +113,15 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }
     logging.initialize("MVP", logging.outpath)
 
-    MVP.Version(width = 60, verbose = verbose)
-    logging.log("Start:", as.character(Sys.time()), "\n", verbose = verbose)
+    MVP.Version(width = 65, verbose = verbose)
+    time_start <- Sys.time()
+    logging.log("Start:", format(time_start, format = "%F %T %Z"), "\n", verbose = verbose)
     if ("log" %in% file.output) {
         logging.log("The log has been output to the file:", get("logging.file", envir = package.env), "\n", verbose = verbose)
     }
     vc.method <- match.arg(vc.method)
-    if (nrow(phe) != ncol(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
-    if (nrow(geno) != nrow(map)) stop("The number of markers in genotype and map doesn't match!")
+    if (nrow(phe) != ncol(geno) & nrow(phe) != nrow(geno)) stop("The number of individuals in phenotype and genotype doesn't match!")
+    if (nrow(map) != ncol(geno) & nrow(map) != nrow(geno)) stop("The number of markers in genotype and map doesn't match!")
     if (!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     
     #list -> matrix
@@ -135,27 +133,39 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     na.index <- NULL
     if (!is.null(CV.GLM)) {
         CV.GLM <- as.matrix(CV.GLM)
-    if (nrow(CV.GLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+    if (nrow(CV.GLM) != nrow(phe)) stop("The number of individuals in covariates and phenotype doesn't match!")
         na.index <- c(na.index, which(is.na(CV.GLM), arr.ind = TRUE)[, 1])
     }
     if (!is.null(CV.MLM)) {
         CV.MLM <- as.matrix(CV.MLM)
-        if (nrow(CV.MLM) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+        if (nrow(CV.MLM) != nrow(phe)) stop("The number of individuals in covariates and phenotype doesn't match!")
        na.index <- c(na.index, which(is.na(CV.MLM), arr.ind = TRUE)[, 1])
     }
     if (!is.null(CV.FarmCPU)) {
         CV.FarmCPU <- as.matrix(CV.FarmCPU)
-        if (nrow(CV.FarmCPU) != ncol(geno)) stop("The number of individuals in covariates and genotype doesn't match!")
+        if (nrow(CV.FarmCPU) != nrow(phe)) stop("The number of individuals in covariates and phenotype doesn't match!")
         na.index <- c(na.index, which(is.na(CV.FarmCPU), arr.ind = TRUE)[, 1])
     }
     na.index <- unique(na.index)
 
     #Data information
-    m <- nrow(geno)
-    n <- ncol(geno)
-    logging.log(paste("Input data has", n, "individuals,", m, "markers"), "\n", verbose = verbose)
+    MrkByCol <- nrow(phe) == nrow(geno)
+    m <- ifelse(MrkByCol, ncol(geno), nrow(geno))
+    n <- nrow(phe)
+    logging.log(paste("Input data has", n, "individuals and", m, "markers"), "\n", verbose = verbose)
+    logging.log(paste("Markers are detected to be stored by", ifelse(MrkByCol, "column", "row")), "\n", verbose = verbose)
     logging.log("Analyzed trait:", colnames(phe)[2], "\n", verbose = verbose)
     logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
+    hpclib <- grepl("mkl", sessionInfo()$LAPACK) | grepl("openblas", sessionInfo()$LAPACK) | !inherits(try(Revo.version, silent=TRUE),"try-error")
+	if(!hpclib){
+		logging.log("No high performance math library detected! The computational efficiency would be greatly reduced\n", verbose = verbose)
+	}else{
+		if(grepl("mkl", sessionInfo()$LAPACK) | !inherits(try(Revo.version, silent=TRUE),"try-error")){
+			logging.log("Math Kernel Library is detected, nice job!\n", verbose = verbose)
+		}else{
+			logging.log("OpenBLAS Library is detected, nice job!\n", verbose = verbose)
+		}
+	}
 
     #remove samples with missing phenotype
     seqTaxa <- which(!is.na(phe[,2]))
@@ -169,15 +179,23 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         if (!is.null(CV.GLM)) { CV.GLM = CV.GLM[seqTaxa, , drop = FALSE] }
         if (!is.null(CV.MLM)) { CV.MLM = CV.MLM[seqTaxa, , drop = FALSE] }
         if (!is.null(CV.FarmCPU)) { CV.FarmCPU = CV.FarmCPU[seqTaxa, , drop = FALSE] }
-        if(length(seqTaxa) < n * 0.85){
-            geno <- deepcopy(geno, cols = seqTaxa)
+        if(length(seqTaxa) < n * 0.8){
+            logging.log("Re-build memory-mapping file for remaining individuals", "\n", verbose = verbose)
+            if(!MrkByCol){
+                geno <- deepcopy(geno, cols = seqTaxa)
+            }else{
+                geno <- deepcopy(geno, rows = seqTaxa)
+            }
             seqTaxa <- NULL
         }
     }
 
-    logging.log("Check if NAs exist in genotype...", verbose = verbose)
-    if(hasNA(geno@address, geno_ind = seqTaxa, threads = ncpus))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
-    logging.log("(OK!)", "\n", verbose = verbose)
+    logging.log("Check if NAs exist in genotype...", "\n", verbose = verbose)
+    if(hasNA(geno@address, mrkbycol = MrkByCol, geno_ind = seqTaxa, threads = ncpus))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
+
+    logging.log("Calculate allele frequency...", "\n", verbose = verbose)
+    marker_freq <- BigRowMean(geno@address, MrkByCol, threads = ncpus, geno_ind = seqTaxa) / 2
+    map$MAF <- ifelse(marker_freq > 0.5, 1 - marker_freq, marker_freq)
 
     #remove SNPs with low MAF
     geno_marker_index <- NULL
@@ -185,10 +203,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if (!is.null(maf)){
         if(length(maf) != 1) stop("maf should be a value")
         if(maf <= 0 || maf >= 0.5) stop("maf should be at the range of 0-0.5")
-        logging.log("Calculate allele frequency...", "\n", verbose = verbose)
-        marker_maf <- BigRowMean(geno@address, threads = ncpus, geno_ind = seqTaxa) / 2
-        marker_maf <- ifelse(marker_maf > 0.5, 1 - marker_maf, marker_maf)
-        geno_marker_index <- which(marker_maf > maf)
+        geno_marker_index <- which(map$MAF >= maf)
         if(length(geno_marker_index) == 0) stop(paste("MAFs of all markers are smaller than the threshold", maf))
         if(length(geno_marker_index) == 1) stop(paste("only 1 marker left on the given MAF threshold", maf))
         if(length(geno_marker_index) == m)  geno_marker_index <- NULL
@@ -197,12 +212,23 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         logging.log("Total", m - length(geno_marker_index), "markers are removed at MAF threshold", maf, "\n", verbose = verbose)
         m <- length(geno_marker_index)
         map_sub <- map[geno_marker_index, ]
-        if(length(geno_marker_index) < m * 0.85){
+        marker_freq <- marker_freq[geno_marker_index]
+        if(length(geno_marker_index) < m * 0.8){
             if(!is.null(seqTaxa)){
-                geno <- deepcopy(geno, cols = seqTaxa, rows = geno_marker_index)
+                logging.log("Re-build memory-mapping file for remaining individuals and markers", "\n", verbose = verbose)
+                if(MrkByCol){
+                    geno <- deepcopy(geno, rows = seqTaxa, cols = geno_marker_index)
+                }else{
+                    geno <- deepcopy(geno, cols = seqTaxa, rows = geno_marker_index)
+                }
                 seqTaxa <- NULL
             }else{
-                geno <- deepcopy(geno, rows = geno_marker_index)
+                logging.log("Re-build memory-mapping file for remaining markers", "\n", verbose = verbose)
+                if(MrkByCol){
+                    geno <- deepcopy(geno, cols = geno_marker_index)
+                }else{
+                    geno <- deepcopy(geno, rows = geno_marker_index)
+                }
             }
             geno_marker_index <- NULL
         }
@@ -229,11 +255,13 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     if (!is.null(nPC) | "MLM" %in% method) {
         if (is.null(K)) {
             K <- MVP.K.VanRaden(
-              M = geno, 
-              ind_idx = seqTaxa, 
-              mrk_idx = geno_marker_index,
-              maxLine = maxLine, 
-              cpu = ncpus, 
+                M = geno, 
+                ind_idx = seqTaxa, 
+                mrk_idx = geno_marker_index,
+                mrk_freq = marker_freq,
+                mrk_bycol = MrkByCol,
+                maxLine = maxLine, 
+                cpu = ncpus, 
               verbose = verbose,
               checkNA = FALSE
             )
@@ -312,7 +340,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine = maxLine, cpu=ncpus, verbose = verbose);gc()
         colnames(glm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -327,7 +355,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine = maxLine, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -342,7 +370,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     
     if (farmcpu.run) {
         logging.log("FarmCPU Start...", "\n", verbose = verbose)
-        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ind_idx=seqTaxa, mrk_idx=geno_marker_index, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
+        farmcpu.results <- MVP.FarmCPU(phe=phe, geno=geno, map=map[,1:3], CV=CV.FarmCPU, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine = maxLine, ncpus=ncpus, memo="MVP.FarmCPU", p.threshold=p.threshold, QTN.threshold=QTN.threshold, method.bin=method.bin, bin.size=bin.size, bin.selection=bin.selection, maxLoop=maxLoop, verbose = verbose)
         colnames(farmcpu.results) <- c("Effect", "SE", paste(colnames(phe)[2],"FarmCPU",sep="."))
         z = farmcpu.results[, 1]/farmcpu.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -366,12 +394,12 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             myY.shuffle = phe
             myY.shuffle[,2] = myY.shuffle[index.shuffle,2]
             #GWAS using t.test...
-            myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, ind_idx=seqTaxa, mrk_idx=geno_marker_index, cpu=ncpus)
+            myPermutation = MVP.GLM(phe=myY.shuffle[,c(1,2)], geno=geno, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine=maxLine, cpu=ncpus)
             pvalue = min(myPermutation[,3],na.rm=TRUE)
             if(i==1){
-                    pvalue.final=pvalue
-               }else{
-                    pvalue.final=c(pvalue.final,pvalue)
+                pvalue.final=pvalue
+            }else{
+                pvalue.final=c(pvalue.final,pvalue)
             }
         }#end of permutation.rep
         permutation.cutoff = sort(pvalue.final)[ceiling(permutation.rep*0.05)]
@@ -451,11 +479,20 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
             )
         }
     }
-    now <- Sys.time()
+    time_end <- Sys.time()
     if (length(file.output) > 0) {
       logging.log("Results are stored at Working Directory:", outpath, "\n", verbose = verbose)
     }
-    logging.log("End:", as.character(now), "\n", verbose = verbose)
+    logging.log("End:", format(time_end, format = "%F %T %Z"), "\n", verbose = verbose)
+    time_diff <- as.numeric(time_end) - as.numeric(time_start)
+    h <- time_diff %/% 3600
+	m <- (time_diff %% 3600) %/% 60
+	s <- ((time_diff %% 3600) %% 60)
+	index <- which(c(h, m, s) != 0)
+	num <- c(h, m, s)[index]
+	num <- round(num, 0)
+	char <- c("h", "m", "s")[index]
+	logging.log("Total running time:", paste(num, char, sep="", collapse=""), "\n", verbose = verbose)
     print_accomplished(width = 60, verbose = verbose)
     
     return(invisible(MVP.return))

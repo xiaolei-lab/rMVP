@@ -13,6 +13,7 @@ MVP.MLM(
   ind_idx = NULL,
   mrk_idx = NULL,
   REML = NULL,
+  maxLine = 5000,
   cpu = 1,
   vc.method = c("BRENT", "EMMA", "HE"),
   verbose = TRUE
@@ -21,7 +22,7 @@ MVP.MLM(
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
 
-\item{geno}{genotype, m * n, m is marker size, n is population size}
+\item{geno}{genotype, either m by n or n by m is supportable, m is marker size, n is population size}
 
 \item{K}{Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite}
 
@@ -35,6 +36,8 @@ MVP.MLM(
 
 \item{REML}{a list that contains ve and vg}
 
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
+
 \item{cpu}{number of cpus used for parallel computation}
 
 \item{vc.method}{the methods for estimating variance component("emma" or "he" or "brent")}
@@ -45,8 +48,7 @@ MVP.MLM(
 results: a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 }
 \description{
-Build date: Aug 30, 2016
-Last update: Aug 30, 2016
+To perform GWAS with GLM and MLM model and get the P value of SNPs
 }
 \examples{
 \donttest{
@@ -57,7 +59,7 @@ phenotype <- phenotype[idx, ]
 print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
-genotype <- deepcopy(genotype, cols=idx)
+genotype <- deepcopy(genotype, rows=idx)
 print(dim(genotype))
 K <- MVP.K.VanRaden(genotype, cpu=1)
 

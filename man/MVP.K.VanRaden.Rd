@@ -9,19 +9,25 @@ MVP.K.VanRaden(
   maxLine = 5000,
   ind_idx = NULL,
   mrk_idx = NULL,
+  mrk_freq = NULL,
+  mrk_bycol = TRUE,
   cpu = 1,
   verbose = TRUE,
   checkNA = TRUE
 )
 }
 \arguments{
-\item{M}{Genotype, m * n, m is marker size, n is population size}
+\item{M}{genotype, either m by n or n by m is supportable, m is marker size, n is population size}
 
 \item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{ind_idx}{the index of effective genotyped individuals used in analysis}
 
 \item{mrk_idx}{the index of effective markers used in analysis}
+
+\item{mrk_freq}{the prior calculated major allele frequency (not MAF) for all markers used in analysis}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)}
 
 \item{cpu}{the number of cpu}
 
@@ -33,8 +39,7 @@ MVP.K.VanRaden(
 K, n * n matrix
 }
 \description{
-Build date: Dec 12, 2016
-Last update: Dec 12, 2019
+Calculate Kinship matrix by VanRaden method
 }
 \examples{
 \donttest{

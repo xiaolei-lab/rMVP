@@ -25,12 +25,12 @@
 #'
 #' @examples
 #' MVP.Version()
-MVP.Version <- function(width=60, verbose=TRUE) {
+MVP.Version <- function(width=65, verbose=TRUE) {
     welcome <- "Welcome to MVP"
-    title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
-    authors <- c("Designed and Maintained by Lilin Yin, Haohao Zhang, and Xiaolei Liu", 
+    title   <- "an R package for Memory-efficient, Visualization-enhanced and Parallel-accelerated genome-wide association study"
+    authors <- c("Design & Maintain: Lilin Yin, Haohao Zhang, and Xiaolei Liu", 
                  "Contributors: Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li")
-    contact <- "Contact: xiaoleiliu@mail.hzau.edu.cn"
+    contact <- "Mailto: xiaoleiliu@mail.hzau.edu.cn, ylilin@mail.hzau.edu.cn"
     logo_s  <- c(" __  __  __   __  ___",
                  "|  \\/  | \\ \\ / / | _ \\",
                  "| |\\/| |  \\ V /  |  _/",

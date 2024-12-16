@@ -4,7 +4,7 @@
 \alias{MVP.Version}
 \title{Print MVP Banner}
 \usage{
-MVP.Version(width = 60, verbose = TRUE)
+MVP.Version(width = 65, verbose = TRUE)
 }
 \arguments{
 \item{width}{the width of the message}

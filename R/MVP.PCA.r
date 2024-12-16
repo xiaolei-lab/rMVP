@@ -13,15 +13,12 @@
 
 #' Principal Component Analysis
 #' 
-#' Build date: Dec 14, 2016
-#' Last update: Oct 29, 2018
-#' @author Xiaolei Liu, Lilin Yin and Haohao Zhang
-#' 
-#' @param M Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
+#' @param M genotype, either m by n or n by m is supportable, m is marker size, n is population size
 #' @param K kinship matrix
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param ind_idx the index of effective genotyped individuals used in analysis
 #' @param mrk_idx the index of effective markers used in analysis
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)
 #' @param pcs.keep maximum number of PCs for output
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
@@ -42,7 +39,7 @@
 #' }
 #' 
 MVP.PCA <-
-function(M=NULL, K=NULL, maxLine=10000, ind_idx=NULL, mrk_idx=NULL, pcs.keep=5, cpu=1, verbose=TRUE){
+function(M=NULL, K=NULL, maxLine=10000, ind_idx=NULL, mrk_idx=NULL, mrk_bycol=TRUE, pcs.keep=5, cpu=1, verbose=TRUE){
 
     #Data Check
     if (is.null(M) & is.null(K)) {
@@ -58,7 +55,7 @@ function(M=NULL, K=NULL, maxLine=10000, ind_idx=NULL, mrk_idx=NULL, pcs.keep=5, 
     }
 
     if(is.null(K)){
-        K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, mrk_idx = mrk_idx, maxLine = maxLine, cpu = cpu, verbose = verbose)
+        K <- MVP.K.VanRaden(M=M, ind_idx = ind_idx, mrk_idx = mrk_idx, mrk_bycol = mrk_bycol, maxLine = maxLine, cpu = cpu, verbose = verbose)
     }else{
         if(!is.null(ind_idx))    K <- K[ind_idx, ind_idx]
     }

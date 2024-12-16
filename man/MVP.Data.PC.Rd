@@ -11,6 +11,7 @@ MVP.Data.PC(
   out = NULL,
   pcs.keep = 5,
   maxLine = 10000,
+  mrk_bycol = TRUE,
   sep = "\\t",
   cpu = 1,
   verbose = TRUE
@@ -28,6 +29,8 @@ MVP.Data.PC(
 \item{pcs.keep}{how many PCs to keep}
 
 \item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)}
 
 \item{sep}{seperator for PC file.}
 

@@ -19,10 +19,11 @@
 #' @author Lilin Yin and Xiaolei Liu
 #' 
 #' @param phe phenotype, n * 2 matrix
-#' @param geno Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size
+#' @param geno genotype, either m by n or n by m is supportable, m is marker size, n is population size
 #' @param CV Covariance, design matrix(n * x) for the fixed effects
 #' @param ind_idx the index of effective genotyped individuals
 #' @param mrk_idx the index of effective markers used in analysis
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param cpu number of cpus used for parallel computation
 #' @param verbose whether to print detail.
 #'
@@ -38,7 +39,7 @@
 #' print(dim(phenotype))
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
-#' genotype <- deepcopy(genotype, cols=idx)
+#' genotype <- deepcopy(genotype, rows=idx)
 #' print(dim(genotype))
 #' 
 #' glm <- MVP.GLM(phe=phenotype, geno=genotype, cpu=1)
@@ -49,18 +50,24 @@ function(
     phe, 
     geno, 
     CV=NULL, 
-    ind_idx = NULL,
+    ind_idx=NULL,
     mrk_idx=NULL,
+    maxLine=5000,
     cpu=1,
     verbose=TRUE
 ){
 
-    n <- ifelse(is.null(ind_idx), ncol(geno), length(ind_idx))
-    ys <- as.numeric(as.matrix(phe[,2]))
-    
+    if(is.null(ind_idx)){
+        if(nrow(phe) != ncol(geno) && nrow(phe) != nrow(geno)) stop("number of individuals does not match in phenotype and genotype.")
+        n <- ifelse(nrow(phe) == ncol(geno), ncol(geno), nrow(geno))
+    }else{
+        n <- length(ind_idx)
+        if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
+    }
+
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
+    ys <- as.numeric(as.matrix(phe[,2]))
     if(sum(is.na(ys)) != 0) stop("NAs are not allowed in phenotype.")
-    if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
     
     if(is.null(CV)){
         X0 <- matrix(1, n)
@@ -77,7 +84,7 @@ function(
     logging.log("scanning...\n", verbose = verbose)
 
     mkl_env({
-        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, geno_ind = ind_idx, marker_ind = mrk_idx, verbose = verbose, threads = cpu)
+        results <- glm_c(y = ys, X = X0, iXX = iX0X0, geno@address, geno_ind = ind_idx, marker_ind = mrk_idx, step = maxLine, verbose = verbose, threads = cpu)
     })
 
     return(results[, c(1, 2, ncol(results))])

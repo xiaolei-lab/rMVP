@@ -138,7 +138,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     
     // progress bar
     MinimalProgressBar_perc pb;
-    Progress progress(pMat->nrow(), verbose, pb);
+    Progress progress(pMat->ncol(), verbose, pb);
     
     // Skip Header
     string prefix("#CHROM");
@@ -179,7 +179,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
             //     mat[j][m + i] = markers[j];
             // }
             for(size_t j = 0; j < (l.size() - 9); j++) {
-                mat[j][m + i] = static_cast<T>(vcf_marker_parser(l[j + 9], NA_C));
+                mat[m + i][j] = static_cast<T>(vcf_marker_parser(l[j + 9], NA_C));
             }
         }
         progress.increment(buffer.size());
@@ -339,7 +339,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
     
     // progress bar
     MinimalProgressBar_perc pb;
-    Progress progress(pMat->nrow(), verbose, pb);
+    Progress progress(pMat->ncol(), verbose, pb);
     
     // Skip Header
     string prefix("rs#");
@@ -380,7 +380,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
                 Rcpp::stop(("line " + to_string(m+i+2) + " does not have " + to_string(n_col) + " elements in HAPMAP file.").c_str());
             major = Major[m + i][0];
             for(size_t j = 0; j < (l.size() - 11); j++) {
-                mat[j][m + i] = static_cast<T>(hapmap_marker_parser(l[j + 11], major, NA_C));
+                mat[m + i][j] = static_cast<T>(hapmap_marker_parser(l[j + 11], major, NA_C));
             }
         }
         progress.increment(n_marker);
@@ -436,7 +436,7 @@ List numeric_scan(std::string num_file) {
 // ***** BFILE *****
 
 template <typename T>
-void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int threads=0, bool verbose=true) {
+void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool mrkbycol = true, int threads=0, bool verbose=true) {
     // check input
     string ending = ".bed";
     if (bed_file.length() <= ending.length() ||
@@ -447,10 +447,10 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     // define
     T c;
     omp_setup(threads);
-    int m = pMat->nrow();
-    int nind = pMat->ncol();
-    int n = pMat->ncol() / 4;  // 4 individual = 1 bit
-    if (pMat->ncol() % 4 != 0) 
+    int m = (mrkbycol ? pMat->ncol() : pMat->nrow());
+    int nind = (mrkbycol ? pMat->nrow() : pMat->ncol());
+    int n = nind / 4;  // 4 individual = 1 bit
+    if (nind % 4 != 0) 
         n++;
     
     vector<uint8_t> geno(n);
@@ -460,7 +460,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     
     // progress bar
     MinimalProgressBar_perc pb;
-    Progress progress(pMat->nrow(), verbose, pb);
+    Progress progress(m, verbose, pb);
     
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
@@ -474,36 +474,52 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, int th
     code[static_cast<T>(NA_C)] = 1;
     
     // write bfile
-    for (int i = 0; i < m; i++) {
-        #pragma omp parallel for private(c)
-        for (int j = 0; j < n; j++) {
-            uint8_t p = 0;
-            for (int x = 0; x < 4 && (4 * j + x) < nind; x++) {
-                c = mat[4 * j + x][i];
-                p |= code[c] << (x*2);
+    if(mrkbycol){
+        for (int i = 0; i < m; i++) {
+            #pragma omp parallel for private(c)
+            for (int j = 0; j < n; j++) {
+                uint8_t p = 0;
+                for (int x = 0; x < 4 && (4 * j + x) < nind; x++) {
+                    c = mat[i][4 * j + x];
+                    p |= code[c] << (x*2);
+                }
+                geno[j] = p;
             }
-            geno[j] = p;
+            fwrite((char*)geno.data(), 1, geno.size(), fout);
+            progress.increment();
         }
-        fwrite((char*)geno.data(), 1, geno.size(), fout);
-        progress.increment();
+    }else{
+        for (int i = 0; i < m; i++) {
+            #pragma omp parallel for private(c)
+            for (int j = 0; j < n; j++) {
+                uint8_t p = 0;
+                for (int x = 0; x < 4 && (4 * j + x) < nind; x++) {
+                    c = mat[4 * j + x][i];
+                    p |= code[c] << (x*2);
+                }
+                geno[j] = p;
+            }
+            fwrite((char*)geno.data(), 1, geno.size(), fout);
+            progress.increment();
+        }
     }
     fclose(fout);
     return;
 }
 
 // [[Rcpp::export]]
-void write_bfile(SEXP pBigMat, std::string bed_file, int threads=0, bool verbose=true) {
+void write_bfile(SEXP pBigMat, std::string bed_file, bool mrkbycol = true, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return write_bfile<char>(xpMat, bed_file, NA_CHAR, threads, verbose);
+        return write_bfile<char>(xpMat, bed_file, NA_CHAR, mrkbycol, threads, verbose);
     case 2:
-        return write_bfile<short>(xpMat, bed_file, NA_SHORT, threads, verbose);
+        return write_bfile<short>(xpMat, bed_file, NA_SHORT, mrkbycol, threads, verbose);
     case 4:
-        return write_bfile<int>(xpMat, bed_file, NA_INTEGER, threads, verbose);
+        return write_bfile<int>(xpMat, bed_file, NA_INTEGER, mrkbycol, threads, verbose);
     case 8:
-        return write_bfile<double>(xpMat, bed_file, NA_REAL, threads, verbose);
+        return write_bfile<double>(xpMat, bed_file, NA_REAL, mrkbycol, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
@@ -518,7 +534,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // define
     omp_setup(threads);
-    size_t ind = pMat->ncol();
+    size_t ind = pMat->nrow();
     long n = ind / 4;  // 4 individual = 1 bit
     if (ind % 4 != 0) 
         n++; 
@@ -572,7 +588,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
             uint8_t p = buffer[j];
             
             for (size_t x = 0; x < 4 && (c + x) < ind; x++) {
-                mat[c + x][r] = code[(p >> (2*x)) & 0x03];
+                mat[r][c + x] = code[(p >> (2*x)) & 0x03];
             }
         }
         progress.increment();

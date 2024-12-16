@@ -12,16 +12,13 @@
 
 
 #' MVP.Data: To prepare data for MVP package
-#' Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
-#' Build date: Aug 30, 2016
-#' Last update: Sep 12, 2018
 #'
 #' @param fileMVP Genotype in MVP format
 #' @param fileVCF Genotype in VCF format
 #' @param fileHMP Genotype in hapmap format
 #' @param fileBed Genotype in PLINK binary format
 #' @param fileInd Individual name file
-#' @param fileNum Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size
+#' @param fileNum Genotype in numeric format; pure 0, 1, 2 matrix; m * n or n * m, m is marker size, n is sample size
 #' @param filePhe Phenotype, the first column is taxa name, the subsequent columns are traits
 #' @param fileMap SNP map information, there are three columns, including SNP_ID, Chromosome, and Position
 #' @param fileKin Kinship that represents relationship among individuals, n * n matrix, n is sample size
@@ -246,8 +243,8 @@ MVP.Data.VCF2MVP <- function(vcf_file, out='mvp', maxLine = 1e4, type.geno='char
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = m,
-        ncol = n,
+        nrow = n,
+        ncol = m,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -308,8 +305,8 @@ MVP.Data.Bfile2MVP <- function(bfile, out='mvp', maxLine=1e4, type.geno='char', 
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = m,
-        ncol = n,
+        nrow = n,
+        ncol = m,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -365,8 +362,8 @@ MVP.Data.Hapmap2MVP <- function(hmp_file, out='mvp', maxLine = 1e4, type.geno='c
     
     # parse genotype
     bigmat <- filebacked.big.matrix(
-        nrow = m,
-        ncol = n,
+        nrow = n,
+        ncol = m,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -432,8 +429,8 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
     
     # define bigmat
     bigmat <- filebacked.big.matrix(
-        nrow = m,
-        ncol = n,
+        nrow = n,
+        ncol = m,
         type = type.geno,
         backingfile = backingfile,
         backingpath = dirname(out),
@@ -476,15 +473,15 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
             len <- length(line)
             if (len == 0) { break }
 
-            line <- do.call(rbind, strsplit(line, '\\s+'))
-            if (row_names) { line <- line[, 2:ncol(line)]}
+            line <- do.call(cbind, strsplit(line, '\\s+'))
+            if (row_names) { line <- line[2:ncol(line), ]}
             if (transposed) {
-                bigmat[, (i + 1):(i + ncol(line))] <- line
-                i <- i + ncol(line)
-                percent <- 100 * i / n
-            } else {
                 bigmat[(i + 1):(i + nrow(line)), ] <- line
                 i <- i + nrow(line)
+                percent <- 100 * i / n
+            } else {
+                bigmat[, (i + 1):(i + ncol(line))] <- line
+                i <- i + ncol(line)
                 percent <- 100 * i / m
             }
 
@@ -527,8 +524,11 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
 #' 
 MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', threads=1, verbose=TRUE) {
     t1 <- as.numeric(Sys.time())
+
+    if(nrow(map) != nrow(bigmat) && nrow(map) != ncol(bigmat))  stop("mismatched number of SNPs between genotype and map.")
+    mrk_bycol <- nrow(map) == ncol(bigmat)
     # write bed file
-    write_bfile(bigmat@address, out, threads=threads, verbose = verbose)
+    write_bfile(bigmat@address, out, mrkbycol=mrk_bycol, threads=threads, verbose = verbose)
     
     # write fam
     #  1. Family ID ('FID')
@@ -537,13 +537,14 @@ MVP.Data.MVP2Bfile <- function(bigmat, map, pheno=NULL, out='mvp.plink', threads
     #  4. Within-family ID of mother ('0' if mother isn't in dataset)
     #  5. Sex code ('1' = male, '2' = female, '0' = unknown)
     #  6. Phenotype value ('1' = control, '2' = case, '-9'/'0'/non-numeric = missing data if case/control)
+    n <- ifelse(mrk_bycol, nrow(bigmat), ncol(bigmat))
     if (is.null(pheno)) {
-        ind <- paste0("ind", 1:ncol(bigmat))
-        pheno <- rep(-9, ncol(bigmat))
+        ind <- paste0("ind", 1:n)
+        pheno <- rep(-9, n)
         message("pheno is NULL, automatically named individuals.")
     } else if (ncol(pheno) == 1) {
         ind <- pheno[, 1]
-        pheno <- rep(-9, ncol(bigmat))
+        pheno <- rep(-9, n)
     } else {
         if (ncol(pheno) > 2) { 
             message("Only the first phenotype is written to the fam file, and the remaining ", ncol(pheno) - 1, " phenotypes are ignored.")
@@ -704,6 +705,7 @@ MVP.Data.Map <- function(map, out='mvp', cols=1:5, header=TRUE, sep='\t', verbos
 #' @param out prefix of output file name
 #' @param pcs.keep how many PCs to keep
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)
 #' @param sep seperator for PC file.
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
@@ -727,6 +729,7 @@ MVP.Data.PC <- function(
     out=NULL,  
     pcs.keep=5,
     maxLine=10000,
+    mrk_bycol=TRUE,
     sep='\t',
     cpu=1,
     verbose=TRUE
@@ -743,7 +746,7 @@ MVP.Data.PC <- function(
     } else if (filePC == TRUE) {
         if(is.null(K)){
             geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-            myPC <- MVP.PCA(M=geno, pcs.keep = pcs.keep, maxLine = maxLine, cpu=cpu)
+            myPC <- MVP.PCA(M=geno, mrk_bycol=mrk_bycol, pcs.keep = pcs.keep, maxLine = maxLine, cpu=cpu)
         }else{
             myPC <- MVP.PCA(K=K, pcs.keep = pcs.keep, maxLine = maxLine, cpu=cpu)
         }
@@ -773,6 +776,7 @@ MVP.Data.PC <- function(
 #' @param mvp_prefix Prefix for mvp format files
 #' @param out prefix of output file name
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)
 #' @param sep seperator for Kinship file.
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
@@ -794,6 +798,7 @@ MVP.Data.Kin <- function(
     mvp_prefix='mvp', 
     out=NULL, 
     maxLine=10000, 
+    mrk_bycol=TRUE,
     sep='\t',
     cpu=1,
     verbose=TRUE
@@ -809,7 +814,7 @@ MVP.Data.Kin <- function(
         myKin <- read.big.matrix(fileKin, header = FALSE, type = 'double', sep = sep)
     } else if (fileKin == TRUE) {
         geno <- attach.big.matrix(paste0(mvp_prefix, ".geno.desc"))
-        myKin <- MVP.K.VanRaden(geno, maxLine = maxLine, cpu = cpu, verbose = verbose)
+        myKin <- MVP.K.VanRaden(geno, mrk_bycol = mrk_bycol, maxLine = maxLine, cpu = cpu, verbose = verbose)
     } else {
         stop("ERROR: The value of fileKin is invalid.")
     }
@@ -838,6 +843,7 @@ MVP.Data.Kin <- function(
 #' 
 #' @param mvp_prefix the prefix of mvp file
 #' @param out the prefix of output file
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)
 #' @param method 'Major', 'Minor', "Middle"
 #' @param ncpus number of threads for imputing
 #' @param verbose whether to print the reminder
@@ -849,7 +855,7 @@ MVP.Data.Kin <- function(
 #' 
 #' MVP.Data.impute(mvpPath, tempfile("outfile"), ncpus=1)
 #' 
-MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL, verbose=TRUE) {
+MVP.Data.impute <- function(mvp_prefix, out=NULL, mrk_bycol=TRUE, method='Major', ncpus=NULL, verbose=TRUE) {
     # input
     desc <- paste0(mvp_prefix, ".geno.desc")
     bigmat <- attach.big.matrix(desc)
@@ -888,7 +894,7 @@ MVP.Data.impute <- function(mvp_prefix, out=NULL, method='Major', ncpus=NULL, ve
         file.copy(paste0(mvp_prefix, ".geno.map"), paste0(out, ".geno.map"))
     }
     
-    impute_marker(outmat@address, threads = ncpus, verbose = verbose)
+    impute_marker(outmat@address, mrkbycol = mrk_bycol, threads = ncpus, verbose = verbose)
     
     logging.log("Impute Genotype File is done!\n", verbose = verbose)
 }

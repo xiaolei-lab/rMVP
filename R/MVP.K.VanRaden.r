@@ -13,13 +13,12 @@
 
 #' Calculate Kinship matrix by VanRaden method
 #'
-#' Build date: Dec 12, 2016
-#' Last update: Dec 12, 2019
-#'
-#' @param M Genotype, m * n, m is marker size, n is population size
+#' @param M genotype, either m by n or n by m is supportable, m is marker size, n is population size
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param ind_idx the index of effective genotyped individuals used in analysis
 #' @param mrk_idx the index of effective markers used in analysis
+#' @param mrk_freq the prior calculated major allele frequency (not MAF) for all markers used in analysis
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)
 #' @param cpu the number of cpu
 #' @param verbose whether to print detail.
 #' @param checkNA whether to check NA in genotype.
@@ -42,6 +41,8 @@ function(
     maxLine=5000,
     ind_idx=NULL,
     mrk_idx=NULL,
+    mrk_freq = NULL,
+    mrk_bycol = TRUE,
     cpu=1,
     verbose=TRUE,
     checkNA=TRUE
@@ -53,19 +54,32 @@ function(
     mac <- (!linux) & (!wind)
     HPCMathLib <- mac | grepl("mkl", sessionInfo()$LAPACK) | grepl("openblas", sessionInfo()$LAPACK) | eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 
-    if (!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
+    if(!is.big.matrix(M)) stop("Format of Genotype Data must be big.matrix")
     if(checkNA){
-        if(hasNA(M@address, geno_ind = ind_idx, threads = cpu))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
+        if(hasNA(M@address, mrkbycol = mrk_bycol, geno_ind = ind_idx, marker_ind = mrk_idx, threads = cpu))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
     }
-    n <- ifelse(is.null(ind_idx), ncol(M), length(ind_idx))
-    m <- ifelse(is.null(mrk_idx), nrow(M), length(mrk_idx))
+
+    if(!is.null(mrk_freq)){
+        if(!is.null(mrk_idx)){
+            if(length(mrk_freq) != length(mrk_idx)) stop("mismatched number of markers between provided frequency and index.")
+        }else{
+            if(mrk_bycol){
+                if(length(mrk_freq) != ncol(M)) stop("mismatched number of markers between genotype and provided frequency.")
+            }else{
+                if(length(mrk_freq) != nrow(M)) stop("mismatched number of markers between genotype and provided frequency.")
+            }
+        }
+    }
+    
+    n <- ifelse(is.null(ind_idx), ifelse(mrk_bycol, nrow(M), ncol(M)), length(ind_idx))
+    m <- ifelse(is.null(mrk_idx), ifelse(mrk_bycol, ncol(M), nrow(M)), length(mrk_idx))
 
     # logging.log("Relationship matrix mode in", priority[1], "\n", verbose = verbose)
     # if(is.null(dim(M))) M <- t(as.matrix(M))
     
     logging.log(paste0("Computing GRM for ", n, " individuals using ", m, " markers with a step of ", maxLine), "\n", verbose = verbose)
     
-    K <- try(kin_cal(M@address, geno_ind = ind_idx, marker_ind = mrk_idx, threads = cpu, step = maxLine, verbose = verbose, mkl = HPCMathLib), silent=TRUE)
+    K <- try(kin_cal(M@address, geno_ind = ind_idx, marker_ind = mrk_idx, marker_freq = mrk_freq, marker_bycol = mrk_bycol, threads = cpu, step = maxLine, verbose = verbose, mkl = HPCMathLib), silent=TRUE)
     # K <- try(kin_cal_s(M@address, threads = cpu, verbose = verbose, mkl = HPCMathLib), silent=TRUE)
 
     if(inherits(K,"try-error")){
@@ -177,40 +191,3 @@ function(
     logging.log("Deriving relationship matrix successfully", "\n", verbose = verbose); gc()
     return(K)
 }#end of MVP.k.VanRaden function
-
-# #' Calculate Kinship matrix by Blocking strategy
-# #'
-# #' Build date: Apr 14, 2021
-# #' Last update: Apr 14, 2021
-# #'
-# #' @param M Genotype, m * n, m is marker size, n is population size
-# #' @param step Number of markers processed at one time
-# #'
-# #' @return K, n * n matrix
-# #' @export
-# #'
-# #' @examples
-# #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
-# #' genotype <- attach.big.matrix(genoPath)
-# #' print(dim(genotype))
-# #'
-# #' K <- MVP.calk(genotype)
-# #'
-# MVP.calk <- function(M, step = 1000) {
-#     n_marker = nrow(M)
-#     n_sample = ncol(M)
-#     if (step > n_marker) { step = n_marker }
-#     idx = 0
-#     sum = 0
-#     K = matrix(0, n_sample, n_sample)
-#     while(idx < n_marker){
-#         G_buffer = M[idx + seq_len(step), ]
-#         means = rowMeans(G_buffer)
-#         sum   = sum + (0.5 * means) %*% (1 - 0.5 * means)
-#         K = K + crossprod(G_buffer - means)
-#         idx = idx + step
-#         if (idx + step > n_marker) { step = n_marker - idx }
-#     }
-#     K = K / (2 * drop(sum))
-#     return(K)
-# }

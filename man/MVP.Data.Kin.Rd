@@ -9,6 +9,7 @@ MVP.Data.Kin(
   mvp_prefix = "mvp",
   out = NULL,
   maxLine = 10000,
+  mrk_bycol = TRUE,
   sep = "\\t",
   cpu = 1,
   verbose = TRUE
@@ -22,6 +23,8 @@ MVP.Data.Kin(
 \item{out}{prefix of output file name}
 
 \item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)}
 
 \item{sep}{seperator for Kinship file.}
 

@@ -43,7 +43,7 @@ MVP(
 \arguments{
 \item{phe}{phenotype, n * 2 matrix, n is sample size}
 
-\item{geno}{Genotype in bigmatrix format; m * n, m is marker size, n is sample size}
+\item{geno}{genotype, either m by n or n by m is supportable, m is marker size, n is population size}
 
 \item{map}{SNP map information, SNP name, Chr, Pos}
 
@@ -91,6 +91,8 @@ MVP(
 
 \item{memo}{Character. A text marker on output files}
 
+\item{outpath}{the path of the output files}
+
 \item{col}{for color of points in each chromosome on manhattan plot}
 
 \item{file.output}{whether to output files or not}
@@ -102,11 +104,8 @@ MVP(
 \item{threshold}{a cutoff line on manhattan plot, 0.05/marker size}
 
 \item{verbose}{whether to print detail.}
-
-\item{tmppath}{the path of the temporary file}
 }
 \value{
-a m * 2 matrix, the first column is the SNP effect, the second column is the P values
 Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
 Output: MVP.return$glm.results - p-values obtained by GLM method
 Output: MVP.return$mlm.results - p-values obtained by MLM method
@@ -117,10 +116,6 @@ Object 1: To perform GWAS using General Linear Model (GLM), Mixed Linear Model (
 Object 2: To calculate kinship among individuals using Varaden method
 Object 3: Estimate variance components using EMMA, FaST-LMM, and HE regression
 Object 4: Generate high-quality figures
-}
-\details{
-Build date: Aug 30, 2017
-Last update: Dec 14, 2018
 }
 \examples{
 \donttest{

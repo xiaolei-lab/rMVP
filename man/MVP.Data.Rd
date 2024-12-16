@@ -2,10 +2,7 @@
 % Please edit documentation in R/MVP.Data.r
 \name{MVP.Data}
 \alias{MVP.Data}
-\title{MVP.Data: To prepare data for MVP package
-Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
-Build date: Aug 30, 2016
-Last update: Sep 12, 2018}
+\title{MVP.Data: To prepare data for MVP package}
 \usage{
 MVP.Data(
   fileMVP = NULL,
@@ -44,7 +41,7 @@ MVP.Data(
 
 \item{fileBed}{Genotype in PLINK binary format}
 
-\item{fileNum}{Genotype in numeric format; pure 0, 1, 2 matrix; m * n, m is marker size, n is sample size}
+\item{fileNum}{Genotype in numeric format; pure 0, 1, 2 matrix; m * n or n * m, m is marker size, n is sample size}
 
 \item{fileMap}{SNP map information, there are three columns, including SNP_ID, Chromosome, and Position}
 
@@ -101,9 +98,6 @@ Requirement: fileHMP, fileBed, and fileNum can not input at the same time
 }
 \description{
 MVP.Data: To prepare data for MVP package
-Author: Xiaolei Liu, Lilin Yin and Haohao Zhang
-Build date: Aug 30, 2016
-Last update: Sep 12, 2018
 }
 \examples{
 \donttest{

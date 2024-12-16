@@ -5,12 +5,12 @@ getRow <- function(pBigMat, row) {
     .Call(`_rMVP_getRow`, pBigMat, row)
 }
 
-glm_c <- function(y, X, iXX, pBigMat, geno_ind = NULL, marker_ind = NULL, verbose = TRUE, threads = 0L) {
-    .Call(`_rMVP_glm_c`, y, X, iXX, pBigMat, geno_ind, marker_ind, verbose, threads)
+glm_c <- function(y, X, iXX, pBigMat, geno_ind = NULL, marker_ind = NULL, step = 10000L, verbose = TRUE, threads = 0L) {
+    .Call(`_rMVP_glm_c`, y, X, iXX, pBigMat, geno_ind, marker_ind, step, verbose, threads)
 }
 
-mlm_c <- function(y, X, U, vgs, pBigMat, geno_ind = NULL, marker_ind = NULL, verbose = TRUE, threads = 0L) {
-    .Call(`_rMVP_mlm_c`, y, X, U, vgs, pBigMat, geno_ind, marker_ind, verbose, threads)
+mlm_c <- function(y, X, U, vgs, pBigMat, geno_ind = NULL, marker_ind = NULL, step = 10000L, verbose = TRUE, threads = 0L) {
+    .Call(`_rMVP_mlm_c`, y, X, U, vgs, pBigMat, geno_ind, marker_ind, step, verbose, threads)
 }
 
 vcf_parser_map <- function(vcf_file, out) {
@@ -33,8 +33,8 @@ numeric_scan <- function(num_file) {
     .Call(`_rMVP_numeric_scan`, num_file)
 }
 
-write_bfile <- function(pBigMat, bed_file, threads = 0L, verbose = TRUE) {
-    invisible(.Call(`_rMVP_write_bfile`, pBigMat, bed_file, threads, verbose))
+write_bfile <- function(pBigMat, bed_file, mrkbycol = TRUE, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_rMVP_write_bfile`, pBigMat, bed_file, mrkbycol, threads, verbose))
 }
 
 read_bfile <- function(bed_file, pBigMat, maxLine, threads = 0L, verbose = TRUE) {
@@ -53,16 +53,16 @@ geninv <- function(GG) {
     .Call(`_rMVP_geninv`, GG)
 }
 
-impute_marker <- function(pBigMat, threads = 0L, verbose = TRUE) {
-    invisible(.Call(`_rMVP_impute_marker`, pBigMat, threads, verbose))
+impute_marker <- function(pBigMat, mrkbycol = TRUE, threads = 0L, verbose = TRUE) {
+    invisible(.Call(`_rMVP_impute_marker`, pBigMat, mrkbycol, threads, verbose))
 }
 
-hasNA <- function(pBigMat, geno_ind = NULL, threads = 1L) {
-    .Call(`_rMVP_hasNA`, pBigMat, geno_ind, threads)
+hasNA <- function(pBigMat, mrkbycol = TRUE, geno_ind = NULL, marker_ind = NULL, threads = 1L) {
+    .Call(`_rMVP_hasNA`, pBigMat, mrkbycol, geno_ind, marker_ind, threads)
 }
 
-BigRowMean <- function(pBigMat, threads = 0L, geno_ind = NULL) {
-    .Call(`_rMVP_BigRowMean`, pBigMat, threads, geno_ind)
+BigRowMean <- function(pBigMat, mrkbycol = TRUE, threads = 0L, geno_ind = NULL) {
+    .Call(`_rMVP_BigRowMean`, pBigMat, mrkbycol, threads, geno_ind)
 }
 
 kin_cal_m <- function(pBigMat, threads = 0L, verbose = TRUE) {
@@ -73,7 +73,7 @@ kin_cal_s <- function(pBigMat, threads = 0L, mkl = FALSE, verbose = TRUE) {
     .Call(`_rMVP_kin_cal_s`, pBigMat, threads, mkl, verbose)
 }
 
-kin_cal <- function(pBigMat, geno_ind = NULL, marker_ind = NULL, threads = 0L, step = 10000L, mkl = FALSE, verbose = TRUE) {
-    .Call(`_rMVP_kin_cal`, pBigMat, geno_ind, marker_ind, threads, step, mkl, verbose)
+kin_cal <- function(pBigMat, geno_ind = NULL, marker_ind = NULL, marker_freq = NULL, marker_bycol = TRUE, threads = 0L, step = 10000L, mkl = FALSE, verbose = TRUE) {
+    .Call(`_rMVP_kin_cal`, pBigMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose)
 }
 

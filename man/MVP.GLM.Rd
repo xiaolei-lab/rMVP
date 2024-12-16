@@ -10,6 +10,7 @@ MVP.GLM(
   CV = NULL,
   ind_idx = NULL,
   mrk_idx = NULL,
+  maxLine = 5000,
   cpu = 1,
   verbose = TRUE
 )
@@ -17,13 +18,15 @@ MVP.GLM(
 \arguments{
 \item{phe}{phenotype, n * 2 matrix}
 
-\item{geno}{Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size}
+\item{geno}{genotype, either m by n or n by m is supportable, m is marker size, n is population size}
 
 \item{CV}{Covariance, design matrix(n * x) for the fixed effects}
 
 \item{ind_idx}{the index of effective genotyped individuals}
 
 \item{mrk_idx}{the index of effective markers used in analysis}
+
+\item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 
 \item{cpu}{number of cpus used for parallel computation}
 
@@ -45,7 +48,7 @@ phenotype <- phenotype[idx, ]
 print(dim(phenotype))
 genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 genotype <- attach.big.matrix(genoPath)
-genotype <- deepcopy(genotype, cols=idx)
+genotype <- deepcopy(genotype, rows=idx)
 print(dim(genotype))
 
 glm <- MVP.GLM(phe=phenotype, geno=genotype, cpu=1)

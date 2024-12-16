@@ -12,20 +12,18 @@
 
 
 #' To perform GWAS with GLM and MLM model and get the P value of SNPs
-#'
-#' Build date: Aug 30, 2016
-#' Last update: Aug 30, 2016
 #' 
 #' @author Lilin Yin and Xiaolei Liu
 #' 
 #' @param phe phenotype, n * 2 matrix
-#' @param geno genotype, m * n, m is marker size, n is population size
+#' @param geno genotype, either m by n or n by m is supportable, m is marker size, n is population size
 #' @param K Kinship, Covariance matrix(n * n) for random effects; must be positive semi-definite
 #' @param eigenK list of eigen Kinship
 #' @param CV covariates
 #' @param ind_idx the index of effective genotyped individuals
 #' @param mrk_idx the index of effective markers used in analysis
 #' @param REML a list that contains ve and vg
+#' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param cpu number of cpus used for parallel computation
 #' @param vc.method the methods for estimating variance component("emma" or "he" or "brent")
 #' @param verbose whether to print detail.
@@ -43,7 +41,7 @@
 #' print(dim(phenotype))
 #' genoPath <- system.file("extdata", "06_mvp-impute", "mvp.imp.geno.desc", package = "rMVP")
 #' genotype <- attach.big.matrix(genoPath)
-#' genotype <- deepcopy(genotype, cols=idx)
+#' genotype <- deepcopy(genotype, rows=idx)
 #' print(dim(genotype))
 #' K <- MVP.K.VanRaden(genotype, cpu=1)
 #' 
@@ -62,18 +60,24 @@ function(
     ind_idx=NULL,
     mrk_idx=NULL,
     REML=NULL,
+    maxLine=5000,
     cpu=1,
     vc.method=c("BRENT", "EMMA", "HE"),
     verbose=TRUE
 ){
 
+    if(is.null(ind_idx)){
+        if(nrow(phe) != ncol(geno) && nrow(phe) != nrow(geno)) stop("number of individuals does not match in phenotype and genotype.")
+        n <- ifelse(nrow(phe) == ncol(geno), ncol(geno), nrow(geno))
+    }else{
+        n <- length(ind_idx)
+        if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
+    }
     vc.method <- match.arg(vc.method)
-    n <- ifelse(is.null(ind_idx), ncol(geno), length(ind_idx))
     ys <- as.numeric(as.matrix(phe[,2]))
 
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(ys)) != 0) stop("NAs are not allowed in phenotype.")
-    if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
     
     if(is.null(K)){
         if(vc.method == "EMMA" | vc.method == "he")  stop("Kinship must be provided!")
@@ -121,7 +125,7 @@ function(
     
     logging.log("scanning...\n", verbose = verbose)
     mkl_env({
-        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, ind_idx, mrk_idx, verbose = verbose, threads = cpu)
+        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, ind_idx, mrk_idx, step = maxLine, verbose = verbose, threads = cpu)
     })
 
     return(results)

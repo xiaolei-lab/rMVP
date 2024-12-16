@@ -10,13 +10,14 @@ MVP.PCA(
   maxLine = 10000,
   ind_idx = NULL,
   mrk_idx = NULL,
+  mrk_bycol = TRUE,
   pcs.keep = 5,
   cpu = 1,
   verbose = TRUE
 )
 }
 \arguments{
-\item{M}{Genotype in numeric format, pure 0, 1, 2 matrix; m * n, m is marker size, n is population size}
+\item{M}{genotype, either m by n or n by m is supportable, m is marker size, n is population size}
 
 \item{K}{kinship matrix}
 
@@ -25,6 +26,8 @@ MVP.PCA(
 \item{ind_idx}{the index of effective genotyped individuals used in analysis}
 
 \item{mrk_idx}{the index of effective markers used in analysis}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)}
 
 \item{pcs.keep}{maximum number of PCs for output}
 
@@ -36,8 +39,7 @@ MVP.PCA(
 Output: PCs - a n * npc matrix of top number of PCs, n is population size and npc is @param pcs.keep
 }
 \description{
-Build date: Dec 14, 2016
-Last update: Oct 29, 2018
+Principal Component Analysis
 }
 \examples{
 \donttest{
@@ -49,7 +51,4 @@ pca <- MVP.PCA(M=genotype, cpu=1)
 str(pca)
 }
 
-}
-\author{
-Xiaolei Liu, Lilin Yin and Haohao Zhang
 }

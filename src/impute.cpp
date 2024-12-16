@@ -23,116 +23,200 @@ using namespace Rcpp;
 using namespace arma;
 
 template <typename T>
-void impute_marker(XPtr<BigMatrix> pMat, int threads=0, bool verbose=true) {
+void impute_marker(XPtr<BigMatrix> pMat, bool mrkbycol = true, int threads=0, bool verbose=true) {
     omp_setup(threads);
 
-    MinimalProgressBar_perc pb;
-    Progress progress(pMat->nrow(), verbose, pb);
-    
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    const size_t n = pMat->ncol();
-    const size_t m = pMat->nrow();
+    const size_t n = (mrkbycol ? pMat->nrow() : pMat->ncol());
+    const size_t m = (mrkbycol ? pMat->ncol() : pMat->nrow());
+    
+    MinimalProgressBar_perc pb;
+    Progress progress(m, verbose, pb);
     
     // loop marker
-    #pragma omp parallel for
-    for (size_t i = 0; i < m; i++) {
-        std::vector<size_t> na_index = {};;
-        size_t counts[3] = { 0 };
-        
-        // count allele, record missing index 
-        for (size_t j = 0; j < n; j++) {
-            switch(int(mat[j][i])) {
-            case 0: counts[0]++; break;
-            case 1: counts[1]++; break;
-            case 2: counts[2]++; break;
-            default: na_index.push_back(j);
+    if(mrkbycol){
+        #pragma omp parallel for
+        for (size_t i = 0; i < m; i++) {
+            std::vector<size_t> na_index = {};;
+            size_t counts[3] = { 0 };
+            
+            // count allele, record missing index 
+            for (size_t j = 0; j < n; j++) {
+                switch(int(mat[i][j])) {
+                case 0: counts[0]++; break;
+                case 1: counts[1]++; break;
+                case 2: counts[2]++; break;
+                default: na_index.push_back(j);
+                }
             }
+            
+            // find major allele
+            T major = counts[2] > counts[1] ? (counts[2] > counts[0] ? 2 : 0) : (counts[1] > counts[0] ? 1 : 0);
+            
+            // impute
+            for (auto&& x: na_index) {
+                mat[i][x] = major;   
+            }
+            progress.increment();
         }
-        
-        // find major allele
-        T major = counts[2] > counts[1] ? (counts[2] > counts[0] ? 2 : 0) : (counts[1] > counts[0] ? 1 : 0);
-        
-        // impute
-        for (auto&& x: na_index) {
-            mat[x][i] = major;   
+    }else{
+        #pragma omp parallel for
+        for (size_t i = 0; i < m; i++) {
+            std::vector<size_t> na_index = {};;
+            size_t counts[3] = { 0 };
+            
+            // count allele, record missing index 
+            for (size_t j = 0; j < n; j++) {
+                switch(int(mat[j][i])) {
+                case 0: counts[0]++; break;
+                case 1: counts[1]++; break;
+                case 2: counts[2]++; break;
+                default: na_index.push_back(j);
+                }
+            }
+            
+            // find major allele
+            T major = counts[2] > counts[1] ? (counts[2] > counts[0] ? 2 : 0) : (counts[1] > counts[0] ? 1 : 0);
+            
+            // impute
+            for (auto&& x: na_index) {
+                mat[x][i] = major;   
+            }
+            progress.increment();
         }
-        progress.increment();
     }
 }
 
 // [[Rcpp::export]]
-void impute_marker(SEXP pBigMat, int threads=0, bool verbose=true) {
+void impute_marker(SEXP pBigMat, bool mrkbycol = true, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return impute_marker<char>(xpMat, threads, verbose);
+        return impute_marker<char>(xpMat, mrkbycol, threads, verbose);
     case 2:
-        return impute_marker<short>(xpMat, threads, verbose);
+        return impute_marker<short>(xpMat, mrkbycol, threads, verbose);
     case 4:
-        return impute_marker<int>(xpMat, threads, verbose);
+        return impute_marker<int>(xpMat, mrkbycol, threads, verbose);
     case 8:
-        return impute_marker<double>(xpMat, threads, verbose);
+        return impute_marker<double>(xpMat, mrkbycol, threads, verbose);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }
 }
 
 template <typename T>
-bool hasNA(XPtr<BigMatrix> pMat, double NA_C, const Nullable<arma::uvec> geno_ind=R_NilValue, const int threads=1) {
+bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int threads = 1) {
     
     omp_setup(threads);
-    size_t m = pMat->nrow();
-    size_t n;
-    
-    uvec _geno_ind;
-	if(geno_ind.isNotNull()){
-        _geno_ind = as<uvec>(geno_ind) - 1;
-        n = _geno_ind.n_elem;
-    }else{
-		n = pMat->ncol();
-	}
 
     bool HasNA = false;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
-    if(_geno_ind.is_empty()){
-        #pragma omp parallel for shared(HasNA)
-        for (size_t j = 0; j < n; j++) {
-            if(HasNA)   continue;
-            for (size_t i = 0; i < m; i++) {
-                if (mat[j][i] == NA_C) {
-                    HasNA = true;
+    if(geno_ind.isNotNull()){
+        uvec _geno_ind = as<uvec>(geno_ind) - 1;
+        int n = _geno_ind.n_elem;
+        if(marker_ind.isNotNull()){
+            uvec _marker_ind = as<uvec>(marker_ind) - 1;
+            int m = _marker_ind.n_elem;
+            if(mrkbycol){
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < m; j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < n; i++) {
+                        if (mat[_marker_ind[j]][_geno_ind[i]] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
+                }
+            }else{
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < n; j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < m; i++) {
+                        if (mat[_geno_ind[j]][_marker_ind[i]] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
+                }
+            }
+        }else{
+            if(mrkbycol){
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < pMat->ncol(); j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < n; i++) {
+                        if (mat[j][_geno_ind[i]] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
+                }
+            }else{
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < n; j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < pMat->nrow(); i++) {
+                        if (mat[_geno_ind[j]][i] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
                 }
             }
         }
     }else{
-        #pragma omp parallel for shared(HasNA)
-        for (size_t j = 0; j < n; j++) {
-            if(HasNA)   continue;
-            for (size_t i = 0; i < m; i++) {
-                if (mat[_geno_ind[j]][i] == NA_C) {
-                    HasNA = true;
+        if(marker_ind.isNotNull()){
+            uvec _marker_ind = as<uvec>(marker_ind) - 1;
+            int m = _marker_ind.n_elem;
+            if(mrkbycol){
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < m; j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < pMat->nrow(); i++) {
+                        if (mat[_marker_ind[j]][i] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
+                }
+            }else{
+                #pragma omp parallel for shared(HasNA)
+                for (int j = 0; j < pMat->ncol(); j++) {
+                    if(HasNA)   continue;
+                    for (int i = 0; i < m; i++) {
+                        if (mat[j][_marker_ind[i]] == NA_C) {
+                            HasNA = true;
+                        }
+                    }
+                }
+            }
+        }else{
+            #pragma omp parallel for shared(HasNA)
+            for (int j = 0; j < pMat->ncol(); j++) {
+                if(HasNA)   continue;
+                for (int i = 0; i < pMat->nrow(); i++) {
+                    if (mat[j][i] == NA_C) {
+                        HasNA = true;
+                    }
                 }
             }
         }
     }
+
     return HasNA;
 }
 
 // [[Rcpp::export]]
-bool hasNA(SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const int threads=1) {
+bool hasNA(SEXP pBigMat, bool mrkbycol = true, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int threads=1) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hasNA<char>(xpMat, NA_CHAR, geno_ind, threads);
+        return hasNA<char>(xpMat, NA_CHAR, mrkbycol, geno_ind, marker_ind, threads);
     case 2:
-        return hasNA<short>(xpMat, NA_SHORT, geno_ind, threads);
+        return hasNA<short>(xpMat, NA_SHORT, mrkbycol, geno_ind, marker_ind, threads);
     case 4:
-        return hasNA<int>(xpMat, NA_INTEGER, geno_ind, threads);
+        return hasNA<int>(xpMat, NA_INTEGER, mrkbycol, geno_ind, marker_ind, threads);
     case 8:
-        return hasNA<double>(xpMat, NA_REAL, geno_ind, threads);
+        return hasNA<double>(xpMat, NA_REAL, mrkbycol, geno_ind, marker_ind, threads);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

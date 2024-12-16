@@ -25,8 +25,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // glm_c
-SEXP glm_c(const arma::vec& y, const arma::mat& X, const arma::mat& iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const bool verbose, const int threads);
-RcppExport SEXP _rMVP_glm_c(SEXP ySEXP, SEXP XSEXP, SEXP iXXSEXP, SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
+SEXP glm_c(const arma::vec& y, const arma::mat& X, const arma::mat& iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const int step, const bool verbose, const int threads);
+RcppExport SEXP _rMVP_glm_c(SEXP ySEXP, SEXP XSEXP, SEXP iXXSEXP, SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP stepSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -36,15 +36,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type geno_ind(geno_indSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type marker_ind(marker_indSEXP);
+    Rcpp::traits::input_parameter< const int >::type step(stepSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(glm_c(y, X, iXX, pBigMat, geno_ind, marker_ind, verbose, threads));
+    rcpp_result_gen = Rcpp::wrap(glm_c(y, X, iXX, pBigMat, geno_ind, marker_ind, step, verbose, threads));
     return rcpp_result_gen;
 END_RCPP
 }
 // mlm_c
-SEXP mlm_c(const arma::vec& y, const arma::mat& X, const arma::mat& U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const bool verbose, const int threads);
-RcppExport SEXP _rMVP_mlm_c(SEXP ySEXP, SEXP XSEXP, SEXP USEXP, SEXP vgsSEXP, SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
+SEXP mlm_c(const arma::vec& y, const arma::mat& X, const arma::mat& U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const int step, const bool verbose, const int threads);
+RcppExport SEXP _rMVP_mlm_c(SEXP ySEXP, SEXP XSEXP, SEXP USEXP, SEXP vgsSEXP, SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP stepSEXP, SEXP verboseSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -55,9 +56,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type geno_ind(geno_indSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type marker_ind(marker_indSEXP);
+    Rcpp::traits::input_parameter< const int >::type step(stepSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mlm_c(y, X, U, vgs, pBigMat, geno_ind, marker_ind, verbose, threads));
+    rcpp_result_gen = Rcpp::wrap(mlm_c(y, X, U, vgs, pBigMat, geno_ind, marker_ind, step, verbose, threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -126,15 +128,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // write_bfile
-void write_bfile(SEXP pBigMat, std::string bed_file, int threads, bool verbose);
-RcppExport SEXP _rMVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+void write_bfile(SEXP pBigMat, std::string bed_file, bool mrkbycol, int threads, bool verbose);
+RcppExport SEXP _rMVP_write_bfile(SEXP pBigMatSEXP, SEXP bed_fileSEXP, SEXP mrkbycolSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< std::string >::type bed_file(bed_fileSEXP);
+    Rcpp::traits::input_parameter< bool >::type mrkbycol(mrkbycolSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    write_bfile(pBigMat, bed_file, threads, verbose);
+    write_bfile(pBigMat, bed_file, mrkbycol, threads, verbose);
     return R_NilValue;
 END_RCPP
 }
@@ -194,40 +197,44 @@ BEGIN_RCPP
 END_RCPP
 }
 // impute_marker
-void impute_marker(SEXP pBigMat, int threads, bool verbose);
-RcppExport SEXP _rMVP_impute_marker(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
+void impute_marker(SEXP pBigMat, bool mrkbycol, int threads, bool verbose);
+RcppExport SEXP _rMVP_impute_marker(SEXP pBigMatSEXP, SEXP mrkbycolSEXP, SEXP threadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< bool >::type mrkbycol(mrkbycolSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    impute_marker(pBigMat, threads, verbose);
+    impute_marker(pBigMat, mrkbycol, threads, verbose);
     return R_NilValue;
 END_RCPP
 }
 // hasNA
-bool hasNA(SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const int threads);
-RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP threadsSEXP) {
+bool hasNA(SEXP pBigMat, bool mrkbycol, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const int threads);
+RcppExport SEXP _rMVP_hasNA(SEXP pBigMatSEXP, SEXP mrkbycolSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< bool >::type mrkbycol(mrkbycolSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type geno_ind(geno_indSEXP);
+    Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type marker_ind(marker_indSEXP);
     Rcpp::traits::input_parameter< const int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat, geno_ind, threads));
+    rcpp_result_gen = Rcpp::wrap(hasNA(pBigMat, mrkbycol, geno_ind, marker_ind, threads));
     return rcpp_result_gen;
 END_RCPP
 }
 // BigRowMean
-arma::vec BigRowMean(SEXP pBigMat, int threads, const Nullable<arma::uvec> geno_ind);
-RcppExport SEXP _rMVP_BigRowMean(SEXP pBigMatSEXP, SEXP threadsSEXP, SEXP geno_indSEXP) {
+arma::vec BigRowMean(SEXP pBigMat, bool mrkbycol, int threads, const Nullable<arma::uvec> geno_ind);
+RcppExport SEXP _rMVP_BigRowMean(SEXP pBigMatSEXP, SEXP mrkbycolSEXP, SEXP threadsSEXP, SEXP geno_indSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
+    Rcpp::traits::input_parameter< bool >::type mrkbycol(mrkbycolSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type geno_ind(geno_indSEXP);
-    rcpp_result_gen = Rcpp::wrap(BigRowMean(pBigMat, threads, geno_ind));
+    rcpp_result_gen = Rcpp::wrap(BigRowMean(pBigMat, mrkbycol, threads, geno_ind));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -259,43 +266,45 @@ BEGIN_RCPP
 END_RCPP
 }
 // kin_cal
-SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, int threads, size_t step, bool mkl, bool verbose);
-RcppExport SEXP _rMVP_kin_cal(SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP threadsSEXP, SEXP stepSEXP, SEXP mklSEXP, SEXP verboseSEXP) {
+SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const Nullable<arma::vec> marker_freq, const bool marker_bycol, int threads, size_t step, bool mkl, bool verbose);
+RcppExport SEXP _rMVP_kin_cal(SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP marker_freqSEXP, SEXP marker_bycolSEXP, SEXP threadsSEXP, SEXP stepSEXP, SEXP mklSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type pBigMat(pBigMatSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type geno_ind(geno_indSEXP);
     Rcpp::traits::input_parameter< const Nullable<arma::uvec> >::type marker_ind(marker_indSEXP);
+    Rcpp::traits::input_parameter< const Nullable<arma::vec> >::type marker_freq(marker_freqSEXP);
+    Rcpp::traits::input_parameter< const bool >::type marker_bycol(marker_bycolSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< size_t >::type step(stepSEXP);
     Rcpp::traits::input_parameter< bool >::type mkl(mklSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(kin_cal(pBigMat, geno_ind, marker_ind, threads, step, mkl, verbose));
+    rcpp_result_gen = Rcpp::wrap(kin_cal(pBigMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rMVP_getRow", (DL_FUNC) &_rMVP_getRow, 2},
-    {"_rMVP_glm_c", (DL_FUNC) &_rMVP_glm_c, 8},
-    {"_rMVP_mlm_c", (DL_FUNC) &_rMVP_mlm_c, 9},
+    {"_rMVP_glm_c", (DL_FUNC) &_rMVP_glm_c, 9},
+    {"_rMVP_mlm_c", (DL_FUNC) &_rMVP_mlm_c, 10},
     {"_rMVP_vcf_parser_map", (DL_FUNC) &_rMVP_vcf_parser_map, 2},
     {"_rMVP_vcf_parser_genotype", (DL_FUNC) &_rMVP_vcf_parser_genotype, 5},
     {"_rMVP_hapmap_parser_map", (DL_FUNC) &_rMVP_hapmap_parser_map, 2},
     {"_rMVP_hapmap_parser_genotype", (DL_FUNC) &_rMVP_hapmap_parser_genotype, 6},
     {"_rMVP_numeric_scan", (DL_FUNC) &_rMVP_numeric_scan, 1},
-    {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 4},
+    {"_rMVP_write_bfile", (DL_FUNC) &_rMVP_write_bfile, 5},
     {"_rMVP_read_bfile", (DL_FUNC) &_rMVP_read_bfile, 5},
     {"_rMVP_fit_diago_brent", (DL_FUNC) &_rMVP_fit_diago_brent, 9},
     {"_rMVP_crossprodcpp", (DL_FUNC) &_rMVP_crossprodcpp, 1},
     {"_rMVP_geninv", (DL_FUNC) &_rMVP_geninv, 1},
-    {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 3},
-    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 3},
-    {"_rMVP_BigRowMean", (DL_FUNC) &_rMVP_BigRowMean, 3},
+    {"_rMVP_impute_marker", (DL_FUNC) &_rMVP_impute_marker, 4},
+    {"_rMVP_hasNA", (DL_FUNC) &_rMVP_hasNA, 5},
+    {"_rMVP_BigRowMean", (DL_FUNC) &_rMVP_BigRowMean, 4},
     {"_rMVP_kin_cal_m", (DL_FUNC) &_rMVP_kin_cal_m, 3},
     {"_rMVP_kin_cal_s", (DL_FUNC) &_rMVP_kin_cal_s, 4},
-    {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 7},
+    {"_rMVP_kin_cal", (DL_FUNC) &_rMVP_kin_cal, 9},
     {NULL, NULL, 0}
 };
 

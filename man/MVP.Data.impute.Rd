@@ -9,6 +9,7 @@ Build date: Sep 12, 2018}
 MVP.Data.impute(
   mvp_prefix,
   out = NULL,
+  mrk_bycol = TRUE,
   method = "Major",
   ncpus = NULL,
   verbose = TRUE
@@ -18,6 +19,8 @@ MVP.Data.impute(
 \item{mvp_prefix}{the prefix of mvp file}
 
 \item{out}{the prefix of output file}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. genotype is a n by m matrix)}
 
 \item{method}{'Major', 'Minor', "Middle"}
 

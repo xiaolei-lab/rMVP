@@ -1,4 +1,4 @@
-# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.2.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
+# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.3.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
 
 ## An [r](https://) package for [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Genome-Wide Association Study
 
@@ -227,7 +227,7 @@ MVP.Data(fileHMP=c("hmp.chr1.txt", "hmp.chr2.txt", "hmp.chr3.txt", "hmp.chr4.txt
 
 ### Numeric
 **[back to top](#contents)**  
-If you have genotype data in **Numeric** (m * n, m rows and n columns, m is the number of SNPs, n is the number of individuals) format:  
+If you have genotype data in **Numeric** (either m * n or n * m is acceptable, m is the number of SNPs, n is the number of individuals) format:  
 
 **fileNum**, name of genotype data in Numeric format  
 **filePhe**, name of phenotype file  

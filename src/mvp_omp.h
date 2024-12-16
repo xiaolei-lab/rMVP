@@ -17,7 +17,6 @@
 
 #if defined(_OPENMP)
 #include <omp.h>
-#else
 #endif
 
 #include <Rcpp.h>
