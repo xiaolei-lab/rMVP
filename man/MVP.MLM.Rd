@@ -12,6 +12,7 @@ MVP.MLM(
   CV = NULL,
   ind_idx = NULL,
   mrk_idx = NULL,
+  mrk_bycol = TRUE,
   REML = NULL,
   maxLine = 5000,
   cpu = 1,
@@ -33,6 +34,8 @@ MVP.MLM(
 \item{ind_idx}{the index of effective genotyped individuals}
 
 \item{mrk_idx}{the index of effective markers used in analysis}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)}
 
 \item{REML}{a list that contains ve and vg}
 

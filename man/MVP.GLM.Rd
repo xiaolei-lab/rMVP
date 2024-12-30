@@ -10,6 +10,7 @@ MVP.GLM(
   CV = NULL,
   ind_idx = NULL,
   mrk_idx = NULL,
+  mrk_bycol = TRUE,
   maxLine = 5000,
   cpu = 1,
   verbose = TRUE
@@ -25,6 +26,8 @@ MVP.GLM(
 \item{ind_idx}{the index of effective genotyped individuals}
 
 \item{mrk_idx}{the index of effective markers used in analysis}
+
+\item{mrk_bycol}{whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)}
 
 \item{maxLine}{the number of markers handled at a time, smaller value would reduce the memory cost}
 

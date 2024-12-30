@@ -156,11 +156,11 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log(paste("Markers are detected to be stored by", ifelse(MrkByCol, "column", "row")), "\n", verbose = verbose)
     logging.log("Analyzed trait:", colnames(phe)[2], "\n", verbose = verbose)
     logging.log("Number of threads used:", ncpus, "\n", verbose = verbose)
-    hpclib <- grepl("mkl", sessionInfo()$LAPACK) | grepl("openblas", sessionInfo()$LAPACK) | !inherits(try(Revo.version, silent=TRUE),"try-error")
+    hpclib <- grepl("mkl", sessionInfo()$LAPACK) | grepl("openblas", sessionInfo()$LAPACK) | eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))
 	if(!hpclib){
 		logging.log("No high performance math library detected! The computational efficiency would be greatly reduced\n", verbose = verbose)
 	}else{
-		if(grepl("mkl", sessionInfo()$LAPACK) | !inherits(try(Revo.version, silent=TRUE),"try-error")){
+		if(grepl("mkl", sessionInfo()$LAPACK) | eval(parse(text = "!inherits(try(Revo.version,silent=TRUE),'try-error')"))){
 			logging.log("Math Kernel Library is detected, nice job!\n", verbose = verbose)
 		}else{
 			logging.log("OpenBLAS Library is detected, nice job!\n", verbose = verbose)
@@ -190,7 +190,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         }
     }
 
-    logging.log("Check if NAs exist in genotype...", "\n", verbose = verbose)
+    logging.log("Check if NAs exist in genotype", "\n", verbose = verbose)
     if(hasNA(geno@address, mrkbycol = MrkByCol, geno_ind = seqTaxa, threads = ncpus))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
 
     logging.log("Calculate allele frequency...", "\n", verbose = verbose)
@@ -340,7 +340,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine = maxLine, cpu=ncpus, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, verbose = verbose);gc()
         colnames(glm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -355,7 +355,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, maxLine = maxLine, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
         colnames(mlm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)

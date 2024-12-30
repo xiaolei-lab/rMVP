@@ -74,6 +74,8 @@
 
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(phe[, 2])) != 0) stop("NAs are not allowed in phenotype.")
+    if(nrow(map) != ncol(geno) & nrow(map) != nrow(geno)) stop("The number of markers in genotype and map doesn't match!")
+    mrk_bycol <- ncol(geno) == nrow(map)
     if(is.null(ind_idx)){
         if(nrow(phe) != ncol(geno) && nrow(phe) != nrow(geno)) stop("number of individuals does not match in phenotype and genotype.")
         n <- ifelse(nrow(phe) == ncol(geno), ncol(geno), nrow(geno))
@@ -242,7 +244,7 @@
                 theCV=cbind(CV,myRemove$bin)
             }
 
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=ind_idx,w=theCV,maxLine=maxLine,ncpus=ncpus,npc=npc, verbose=verbose)
+            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=ind_idx,GDP_mrk_bycol=mrk_bycol,w=theCV,maxLine=maxLine,ncpus=ncpus,npc=npc, verbose=verbose)
             if(!is.null(seqQTN)){
                 if(ncol(myGLM$P) != (npc + length(seqQTN) + 1))    stop("wrong dimensions.")
             }
@@ -499,7 +501,7 @@ FarmCPU.BIN <-
         
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
         
-        if(nrow(Y) == nrow(GDP)){
+        if(nrow(GM) == ncol(GDP)){
             if(is.null(GDP_index))  GDP_index=seq(1, nrow(GDP))
         }else{
             if(is.null(GDP_index))  GDP_index=seq(1, ncol(GDP))
@@ -558,7 +560,7 @@ FarmCPU.BIN <-
                     GP=cbind(GM,P,NA,NA,NA)
                     mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                     seqQTN=which(mySpecify$index==TRUE)
-                    if(nrow(Y) == nrow(GDP)){
+                    if(nrow(GM) == ncol(GDP)){
                         GK=GDP[GDP_index, seqQTN]
                     }else{
                         GK=t(GDP[seqQTN, GDP_index])
@@ -606,7 +608,7 @@ FarmCPU.BIN <-
                 GP=cbind(GM,P,NA,NA,NA)
                 mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                 seqQTN=which(mySpecify$index==TRUE)
-                if(nrow(Y) == nrow(GDP)){
+                if(nrow(GM) == ncol(GDP)){
                     GK=GDP[GDP_index, seqQTN]
                 }else{
                     GK=t(GDP[seqQTN, GDP_index])
@@ -647,7 +649,7 @@ FarmCPU.BIN <-
                 GP=cbind(GM,P,NA,NA,NA)
                 mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
                 seqQTN=which(mySpecify$index==TRUE)
-                if(nrow(Y) == nrow(GDP)){
+                if(nrow(GM) == ncol(GDP)){
                     GK=GDP[GDP_index, seqQTN]
                 }else{
                     GK=t(GDP[seqQTN, GDP_index])
@@ -775,6 +777,7 @@ FarmCPU.Specify <-
 #' @param w covariates, n by c matrix, n is sample size, c is number of covariates
 #' @param GDP genotype
 #' @param GDP_index index of effective genotyped individuals
+#' @param GDP_mrk_bycol whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param ncpus number of threads used for parallele computation
 #' @param npc number of covariates without pseudo QTNs
@@ -787,7 +790,7 @@ FarmCPU.Specify <-
 #' 
 #' @keywords internal
 FarmCPU.LM <-
-    function(y, w=NULL, GDP, GDP_index=NULL, maxLine=5000, ncpus=2, npc=0, verbose=TRUE){
+    function(y, w=NULL, GDP, GDP_index=NULL, GDP_mrk_bycol=TRUE, maxLine=5000, ncpus=2, npc=0, verbose=TRUE){
         #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
@@ -863,7 +866,7 @@ FarmCPU.LM <-
         # if(ncol(w) == 50)  write.csv(P, "P.csv")
 
         mkl_env({
-            results <- glm_c(y=y, X=w, iXX = wwi, GDP@address, geno_ind=GDP_index, step=maxLine, verbose=verbose, threads=ncpus)
+            results <- glm_c(y=y, X=w, iXX = wwi, GDP@address, geno_ind=GDP_index, marker_bycol=GDP_mrk_bycol, step=maxLine, verbose=verbose, threads=ncpus)
         })
         return(list(P=results[ ,-c(1:3), drop=FALSE], betapred=betapred, sepred=sepred, B=results[ , 1, drop=FALSE], S=results[ , 2, drop=FALSE]))
         # return(list(P=P, betapred=betapred, B=as.matrix(B), S=S))

@@ -22,6 +22,7 @@
 #' @param CV covariates
 #' @param ind_idx the index of effective genotyped individuals
 #' @param mrk_idx the index of effective markers used in analysis
+#' @param mrk_bycol whether the markers are stored by columns in genotype (i.e. M is a n by m matrix)
 #' @param REML a list that contains ve and vg
 #' @param maxLine the number of markers handled at a time, smaller value would reduce the memory cost
 #' @param cpu number of cpus used for parallel computation
@@ -59,6 +60,7 @@ function(
     CV=NULL, 
     ind_idx=NULL,
     mrk_idx=NULL,
+    mrk_bycol=TRUE,
     REML=NULL,
     maxLine=5000,
     cpu=1,
@@ -69,6 +71,11 @@ function(
     if(is.null(ind_idx)){
         if(nrow(phe) != ncol(geno) && nrow(phe) != nrow(geno)) stop("number of individuals does not match in phenotype and genotype.")
         n <- ifelse(nrow(phe) == ncol(geno), ncol(geno), nrow(geno))
+        if(mrk_bycol){
+            if(nrow(phe) != nrow(geno))    stop("set the argument 'mrk_bycol=FALSE'?")
+        }else{
+            if(nrow(phe) != ncol(geno))    stop("set the argument 'mrk_bycol=TRUE'?")
+        }
     }else{
         n <- length(ind_idx)
         if(nrow(phe) != n) stop("number of individuals does not match in phenotype and genotype.")
@@ -125,7 +132,7 @@ function(
     
     logging.log("scanning...\n", verbose = verbose)
     mkl_env({
-        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, ind_idx, mrk_idx, step = maxLine, verbose = verbose, threads = cpu)
+        results <- mlm_c(y = ys, X = X0, U = U, vgs = vgs, geno@address, geno_ind = ind_idx, marker_ind = mrk_idx, marker_bycol = mrk_bycol, step = maxLine, verbose = verbose, threads = cpu)
     })
 
     return(results)

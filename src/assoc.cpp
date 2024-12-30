@@ -67,12 +67,11 @@ NumericVector getRow(SEXP pBigMat, const int row){
 }
 
 template <typename T>
-SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int step = 10000, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool marker_bycol = true, const int step = 10000, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 	
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
-	bool marker_bycol = (y.n_elem == pMat->nrow());
 	
 	int n;
 	uvec _geno_ind;
@@ -245,32 +244,31 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 }
 
 // [[Rcpp::export]]
-SEXP glm_c(const arma::vec & y, const arma::mat & X, const arma::mat & iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int step = 10000, const bool verbose = true, const int threads = 0){
+SEXP glm_c(const arma::vec & y, const arma::mat & X, const arma::mat & iXX, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool marker_bycol = true, const int step = 10000, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return glm_c<char>(y, X, iXX, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return glm_c<char>(y, X, iXX, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 2:
-		return glm_c<short>(y, X, iXX, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return glm_c<short>(y, X, iXX, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 4:
-		return glm_c<int>(y, X, iXX, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return glm_c<int>(y, X, iXX, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 8:
-		return glm_c<double>(y, X, iXX, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return glm_c<double>(y, X, iXX, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}
 }
 
 template <typename T>
-SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int step = 10000, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool marker_bycol = true, const int step = 10000, const bool verbose = true, const int threads = 0){
 	
 	omp_setup(threads);
 
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
-	bool marker_bycol = (y.n_elem == pMat->nrow());
-
+	
 	int n;
 	uvec _geno_ind;
 	if(geno_ind.isNotNull()){
@@ -302,7 +300,6 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 	
 	arma::mat res(m, 3);		
 	arma::mat iXXs(q0 + 1, q0 + 1);
-
 
 	arma::mat Z_buffer(n, step, fill::none);
 	int i = 0, j = 0;
@@ -426,19 +423,19 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 }
 
 // [[Rcpp::export]]
-SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int step = 10000, const bool verbose = true, const int threads = 0){
+SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const double vgs, SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const bool marker_bycol = true, const int step = 10000, const bool verbose = true, const int threads = 0){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
 	switch(xpMat->matrix_type()){
 	case 1:
-		return mlm_c<char>(y, X, U, vgs, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return mlm_c<char>(y, X, U, vgs, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 2:
-		return mlm_c<short>(y, X, U, vgs, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return mlm_c<short>(y, X, U, vgs, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 4:
-		return mlm_c<int>(y, X, U, vgs, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return mlm_c<int>(y, X, U, vgs, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	case 8:
-		return mlm_c<double>(y, X, U, vgs, xpMat, geno_ind, marker_ind, step, verbose, threads);
+		return mlm_c<double>(y, X, U, vgs, xpMat, geno_ind, marker_ind, marker_bycol, step, verbose, threads);
 	default:
 		throw Rcpp::exception("unknown type detected for big.matrix object!");
 	}
