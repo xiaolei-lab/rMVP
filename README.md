@@ -9,7 +9,7 @@
 </a>
 </p>
 
-### #----------------------***rMVP [v1.3.5]() is coming, and stronger and faster again!***------------------------#
+### #-----------------***rMVP [v1.3.5]() is coming, and stronger and faster again!***------------------#
 
 ### Repos:
 **Github:** https://github.com/xiaolei-lab/rMVP  
