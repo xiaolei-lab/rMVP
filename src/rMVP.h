@@ -12,6 +12,7 @@
 #include <iostream>
 #include <bigmemory/BigMatrix.h>
 #include <bigmemory/MatrixAccessor.hpp>
+#include <bigmemory/isna.hpp>
 #include <R_ext/Print.h>
 #include <progress.hpp>
 #include "progress_bar.hpp"

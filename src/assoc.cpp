@@ -124,14 +124,14 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[(i_marker + l)][k];
+							Z_buffer(k, l) = (double)genomat[(i_marker + l)][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[k][(i_marker + l)];
+							Z_buffer(k, l) = (double)genomat[k][(i_marker + l)];
 						}
 					}
 				}
@@ -140,14 +140,14 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[_marker_ind[(i_marker + l)]][k];
+							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[k][_marker_ind[(i_marker + l)]];
+							Z_buffer(k, l) = (double)genomat[k][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}
@@ -158,14 +158,14 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[(i_marker + l)][_geno_ind[k]];
+							Z_buffer(k, l) = (double)genomat[(i_marker + l)][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[_geno_ind[k]][(i_marker + l)];
+							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][(i_marker + l)];
 						}
 					}
 				}
@@ -174,14 +174,14 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
+							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
+							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}
@@ -322,14 +322,14 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[(i_marker + l)][k];
+							Z_buffer(k, l) = (double)genomat[(i_marker + l)][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[k][(i_marker + l)];
+							Z_buffer(k, l) = (double)genomat[k][(i_marker + l)];
 						}
 					}
 				}
@@ -338,14 +338,14 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[_marker_ind[(i_marker + l)]][k];
+							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[k][_marker_ind[(i_marker + l)]];
+							Z_buffer(k, l) = (double)genomat[k][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}
@@ -356,14 +356,14 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[(i_marker + l)][_geno_ind[k]];
+							Z_buffer(k, l) = (double)genomat[(i_marker + l)][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[_geno_ind[k]][(i_marker + l)];
+							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][(i_marker + l)];
 						}
 					}
 				}
@@ -372,14 +372,14 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
+							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
+							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}

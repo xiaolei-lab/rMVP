@@ -190,9 +190,6 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
         }
     }
 
-    logging.log("Check if NAs exist in genotype", "\n", verbose = verbose)
-    if(hasNA(geno@address, mrkbycol = MrkByCol, geno_ind = seqTaxa, threads = ncpus))   stop("NA is not allowed in genotype, use 'MVP.Data.impute' to impute.")
-
     logging.log("Calculate allele frequency...", "\n", verbose = verbose)
     marker_freq <- BigRowMean(geno@address, MrkByCol, threads = ncpus, geno_ind = seqTaxa) / 2
     map$MAF <- ifelse(marker_freq > 0.5, 1 - marker_freq, marker_freq)

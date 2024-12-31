@@ -106,7 +106,7 @@ void impute_marker(SEXP pBigMat, bool mrkbycol = true, int threads=0, bool verbo
 }
 
 template <typename T>
-bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int threads = 1) {
+bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int threads = 1) {
     
     omp_setup(threads);
 
@@ -124,7 +124,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < m; j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < n; i++) {
-                        if (mat[_marker_ind[j]][_geno_ind[i]] == NA_C) {
+                        // if (mat[_marker_ind[j]][_geno_ind[i]] == NA_C) {
+                        if (isna(mat[_marker_ind[j]][_geno_ind[i]])) {
                             HasNA = true;
                         }
                     }
@@ -134,7 +135,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < n; j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < m; i++) {
-                        if (mat[_geno_ind[j]][_marker_ind[i]] == NA_C) {
+                        // if (mat[_geno_ind[j]][_marker_ind[i]] == NA_C) {
+                        if (isna(mat[_geno_ind[j]][_marker_ind[i]])) {
                             HasNA = true;
                         }
                     }
@@ -146,7 +148,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < pMat->ncol(); j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < n; i++) {
-                        if (mat[j][_geno_ind[i]] == NA_C) {
+                        // if (mat[j][_geno_ind[i]] == NA_C) {
+                        if (isna(mat[j][_geno_ind[i]])) {
                             HasNA = true;
                         }
                     }
@@ -156,7 +159,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < n; j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < pMat->nrow(); i++) {
-                        if (mat[_geno_ind[j]][i] == NA_C) {
+                        // if (mat[_geno_ind[j]][i] == NA_C) {
+                        if (isna(mat[_geno_ind[j]][i])) {
                             HasNA = true;
                         }
                     }
@@ -172,7 +176,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < m; j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < pMat->nrow(); i++) {
-                        if (mat[_marker_ind[j]][i] == NA_C) {
+                        // if (mat[_marker_ind[j]][i] == NA_C) {
+                        if (isna(mat[_marker_ind[j]][i])) {
                             HasNA = true;
                         }
                     }
@@ -182,7 +187,8 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
                 for (int j = 0; j < pMat->ncol(); j++) {
                     if(HasNA)   continue;
                     for (int i = 0; i < m; i++) {
-                        if (mat[j][_marker_ind[i]] == NA_C) {
+                        // if (mat[j][_marker_ind[i]] == NA_C) {
+                        if (isna(mat[j][_marker_ind[i]])) {
                             HasNA = true;
                         }
                     }
@@ -193,14 +199,14 @@ bool hasNA(XPtr<BigMatrix> pMat, double NA_C, bool mrkbycol = true, const Nullab
             for (int j = 0; j < pMat->ncol(); j++) {
                 if(HasNA)   continue;
                 for (int i = 0; i < pMat->nrow(); i++) {
-                    if (mat[j][i] == NA_C) {
+                    // if (mat[j][i] == NA_C) {
+                    if (isna(mat[j][i])) {
                         HasNA = true;
                     }
                 }
             }
         }
     }
-
     return HasNA;
 }
 
@@ -210,13 +216,13 @@ bool hasNA(SEXP pBigMat, bool mrkbycol = true, const Nullable<arma::uvec> geno_i
     
     switch(xpMat->matrix_type()) {
     case 1:
-        return hasNA<char>(xpMat, NA_CHAR, mrkbycol, geno_ind, marker_ind, threads);
+        return hasNA<char>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
     case 2:
-        return hasNA<short>(xpMat, NA_SHORT, mrkbycol, geno_ind, marker_ind, threads);
+        return hasNA<short>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
     case 4:
-        return hasNA<int>(xpMat, NA_INTEGER, mrkbycol, geno_ind, marker_ind, threads);
+        return hasNA<int>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
     case 8:
-        return hasNA<double>(xpMat, NA_REAL, mrkbycol, geno_ind, marker_ind, threads);
+        return hasNA<double>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
     default:
         throw Rcpp::exception("unknown type detected for big.matrix object!");
     }

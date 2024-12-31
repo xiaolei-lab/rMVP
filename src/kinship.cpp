@@ -21,7 +21,7 @@ arma::vec BigRowMean(XPtr<BigMatrix> pMat, bool marker_bycol = true, size_t step
 
 	int n;
 	int m = marker_bycol ? pMat->ncol() : pMat->nrow();
-	arma::vec mean(m);
+	arma::vec mean(m, fill::zeros);
 
 	uvec _geno_ind;
 	if(geno_ind.isNotNull()){
@@ -54,14 +54,16 @@ arma::vec BigRowMean(XPtr<BigMatrix> pMat, bool marker_bycol = true, size_t step
 				#pragma omp parallel for
 				for(int l = 0; l < cnt; l++){
 					for(int k = 0; k < n; k++){
-						Z_buffer(k, l) = bigm[(i_marker + l)][k];
+						T elem = bigm[(i_marker + l)][k];
+						Z_buffer(k, l) = (isna(elem) ? datum::nan : (double)elem);
 					}
 				}
 			}else{
 				#pragma omp parallel for
 				for(int k = 0; k < n; k++){
 					for(int l = 0; l < cnt; l++){
-						Z_buffer(k, l) = bigm[k][(i_marker + l)];
+						T elem = bigm[k][(i_marker + l)];
+						Z_buffer(k, l) = (isna(elem) ? datum::nan : (double)elem);
 					}
 				}
 			}
@@ -70,14 +72,16 @@ arma::vec BigRowMean(XPtr<BigMatrix> pMat, bool marker_bycol = true, size_t step
 				#pragma omp parallel for
 				for(int l = 0; l < cnt; l++){
 					for(int k = 0; k < n; k++){
-						Z_buffer(k, l) = bigm[(i_marker + l)][_geno_ind[k]];
+						T elem = bigm[(i_marker + l)][_geno_ind[k]];
+						Z_buffer(k, l) = (isna(elem) ? datum::nan : (double)elem);
 					}
 				}
 			}else{
 				#pragma omp parallel for
 				for(int k = 0; k < n; k++){
 					for(int l = 0; l < cnt; l++){
-						Z_buffer(k, l) = bigm[_geno_ind[k]][(i_marker + l)];
+						T elem = bigm[_geno_ind[k]][(i_marker + l)];
+						Z_buffer(k, l) = (isna(elem) ? datum::nan : (double)elem);
 					}
 				}
 			}
@@ -87,6 +91,7 @@ arma::vec BigRowMean(XPtr<BigMatrix> pMat, bool marker_bycol = true, size_t step
 		for(int l = 0; l < cnt; l++){
 			mean[i_marker + l] = arma::mean(Z_buffer.col(l));
 		}
+		if(mean.subvec(i_marker, i_marker + cnt - 1).has_nan())	throw Rcpp::exception("NA is not allowed in genotype, use 'MVP.Data.impute' to impute!");
 
 		i = j;
 		i_marker += cnt;
@@ -348,94 +353,7 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 	vec means;
 	if(marker_freq.isNotNull()){
 		means = as<vec>(marker_freq) * 2;
-	}else{
-		means.resize(m);
-		if(_geno_ind.is_empty()){
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[j][k];
-						}
-						means[j] = p1 / n;
-					}
-				}else{
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[k][j];
-						}
-						means[j] = p1 / n;
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[_marker_ind[j]][k];
-						}
-						means[j] = p1 / n;
-					}
-				}else{
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[k][_marker_ind[j]];
-						}
-						means[j] = p1 / n;
-					}
-				}
-			}
-		}else{
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[j][_geno_ind[k]];
-						}
-						means[j] = p1 / n;
-					}
-				}else{
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[_geno_ind[k]][j];
-						}
-						means[j] = p1 / n;
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[_marker_ind[j]][_geno_ind[k]];
-						}
-						means[j] = p1 / n;
-					}
-				}else{
-					#pragma omp parallel for
-					for(int j = 0; j < m; j++){
-						double p1 = 0.0;
-						for(int k = 0; k < n; k++){
-							p1 += bigm[_geno_ind[k]][_marker_ind[j]];
-						}
-						means[j] = p1 / n;
-					}
-				}
-			}
-		}
-		if(means.has_nan())	throw Rcpp::exception("NA is not allowed in genotype, use 'MVP.Data.impute' to impute!");
+		if(means.has_nan())	throw Rcpp::exception("NA is not allowed in allele frequency!");
 	}
 
 	arma::mat kin = zeros<mat>(n, n);
@@ -453,7 +371,6 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 		{
 			cnt++;
 		}
-
 		if (cnt != step) {
 			Z_buffer.set_size(cnt, n);
 		}
@@ -464,14 +381,14 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = bigm[(i_marker + l)][k] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[(i_marker + l)][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = bigm[k][(i_marker + l)] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[k][(i_marker + l)];
 						}
 					}
 				}
@@ -480,14 +397,14 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = bigm[_marker_ind[(i_marker + l)]][k] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[_marker_ind[(i_marker + l)]][k];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = bigm[k][_marker_ind[(i_marker + l)]] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[k][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}
@@ -498,14 +415,14 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = bigm[(i_marker + l)][_geno_ind[k]] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[(i_marker + l)][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = bigm[_geno_ind[k]][(i_marker + l)] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[_geno_ind[k]][(i_marker + l)];
 						}
 					}
 				}
@@ -514,20 +431,28 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 					#pragma omp parallel for
 					for(int l = 0; l < cnt; l++){
 						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = bigm[_marker_ind[(i_marker + l)]][_geno_ind[k]] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[_marker_ind[(i_marker + l)]][_geno_ind[k]];
 						}
 					}
 				}else{
 					#pragma omp parallel for
 					for(int k = 0; k < n; k++){
 						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = bigm[_geno_ind[k]][_marker_ind[(i_marker + l)]] - means[(i_marker + l)];
+							Z_buffer(l, k) = (double)bigm[_geno_ind[k]][_marker_ind[(i_marker + l)]];
 						}
 					}
 				}
 			}
 		}
 		
+		if(marker_freq.isNotNull()){
+			Z_buffer.each_col() -= means.subvec(i_marker, i_marker + cnt - 1);
+		}else{
+			means = mean(Z_buffer, 1);
+			if(means.has_nan())	throw Rcpp::exception("NA is not allowed in genotype, use 'MVP.Data.impute' to impute!");
+			Z_buffer.each_col() -= means;
+		}
+
 		if(mkl){
 			double alp = 1.0;
 			double beta = 1.0;
