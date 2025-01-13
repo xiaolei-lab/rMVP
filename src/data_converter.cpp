@@ -320,7 +320,7 @@ double hapmap_marker_parser(string m, char major, double NA_C) {
             (m[1] != 'A' && m[1] != 'T' && m[1] != 'G' && m[1] != 'C')) {
             return NA_C;
         } else {
-            return ((m[0] == major) ? '0' : '1') + ((m[1] == major) ? '0' : '1');
+            return ((m[0] == major) ? 0 : 1) + ((m[1] == major) ? 0 : 1);
         }
     }
     return NA_C;

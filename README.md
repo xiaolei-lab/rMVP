@@ -1,4 +1,4 @@
-# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.3.5-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
+# rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![](http://www.r-pkg.org/badges/version/rMVP?color=red)](https://cran.r-project.org/package=rMVP) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.3.6-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxiaolei-lab%2FrMVP"/></a>
 
 ## An [r](https://) package for [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Genome-Wide Association Study
 
@@ -9,7 +9,7 @@
 </a>
 </p>
 
-### #-----------------***rMVP [v1.3.5]() is coming, and stronger and faster again!***------------------#
+### #-----------------***rMVP [v1.3.6]() is coming, and stronger and faster again!***------------------#
 
 ### Repos:
 **Github:** https://github.com/xiaolei-lab/rMVP  
