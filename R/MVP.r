@@ -207,10 +207,11 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     }
     if(!is.null(geno_marker_index)){
         logging.log("Total", m - length(geno_marker_index), "markers are removed at MAF threshold", maf, "\n", verbose = verbose)
+        remmp <- (length(geno_marker_index) < m * 0.8)
         m <- length(geno_marker_index)
         map_sub <- map[geno_marker_index, ]
         marker_freq <- marker_freq[geno_marker_index]
-        if(length(geno_marker_index) < m * 0.8){
+        if(remmp){
             if(!is.null(seqTaxa)){
                 logging.log("Re-build memory-mapping file for remaining individuals and markers", "\n", verbose = verbose)
                 if(MrkByCol){
