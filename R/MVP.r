@@ -55,10 +55,10 @@
 #' 
 #' @export
 #' @return
-#' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos
-#' Output: MVP.return$glm.results - p-values obtained by GLM method
-#' Output: MVP.return$mlm.results - p-values obtained by MLM method
-#' Output: MVP.return$farmcpu.results - p-values obtained by FarmCPU method
+#' Output: MVP.return$map - SNP map information, SNP name, Chr, Pos, A1, A2, MAF
+#' Output: MVP.return$glm.results - effect (at A2) and p-values obtained by GLM method
+#' Output: MVP.return$mlm.results - effect (at A2) and p-values obtained by MLM method
+#' Output: MVP.return$farmcpu.results - effect (at A2) and p-values obtained by FarmCPU method
 #'
 #' @examples
 #' \donttest{

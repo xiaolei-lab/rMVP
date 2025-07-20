@@ -14,19 +14,24 @@ arma::mat GInv(const arma::mat A){
 	if(A.n_rows == 1){
 		ginv = 1 / A;
 	}else{
-		arma::mat U;
-		arma::vec s;
-		arma::mat V;
-		double tol = sqrt(datum::eps);
-		
-		svd(U,s,V,A);
-		U = conv_to<mat>::from(conj(conv_to<cx_mat>::from(U)));
-		arma::vec sMax(2); sMax.fill(0);
-		sMax[1] = tol * s[0];
-		arma::uvec Positive = find(s > sMax.max());
-		arma::mat Up = U.cols(Positive);
-		Up.each_row() %= 1/s(Positive).t();
-		ginv = V.cols(Positive) * Up.t();
+		try {
+			ginv = arma::inv_sympd(A);
+		}
+		catch (const std::exception& e) {
+			arma::mat U;
+			arma::vec s;
+			arma::mat V;
+			double tol = sqrt(datum::eps);
+			
+			svd(U,s,V,A);
+			U = conv_to<mat>::from(conj(conv_to<cx_mat>::from(U)));
+			arma::vec sMax(2); sMax.fill(0);
+			sMax[1] = tol * s[0];
+			arma::uvec Positive = find(s > sMax.max());
+			arma::mat Up = U.cols(Positive);
+			Up.each_row() %= 1/s(Positive).t();
+			ginv = V.cols(Positive) * Up.t();
+		}
 	}
 	return ginv;
 }

@@ -29,7 +29,7 @@ using namespace arma;
 #include <bigmemory/isna.hpp>
 #include <bigmemory/MatrixAccessor.hpp>
 
-vector<string> split_line(const string& str, const string& whitespace = " ,\t\r\n")
+vector<string> split_line(const string& str, const string& whitespace = " \t\r\n")
 {
     vector<string> result;
     size_t col_end = 0;
@@ -78,7 +78,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     }
     
     // Write inds to file.
-    ind = split_line(line);
+    ind = split_line(line, "\t");
     // boost::split(ind, line, boost::is_any_of("\t"));
     vector<string>(ind.begin() + 9, ind.end()).swap(ind);   // delete first 9 columns
     int indn = ind.size();
@@ -95,11 +95,11 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
     // file.seekg(pos);
     
     // Write inds to file.
-    map << "SNP\tCHROM\tPOS\tREF\tALT"<< endl;
+    map << "SNP\tCHROM\tPOS\tA1\tA2"<< endl;
     m = 0;
     while (getline(file, line)) {
         string tmp = line.substr(0, MAP_INFO_N);
-        l = split_line(tmp);
+        l = split_line(tmp, "\t");
         // boost::split(l, tmp, boost::is_any_of("\t"));
 
         if (l[2] == ".") {      // snp name missing
@@ -166,7 +166,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
         #pragma omp parallel for private(l, markers)
         for (std::size_t i = 0; i < buffer.size(); i++) {
-            l = split_line(buffer[i]);
+            l = split_line(buffer[i], "\t");
             // boost::split(l, buffer[i], boost::is_any_of("\t"));
             // markers.clear();
             // vector<string>(l.begin() + 9, l.end()).swap(l);
@@ -241,7 +241,7 @@ List hapmap_parser_map(std::string hmp_file, std::string out) {
         }
         
         // Write inds to file.
-        ind = split_line(line);
+        ind = split_line(line, " \t");
         // boost::split(ind, line, boost::is_any_of(" \t"));
         vector<string>(ind.begin() + 11, ind.end()).swap(ind);   // delete first 11 columns
         for (size_t i = 0; i < ind.size(); i++) {
@@ -251,11 +251,11 @@ List hapmap_parser_map(std::string hmp_file, std::string out) {
         indfile.close();
         
         // Write SNPs to map file.
-        map << "SNP\tCHROM\tPOS\tREF\tALT"<< endl;
+        map << "SNP\tCHROM\tPOS\tA1\tA2"<< endl;
         m = 0;
         while (getline(file, line)) {
             string tmp = line.substr(0, MAP_INFO_N);
-            l = split_line(tmp);
+            l = split_line(tmp, " \t");
             // boost::split(l, tmp, boost::is_any_of(" \t"));
             
             if (l[0] == ".") {      // snp name missing
@@ -356,7 +356,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
         Rcpp::stop("wrong HAPMAP file, no line begin with \"rs#\".");
     }
 
-    l = split_line(line);
+    l = split_line(line, " \t");
     size_t n_col = l.size();
     
     // parser genotype
@@ -374,7 +374,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
 
         #pragma omp parallel for private(l, major)
         for (size_t i = 0; i < n_marker; i++) {
-            l = split_line(buffer[i]);
+            l = split_line(buffer[i], " \t");
             // boost::split(l, buffer[i], boost::is_any_of(" \t"));
             if(l.size() != n_col)
                 Rcpp::stop(("line " + to_string(m+i+2) + " does not have " + to_string(n_col) + " elements in HAPMAP file.").c_str());
@@ -420,7 +420,7 @@ List numeric_scan(std::string num_file) {
     ifstream file(num_file);
     
     getline(file, line);
-    l = split_line(line);
+    l = split_line(line, " ,\t");
     // boost::split(l, line, boost::is_any_of("\t ,"));
 
     n = l.size();

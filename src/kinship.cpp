@@ -449,7 +449,6 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 			Z_buffer.each_col() -= means.subvec(i_marker, i_marker + cnt - 1);
 		}else{
 			means = mean(Z_buffer, 1);
-			if(means.has_nan())	throw Rcpp::exception("NA is not allowed in genotype, use 'MVP.Data.impute' to impute!");
 			Z_buffer.each_col() -= means;
 		}
 
