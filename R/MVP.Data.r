@@ -418,11 +418,10 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
     scan <- numeric_scan(num_file)
     n <- scan$n
     m <- scan$m
+    n_marker <- numeric_scan(map_file)$m
+    marker_by_col <- ifelse(n == n_marker || n == (n_marker - 1), TRUE, FALSE)
 
-    transposed <- FALSE
-    if (auto_transpose & (m < n)) {
-        message("WARNING: nrow < ncol detected, has been automatically transposed.")
-        transposed <- TRUE
+    if (marker_by_col) {
         t <- n; n <- m; m <- t;
     }
     logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
@@ -473,20 +472,21 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
             len <- length(line)
             if (len == 0) { break }
 
-            line <- do.call(cbind, strsplit(line, '\\s+'))
+            line <- do.call(rbind, strsplit(line, '\\s+'))
             if (row_names) { line <- line[2:ncol(line), ]}
-            if (transposed) {
+            if (!marker_by_col) {
+                bigmat[, (i + 1):(i + nrow(line))] <- t(line)
+                i <- i + nrow(line)
+                percent <- 100 * i / m
+            } else {
                 bigmat[(i + 1):(i + nrow(line)), ] <- line
                 i <- i + nrow(line)
                 percent <- 100 * i / n
-            } else {
-                bigmat[, (i + 1):(i + ncol(line))] <- line
-                i <- i + ncol(line)
-                percent <- 100 * i / m
             }
 
-            logging.log(paste0("Written into MVP File: ", percent, "%"), verbose = verbose)
+            logging.log(paste0("\rWritten into MVP File: ", round(percent), "%"), verbose = verbose)
         }
+        logging.log("\n", verbose = verbose)
         close(con)
     # }
     
