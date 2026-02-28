@@ -397,7 +397,7 @@ SEXP crossprodcpp(SEXP X)
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (...) {
-    ::Rf_error("C++ exception (unknown reason)");
+    Rcpp::stop("C++ exception (unknown reason)");
   }
   return R_NilValue; //-Wall
 }
@@ -464,7 +464,7 @@ SEXP geninv(SEXP GG)
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (...) {
-    ::Rf_error("C++ exception (unknown reason)");
+    Rcpp::stop("C++ exception (unknown reason)");
   }
   return R_NilValue; //-Wall
 }
