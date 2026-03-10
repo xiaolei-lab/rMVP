@@ -1,5 +1,10 @@
 # rMVP [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/XiaoleiLiuBio/rMVP/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/rMVP?color=yellow)](https://CRAN.R-project.org/package=rMVP) [![](https://img.shields.io/badge/GitHub-1.4.6-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/rMVP?color=green) [![](https://cranlogs.r-pkg.org/badges/rMVP)](https://cran.r-project.org/package=rMVP) <img alt="Hits" src="https://hits.sh/github.com/xiaolei-lab/rMVP.svg?view=today-total&extraCount=81834"/>
 
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/xiaolei-lab/rMVP/graph/badge.svg)](https://app.codecov.io/gh/xiaolei-lab/rMVP)
+[![R-CMD-check](https://github.com/xiaolei-lab/rMVP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/xiaolei-lab/rMVP/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## An [r](https://) package for [M](https://)emory-efficient, [V](https://)isualization-enhanced, and [P](https://)arallel-accelerated Genome-Wide Association Study
 
 
