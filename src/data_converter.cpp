@@ -567,14 +567,20 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // magic number of bfile
     buffer = new char [3];
-    size_t n_bytes_read = static_cast<size_t>(fread(buffer, 1, 3, fin));
+    if (fread(buffer, 1, 3, fin) != 3) {
+        // file too short or corrupt - magic bytes unreadable
+        fclose(fin);
+        Rcpp::stop("Cannot read magic bytes from .bed file.");
+    }
     
     // loop file
     size_t cond;
     long block_start;
     for (int i = 0; i < n_block; i++) {
         buffer = new char [buffer_size];
-        n_bytes_read = static_cast<size_t>(fread(buffer, 1, buffer_size, fin));
+        size_t n_read = fread(buffer, 1, buffer_size, fin);
+        if (n_read == 0)
+            break; // end of file
         
         // i: current block, j: current bit.
         block_start = i * buffer_size;

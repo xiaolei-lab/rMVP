@@ -97,7 +97,7 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 	}
 
 	int q0 = X.n_cols;
-	if(y.n_elem != n)	throw Rcpp::exception("number of individuals not match!");
+	if(y.n_elem != (arma::uword)n)	throw Rcpp::exception("number of individuals not match!");
 
 	MinimalProgressBar_plus pb;
 	Progress progress(m, verbose, pb);
@@ -213,8 +213,8 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 			arma::mat NeginvB22B21 = -1 * invB22 * B21;
 			iXXs(q0, q0) = invB22;
 			iXXs.submat(0, 0, q0 - 1, q0 - 1) = iXX + invB22 * B21.t() * B21;
-			iXXs(q0, span(0, q0 - 1)) = NeginvB22B21;
-			iXXs(span(0, q0 - 1), q0) = NeginvB22B21.t();
+			iXXs(q0, arma::span(0, q0 - 1)) = NeginvB22B21;
+			iXXs(arma::span(0, q0 - 1), q0) = NeginvB22B21.t();
 
 			// statistics
 			arma::mat rhs(xy.n_rows + 1, 1);
@@ -293,7 +293,7 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 	}
 
 	int q0 = X.n_cols;
-	if(y.n_elem != n)	throw Rcpp::exception("number of individuals not match.!");
+	if(y.n_elem != (arma::uword)n)	throw Rcpp::exception("number of individuals not match.!");
 
 	MinimalProgressBar_plus pb;
 	Progress progress(m, verbose, pb);
@@ -404,8 +404,8 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 			
 			iXXs(q0, q0)=invB22;
 			iXXs.submat(0, 0, q0 - 1, q0 - 1) = iUXUX + invB22 * B21.t() * B21;
-			iXXs(q0, span(0, q0 - 1)) = NeginvB22B21;
-			iXXs(span(0, q0 - 1), q0) = NeginvB22B21.t();
+			iXXs(q0, arma::span(0, q0 - 1)) = NeginvB22B21;
+			iXXs(arma::span(0, q0 - 1), q0) = NeginvB22B21.t();
 
 			// statistics
 			arma::mat rhs(UXUy.n_rows + 1, 1);
