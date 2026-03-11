@@ -2,6 +2,8 @@
 *.o
 *.so
 symbols.rds
+*.dll
+*.zip
 
 # VS code
 .vscode/*
@@ -19,6 +21,7 @@ symbols.rds
 
 # Output files from R CMD build
 /*.tar.gz
+
 
 # Output files from R CMD check
 /*.Rcheck/
