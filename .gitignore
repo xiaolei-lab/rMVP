@@ -46,3 +46,6 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 packages
+
+# R Files for comparisions
+compare_perf.R

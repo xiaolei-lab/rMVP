@@ -119,10 +119,6 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 			cnt++;
 		}
 
-		if (cnt != step) {
-			Z_buffer.set_size(n, cnt);
-		}
-
 		if(_geno_ind.is_empty()){
 			if(_marker_ind.is_empty()){
 				if(marker_bycol){
