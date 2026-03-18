@@ -85,8 +85,7 @@ function(
         CV <- CV[, CV.index, drop=FALSE]
         X0 <- cbind(matrix(1, n), CV)
     }
-    X0 <- as.matrix(X0)
-    tX0X0 <- crossprod(X0);
+    tX0X0 <- crossprod(X0)
     iX0X0 <- try(solve(tX0X0), silent = TRUE)
     if(inherits(iX0X0, "try-error")) {
         iX0X0 <- MASS::ginv(tX0X0)
