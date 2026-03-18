@@ -318,10 +318,6 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 			cnt++;
 		}
 
-		if (cnt != step) {
-			Z_buffer.set_size(n, cnt);
-		}
-
 		if(_geno_ind.is_empty()){
 			if(_marker_ind.is_empty()){
 				if(marker_bycol){
@@ -403,7 +399,7 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 			arma::mat B21 = UXUs.t() * iUXUX;
 			arma::mat NeginvB22B21 = -1 * invB22 * B21;
 			
-			iXXs(q0, q0)=invB22;
+			iXXs(q0, q0) = invB22;
 			iXXs.submat(0, 0, q0 - 1, q0 - 1) = iUXUX + invB22 * B21.t() * B21;
 			iXXs(q0, arma::span(0, q0 - 1)) = NeginvB22B21;
 			iXXs(arma::span(0, q0 - 1), q0) = NeginvB22B21.t();
