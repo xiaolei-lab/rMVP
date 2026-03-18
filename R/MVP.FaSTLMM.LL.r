@@ -64,9 +64,7 @@
     #Iteration on the range of delta (-5 to 5 in glog scale)
     delta.range <- seq(deltaExpStart,deltaExpEnd,by=0.1)
     m <- length(delta.range)
-    #for (m in seq(deltaExpStart,deltaExpEnd,by=0.1)){
     beta.optimize.parallel <- function(ii){
-        #p=p+1
         delta <- exp(delta.range[ii])
         #----------------------------calculate beta-------------------------------------
         #######get beta1
@@ -107,23 +105,15 @@
         
         #######get final beta
         zw1 <- ginv(beta1+beta2)
-        #zw1 <- try(solve(beta1+beta2))
-        #if(inherits(zw1, "try-error")){
-        #zw1 <- ginv(beta1+beta2)
-        #}
         
-        zw2=(beta3+beta4)
+        zw2 <- (beta3+beta4)
         beta=crossprod(zw1,zw2)
         
         #----------------------------calculate LL---------------------------------------
         ####part 1
-        part11<-n*log(2*3.14)
-        part12<-0
-        for(i in 1:length(d)){
-            part12_pre=log(d[i]+delta)
-            part12= part12+part12_pre
-        }
-        part13<- (nrow(U1)-length(d))*log(delta)
+        part11 <- n*log(2*3.14)
+        part12 <- sum(log(d+delta))
+        part13 <- (nrow(U1)-length(d))*log(delta)
         part1<- -1/2*(part11+part12+part13)
         
         ######  part2
@@ -155,53 +145,28 @@
         
         return(list(beta=beta,delta=delta,LL=LL))
     }
-    #} # end of Iteration on the range of delta (-5 to 5 in glog scale)
 
     llresults <- lapply(1:m, beta.optimize.parallel)
 
-    for(i in 1:m){
-        if(i == 1){
-            beta.save = llresults[[i]]$beta
-            delta.save = llresults[[i]]$delta
-            LL.save = llresults[[i]]$LL
-        }else{
-            if(llresults[[i]]$LL > LL.save){
-                beta.save = llresults[[i]]$beta
-                delta.save = llresults[[i]]$delta
-                LL.save = llresults[[i]]$LL
-            }
-        }
-    }
+    # Find result with maximum log-likelihood
+    LL_values <- sapply(llresults, function(x) x$LL)
+    best_idx <- which.max(LL_values)
+    beta <- llresults[[best_idx]]$beta
+    delta <- llresults[[best_idx]]$delta
+    LL <- llresults[[best_idx]]$LL
     #--------------------update with the optimum------------------------------------
-    beta=beta.save
-    delta=delta.save
-    LL=LL.save
     
     #--------------------calculating Va and Vem-------------------------------------
-    #sigma_a1
-    sigma_a1=0
-    for(i in 1:length(d)){
-        one1=matrix(U1TX[i,], ncol=1)
-        one2=matrix(U1TY[i,], nrow=1)
-        #sigma_a1_pre=(one2-one1%*%beta)^2/(d[i]+delta)
-        sigma_a1_pre=(one2-crossprod(one1,beta))^2/(d[i]+delta)
-        sigma_a1= sigma_a1+sigma_a1_pre
-    }
+    # Vectorized sigma_a1 calculation
+    preds_a1 <- U1TX %*% beta
+    sigma_a1 <- sum((U1TY - preds_a1)^2 / (d + delta))
     
-    ### sigma_a2
-    sigma_a2=0
+    # Vectorized sigma_a2 calculation
+    preds_a2 <- IUX %*% beta
+    sigma_a2 <- sum((IUY - preds_a2)^2) / delta
     
-    for(i in 1:nrow(U1)){
-        one1=matrix(IUX[i,], ncol=1)
-        one2=matrix(IUY[i,], nrow=1)
-        #sigma_a2_pre<-(one2-one1%*%beta)^2
-        sigma_a2_pre<-(one2-crossprod(one1,beta))^2
-        sigma_a2= sigma_a2+sigma_a2_pre
-    }
-    
-    sigma_a2<-sigma_a2/delta
-    sigma_a<- 1/n*(sigma_a1+sigma_a2)
-    sigma_e<-delta*sigma_a
+    sigma_a <- 1/n * (sigma_a1 + sigma_a2)
+    sigma_e <- delta * sigma_a
     
     return(list(beta=beta, delta=delta, LL=LL, vg=sigma_a, ve=sigma_e))
 }
