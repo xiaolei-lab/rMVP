@@ -8,7 +8,7 @@ using namespace std;
 using namespace Rcpp;
 using namespace arma;
 
-arma::mat GInv(const arma::mat A){
+arma::mat GInv(const arma::mat& A){
 	
 	arma::mat ginv;
 	if(A.n_rows == 1){
@@ -37,7 +37,7 @@ arma::mat GInv(const arma::mat A){
 }
 
 template <typename T>
-NumericVector getRow(XPtr<BigMatrix> pMat, const int row){
+NumericVector getRow(const XPtr<BigMatrix> pMat, const int row){
 	
 	MatrixAccessor<T> genomat = MatrixAccessor<T>(*pMat);
 
@@ -102,28 +102,16 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 	MinimalProgressBar_plus pb;
 	Progress progress(m, verbose, pb);
 
-	// arma::mat iXX = GInv(X.t() * X);
 	arma::mat xy = X.t() * y;
 	double yy = sum(y % y);
 	arma::mat res(m, 1 + 1 + 1 + q0);
 
-	int n_threads = 1;
-	#ifdef _OPENMP
-	n_threads = omp_get_max_threads();
-	#endif
-	std::vector<arma::mat> iXXs_pool(n_threads, arma::mat(q0 + 1, q0 + 1, fill::none));
-	std::vector<arma::mat> xs_pool(n_threads, arma::mat(q0, 1, fill::none));
-	std::vector<arma::mat> B21_pool(n_threads, arma::mat(1, q0, fill::none));
-	std::vector<arma::mat> NeginvB22B21_pool(n_threads, arma::mat(1, q0, fill::none));
-	std::vector<arma::mat> rhs_pool(n_threads, arma::mat(xy.n_rows + 1, 1, fill::none));
-	std::vector<arma::mat> beta_pool(n_threads, arma::mat(q0 + 1, 1, fill::none));
-	std::vector<arma::vec> se_pool(n_threads, arma::vec(q0 + 1, fill::none));
-	std::vector<arma::vec> pvalue_pool(n_threads, arma::vec(q0 + 1, fill::none));
+	arma::mat iXXs(q0 + 1, q0 + 1);
 
 	arma::mat Z_buffer(n, step, fill::none);
 	int i = 0, j = 0;
 	int i_marker = 0;
-	for (;i < m;) {
+	while(i < m) {
 		
 		int cnt = 0;
 		for (; j < m && cnt < step; j++)
@@ -201,20 +189,15 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 			}
 		}
 
-		#pragma omp parallel for
+		#pragma omp parallel for firstprivate(iXXs)
 		for(int l = 0; l < cnt; l++){
-			int tid = 0;
-			#ifdef _OPENMP
-			tid = omp_get_thread_num();
-			#endif
-			arma::mat &iXXs = iXXs_pool[tid];
-			arma::mat &xs = xs_pool[tid];
-			arma::mat &B21 = B21_pool[tid];
-			arma::mat &NeginvB22B21 = NeginvB22B21_pool[tid];
-			arma::mat &rhs = rhs_pool[tid];
-			arma::mat &beta = beta_pool[tid];
-			arma::vec &se = se_pool[tid];
-			arma::vec &pvalue = pvalue_pool[tid];
+			arma::mat xs(q0, 1);
+			arma::mat B21(1, q0);
+			arma::mat NeginvB22B21(1, q0);
+			arma::mat rhs(xy.n_rows + 1, 1);
+			arma::mat beta(q0 + 1, 1);
+			arma::vec se(q0 + 1);
+			arma::vec pvalue(q0 + 1);
 
 			double sy = sum(Z_buffer.col(l) % y);
 			double ss = sum(Z_buffer.col(l) % Z_buffer.col(l));
@@ -327,7 +310,7 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 	arma::mat Z_buffer(n, step, fill::none);
 	int i = 0, j = 0;
 	int i_marker = 0;
-	for (;i < m;) {
+	while(i < m) {
 		
 		int cnt = 0;
 		for (; j < m && cnt < step; j++)
