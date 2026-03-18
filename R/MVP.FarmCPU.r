@@ -70,7 +70,6 @@
                           memo="MVP.FarmCPU", Prior=NULL, ncpus=2, maxLoop=10, maxLine=5000,
                           threshold.output=.01, converge=1, iteration.output=FALSE, p.threshold=NA, 
                           QTN.threshold=0.01, bound=NULL, verbose=TRUE){
-    #print("--------------------- Welcome to FarmCPU ----------------------------")
 
     if(!is.big.matrix(geno))    stop("genotype should be in 'big.matrix' format.")
     if(sum(is.na(phe[, 2])) != 0) stop("NAs are not allowed in phenotype.")
@@ -266,7 +265,6 @@
             colnames(results) = c("effect", "se", "p")
             if(isDone && !is.null(mrk_idx)) results <- results[mrk_idx, ]
         } #end of while loop
-        #print("****************FarmCPU ACCOMPLISHED****************")
         return(results)
 }#The MVP.FarmCPU function ends here
 
@@ -420,23 +418,13 @@
         return(list(beta=beta,delta=delta,LL=LL))
     }
     llresults <- lapply(1:m, beta.optimize.parallel)
-    for(i in 1:m){
-        if(i == 1){
-            beta.save = llresults[[i]]$beta
-            delta.save = llresults[[i]]$delta
-            LL.save = llresults[[i]]$LL
-        }else{
-            if(llresults[[i]]$LL > LL.save){
-                beta.save = llresults[[i]]$beta
-                delta.save = llresults[[i]]$delta
-                LL.save = llresults[[i]]$LL
-            }
-        }
-    }
+    # Find result with maximum log-likelihood
+    LL_values <- sapply(llresults, function(x) x$LL)
+    best_idx <- which.max(LL_values)
+    beta <- llresults[[best_idx]]$beta
+    delta <- llresults[[best_idx]]$delta
+    LL <- llresults[[best_idx]]$LL
     #--------------------update with the optimum------------------------------------
-    beta=beta.save
-    delta=delta.save
-    LL=LL.save
     
     #--------------------calculating Va and Vem-------------------------------------
     #sigma_a1
@@ -497,8 +485,7 @@
 #' @keywords internal
 FarmCPU.BIN <-
     function(Y=NULL, GDP=NULL, GDP_index=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2, verbose=TRUE){
-        #print("FarmCPU.BIN Started")
-        
+
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
         
         if(nrow(GM) == ncol(GDP)){
@@ -524,7 +511,6 @@ FarmCPU.BIN <-
         
         if(optimumable){
             s[s>bound]=bound
-            #print("optimizing possible QTNs...")
             #GP=cbind(GM,P,NA,NA,NA)
             #mySpecify=FarmCPU.Specify(GI=GM, GP=GP, bin.size=b, inclosure.size=s)
             #seqQTN=which(mySpecify$index==TRUE)
@@ -532,7 +518,6 @@ FarmCPU.BIN <-
         
         #Method of static
         if(method=="static"&optimumable){
-            #print("Via static")
             if(theLoop==2){
                 b=b[3]
             }else if(theLoop==3){
@@ -551,7 +536,6 @@ FarmCPU.BIN <-
         #Method of optimum: FaST-LMM
         #============================Optimize by FaST-LMM============================================
         if(method=="FaST-LMM"&optimumable){
-            #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             count=0
             for (bin in b){
@@ -596,7 +580,6 @@ FarmCPU.BIN <-
         #Method of optimum: EMMA
         #============================Optimize by EMMA============================================
         if(method=="EMMA"&optimumable){
-            #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             m <- length(b)*length(s)
             inc.index = rep(c(1:length(s)), length(b))
@@ -622,24 +605,17 @@ FarmCPU.BIN <-
             }
             llresults <- lapply(1:m, seqQTN.optimize.parallel)
 
-            for(i in 1:m){
-                if(i == 1){
-                    seqQTN.save = llresults[[i]]$seqQTN
-                    myREML.save = llresults[[i]]$myREML
-                }else{
-                    if(llresults[[i]]$myREML < myREML.save){
-                        seqQTN.save = llresults[[i]]$seqQTN
-                        myREML.save = llresults[[i]]$myREML
-                    }
-                }
-            }
+            # Find result with minimum REML
+            REML_values <- sapply(llresults, function(x) x$myREML)
+            best_idx <- which.min(REML_values)
+            seqQTN.save <- llresults[[best_idx]]$seqQTN
+            myREML.save <- llresults[[best_idx]]$myREML
         }
         
         #Method of optimum: GEMMA
         #can not be used to provide REML
         #============================Optimize by GEMMA============================================
         if(method=="GEMMA"&optimumable){
-            #print("c(bin.size, bin.selection, -2LL, VG, VE)")
             logging.log("Optimizing Pseudo QTNs...\n", verbose = verbose)
             m <- length(b)*length(s)
             
@@ -663,17 +639,11 @@ FarmCPU.BIN <-
             }
             llresults <- lapply(1:m, seqQTN.optimize.parallel)
 
-            for(i in 1:m){
-                if(i == 1){
-                    seqQTN.save = llresults[[i]]$seqQTN
-                    myREML.save = llresults[[i]]$myREML
-                }else{
-                    if(llresults[[i]]$myREML < myREML.save){
-                        seqQTN.save = llresults[[i]]$seqQTN
-                        myREML.save = llresults[[i]]$myREML
-                    }
-                }
-            }
+            # Find result with minimum REML
+            REML_values <- sapply(llresults, function(x) x$myREML)
+            best_idx <- which.min(REML_values)
+            seqQTN.save <- llresults[[best_idx]]$seqQTN
+            myREML.save <- llresults[[best_idx]]$myREML
         }
         
         return(list(seqQTN=seqQTN.save))
@@ -700,7 +670,6 @@ FarmCPU.BIN <-
 #' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not
 FarmCPU.Specify <-
     function(GI=NULL, GP=NULL, bin.size=10000000, inclosure.size=NULL, MaxBP=1e10){
-        #print("Specification in process...")
         if(is.null(GP))return (list(index=NULL,BP=NULL))
         
         #set inclosure bin in GP
@@ -791,7 +760,6 @@ FarmCPU.Specify <-
 #' @keywords internal
 FarmCPU.LM <-
     function(y, w=NULL, GDP, GDP_index=NULL, GDP_mrk_bycol=TRUE, maxLine=5000, ncpus=2, npc=0, verbose=TRUE){
-        #print("FarmCPU.LM started")
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
         #Constant section (non individual marker specific)
@@ -849,7 +817,6 @@ FarmCPU.LM <-
             sepred = se[-1]
         }
 
-        #print(ncpus)
         logging.log("scanning...", "\n", verbose = verbose)
 
         # P <- NULL
@@ -935,7 +902,6 @@ FarmCPU.Burger <-
             ve=myEMMAREML$ve
         }
         
-        #print("FarmCPU.Burger succeed!")
         return (list(REMLs=REMLs, vg=vg, ve=ve, delta=delta))
     } #end of FarmCPU.Burger
 
@@ -959,8 +925,6 @@ FarmCPU.SUB <-
     function(GM=NULL,GLM=NULL,QTN=NULL,method="mean"){
         if(is.null(GLM$P)) return(NULL)  #P is required
         if(is.null(QTN)) return(NULL)  #QTN is required
-        #print("FarmCPU.SUB Started")
-        #print(length(QTN))
         #if(length(QTN)==3){
             #QTN=QTN[1]
         #}else{
@@ -1039,16 +1003,9 @@ FarmCPU.Remove <-
         cb=as.numeric(binmap[, 2, drop=FALSE])*hugeNum+as.numeric(binmap[, 3, drop=FALSE])#create ID for chromosome and bp
         cb.unique=unique(cb)
         
-        #print("debuge")
-        #print(cb)
-        #print(cb.unique)
-        
         index=match(cb.unique,cb,nomatch = 0)
         seqQTN=seqQTN[index]
         
-        #print("Number of bins after chr and bp fillter")
-        n=length(seqQTN) #update n
-
         #Set sample
         ratio=.1
         maxNum=100000
@@ -1138,15 +1095,11 @@ FarmCPU.Remove <-
 #' @keywords internal
 FarmCPU.Prior <-
     function(GM, P=NULL, Prior=NULL){
-        #print("FarmCPU.Prior Started")
-        
+
         if(is.null(Prior)& is.null(P))return(P)
         
         #get prior position
         if(!is.null(Prior)) index=match(Prior[, 1, drop=FALSE],GM[, 1, drop=FALSE],nomatch = 0)
-        
-        #if(is.null(P)) P=runif(nrow(GM)) #set random p value if not provided (This is not helpful)
-        #print("debug set prior  a")
         
         #Get product with prior if provided
         if(!is.null(Prior) & !is.null(P) )P[index]=P[index]*Prior[, 4, drop=FALSE]
