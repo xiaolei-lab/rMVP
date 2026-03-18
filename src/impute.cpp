@@ -37,7 +37,7 @@ void impute_marker(XPtr<BigMatrix> pMat, bool mrkbycol = true, int threads=0, bo
     if(mrkbycol){
         #pragma omp parallel for
         for (size_t i = 0; i < m; i++) {
-            std::vector<size_t> na_index = {};;
+            std::vector<size_t> na_index;
             size_t counts[3] = { 0 };
             
             // count allele, record missing index 
@@ -62,7 +62,7 @@ void impute_marker(XPtr<BigMatrix> pMat, bool mrkbycol = true, int threads=0, bo
     }else{
         #pragma omp parallel for
         for (size_t i = 0; i < m; i++) {
-            std::vector<size_t> na_index = {};;
+            std::vector<size_t> na_index;
             size_t counts[3] = { 0 };
             
             // count allele, record missing index 
@@ -120,22 +120,18 @@ bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec
             uvec _marker_ind = as<uvec>(marker_ind) - 1;
             int m = _marker_ind.n_elem;
             if(mrkbycol){
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < m; j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < n; i++) {
-                        // if (mat[_marker_ind[j]][_geno_ind[i]] == NA_C) {
                         if (isna(mat[_marker_ind[j]][_geno_ind[i]])) {
                             HasNA = true;
                         }
                     }
                 }
             }else{
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < n; j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < m; i++) {
-                        // if (mat[_geno_ind[j]][_marker_ind[i]] == NA_C) {
                         if (isna(mat[_geno_ind[j]][_marker_ind[i]])) {
                             HasNA = true;
                         }
@@ -144,22 +140,18 @@ bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec
             }
         }else{
             if(mrkbycol){
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < pMat->ncol(); j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < n; i++) {
-                        // if (mat[j][_geno_ind[i]] == NA_C) {
                         if (isna(mat[j][_geno_ind[i]])) {
                             HasNA = true;
                         }
                     }
                 }
             }else{
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < n; j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < pMat->nrow(); i++) {
-                        // if (mat[_geno_ind[j]][i] == NA_C) {
                         if (isna(mat[_geno_ind[j]][i])) {
                             HasNA = true;
                         }
@@ -172,22 +164,18 @@ bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec
             uvec _marker_ind = as<uvec>(marker_ind) - 1;
             int m = _marker_ind.n_elem;
             if(mrkbycol){
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < m; j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < pMat->nrow(); i++) {
-                        // if (mat[_marker_ind[j]][i] == NA_C) {
                         if (isna(mat[_marker_ind[j]][i])) {
                             HasNA = true;
                         }
                     }
                 }
             }else{
-                #pragma omp parallel for shared(HasNA)
+                #pragma omp parallel for reduction(||:HasNA)
                 for (int j = 0; j < pMat->ncol(); j++) {
-                    if(HasNA)   continue;
                     for (int i = 0; i < m; i++) {
-                        // if (mat[j][_marker_ind[i]] == NA_C) {
                         if (isna(mat[j][_marker_ind[i]])) {
                             HasNA = true;
                         }
@@ -195,11 +183,9 @@ bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec
                 }
             }
         }else{
-            #pragma omp parallel for shared(HasNA)
+            #pragma omp parallel for reduction(||:HasNA)
             for (int j = 0; j < pMat->ncol(); j++) {
-                if(HasNA)   continue;
                 for (int i = 0; i < pMat->nrow(); i++) {
-                    // if (mat[j][i] == NA_C) {
                     if (isna(mat[j][i])) {
                         HasNA = true;
                     }
