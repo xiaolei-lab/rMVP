@@ -152,7 +152,7 @@ MVP.Data <- function(fileMVP = NULL, fileVCF = NULL, fileHMP = NULL, fileBed = N
     # phenotype
     if (!is.null(filePhe)) {
         MVP.Data.Pheno(
-            pheno_file = filePhe, 
+            pheno_file <- filePhe, 
             out = out, 
             header = TRUE,
             cols = pheno_cols, 
@@ -438,36 +438,12 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
     )
     logging.log(paste0("Loading genotype at a step of ", maxLine, '...\n'), verbose = verbose)
     
-    # convert to bigmat - speed
-    # if (priority == "speed") {
-    #     opts <- options(bigmemory.typecast.warning = FALSE)
-    #     on.exit(options(opts))
-        
-    #     # detecte sep
-    #     con <- file(num_file, open = 'r')
-    #     line <- readLines(con, 1)
-    #     close(con)
-    #     sep <- substr(line, 2, 2)
-        
-    #     # load geno
-    #     suppressWarnings(
-    #         geno <- read.big.matrix(num_file, header = FALSE, sep = sep)
-    #     )
-    #     if (transposed) {
-    #         bigmat[, ] <- t(geno[, ])
-    #     } else {
-    #         bigmat[, ] <- geno[, ]
-    #     }
-    #     rm("geno")
-    # }
-    
-    # convert to bigmat - memory
-    # if (priority == "memory") {
-        i <- 0
-        con <- file(num_file, open = 'r')
+    # convert to bigmat - memory priority: read in chunks to reduce memory footprint
+    i <- 0
+    con <- file(num_file, open = 'r')
         if (col_names) { readLines(con, n = 1) }
         while (TRUE) {
-            line = readLines(con, n = maxLine)
+            line <- readLines(con, n = maxLine)
 
             len <- length(line)
             if (len == 0) { break }
@@ -488,7 +464,6 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
         }
         logging.log("\n", verbose = verbose)
         close(con)
-    # }
     
     file.copy(map_file, paste0(out, ".geno.map"))
     
@@ -639,10 +614,10 @@ MVP.Data.Pheno <- function(pheno_file, out='mvp', cols=NULL, header=TRUE, sep='\
     
     # drop empty traits
     pheno[pheno %in% missing] <- NA
-    drop = c()
+    drop <- c()
     for (i in 2:ncol(pheno)) {
         if (all(is.na(pheno[, i]))) {
-            drop = c(drop, i)
+            drop <- c(drop, i)
         }
     }
     if (length(drop) > 0) {
