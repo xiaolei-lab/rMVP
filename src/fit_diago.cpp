@@ -370,13 +370,13 @@ MatrixXd conjugate_gradient(const MatrixXd& A, const VectorXd& b, int maxit, dou
   for (int i = 0; i < maxit; i++) {
     Ap = A * p;
     alpha = rsold / (p.transpose() * Ap);
-    x = x + (alpha * p.array()).matrix();
-    r = r - (alpha * Ap.array()).matrix();
+    x.noalias() += alpha * p;
+    r.noalias() -= alpha * Ap;
     rsnew = r.squaredNorm();
     if (sqrt(rsnew) < tol) {
       break;
     }
-    p = r + ((rsnew / rsold) * p.array()).matrix();
+    p = r + (rsnew / rsold) * p;
     rsold = rsnew;
   }
   return(x);
@@ -418,8 +418,6 @@ SEXP geninv(SEXP GG)
     double tol(1.0e-10);
     MatrixXd A(MatrixXd(mn, mn));
     MatrixXd L(MatrixXd(mn, mn).setZero());
-    
-    
     
     if (n < m) {
       transp = true;
