@@ -63,6 +63,13 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
         delta <-  exp(logdelta)
         return( 0.5 * (nq * (log(nq/(2 * pi))-1-log(sum(etas * etas/(lambda + delta))))-sum(log(lambda + delta))) )
     }
+    emma.delta.REML.dLL.wo.Z <- function(logdelta, lambda, etas) {
+        nq <- length(etas)
+        delta <- exp(logdelta)
+        etasq <- etas * etas
+        ldelta <- lambda + delta
+        return( 0.5 * (nq * sum(etasq/(ldelta * ldelta))/sum(etasq/ldelta)-sum(1/ldelta)) )
+    }
     emma.eigen.R.wo.Z=function(K, X) {
         n <- nrow(X)
         q <- ncol(X)
@@ -112,30 +119,18 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     }
     for(i in 1:(m-1) ){
         if( ( dLL[i] * dLL[i + 1] < 0 ) && ( dLL[i] > 0 ) && ( dLL[i + 1] < 0 ) ) {
-            emma.delta.REML.dLL.wo.Z <- function(logdelta, lambda, etas) {
-                nq <- length(etas)
-                delta <- exp(logdelta)
-                etasq <- etas * etas
-                ldelta <- lambda + delta
-                return( 0.5 * (nq * sum(etasq/(ldelta * ldelta))/sum(etasq/ldelta)-sum(1/ldelta)) )
-            }
             r <- uniroot(emma.delta.REML.dLL.wo.Z, lower=logdelta[i], upper=logdelta[i + 1], lambda=eig.R$values, etas=etas)
             optlogdelta <- append(optlogdelta, r$root)
-            emma.delta.REML.LL.wo.Z <- function(logdelta, lambda, etas) {
-                nq <- length(etas)
-                delta <-  exp(logdelta)
-                return( 0.5 * (nq * (log(nq/(2 * pi))-1-log(sum(etas * etas/(lambda + delta))))-sum(log(lambda + delta))) )
-            }
             optLL <- append(optLL, emma.delta.REML.LL.wo.Z(r$root, eig.R$values, etas))
         }
     }
     maxdelta <- exp(optlogdelta[which.max(optLL)])
-    #handler of grids with NaN log
-    replaceNaN<-function(LL) {
-        index=(LL == "NaN")
-        if(length(index)>0) theMin=min(LL[!index])
-        if(length(index)<1) theMin="NaN"
-        LL[index]=theMin
+    # Handle grids with NaN log values
+    replaceNaN <- function(LL) {
+        index <- (LL == "NaN")
+        if(length(index)>0) theMin <- min(LL[!index])
+        if(length(index)<1) theMin <- "NaN"
+        LL[index] <- theMin
         return(LL)    
     }
     optLL=replaceNaN(optLL)   
