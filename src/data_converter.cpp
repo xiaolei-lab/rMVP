@@ -538,7 +538,7 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     long n = ind / 4;  // 4 individual = 1 bit
     if (ind % 4 != 0) 
         n++; 
-    char *buffer;
+    std::vector<char> buffer;
     long buffer_size;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
@@ -566,8 +566,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     Progress progress(n_block, verbose, pb);
     
     // magic number of bfile
-    buffer = new char [3];
-    if (fread(buffer, 1, 3, fin) != 3) {
+    std::vector<char> magic_buffer(3);
+    if (fread(magic_buffer.data(), 1, 3, fin) != 3) {
         // file too short or corrupt - magic bytes unreadable
         fclose(fin);
         Rcpp::stop("Cannot read magic bytes from .bed file.");
@@ -577,8 +577,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     size_t cond;
     long block_start;
     for (int i = 0; i < n_block; i++) {
-        buffer = new char [buffer_size];
-        size_t n_read = fread(buffer, 1, buffer_size, fin);
+        buffer.resize(buffer_size);
+        size_t n_read = fread(buffer.data(), 1, buffer_size, fin);
         if (n_read == 0)
             break; // end of file
         
