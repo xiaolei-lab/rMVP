@@ -21,18 +21,17 @@
 
 #include <Rcpp.h>
 
-static int omp_setup(int threads);
 static inline int omp_setup(int threads=0) {
     int t = 1;
 #ifdef _OPENMP
     if (threads == 0) {
+        // Reserve one thread for OS; default to physical processor count - 1
         t = omp_get_num_procs() - 1;
         t = t > 0 ? t : 1;
     } else {
         t = threads > 0 ? threads : 1;
     }
     omp_set_num_threads(t);
-#else
 #endif
     return t;
 }
