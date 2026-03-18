@@ -243,7 +243,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // kin_cal
-SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const Nullable<arma::vec> marker_freq, const bool marker_bycol, int threads, size_t step, bool mkl, bool verbose);
+SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind, const Nullable<arma::uvec> marker_ind, const Nullable<arma::vec> marker_freq, const bool marker_bycol, int threads, int step, bool mkl, bool verbose);
 RcppExport SEXP _rMVP_kin_cal(SEXP pBigMatSEXP, SEXP geno_indSEXP, SEXP marker_indSEXP, SEXP marker_freqSEXP, SEXP marker_bycolSEXP, SEXP threadsSEXP, SEXP stepSEXP, SEXP mklSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -254,7 +254,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Nullable<arma::vec> >::type marker_freq(marker_freqSEXP);
     Rcpp::traits::input_parameter< const bool >::type marker_bycol(marker_bycolSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    Rcpp::traits::input_parameter< size_t >::type step(stepSEXP);
+    Rcpp::traits::input_parameter< int >::type step(stepSEXP);
     Rcpp::traits::input_parameter< bool >::type mkl(mklSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(kin_cal(pBigMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose));
