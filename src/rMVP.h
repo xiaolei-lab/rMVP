@@ -1,6 +1,5 @@
-#ifndef RMVP_
-#define RMVP_
-#endif
+#ifndef RMVP_H_
+#define RMVP_H_
 
 #if !defined(ARMA_64BIT_WORD)
 #define ARMA_64BIT_WORD 1
@@ -128,7 +127,6 @@ class MinimalProgressBar_plus: public ProgressBar{
 		        	strs << "[" << cur_display << "] " << time_string;
 		        }
 		    	empty_length_p = empty_length;
-		    	// strs << "[" << cur_display << "]";
 
 		        std::string temp_str = strs.str();
 		        char const* char_type = temp_str.c_str();
@@ -139,7 +137,6 @@ class MinimalProgressBar_plus: public ProgressBar{
 
 		    }
 		    if (_ticks_displayed >= _max_ticks)
-       			// end_display();
        			_finalize_display();
 	    }
 	}
@@ -267,7 +264,6 @@ class MinimalProgressBar_perc: public ProgressBar{
 		        	strs << "[" << cur_display << "] " << time_string;
 		        }
 		    	empty_length_p = empty_length;
-		    	// strs << "[" << cur_display << "]";
 
 		        std::string temp_str = strs.str();
 		        char const* char_type = temp_str.c_str();
@@ -278,7 +274,6 @@ class MinimalProgressBar_perc: public ProgressBar{
 
 		    }
 		    if (_ticks_displayed >= _max_ticks)
-       			// end_display();
        			_finalize_display();
 	    }
 	}
@@ -321,3 +316,5 @@ class MinimalProgressBar: public ProgressBar{
 	private:
 	bool _finalized;
 };
+
+#endif  // RMVP_H_
