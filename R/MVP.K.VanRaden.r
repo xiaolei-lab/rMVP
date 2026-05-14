@@ -188,6 +188,6 @@ function(
     #     }
     # )
     #print("K Preparation is Done!")
-    logging.log("Deriving relationship matrix successfully", "\n", verbose = verbose); gc()
+    logging.log("Deriving relationship matrix successfully", "\n", verbose = verbose)
     return(K)
 }#end of MVP.k.VanRaden function

@@ -235,7 +235,6 @@
             
             #Step 3: Screen with bins
             rm(myBin)
-            gc()
             
             theCV=CV
             

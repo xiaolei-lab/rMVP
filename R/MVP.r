@@ -338,7 +338,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
     logging.log("-------------------------GWAS Start-------------------------", "\n", verbose = verbose)
     if (glm.run) {
         logging.log("General Linear Model (GLM) Start...", "\n", verbose = verbose)
-        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, verbose = verbose);gc()
+        glm.results <- MVP.GLM(phe=phe, geno=geno, CV=CV.GLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, verbose = verbose)
         colnames(glm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"GLM",sep="."))
         z = glm.results[, 1]/glm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
@@ -353,7 +353,7 @@ function(phe, geno, map, K=NULL, nPC.GLM=NULL, nPC.MLM=NULL, nPC.FarmCPU=NULL,
 
     if (mlm.run) {
         logging.log("Mixed Linear Model (MLM) Start...", "\n", verbose = verbose)
-        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, vc.method=vc.method, verbose = verbose);gc()
+        mlm.results <- MVP.MLM(phe=phe, geno=geno, K=K, eigenK=eigenK, CV=CV.MLM, ind_idx=seqTaxa, mrk_idx=geno_marker_index, mrk_bycol = MrkByCol, maxLine = maxLine, cpu=ncpus, vc.method=vc.method, verbose = verbose)
         colnames(mlm.results) <- c("Effect", "SE", paste(colnames(phe)[2],"MLM",sep="."))
         z = mlm.results[, 1]/mlm.results[, 2]
         lambda = median(z^2, na.rm=TRUE)/qchisq(1/2, df = 1,lower.tail=FALSE)
