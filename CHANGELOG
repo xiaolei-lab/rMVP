@@ -1,3 +1,24 @@
+## refactor-branch (2026-05-14)
++ Bug fixes:
+    + Fixed 2*3.14 → 2*pi in FaSTLMM log-likelihood computation (~0.0028/obs error in LL values)
+    + Fixed double-subtraction of mean^2 in MVP.HE.Vg.Ve StandardizeVector (numerically benign but mathematically wrong)
++ Code quality:
+    + Named constants extracted to R/MVP.Constants.R (eliminated magic numbers in FaSTLMM, EMMA, BRENT, HE, FarmCPU)
+    + FaSTLMM inner-loop vectorized: scalar for-loops replaced with sweep/crossprod operations
+    + Duplicate FaSTLMM implementation unified via .fastlmm_core() shared by MVP.FaSTLMM.LL and FarmCPU
+    + FarmCPU internal helpers renamed to .farmcpu_* convention
+    + .safe_solve() helper eliminates repeated try/inherits(solve(...), 'try-error') patterns
+    + MVP.BRENT.Vg.Ve gains stopifnot() input validation
+    + Dead LogRL_dev1 function removed from MVP.HE.Vg.Ve
+    + gc() calls removed from hot loops (kept only after explicit rm() of large objects)
++ C++ improvements:
+    + C++ standard set to CXX17 in Makevars/Makevars.win
+    + ProgressBar base class extracted to eliminate ~100 lines of duplicated C++
+    + fill_geno_buffer<T> template eliminates 8-branch fill blocks in assoc.cpp and kinship.cpp
+    + DISPATCH_MATRIX_TYPE macro eliminates repeated switch/case dispatch boilerplate
+    + FILE* replaced with RAII std::ifstream/ofstream in write_bfile and read_bfile
+    + split_line_view() using std::string_view eliminates per-token heap allocations in VCF/HAPMAP parsers
+
 ## v1.1.0beta (2018/09/12)
 + Unified installation package for Windows platform and Linux platform.
 + The 3D PCA map has been temporarily disabled, and we will improve this feature in subsequent versions.

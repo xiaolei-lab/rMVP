@@ -118,30 +118,6 @@ print_bar <- function(i,
                 }
             }
         },
-        # "type2"={
-        #     if(inherits(parallel:::mcfork(), "masterProcess")) {
-        #         progress <- 0.0
-        #         while(progress < n && !isIncomplete(tmp.file)){
-        #             msg <- readBin(tmp.file, "double")
-        #             progress <- progress + as.numeric(msg)
-        #             print.len <- round(symbol.len * progress / n)
-        #             if(fixed.points){
-        #                 if(progress %in% round(points * n / 100)){
-        #                     logging.log(paste("\r", 
-        #                               paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-        #                               paste(rep(" ", symbol.len-print.len), collapse=""),
-        #                               sprintf("%.2f%%", progress * 100 / n), sep=""))
-        #                 }
-        #             }else{
-        #                 logging.log(paste("\r", 
-        #                           paste(c(symbol.head, rep("-", print.len), symbol.tail), collapse=""), 
-        #                           paste(rep(" ", symbol.len-print.len), collapse=""),
-        #                           sprintf("%.2f%%", progress * 100 / n), sep=""))
-        #             }
-        #         }
-        #         parallel:::mcexit()
-        #     }
-        # },
         "type3"={
             progress <- readBin(tmp.file, "double") + 1
             writeBin(progress, tmp.file)
