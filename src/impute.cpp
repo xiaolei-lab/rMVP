@@ -91,18 +91,7 @@ void impute_marker(XPtr<BigMatrix> pMat, bool mrkbycol = true, int threads=0, bo
 void impute_marker(SEXP pBigMat, bool mrkbycol = true, int threads=0, bool verbose=true) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
-    switch(xpMat->matrix_type()) {
-    case 1:
-        return impute_marker<char>(xpMat, mrkbycol, threads, verbose);
-    case 2:
-        return impute_marker<short>(xpMat, mrkbycol, threads, verbose);
-    case 4:
-        return impute_marker<int>(xpMat, mrkbycol, threads, verbose);
-    case 8:
-        return impute_marker<double>(xpMat, mrkbycol, threads, verbose);
-    default:
-        throw Rcpp::exception("unknown type detected for big.matrix object!");
-    }
+    DISPATCH_MATRIX_TYPE(impute_marker, xpMat, mrkbycol, threads, verbose);
 }
 
 template <typename T>
@@ -200,16 +189,5 @@ bool hasNA(XPtr<BigMatrix> pMat, bool mrkbycol = true, const Nullable<arma::uvec
 bool hasNA(SEXP pBigMat, bool mrkbycol = true, const Nullable<arma::uvec> geno_ind = R_NilValue, const Nullable<arma::uvec> marker_ind = R_NilValue, const int threads=1) {
     XPtr<BigMatrix> xpMat(pBigMat);
     
-    switch(xpMat->matrix_type()) {
-    case 1:
-        return hasNA<char>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
-    case 2:
-        return hasNA<short>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
-    case 4:
-        return hasNA<int>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
-    case 8:
-        return hasNA<double>(xpMat, mrkbycol, geno_ind, marker_ind, threads);
-    default:
-        throw Rcpp::exception("unknown type detected for big.matrix object!");
-    }
+    DISPATCH_MATRIX_TYPE(hasNA, xpMat, mrkbycol, geno_ind, marker_ind, threads);
 }

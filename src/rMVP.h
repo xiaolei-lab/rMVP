@@ -258,4 +258,16 @@ void fill_geno_buffer(arma::mat&         buf,
     }
 }
 
+// Dispatch a bigmatrix function call based on element type.
+// Requires xpMat to be the first argument to FUNC<T>; trailing args forwarded via __VA_ARGS__.
+// Usage: DISPATCH_MATRIX_TYPE(myFunc, xpMat, arg1, arg2, ...)
+#define DISPATCH_MATRIX_TYPE(FUNC, xpMat, ...)                              \
+    switch((xpMat)->matrix_type()) {                                         \
+    case 1: return FUNC<char>  (xpMat, ##__VA_ARGS__);                     \
+    case 2: return FUNC<short> (xpMat, ##__VA_ARGS__);                     \
+    case 4: return FUNC<int>   (xpMat, ##__VA_ARGS__);                     \
+    case 8: return FUNC<double>(xpMat, ##__VA_ARGS__);                     \
+    default: throw Rcpp::exception("unsupported bigmatrix type");           \
+    }
+
 #endif  // RMVP_H_

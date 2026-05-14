@@ -57,18 +57,7 @@ NumericVector getRow(SEXP pBigMat, const int row){
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
-	switch(xpMat->matrix_type()){
-	case 1:
-		return getRow<char>(xpMat, row);
-	case 2:
-		return getRow<short>(xpMat, row);
-	case 4:
-		return getRow<int>(xpMat, row);
-	case 8:
-		return getRow<double>(xpMat, row);
-	default:
-		throw Rcpp::exception("unknown type detected for big.matrix object!");
-	}
+	DISPATCH_MATRIX_TYPE(getRow, xpMat, row);
 }
 
 template <typename T>

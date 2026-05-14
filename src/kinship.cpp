@@ -107,18 +107,7 @@ arma::vec BigRowMean(SEXP pBigMat, bool marker_bycol = true, size_t step = 10000
 	
 	XPtr<BigMatrix> xpMat(pBigMat);
 
-	switch(xpMat->matrix_type()) {
-	case 1:
-		return BigRowMean<char>(xpMat, marker_bycol, step, threads, geno_ind, verbose);
-	case 2:
-		return BigRowMean<short>(xpMat, marker_bycol, step, threads, geno_ind, verbose);
-	case 4:
-		return BigRowMean<int>(xpMat, marker_bycol, step, threads, geno_ind, verbose);
-	case 8:
-		return BigRowMean<double>(xpMat, marker_bycol, step, threads, geno_ind, verbose);
-	default:
-		throw Rcpp::exception("unknown type detected for big.matrix object!");
-	}
+	DISPATCH_MATRIX_TYPE(BigRowMean, xpMat, marker_bycol, step, threads, geno_ind, verbose);
 }
 
 
@@ -228,16 +217,5 @@ SEXP kin_cal(SEXP pBigMat, const Nullable<arma::uvec> geno_ind = R_NilValue, con
 
 	XPtr<BigMatrix> xpMat(pBigMat);
 
-	switch(xpMat->matrix_type()){
-	case 1:
-		return kin_cal<char>(xpMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose);
-	case 2:
-		return kin_cal<short>(xpMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose);
-	case 4:
-		return kin_cal<int>(xpMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose);
-	case 8:
-		return kin_cal<double>(xpMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose);
-	default:
-		throw Rcpp::exception("unknown type detected for big.matrix object!");
-	}
+	DISPATCH_MATRIX_TYPE(kin_cal, xpMat, geno_ind, marker_ind, marker_freq, marker_bycol, threads, step, mkl, verbose);
 }
