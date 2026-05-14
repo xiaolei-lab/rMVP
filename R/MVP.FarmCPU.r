@@ -135,13 +135,13 @@
         }
             
         #Step 2a: Set prior
-        myPrior=FarmCPU.Prior(GM=map,P=P,Prior=Prior)
+        myPrior=.farmcpu_prior(GM=map,P=P,Prior=Prior)
 
         #Step 2b: Set bins
         if(theLoop<=2){
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
+            myBin=.farmcpu_bin(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=CV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,bound=bound,ncpus=ncpus, verbose = verbose)
         }else{
-            myBin=FarmCPU.BIN(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
+            myBin=.farmcpu_bin(Y=phe[,c(1,2)],GDP=geno,GDP_index=ind_idx,GM=map,CV=theCV,P=myPrior,method=method.bin,b=bin.size,s=bin.selection,theLoop=theLoop,ncpus=ncpus, verbose = verbose)
         }
         
         #Step 2c: Remove bin dependency
@@ -203,7 +203,7 @@
                 }
             }
 
-            myRemove=FarmCPU.Remove(GDP=geno,GDP_index=ind_idx,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.FARMCPU_LD_THRESHOLD)
+            myRemove=.farmcpu_remove(GDP=geno,GDP_index=ind_idx,GM=map,seqQTN=seqQTN,seqQTN.p=seqQTN.p,threshold=.FARMCPU_LD_THRESHOLD)
             
             #Recoding QTNs history
             seqQTN=myRemove$seqQTN
@@ -242,16 +242,16 @@
                 theCV=cbind(CV,myRemove$bin)
             }
 
-            myGLM=FarmCPU.LM(y=phe[,2],GDP=geno,GDP_index=ind_idx,GDP_mrk_bycol=mrk_bycol,w=theCV,maxLine=maxLine,ncpus=ncpus,npc=npc, verbose=verbose)
+            myGLM=.farmcpu_lm(y=phe[,2],GDP=geno,GDP_index=ind_idx,GDP_mrk_bycol=mrk_bycol,w=theCV,maxLine=maxLine,ncpus=ncpus,npc=npc, verbose=verbose)
             if(!is.null(seqQTN)){
                 if(ncol(myGLM$P) != (npc + length(seqQTN) + 1))    stop("wrong dimensions.")
             }
             
             #Step 4: Background unit substitution
             if(!isDone){
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN, , drop=FALSE],method=method.sub)
+                myGLM=.farmcpu_sub(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN, , drop=FALSE],method=method.sub)
             }else{
-                myGLM=FarmCPU.SUB(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN, , drop=FALSE],method=method.sub.final)
+                myGLM=.farmcpu_sub(GM=map,GLM=myGLM,QTN=map[myRemove$seqQTN, , drop=FALSE],method=method.sub.final)
             }
             if(!is.null(mrk_idx)){
                 myGLM$P[-mrk_idx] = NA
@@ -294,7 +294,7 @@
 }
 
 
-#' FarmCPU.BIN
+#' .farmcpu_bin
 #'
 #' Last update: March 28, 2017
 #' Requirement: Y, GDP, and CV must have same taxa order. GDP and GM must have the same order on SNP
@@ -321,7 +321,7 @@
 #' Output: seqQTN - an s by 1 vecter for index of QTNs on GM file
 #'
 #' @keywords internal
-FarmCPU.BIN <-
+.farmcpu_bin <-
     function(Y=NULL, GDP=NULL, GDP_index=NULL, GM=NULL, CV=NULL, P=NULL, method="EMMA", b=c(5e5,5e6,5e7), s=seq(10,100,10), theLoop=NULL, bound=NULL, ncpus=2, verbose=TRUE){
 
         if(is.null(P)) return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -350,7 +350,7 @@ FarmCPU.BIN <-
         if(optimumable){
             s[s>bound]=bound
             #GP=cbind(GM,P,NA,NA,NA)
-            #mySpecify=FarmCPU.Specify(GI=GM, GP=GP, bin.size=b, inclosure.size=s)
+            #mySpecify=.farmcpu_specify(GI=GM, GP=GP, bin.size=b, inclosure.size=s)
             #seqQTN=which(mySpecify$index==TRUE)
         }
         
@@ -367,7 +367,7 @@ FarmCPU.BIN <-
             s[s>bound]=bound
             logging.log("Optimizing Pseudo QTNs...", "\n", verbose = verbose)
             GP=cbind(GM,P,NA,NA,NA)
-            mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=b,inclosure.size=s)
+            mySpecify=.farmcpu_specify(GI=GM,GP=GP,bin.size=b,inclosure.size=s)
             seqQTN.save=which(mySpecify$index==TRUE)
         }
         
@@ -380,14 +380,14 @@ FarmCPU.BIN <-
                 for (inc in s){
                     count=count+1
                     GP=cbind(GM,P,NA,NA,NA)
-                    mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
+                    mySpecify=.farmcpu_specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                     seqQTN=which(mySpecify$index==TRUE)
                     if(nrow(GM) == ncol(GDP)){
                         GK=GDP[GDP_index, seqQTN]
                     }else{
                         GK=t(GDP[seqQTN, GDP_index])
                     }
-                    myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
+                    myBurger=.farmcpu_burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                     myREML=myBurger$REMLs
                     myVG=myBurger$vg #it is unused
                     myVE=myBurger$ve #it is unused
@@ -427,14 +427,14 @@ FarmCPU.BIN <-
                 bin = b[bin.index]
                 inc = s[inc.index[ii]]
                 GP=cbind(GM,P,NA,NA,NA)
-                mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
+                mySpecify=.farmcpu_specify(GI=GM,GP=GP,bin.size=bin,inclosure.size=inc)
                 seqQTN=which(mySpecify$index==TRUE)
                 if(nrow(GM) == ncol(GDP)){
                     GK=GDP[GDP_index, seqQTN]
                 }else{
                     GK=t(GDP[seqQTN, GDP_index])
                 }
-                myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
+                myBurger=.farmcpu_burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
@@ -461,14 +461,14 @@ FarmCPU.BIN <-
                 bin = floor((ii-0.1)/length(s)) + 1
                 inc = rep(c(1:length(s)), length(b))
                 GP=cbind(GM,P,NA,NA,NA)
-                mySpecify=FarmCPU.Specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
+                mySpecify=.farmcpu_specify(GI=GM,GP=GP,bin.size=bin[ii],inclosure.size=inc[ii])
                 seqQTN=which(mySpecify$index==TRUE)
                 if(nrow(GM) == ncol(GDP)){
                     GK=GDP[GDP_index, seqQTN]
                 }else{
                     GK=t(GDP[seqQTN, GDP_index])
                 }
-                myBurger=FarmCPU.Burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
+                myBurger=.farmcpu_burger(Y=Y[,1:2], CV=CV, GK=GK, ncpus=ncpus, method=method)
                 myREML=myBurger$REMLs
                 myVG=myBurger$vg #it is unused
                 myVE=myBurger$ve #it is unused
@@ -485,7 +485,7 @@ FarmCPU.BIN <-
         }
         
         return(list(seqQTN=seqQTN.save))
-    }#The function FarmCPU.BIN ends here
+    }#The function .farmcpu_bin ends here
 
 
 #' To get indicator (TURE or FALSE) for GI based on GP
@@ -506,7 +506,7 @@ FarmCPU.BIN <-
 #' @param MaxBP maximum base pairs for each chromosome
 #'
 #' @return theIndex: a vector indicating if the SNPs in GI belong to QTN or not
-FarmCPU.Specify <-
+.farmcpu_specify <-
     function(GI=NULL, GP=NULL, bin.size=10000000, inclosure.size=NULL, MaxBP=1e10){
         if(is.null(GP))return (list(index=NULL,BP=NULL))
         
@@ -564,7 +564,7 @@ FarmCPU.Specify <-
         
         myList=list(index=theIndex,CB=ID.GP)
         return (list(index=theIndex,CB=ID.GP))
-    } #end of FarmCPU.Specify
+    } #end of .farmcpu_specify
 
 
 #' To quickly sovel LM with one variable substitute multiple times
@@ -596,7 +596,7 @@ FarmCPU.Specify <-
 #' Output: B - effect of each SNP
 #' 
 #' @keywords internal
-FarmCPU.LM <-
+.farmcpu_lm <-
     function(y, w=NULL, GDP, GDP_index=NULL, GDP_mrk_bycol=TRUE, maxLine=5000, ncpus=2, npc=0, verbose=TRUE){
         if(is.null(y)) return(NULL)
         if(is.null(GDP)) return(NULL)
@@ -675,10 +675,10 @@ FarmCPU.LM <-
         })
         return(list(P=results[ ,-c(1:3), drop=FALSE], betapred=betapred, sepred=sepred, B=results[ , 1, drop=FALSE], S=results[ , 2, drop=FALSE]))
         # return(list(P=P, betapred=betapred, B=as.matrix(B), S=S))
-    } #end of FarmCPU.LM function
+    } #end of .farmcpu_lm function
 
 
-#' FarmCPU.Burger
+#' .farmcpu_burger
 #' 
 #' Last update: Dec 21, 2016
 #' To calculate likelihood, variances and ratio, revised by Xiaolei based on GAPIT.Burger function from GAPIT package
@@ -698,7 +698,7 @@ FarmCPU.LM <-
 #' Output: delta - exp(root)
 #' 
 #' @keywords internal
-FarmCPU.Burger <-
+.farmcpu_burger <-
     function(Y=NULL,CV=NULL,GK=NULL,ncpus=2, method="FaST-LMM"){
         if(!is.null(CV)){
             CV=as.matrix(CV)#change CV to a matrix when it is a vector
@@ -741,10 +741,10 @@ FarmCPU.Burger <-
         }
         
         return (list(REMLs=REMLs, vg=vg, ve=ve, delta=delta))
-    } #end of FarmCPU.Burger
+    } #end of .farmcpu_burger
 
 
-#' FarmCPU.SUB
+#' .farmcpu_sub
 #'
 #' Last update: Febuary 26, 2013
 #' Requirement: P has row name of SNP. s<=t. covariates of QTNs are next to SNP
@@ -759,7 +759,7 @@ FarmCPU.Burger <-
 #' @return 
 #' Output: GLM$P - Updated p-values by substitution process
 #' Output: GLM$B - Updated effects by substitution process
-FarmCPU.SUB <-
+.farmcpu_sub <-
     function(GM=NULL,GLM=NULL,QTN=NULL,method="mean"){
         if(is.null(GLM$P)) return(NULL)  #P is required
         if(is.null(QTN)) return(NULL)  #QTN is required
@@ -797,7 +797,7 @@ FarmCPU.SUB <-
             GLM$S[position, ] = GLM$sepred
         }
         return(GLM)
-    }#The function FarmCPU.SUB ends here
+    }#The function .farmcpu_sub ends here
 
 
 #' Remove bins that are highly correlated
@@ -820,7 +820,7 @@ FarmCPU.SUB <-
 #' Output: seqQTN - s0 by 1 vecter for index of QTN on GM
 #' Relationship: bin=GDP[,c(seqQTN)], binmap=GM[seqQTN,], s0<=s
 #' @keywords internal
-FarmCPU.Remove <-
+.farmcpu_remove <-
     function(GDP=NULL, GDP_index=NULL, GM=NULL, seqQTN=NULL, seqQTN.p=NULL, threshold=.99){
         
         if(is.null(seqQTN))return(list(bin=NULL,binmap=NULL,seqQTN=NULL))
@@ -913,7 +913,7 @@ FarmCPU.Remove <-
         binmap=GM[seqQTN, , drop=FALSE]
 
         return(list(bin=bin, binmap=binmap, seqQTN=seqQTN))
-    }#The function FarmCPU.Remove ends here
+    }#The function .farmcpu_remove ends here
 
 
 #' Set prior on existing p value
@@ -931,7 +931,7 @@ FarmCPU.Remove <-
 #' Output: P - updated P value by prior information
 #' 
 #' @keywords internal
-FarmCPU.Prior <-
+.farmcpu_prior <-
     function(GM, P=NULL, Prior=NULL){
 
         if(is.null(Prior)& is.null(P))return(P)
@@ -943,4 +943,4 @@ FarmCPU.Prior <-
         if(!is.null(Prior) & !is.null(P) )P[index]=P[index]*Prior[, 4, drop=FALSE]
         
         return(P)
-    }#The function FarmCPU.Prior ends here
+    }#The function .farmcpu_prior ends here
