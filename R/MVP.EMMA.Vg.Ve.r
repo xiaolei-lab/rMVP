@@ -49,7 +49,7 @@
 #' }
 #' 
 MVP.EMMA.Vg.Ve <-
-function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
+function(y, X, K, ngrids=.EMMA_NGRIDS, llim=.EMMA_LLIM, ulim=.EMMA_ULIM, esp=.EMMA_ESP) {
     # NA in phenotype
     idx <- !is.na(y)
     y <- y[idx]
@@ -75,11 +75,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
         q <- ncol(X)
         
         XX <- crossprod(X)
-        iXX <- try(solve(XX), silent = TRUE)
-        if(inherits(iXX, "try-error")){
-            #library(MASS)
-            iXX <- ginv(XX)
-        }
+        iXX <- .safe_solve(XX)
 
         SS1 <- X %*% iXX
         SS2 <- tcrossprod(SS1, X)

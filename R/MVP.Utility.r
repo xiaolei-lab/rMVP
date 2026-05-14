@@ -363,6 +363,12 @@ load_if_installed <- function(package) {
 }
 
 
+.safe_solve <- function(X) {
+    result <- tryCatch(solve(X), error = function(e) MASS::ginv(X))
+    result
+}
+
+
 mkl_env <- function(exprs, threads = 1) {
     if (load_if_installed("RevoUtilsMath")) {
         math.cores <- eval(parse(text = "getMKLthreads()"))
