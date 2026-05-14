@@ -25,11 +25,15 @@
 #' }
 #' 
 MVP.BRENT.Vg.Ve <- function(y, X, eigenK, verbose = FALSE) {
+    stopifnot(
+        !anyNA(eigenK$values),
+        length(eigenK$values) == nrow(X),
+        length(y) == nrow(X)
+    )
     p <- 0
     Sigma <- eigenK$values
-    # Enforce minimum eigenvalue threshold to avoid numerical issues
-    w <- which(Sigma < 1e-6)
-    Sigma[w] <- 1e-6
+    w <- which(Sigma < .BRENT_MIN_EIGENVALUE)
+    Sigma[w] <- .BRENT_MIN_EIGENVALUE
     U <- eigenK$vectors
     min_h2 <- 0
     max_h2 <- 1
