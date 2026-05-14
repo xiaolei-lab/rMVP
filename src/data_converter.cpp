@@ -18,6 +18,7 @@
 // #include <boost/bind/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <string_view>
 
 using namespace std;
 using namespace Rcpp;
@@ -45,6 +46,23 @@ vector<string> split_line(const string& str, const string& whitespace = " \t\r\n
         string stri = str.substr(col_begin, col_end - col_begin);
         stri.erase(stri.find_last_not_of(" \n\r\t") + 1);
         result.push_back(stri);
+    }
+}
+
+// Zero-allocation variant for hot-path inner loops: views into the caller's string.
+// The caller must ensure the underlying string outlives the returned views.
+vector<string_view> split_line_view(string_view str, string_view whitespace = " \t\r\n")
+{
+    vector<string_view> result;
+    size_t col_end = 0;
+    while (true) {
+        size_t col_begin = str.find_first_not_of(whitespace, col_end);
+        if (col_begin == string_view::npos)
+            return result;
+        col_end = str.find_first_of(whitespace, col_begin);
+        if (col_end == string_view::npos)
+            col_end = str.size();
+        result.push_back(str.substr(col_begin, col_end - col_begin));
     }
 }
 
@@ -116,7 +134,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
 }
 
 
-double vcf_marker_parser(string m, double NA_C) {
+double vcf_marker_parser(string_view m, double NA_C) {
     if (('0' == m[0] || '1' == m[0]) && ('0' == m[2] || '1' == m[2])) {
         return (m[0] - '0' + m[2] - '0');
     } else {
@@ -131,15 +149,15 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
     
     omp_setup(threads);
     string line;
-    vector<string> l;
+    vector<string_view> l;
     vector<char> markers;
     size_t m;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    
+
     // progress bar
     MinimalProgressBar_perc pb;
     Progress progress(pMat->ncol(), verbose, pb);
-    
+
     // Skip Header
     string prefix("#CHROM");
     bool have_header = false;
@@ -166,7 +184,7 @@ void vcf_parser_genotype(std::string vcf_file, XPtr<BigMatrix> pMat, long maxLin
         }
         #pragma omp parallel for private(l, markers)
         for (std::size_t i = 0; i < buffer.size(); i++) {
-            l = split_line(buffer[i], "\t");
+            l = split_line_view(buffer[i], "\t");
             // boost::split(l, buffer[i], boost::is_any_of("\t"));
             // markers.clear();
             // vector<string>(l.begin() + 9, l.end()).swap(l);
@@ -303,7 +321,7 @@ List hapmap_parser_map(std::string hmp_file, std::string out) {
                         _["Major"] = Major);
 }
 
-double hapmap_marker_parser(string m, char major, double NA_C) {
+double hapmap_marker_parser(string_view m, char major, double NA_C) {
     if (m.length() == 1) {  // Hapmap
         // Rcout << "major: " << major << '\t' << "now: " << m[0] << endl;
         if (m[0] == '+' || m[0] == '0' || m[0] == '-' || m[0] == 'N') {
@@ -335,6 +353,7 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
     string line;
     char major;
     vector<string> l;
+    vector<string_view> lv;
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
     
     // progress bar
@@ -372,15 +391,15 @@ void hapmap_parser_genotype(std::string hmp_file, std::vector<std::string> Major
         }
         size_t n_marker = buffer.size();
 
-        #pragma omp parallel for private(l, major)
+        #pragma omp parallel for private(lv, major)
         for (size_t i = 0; i < n_marker; i++) {
-            l = split_line(buffer[i], " \t");
+            lv = split_line_view(buffer[i], " \t");
             // boost::split(l, buffer[i], boost::is_any_of(" \t"));
-            if(l.size() != n_col)
+            if(lv.size() != n_col)
                 Rcpp::stop(("line " + to_string(m+i+2) + " does not have " + to_string(n_col) + " elements in HAPMAP file.").c_str());
             major = Major[m + i][0];
-            for(size_t j = 0; j < (l.size() - 11); j++) {
-                mat[m + i][j] = static_cast<T>(hapmap_marker_parser(l[j + 11], major, NA_C));
+            for(size_t j = 0; j < (lv.size() - 11); j++) {
+                mat[m + i][j] = static_cast<T>(hapmap_marker_parser(lv[j + 11], major, NA_C));
             }
         }
         progress.increment(n_marker);
