@@ -94,7 +94,6 @@ MVP.HE.Vg.Ve <- function(y, X, K) {
         StandardizeVector <- function(x) {
             m = mean(x)
             v = sum((x - m)^2) / length(x)
-            v = v - m * m
             x = (x - m) / sqrt(v)
             return (x)
         }
@@ -161,41 +160,12 @@ MVP.HE.Vg.Ve <- function(y, X, K) {
     log_sigma2 = NULL
     for (i in 1:length(v_sigma2)) {
         if (v_sigma2[i] <= 0){
-            log_sigma2[i] = log(0.1)
+            log_sigma2[i] = .HE_DEFAULT_LOG_SIGMA2
         } else {
             log_sigma2[i] = log(v_sigma2[i])
         }
     }
     
-    LogRL_dev1 <- function(log_sigma2, parms) {
-        
-        y = parms$y
-        X = parms$X
-        K = parms$K
-        n = nrow(K)
-        
-        P = K * exp(log_sigma2[1]) + diag(n) * exp(log_sigma2[2])
-
-        # calculate H^{-1}
-        P = solve(P)
-
-        # calculate P=H^{-1}-H^{-1}X(X^TH^{-1}X)^{-1}X^TH^{-1}
-        HiW = P %*% X
-        WtHiW = crossprod(X, HiW)
-        WtHiWi = solve(WtHiW)
-
-        WtHiWiWtHi = tcrossprod(WtHiWi, HiW)
-        P = P - HiW %*% WtHiWiWtHi
-
-        # calculate Py, KPy, PKPy
-        Py = P %*% matrix(y)
-        KPy = K %*% Py
-        
-        # calculate dev1=-0.5*trace(PK_i)+0.5*yPKPy
-        c(para1 = (-0.5 * sum(t(P) * K) + 0.5 * crossprod(Py, KPy)) * exp(log_sigma2[1]),
-            para2 = (-0.5 * sum(diag(P)) + 0.5 * crossprod(Py)) * exp(log_sigma2[2]))
-    }
-
     vg = exp(log_sigma2[1])
     ve = exp(log_sigma2[2])
     delta = ve / vg
