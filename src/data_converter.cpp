@@ -455,16 +455,18 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool m
     
     vector<uint8_t> geno(n);
     MatrixAccessor<T> mat = MatrixAccessor<T>(*pMat);
-    FILE *fout;
-    fout = fopen(bed_file.c_str(), "wb");
-    
+    std::ofstream fout(bed_file, std::ios::binary);
+    if (!fout.is_open()) {
+        Rcpp::stop("Cannot open file for writing: " + bed_file);
+    }
+
     // progress bar
     MinimalProgressBar_perc pb;
     Progress progress(m, verbose, pb);
-    
+
     // magic number of bfile
     const unsigned char magic_bytes[] = { 0x6c, 0x1b, 0x01 };
-    fwrite((char*)magic_bytes, 1, 3, fout);
+    fout.write(reinterpret_cast<const char*>(magic_bytes), 3);
     
     // map
     std::map<T, int> code;
@@ -485,7 +487,7 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool m
                 }
                 geno[j] = p;
             }
-            fwrite((char*)geno.data(), 1, geno.size(), fout);
+            fout.write(reinterpret_cast<const char*>(geno.data()), geno.size());
             progress.increment();
         }
     }else{
@@ -499,11 +501,10 @@ void write_bfile(XPtr<BigMatrix> pMat, std::string bed_file, double NA_C, bool m
                 }
                 geno[j] = p;
             }
-            fwrite((char*)geno.data(), 1, geno.size(), fout);
+            fout.write(reinterpret_cast<const char*>(geno.data()), geno.size());
             progress.increment();
         }
     }
-    fclose(fout);
     return;
 }
 
@@ -550,11 +551,13 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     code[0] = static_cast<T>(2);
     
     // open file
-    FILE *fin;
-    fin = fopen(bed_file.c_str(), "rb");
-    fseek(fin, 0, SEEK_END);
-    long length = ftell(fin);
-    rewind(fin);
+    std::ifstream fin(bed_file, std::ios::binary);
+    if (!fin.is_open()) {
+        Rcpp::stop("Cannot open .bed file: " + bed_file);
+    }
+    fin.seekg(0, std::ios::end);
+    long length = (long)fin.tellg();
+    fin.seekg(0, std::ios::beg);
     
     // get buffer_size
     buffer_size = maxLine > 0 ? (maxLine * n) : (length - 3);
@@ -567,9 +570,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     
     // magic number of bfile
     std::vector<char> magic_buffer(3);
-    if (fread(magic_buffer.data(), 1, 3, fin) != 3) {
-        // file too short or corrupt - magic bytes unreadable
-        fclose(fin);
+    fin.read(magic_buffer.data(), 3);
+    if (fin.gcount() != 3) {
         Rcpp::stop("Cannot read magic bytes from .bed file.");
     }
     
@@ -578,7 +580,8 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
     long block_start;
     for (int i = 0; i < n_block; i++) {
         buffer.resize(buffer_size);
-        size_t n_read = fread(buffer.data(), 1, buffer_size, fin);
+        fin.read(buffer.data(), buffer_size);
+        size_t n_read = (size_t)fin.gcount();
         if (n_read == 0)
             break; // end of file
         
@@ -599,7 +602,6 @@ void read_bfile(std::string bed_file, XPtr<BigMatrix> pMat, long maxLine, double
         }
         progress.increment();
     }
-    fclose(fin);
     return;
 }
 
