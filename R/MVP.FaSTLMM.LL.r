@@ -49,58 +49,19 @@
 
     beta.optimize.parallel <- function(ii) {
         delta <- exp(delta.range[ii])
+        dInv  <- 1 / (d + delta)
 
-        # beta1
-        beta1 <- 0
-        for (i in 1:length(d)) {
-            one  <- matrix(U1TX[i,], nrow=1)
-            beta1 <- beta1 + crossprod(one, one / (d[i] + delta))
-        }
-        # beta2
-        beta2 <- 0
-        for (i in 1:nrow(U1)) {
-            one  <- matrix(IUX[i,], nrow=1)
-            beta2 <- beta2 + crossprod(one)
-        }
-        beta2 <- beta2 / delta
-        # beta3
-        beta3 <- 0
-        for (i in 1:length(d)) {
-            one1 <- matrix(U1TX[i,], nrow=1)
-            one2 <- matrix(U1TY[i,], nrow=1)
-            beta3 <- beta3 + crossprod(one1, one2 / (d[i] + delta))
-        }
-        # beta4
-        beta4 <- 0
-        for (i in 1:nrow(U1)) {
-            one1 <- matrix(IUX[i,], nrow=1)
-            one2 <- matrix(IUY[i,], nrow=1)
-            beta4 <- beta4 + crossprod(one1, one2)
-        }
-        beta4 <- beta4 / delta
+        beta1 <- crossprod(sweep(U1TX, 1, sqrt(dInv), "*"))
+        beta2 <- crossprod(IUX) / delta
+        beta3 <- crossprod(U1TX, U1TY * dInv)
+        beta4 <- crossprod(IUX, IUY) / delta
+        beta  <- crossprod(ginv(beta1 + beta2), beta3 + beta4)
 
-        beta <- crossprod(ginv(beta1 + beta2), beta3 + beta4)
+        part1 <- -0.5 * (n * log(.FASTLMM_2PI) + sum(log(d + delta)) + (n - length(d)) * log(delta))
 
-        # Log-likelihood
-        part11 <- n * log(.FASTLMM_2PI)
-        part12 <- sum(log(d + delta))
-        part13 <- (nrow(U1) - length(d)) * log(delta)
-        part1  <- -0.5 * (part11 + part12 + part13)
-
-        part221 <- 0
-        for (i in 1:length(d)) {
-            one1 <- U1TX[i,]
-            one2 <- U1TY[i,]
-            part221 <- part221 + (one2 - one1 %*% beta)^2 / (d[i] + delta)
-        }
-        part222 <- 0
-        for (i in 1:n) {
-            one1 <- XU1TX[i,]
-            one2 <- yU1TY[i,]
-            part222 <- part222 + (one2 - one1 %*% beta)^2 / delta
-        }
-        part22 <- n * log((1/n) * (part221 + part222))
-        part2  <- -0.5 * (n + part22)
+        part221 <- sum((U1TY  - U1TX  %*% beta)^2 * dInv)
+        part222 <- sum((yU1TY - XU1TX %*% beta)^2) / delta
+        part2   <- -0.5 * (n + n * log((part221 + part222) / n))
 
         list(beta=beta, delta=delta, LL=part1 + part2)
     }
