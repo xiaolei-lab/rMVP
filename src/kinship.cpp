@@ -181,76 +181,8 @@ SEXP kin_cal(XPtr<BigMatrix> pMat, const Nullable<arma::uvec> geno_ind = R_NilVa
 			Z_buffer.set_size(cnt, n);
 		}
 
-		if(_geno_ind.is_empty()){
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = (double)bigm[(i_marker + l)][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = (double)bigm[k][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = (double)bigm[_marker_ind[(i_marker + l)]][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = (double)bigm[k][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}else{
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = (double)bigm[(i_marker + l)][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = (double)bigm[_geno_ind[k]][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(l, k) = (double)bigm[_marker_ind[(i_marker + l)]][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(l, k) = (double)bigm[_geno_ind[k]][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}
-		
+		fill_geno_buffer(Z_buffer, bigm, cnt, i_marker, _geno_ind, _marker_ind, marker_bycol, false);
+
 		if(marker_freq.isNotNull()){
 			Z_buffer.each_col() -= means.subvec(i_marker, i_marker + cnt - 1);
 		}else{

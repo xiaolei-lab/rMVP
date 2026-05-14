@@ -119,75 +119,7 @@ SEXP glm_c(const arma::vec &y, const arma::mat &X, const arma::mat & iXX, XPtr<B
 			cnt++;
 		}
 
-		if(_geno_ind.is_empty()){
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[(i_marker + l)][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[k][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[k][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}else{
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[(i_marker + l)][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}
+		fill_geno_buffer(Z_buffer, genomat, cnt, i_marker, _geno_ind, _marker_ind, marker_bycol, true);
 
 		#pragma omp parallel for firstprivate(iXXs)
 		for(int l = 0; l < cnt; l++){
@@ -318,75 +250,7 @@ SEXP mlm_c(const arma::vec & y, const arma::mat & X, const arma::mat & U, const 
 			cnt++;
 		}
 
-		if(_geno_ind.is_empty()){
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[(i_marker + l)][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[k][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][k];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[k][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}else{
-			if(_marker_ind.is_empty()){
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[(i_marker + l)][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][(i_marker + l)];
-						}
-					}
-				}
-			}else{
-				if(marker_bycol){
-					#pragma omp parallel for
-					for(int l = 0; l < cnt; l++){
-						for(int k = 0; k < n; k++){
-							Z_buffer(k, l) = (double)genomat[_marker_ind[(i_marker + l)]][_geno_ind[k]];
-						}
-					}
-				}else{
-					#pragma omp parallel for
-					for(int k = 0; k < n; k++){
-						for(int l = 0; l < cnt; l++){
-							Z_buffer(k, l) = (double)genomat[_geno_ind[k]][_marker_ind[(i_marker + l)]];
-						}
-					}
-				}
-			}
-		}
+		fill_geno_buffer(Z_buffer, genomat, cnt, i_marker, _geno_ind, _marker_ind, marker_bycol, true);
 
 		#pragma omp parallel for firstprivate(iXXs)
 		for(int l = 0; l < cnt; l++){
