@@ -41,10 +41,12 @@ Build date: Oct 22, 2018
 Last update: Oct 22, 2018
 }
 \examples{
+\dontrun{
 welcome <- "Welcome to MVP"
 title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
 authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
 print_info(welcome = welcome, title = title, logo = NULL, authors = authors, contact = NULL, linechar = '=', width = width)
+}
 }
 \author{
 Haohao Zhang
