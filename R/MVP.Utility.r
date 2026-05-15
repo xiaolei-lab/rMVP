@@ -169,14 +169,6 @@ print_accomplished <- function(width = 60, verbose = TRUE) {
 #' @param contact email or website
 #' @param line 1, 2, or char
 #' @param width banner width
-#'
-#' @examples
-#' \dontrun{
-#' welcome <- "Welcome to MVP"
-#' title   <- "A Memory-efficient, Visualization-enhanced, and Parallel-accelerated Tool For GWAS"
-#' authors <- "Authors: Lilin Yin, Haohao Zhang, and Xiaolei Liu"
-#' print_info(welcome = welcome, title = title, logo = NULL, authors = authors, contact = NULL, linechar = '=', width = width)
-#' }
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {
     msg <- c()
     # width
