@@ -167,7 +167,6 @@ print_accomplished <- function(width = 60, verbose = TRUE) {
 #' @param version short label, bottom-right of logo
 #' @param authors 
 #' @param contact email or website
-#' @param line 1, 2, or char
 #' @param width banner width
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {
     msg <- c()
