@@ -41,7 +41,7 @@ Depends: R (>= 3.3)
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress, BH, bigmemory
 NeedsCompilation: yes
 Suggests: knitr, testthat, rmarkdown
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Maintainer: Xiaolei Liu <xll198708@gmail.com>
 Author: Lilin Yin [aut],
   Haohao Zhang [aut],

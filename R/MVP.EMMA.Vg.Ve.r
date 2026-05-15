@@ -49,7 +49,7 @@
 #' }
 #' 
 MVP.EMMA.Vg.Ve <-
-function(y, X, K, ngrids=.EMMA_NGRIDS, llim=.EMMA_LLIM, ulim=.EMMA_ULIM, esp=.EMMA_ESP) {
+function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     # NA in phenotype
     idx <- !is.na(y)
     y <- y[idx]
