@@ -9,7 +9,7 @@ rule_wrap(string, width, align = "center", linechar = " ")
 \description{
 Build date: Oct 22, 2018
 Last update: Dec 12, 2018
-by using base::strwarp.
+by using base::strwrap.
 }
 \author{
 Haohao Zhang

@@ -209,6 +209,9 @@ private:
 //
 // Empty geno_ind   → use direct row/col index k.
 // Empty marker_ind → use sequential index (i_marker + l).
+//
+// NOTE: Does NOT handle NA values. Callers requiring NA-aware buffer filling
+// (e.g. BigRowMean) must use specialized logic.
 // ---------------------------------------------------------------------------
 template <typename T>
 void fill_geno_buffer(arma::mat&         buf,

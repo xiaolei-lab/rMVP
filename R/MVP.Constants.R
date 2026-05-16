@@ -22,5 +22,4 @@
 .HE_DEFAULT_LOG_SIGMA2 <- log(0.1)   # log-sigma2 fallback when CalcVChe returns non-positive value
 
 # FarmCPU
-.FARMCPU_LD_THRESHOLD          <- 0.7    # LD threshold for pseudo-QTN deduplication
-.FARMCPU_QTN_DEFAULT_THRESHOLD <- 0.01   # p-value threshold for initial prior QTN selection
+.FARMCPU_LD_THRESHOLD <- 0.7    # LD threshold for pseudo-QTN deduplication
