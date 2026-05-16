@@ -135,7 +135,7 @@ List vcf_parser_map(std::string vcf_file, std::string out) {
 
 
 double vcf_marker_parser(string_view m, double NA_C) {
-    if (('0' == m[0] || '1' == m[0]) && ('0' == m[2] || '1' == m[2])) {
+    if (m.size() >= 3 && ('0' == m[0] || '1' == m[0]) && ('0' == m[2] || '1' == m[2])) {
         return (m[0] - '0' + m[2] - '0');
     } else {
         return NA_C;

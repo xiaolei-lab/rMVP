@@ -55,7 +55,7 @@
         beta2 <- crossprod(IUX) / delta
         beta3 <- crossprod(U1TX, U1TY * dInv)
         beta4 <- crossprod(IUX, IUY) / delta
-        beta  <- crossprod(ginv(beta1 + beta2), beta3 + beta4)
+        beta  <- crossprod(.safe_solve(beta1 + beta2), beta3 + beta4)
 
         part1 <- -0.5 * (n * log(.FASTLMM_2PI) + sum(log(d + delta)) + (n - length(d)) * log(delta))
 
