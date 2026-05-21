@@ -309,7 +309,7 @@
 #' @param GM SNP map information, m by 3 matrix, m is marker size, the three columns are SNP_ID, Chr, and Pos
 #' @param CV covariates, n by c matrix, n is sample size, c is number of covariates
 #' @param P start p values for all SNPs
-#' @param method two options, 'static' or 'FaST-LMM'
+#' @param method method for selecting the optimal bin: 'static', 'FaST-LMM', 'EMMA', or 'GEMMA'
 #' @param b bin sizes for all iterations, a vector, the bin size is always from large to small
 #' @param s number of selected bins in each iteration, a vector
 #' @param theLoop iteration number
