@@ -33,7 +33,7 @@
 
 \item{P}{start p values for all SNPs}
 
-\item{method}{options: 'static', 'FaST-LMM', 'EMMA', or 'GEMMA'}
+\item{method}{method for selecting the optimal bin: 'static', 'FaST-LMM', 'EMMA', or 'GEMMA'}
 
 \item{b}{bin sizes for all iterations, a vector, the bin size is always from large to small}
 

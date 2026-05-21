@@ -263,7 +263,7 @@ make_line <- function(string, width, linechar = " ", align = "center", margin = 
 #' 
 #' Build date: Oct 22, 2018
 #' Last update: Dec 12, 2018
-#' by using base::strwarp.
+#' by using base::strwrap.
 #' 
 #' @keywords internal
 #' @author Haohao Zhang
