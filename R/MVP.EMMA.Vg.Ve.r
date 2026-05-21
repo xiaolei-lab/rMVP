@@ -50,6 +50,8 @@
 #' 
 MVP.EMMA.Vg.Ve <-
 function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
+    # Defaults above match .EMMA_NGRIDS / .EMMA_LLIM / .EMMA_ULIM / .EMMA_ESP
+    # (kept as literals in the signature for R CMD check codoc compatibility).
     # NA in phenotype
     idx <- !is.na(y)
     y <- y[idx]
@@ -61,7 +63,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     {
         nq <- length(etas)
         delta <-  exp(logdelta)
-        return( 0.5 * (nq * (log(nq/(2 * pi))-1-log(sum(etas * etas/(lambda + delta))))-sum(log(lambda + delta))) )
+        return( 0.5 * (nq * (log(nq/.FASTLMM_2PI)-1-log(sum(etas * etas/(lambda + delta))))-sum(log(lambda + delta))) )
     }
     emma.delta.REML.dLL.wo.Z <- function(logdelta, lambda, etas) {
         nq <- length(etas)
@@ -101,7 +103,7 @@ function(y, X, K, ngrids=100, llim=-10, ulim=10, esp=1e-10) {
     delta <- exp(logdelta)
     Lambdas <- matrix(eig.R$values, n-q, m) + matrix(delta, n-q, m, byrow=TRUE)
     Etasq <- matrix(etas * etas, n-q, m)
-    LL <- 0.5 * ((n-q) * (log((n-q)/(2 * pi))-1-log(colSums(Etasq/Lambdas)))-colSums(log(Lambdas)))
+    LL <- 0.5 * ((n-q) * (log((n-q)/.FASTLMM_2PI)-1-log(colSums(Etasq/Lambdas)))-colSums(log(Lambdas)))
     dLL <- 0.5 * delta * ((n-q) * colSums(Etasq/(Lambdas * Lambdas))/colSums(Etasq/Lambdas)-colSums(1/Lambdas))
     optlogdelta <- vector(length=0)
     optLL <- vector(length=0)
