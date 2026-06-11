@@ -338,6 +338,9 @@ MVP.Report <- function(
 
 	#SNP-Density plot
 	if("d" %in% plot.type){
+		if(identical(chr.den.col, "black") && is.vector(col)){
+			chr.den.col <- col
+		}
 		if(verbose)	logging.log("SNP_Density Plotting", "\n", verbose = verbose)
 		if(file.output){
 			ht=ifelse(is.null(height), 6, height)

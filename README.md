@@ -676,12 +676,12 @@ MVP.Hist(phe=phenotype, file.type="jpg", breakNum=18, dpi=300)
 **plot.type**, four options ("d", "c", "m", "q"); if "d", draw ***SNP-density plot***  
 **bin.size**, the window size for counting SNP number  
 **bin.max**, maximum SNP number, for windows, which has more SNPs than **bin.max**, will be painted in same color  
-**col**, colors for separating windows with different SNP density  
+**chr.den.col**, colors for separating windows with different SNP density  
 **file.type**, format of output figure  
 **dpi**, resolution of output figure  
 
 ```r
-MVP.Report(pig60K[, c(1:3)], plot.type="d", col=c("darkgreen", "yellow", "red"), file.type="jpg", dpi=300)
+MVP.Report(pig60K[, c(1:3)], plot.type="d", chr.den.col=c("darkgreen", "yellow", "red"), file.type="jpg", dpi=300)
 ```
 
 <p align="center">

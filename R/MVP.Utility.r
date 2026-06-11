@@ -165,7 +165,7 @@ print_accomplished <- function(width = 60, verbose = TRUE) {
 #' @param short_title short label, top-left of logo
 #' @param logo logo
 #' @param version short label, bottom-right of logo
-#' @param authors 
+#' @param authors authors of the package
 #' @param contact email or website
 #' @param width banner width
 print_info <- function(welcome=NULL, title=NULL, short_title=NULL, logo=NULL, version=NULL, authors=NULL, contact=NULL, linechar = '=', width=NULL, verbose=TRUE) {

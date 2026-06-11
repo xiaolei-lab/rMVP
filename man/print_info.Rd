@@ -28,8 +28,6 @@ print_info(
 
 \item{version}{short label, bottom-right of logo}
 
-\item{authors}{}
-
 \item{contact}{email or website}
 
 \item{width}{banner width}
