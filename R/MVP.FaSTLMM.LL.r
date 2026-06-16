@@ -80,7 +80,8 @@
     sigma_a  <- (sigma_a1 + sigma_a2) / n
     sigma_e  <- delta * sigma_a
 
-    list(beta=beta, delta=delta, LL=LL, vg=sigma_a, ve=sigma_e)
+    # Convert 1x1 matrix to scalar
+    list(beta=as.numeric(beta), delta=delta, LL=LL, vg=sigma_a, ve=sigma_e)
 }
 
 

@@ -28,7 +28,7 @@ print_info(
 
 \item{version}{short label, bottom-right of logo}
 
-\item{authors}{}
+\item{authors}{authors of the package}
 
 \item{contact}{email or website}
 

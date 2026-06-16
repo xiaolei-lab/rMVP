@@ -416,13 +416,25 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
     # detecte n(ind) and m(marker)
     logging.log("Reading file...\n", verbose = verbose)
     scan <- numeric_scan(num_file)
-    n <- scan$n
-    m <- scan$m
-    n_marker <- numeric_scan(map_file)$m
-    marker_by_col <- ifelse(n == n_marker || n == (n_marker - 1), TRUE, FALSE)
-
-    if (marker_by_col) {
-        t <- n; n <- m; m <- t;
+    n_cols <- scan$n  # Number of columns in numeric file
+    n_rows <- scan$m  # Number of rows in numeric file (from numeric_scan)
+    
+    # Get actual number of markers from map file
+    # numeric_scan returns rows+1, so subtract 1 to get actual marker count
+    n_marker <- numeric_scan(map_file)$m - 1
+    
+    # Determine if it's Marker-by-Individual (rows are markers)
+    # If rows of numeric file == markers, then it's MbI
+    is_marker_by_row <- (n_rows == n_marker)
+    
+    if (is_marker_by_row) {
+        # Marker-by-Individual: rows are markers, cols are individuals
+        n <- n_cols  # individuals
+        m <- n_rows  # markers
+    } else {
+        # Individual-by-Marker: rows are individuals, cols are markers
+        n <- n_rows  # individuals
+        m <- n_cols  # markers
     }
     logging.log(paste0("inds: ", n, "\tmarkers: ", m, '\n'), verbose = verbose)
     
@@ -449,12 +461,19 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
             if (len == 0) { break }
 
             line <- do.call(rbind, strsplit(line, '\\s+'))
-            if (row_names) { line <- line[2:ncol(line), ]}
-            if (!marker_by_col) {
+            if (row_names) { line <- line[, -1, drop = FALSE] }
+            
+            if (is_marker_by_row) {
+                # Rows are markers, cols are individuals
+                # Each line represents a marker with genotypes for all individuals
+                # Assign to columns of bigmat (n_ind x n_marker)
                 bigmat[, (i + 1):(i + nrow(line))] <- t(line)
                 i <- i + nrow(line)
                 percent <- 100 * i / m
             } else {
+                # Rows are individuals, cols are markers
+                # Each line represents an individual with genotypes for all markers
+                # Assign to rows of bigmat (n_ind x n_marker)
                 bigmat[(i + 1):(i + nrow(line)), ] <- line
                 i <- i + nrow(line)
                 percent <- 100 * i / n
@@ -464,6 +483,10 @@ MVP.Data.Numeric2MVP <- function(num_file, map_file, out='mvp', maxLine=1e4, row
         }
         logging.log("\n", verbose = verbose)
         close(con)
+    
+    # Create individual ID file with default names
+    ind_names <- paste0("ind", 1:n)
+    write.table(ind_names, paste0(out, ".geno.ind"), row.names = FALSE, col.names = FALSE, quote = FALSE)
     
     file.copy(map_file, paste0(out, ".geno.map"))
     
